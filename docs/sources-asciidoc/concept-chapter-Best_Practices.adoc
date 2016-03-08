@@ -7,12 +7,12 @@
 :experimental:
 :sourcedir: .
 
-This chapter discusses Best Practices related to &PLATFORM_NAME;SIP Servlets usage in real world deployments.
+This chapter discusses Best Practices related to Restcomm SIP Servlets usage in real world deployments.
 
 [[_bp_best_practices_perf_tips]]
-== &PLATFORM_NAME; SIP Servlets Performance Tips
+== Restcomm SIP Servlets Performance Tips
 
-Because the default profile of &PLATFORM_NAME;SIP Servlets is targeted at a development environment, some tuning is required to make the server performance suitable for a production environment.
+Because the default profile of Restcomm SIP Servlets is targeted at a development environment, some tuning is required to make the server performance suitable for a production environment.
 
 A useful presentation from OKI Japan 
 
@@ -21,14 +21,14 @@ A useful presentation from OKI Japan
 To ensure the server is finely tuned for a production envirionment, certain configuration must be changed.
 Visit the http://wiki.jboss.org/wiki/Wiki.jsp?page=JBossASTuningSliming[JBoss Application Server Tuning] wiki page to learn about optimization techniques. 
 
-While it is preferable to have a fast Application Server, most of the information doesn't apply to &PLATFORM_NAME;.
+While it is preferable to have a fast Application Server, most of the information doesn't apply to Restcomm .
 In summary, the most important optimization technique is to remove logs, leaving only what is required.
 
 Check the log configuration file in the following location and review the information.
 
 <<_bsssc_binary_sip_servlets_server_configuring_logging>>  
 
-=== Tuning &PLATFORM_NAME; SIP Servlets
+=== Tuning Restcomm SIP Servlets
 
 * _Congestion Control_: It is recommended that this feature is enabled to avoid overload of the server and that the _sipMessageQueueSize_ and _memoryThreshold_ parameters are tuned according to <<_sscacc_mss_concurrency_and_congestion_control>>.
 * _Concurrency_ : _Default Value: None._  For better performance, it is recommended to leave this value set to `None`.
@@ -54,7 +54,7 @@ _Default value: true_
 +
 This flag indicates whether the SIP stack listener is executed by a single thread, or concurrently by the threads that parse the messages. 
 +
-&PLATFORM_NAME;SIP Servlets expects this flag to be set to `true`, therefore do not change the value.
+Restcomm SIP Servlets expects this flag to be set to `true`, therefore do not change the value.
 
 * _gov.nist.javax.sip.LOG_MESSAGE_CONTENT_          
 +
@@ -125,7 +125,7 @@ The following tuning information applies to Sun JDK 1.6, however the information
 
 [NOTE]
 ====
-For more information on tuning &PLATFORM_NAME;SIP Servlets performance, refer to the http://www.slideshare.net/jean.deruelle/tuning-and-development-with-sip-servlets-on-mobicents[OKI Japan Presentation].
+For more information on tuning Restcomm SIP Servlets performance, refer to the http://www.slideshare.net/jean.deruelle/tuning-and-development-with-sip-servlets-on-mobicents[OKI Japan Presentation].
 
 For more information on performance, refer to the http://java.sun.com/performance/reference/whitepapers/6_performance.html[Performance White Paper].
 ====

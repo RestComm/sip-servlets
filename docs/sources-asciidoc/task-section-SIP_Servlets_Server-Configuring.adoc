@@ -2,7 +2,7 @@
 [[_bsssc_binary_sip_servlets_server_configuring]]
 =  Sip Connectors 
 
-&PLATFORM_NAME;comes with default settings that are designed to get your system up and running without the need to know about all the detailed configurations.
+Restcomm SIP Servlets comes with default settings that are designed to get your system up and running without the need to know about all the detailed configurations.
 That said, there are situations in which you might like to fine-tune your setttings to adapt it to your needs.
 That is what the following section will help you achieve.
 You will get a better understand of SIP connectors and how to make them work for you. 
@@ -13,10 +13,10 @@ You will get a better understand of SIP connectors and how to make them work for
 == Configuring SIP Connectors and Bindings
 
 There are two important configuration files that you might need to modifying depending on your system needs.
-The standalone-sip.xml file in &SHORT_PLATFORM_NAME;for JBoss AS7 and the server.xml file in &SHORT_PLATFORM_NAME;for Tomcat.
+The standalone-sip.xml file in Restcomm SIP Servlets for JBoss AS7 and the server.xml file in Restcomm SIP Servlets for Tomcat.
 The extracts below will give you a snapshot of default configurations. 
 
-. For JBoss
+.For JBoss
 Changing the ports and other configuration for the SIP connector can be done in the standalone-sip.xml file.
 Below is an extract : 
 
@@ -73,15 +73,15 @@ signalingTransport (use socket-binding element)::
 use-stun::
   Enables Session Traversal Utilities for NAT (STUN) support for this Connector.
   The attribute defaults to "false". If set to "true", ensure that the `ipAddress` attribute is _not_ set to `127.0.0.1`.
-  Refer to &SHORT_PLATFORM_NAME;<<_mssstun__stun>> for more information about STUN.
+  Refer to Restcomm SIP Servlets <<_mssstun__stun>> for more information about STUN.
 
 stun-server-address ::
   Specifies the STUN server address used to discover the public IP address of the SIP Connector.
-  This attribute is only required if the `useStun` attribute is set to "true". Refer to &SHORT_PLATFORM_NAME;<<_mssstun__stun>> for more information about STUN and public STUN servers.
+  This attribute is only required if the `useStun` attribute is set to "true". Refer to Restcomm SIP Servlets <<_mssstun__stun>> for more information about STUN and public STUN servers.
 
 stun-server-port::
   Specifies the STUN server port of the STUN server used in the `stunServerAddress` attribute.
-  You should rarely need to change this attribute; also, it is only needed if the `useStun` attribute is set to "true". Refer to &SHORT_PLATFORM_NAME;<<_mssstun__stun>> for more information about STUN.
+  You should rarely need to change this attribute; also, it is only needed if the `useStun` attribute is set to "true". Refer to Restcomm SIP Servlets <<_mssstun__stun>> for more information about STUN.
 
 use-static-address::
   Specifies whether the settings in staticServerAddress and staticServerPort are activated.
@@ -98,7 +98,7 @@ static-server-port::
 http-follow-sip::
   Makes the application server aware of how the SIP Load Balancers assign request affinity, and stores this information in the application session. 
 
-. For Tomcat
+.For Tomcat
 Changing the ports and other configuration for the SIP connector can be done in the server.xml file.
 Below is an extract. 
 
@@ -140,15 +140,15 @@ signalingTransport::
 useStun::
   Enables Session Traversal Utilities for NAT (STUN) support for this Connector.
   The attribute defaults to "false". If set to "true", ensure that the `ipAddress` attribute is _not_ set to `127.0.0.1`.
-  Refer to &SHORT_PLATFORM_NAME;<<_mssstun__stun>> for more information about STUN.
+  Refer to Restcomm SIP Servlets <<_mssstun__stun>> for more information about STUN.
 
 stunServerAddress::
   Specifies the STUN server address used to discover the public IP address of the SIP Connector.
-  This attribute is only required if the `useStun` attribute is set to "true". Refer to &SHORT_PLATFORM_NAME;<<_mssstun__stun>> for more information about STUN and public STUN servers.
+  This attribute is only required if the `useStun` attribute is set to "true". Refer to Restcomm SIP Servlets <<_mssstun__stun>> for more information about STUN and public STUN servers.
 
 stunServerPort::
   Specifies the STUN server port of the STUN server used in the `stunServerAddress` attribute.
-  You should rarely need to change this attribute; also, it is only needed if the `useStun` attribute is set to "true". Refer to &SHORT_PLATFORM_NAME;<<_mssstun__stun>> for more information about STUN.
+  You should rarely need to change this attribute; also, it is only needed if the `useStun` attribute is set to "true". Refer to Restcomm SIP Servlets <<_mssstun__stun>> for more information about STUN.
 
 useStaticAddress::
   Specifies whether the settings in staticServerAddress and staticServerPort are activated.
@@ -182,7 +182,7 @@ For more information about the application router, refer to the following sectio
 .
 [NOTE]
 ====
-See the example chapters for more information about the Application Router Configuration for SIP &SHORT_PLATFORM_NAME;for JBoss AS7 
+See the example chapters for more information about the Application Router Configuration for SIP Restcomm SIP Servlets for JBoss AS7 
 
 <<_sfss_services_for_sip_servlets>>  
 ====
@@ -216,7 +216,7 @@ In order to configure the application router for Tomcat, you should edit the `Se
 ----
 ====
 
-For &SHORT_PLATFORM_NAME;for JBoss AS7 this is located in standalone-sip.xml file :
+For Restcomm SIP Servlets for JBoss AS7 this is located in standalone-sip.xml file :
 
 .Configuring the Mobicents SubSystem Element in the Container's standalone.xml
 ====
@@ -309,10 +309,10 @@ canceledTimerTasksPurgePeriod (Tomcat) - canceled-timer-tasks-purge-period (JBos
 [[_bsssc_binary_sip_servlets_server_configuring_logging]]
 == SIP Servlets Server Logging
 
-Logging is an important part of working with &PLATFORM_NAME;.
-There are a few files that you need to be familiar with in order to successfully troubleshoot and adapt &SHORT_PLATFORM_NAME;server monitoring and logging to your environment. 
+Logging is an important part of working with Restcomm SIP Servlets.
+There are a few files that you need to be familiar with in order to successfully troubleshoot and adapt Restcomm SIP Servlets server monitoring and logging to your environment. 
 
-.Logging Files for &SHORT_PLATFORM_NAME; for JBoss AS7
+.Logging Files for Restcomm SIP Servlets for JBoss AS7
 $JBOSS/standalone/configuration/logging.properties 
 
 $JBOSS/standalone/configuration/mss-sip-stack.properties 
@@ -345,7 +345,7 @@ server.log.2012-08-07  server.log.2012-08-21  server.log.2012-08-26
 server.log.2012-08-13  server.log.2012-08-22
 ----
 
-.Logging Files for &SHORT_PLATFORM_NAME; for Tomcat 
+.Logging Files for Restcomm SIP Servlets for Tomcat 
 If you are working with Tomcat, the log configuration files are located in the $CATALINA_HOME/conf/ directory.
 The log4j configuration file is located in $CATALINA_HOME/lib/ directory 
 
@@ -423,4 +423,4 @@ To use LOG4J in JAIN SIP Stack in JBoss, you need to define a logger in [path]_J
 ----
 ====
 
-For this category to be used in &SHORT_PLATFORM_NAME;, you need to specify it in [path]_JBOSS_HOME/standalone/configuration/mss-sip-stack.properties_ or [path]_CATALINE_HOME/conf/mss-sip-stack.properties_, add the `gov.nist.javax.sip.LOG4J_LOGGER_NAME=gov.nist` property, and set the `gov.nist.javax.sip.TRACE_LEVEL=LOG4J` property.
+For this category to be used in Restcomm SIP Servlets, you need to specify it in [path]_JBOSS_HOME/standalone/configuration/mss-sip-stack.properties_ or [path]_CATALINE_HOME/conf/mss-sip-stack.properties_, add the `gov.nist.javax.sip.LOG4J_LOGGER_NAME=gov.nist` property, and set the `gov.nist.javax.sip.TRACE_LEVEL=LOG4J` property.

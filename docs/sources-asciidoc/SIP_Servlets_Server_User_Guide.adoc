@@ -4,30 +4,26 @@ Restcomm SIP Servlets User Guide
 This user guide will help you get a better understanding of Restcomm SIP servlets and how the container can be used in an enterprise context. The guide will cover how to  how to quickly get started with Restcomm SIP servlets either on top of JBoss or Apache Tomcat containers. There are sample applications included for those who want to grasp how to build SIP applications. You will also learn how to use advanced features like High Availability through Clustering and Failover. Finally, monitoring and security will be explained.
 
 
-include::concept-chapter-ittsss-Introduction_to_the_SIP_Servlets_Server.adoc[]
+link:concept-chapter-ittsss-Introduction_to_the_SIP_Servlets_Server.adoc[Introduction to the SIP Servlets Server]
 
-include::task-chapter-SIP_Servlets_Server-Installing_Configuring_and_Running.adoc[]
+link:task-chapter-SIP_Servlets_Server-Installing_Configuring_and_Running.adoc[SIP Servlets Server-Installing, Configuring and Running]
 
-include::task-chapter-Application_Router.adoc[]
+link:task-chapter-Application_Router.adoc[Application Router]
 
-include::concept-chapter-SS_Examples.adoc[]
+link:concept-chapter-SS_Examples.adoc[SIP Servlet Example Applications]
 
-== Clustering and High Availability
+link:concept-section-SS_for_JBoss-Clustering_Support.adoc[Clustering and High Availability]
 
-include::concept-section-SS_for_JBoss-Clustering_Support.adoc[]
+link:concept-section-SS_Load_Balancer.adoc[Load Balancer]
 
-include::concept-section-SS_Load_Balancer.adoc[]
+link:concept-chapter-Enterprise-Monitoring-Operations-Management.adoc[Enterprise Monitoring and Management]
 
-include::concept-chapter-Enterprise-Monitoring-Operations-Management.adoc[]
+link:concept-chapter-Security.adoc[Security]
 
-include::concept-chapter-Security.adoc[]
+link:concept-chapter-Advanced_Features_of_the_SIP_Servlets_Server.adoc[Advanced Features of the SIP Servlets Server]
 
-include::concept-chapter-Advanced_Features_of_the_SIP_Servlets_Server.adoc[]
+link:concept-chapter-Best_Practices.adoc[Best Practices]
 
-include::concept-chapter-Best_Practices.adoc[]
+link:concept-chapter-Appendix.adoc[Appendix]
 
-include::concept-chapter-Appendix.adoc[]
-
-include::concept-chapter-JSR289-Errata.adoc[]
-
-include::Revision_History.adoc[]
+link:concept-chapter-JSR289-Errata.adoc[JSR289 Errata]

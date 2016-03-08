@@ -25,16 +25,16 @@ Furthermore, the SIP Servlets specification intentionally allows the Application
 This is because the deployer maintains subscriber information and this information is often private and valuable.
 
 [[_tsdar_mobicents_default_application_router]]
-== &PLATFORM_NAME; Default Application Router
+== Restcomm Default Application Router
 
-&PLATFORM_NAME;SIP Servlets provides an implementation of the Default Application Router (DAR) as defined in the SIP Servlets 1.1 specification, Appendix C.
+Restcomm SIP Servlets provides an implementation of the Default Application Router (DAR) as defined in the SIP Servlets 1.1 specification, Appendix C.
 
 [[_tsdar_dar_configuration_file]]
 === The DAR Configuration File
 
 The Default Application Router (DAR) obtains its operational parameters from a  configuration text file that is modeled as a Java properties file. The configuration file  contains the information needed by the Application Router to select which SIP Servlet application will handle an incoming initial request. 
 
-In the case of &PLATFORM_NAME;SIP Servlets, it is also possible to configure the DAR through the [path]_server.xml_ configuration file (see <<_bsssc_configuring_the_service_element_in_the_containers_server.xml>> and  <<_wwtssmc_working_with_the_sip_servlets_management_console>>).
+In the case of Restcomm SIP Servlets, it is also possible to configure the DAR through the [path]_server.xml_ configuration file (see <<_bsssc_configuring_the_service_element_in_the_containers_server.xml>> and  <<_wwtssmc_working_with_the_sip_servlets_management_console>>).
 
 The properties file has the following characteristics and requirements:
 
@@ -49,7 +49,7 @@ SUBSCRIBE: (sip-router-info-3), (sip-router-info-4)..
 ALL: (sip-router-info-5), (sip-router-info-6)..
 ----
 +
-&PLATFORM_NAME;SIP Servlets defines a new keyword called `ALL`.
+Restcomm SIP Servlets defines a new keyword called `ALL`.
 The keyword  allows mapping between the sip-router-info data, and all methods supported by the container (for example, INVITE, REGISTER, SUBSCRIBE). This mapping can  save time when configuring an application that listens to all incoming methods. 
 
 
@@ -72,7 +72,7 @@ It consists of the following information:
 * A route modifier, which consists of one of the following strings: `ROUTE`, `ROUTE_BACK` or `NO_ROUTE`.
   The route modifier is used in conjunction with the  route information to route a request externally.
 * A string representing the order in which  applications must be invoked (starts at 0).  The string is removed later on in the routing process,  and substituted with the order positions of sip-router-info data.
-* An optional string that contains &PLATFORM_NAME;-specific parameters.
+* An optional string that contains Restcomm -specific parameters.
   Currently, only the `DIRECTION` and `REGEX` parameters are supported. 
 +
 NOTE: The field can contain unsupported `key=value` properties that may be supported in future releases.
@@ -99,7 +99,8 @@ If it does not, it is skipped.
 For example, in the following sip-router-info data: 
 ----
 INVITE - ("org.mobicents.servlet.sip.testsuite.SimpleApplication", "DAR:From", "ORIGINATING", "", "NO_ROUTE", "0", "REGEX=From:.*sip:.*@sip-servlets\.com")
----- - only incoming initial requests with a From Header with a SIP URI that belongs to the sip-servlets.com domain will be passed to the SimpleApplication. 
+---- 
+only incoming initial requests with a From Header with a SIP URI that belongs to the sip-servlets.com domain will be passed to the SimpleApplication. 
 
 
 

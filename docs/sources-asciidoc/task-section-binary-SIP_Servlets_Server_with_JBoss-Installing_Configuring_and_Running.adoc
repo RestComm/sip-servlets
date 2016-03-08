@@ -2,14 +2,14 @@
 [[_bssswjicar_binary_sip_servlets_server_with_jboss_installing_configuring_and_running]]
 = SIP Servlet-Enabled JBoss Application Server: Installing, Configuring and Running
 
-The &PLATFORM_NAME;SIP Servlets Server can run on either the JBoss Application Server or the Tomcat Servlet Container.
+The Restcomm SIP Servlets Server can run on either the JBoss Application Server or the Tomcat Servlet Container.
 This section details how to install the SIP Servlets Server on top of the JBoss Application Server.
 For installation instructions for the Tomcat Servlet Container, refer to <<_bssswticar_sip_servlets_server_with_tomcat_installing_configuring_and_running>> 
 
 NOTE: It is recommended that the SIP Servlets Server is run on the JBoss platform.
 Some functionality, including the ability to execute some SIP Extension examples, is not available in the Tomcat version.
 
-.Differences Between a Standard JBoss Installation and the &PLATFORM_NAME; SIP Servlets Version
+.Differences Between a Standard JBoss Installation and the Restcomm SIP Servlets Version
 Provided here is a list of differences between a standard JBoss Application Server installation one customized for SIP Servlets.
 The differences include:
 
@@ -35,28 +35,28 @@ include::Common_Content/Java_Development_Kit-Installing_Configuring_and_Running.
 
 .Hardware Requirements
 Sufficient Disk Space::
-  Once unzipped, version &VERSION;of the &SHORT_PLATFORM_NAME;for JBoss binary release requires a minimum of &SSS_MSS4J_SIZE;free disk space.
+  Once unzipped, version &VERSION;of the Restcomm SIP Servlets for JBoss binary release requires a minimum of &SSS_MSS4J_SIZE;free disk space.
 
 Anything Java Itself Will Run On::
-  &SHORT_PLATFORM_NAME;for JBoss is 100% Java and will run on the same hardware that the JBoss Application Server runs on.
+  Restcomm SIP Servlets for JBoss is 100% Java and will run on the same hardware that the JBoss Application Server runs on.
 
 .Software Prerequisites
 JDK 5 or Higher::
-  A working installation of the Java Development Kit (<acronym>JDK</acronym>) version 5 or higher is currently required in order to run &SHORT_PLATFORM_NAME;for JBoss binary distribution.
+  A working installation of the Java Development Kit (<acronym>JDK</acronym>) version 5 or higher is currently required in order to run Restcomm SIP Servlets for JBoss binary distribution.
   For instructions on how to install the JDK, refer to <<_bssswjicar_binary_sip_servlets_server_with_jboss_installing>>
 
 [[_bssswjicar_binary_sip_servlets_server_with_jboss_downloading]]
 == Downloading
 
-The latest version of &PLATFORM_NAME;SIP Servlets for JBoss is available from &DOWNLOAD_LINK;link:.
+The latest version of Restcomm SIP Servlets for JBoss is available from &DOWNLOAD_LINK;link:.
 
-Each version of the SIP Servlets Server is comprised of tree separate binary distribution files: one which is &SHORT_PLATFORM_NAME;for JBoss, one which is &SHORT_PLATFORM_NAME;for EAP and the other which is &SHORT_PLATFORM_NAME;for Tomcat.
+Each version of the SIP Servlets Server is comprised of tree separate binary distribution files: one which is Restcomm SIP Servlets for JBoss, one which is Restcomm SIP Servlets for EAP and the other which is Restcomm SIP Servlets for Tomcat.
 Download SIP Servlets Server for JBoss and continue with the following instructions.
 
 [[_bssswjicar_binary_sip_servlets_server_with_jboss_installing]]
 == Installing
 
-Once the requirements and prerequisites have been met and you have downloaded the binary distribution zip file, you are ready to install the &SHORT_PLATFORM_NAME;for JBoss binary distribution.
+Once the requirements and prerequisites have been met and you have downloaded the binary distribution zip file, you are ready to install the Restcomm SIP Servlets for JBoss binary distribution.
 Follow the instructions below for the selected platform, whether Linux or Windows.
 
 .Version Numbers
@@ -66,10 +66,10 @@ For clarity, the command line instructions presented in this chapter use specifi
 Ensure this information is substituted with the binary distribution's version numbers and file names.
 ====
 
-.Procedure: Installing the &SHORT_PLATFORM_NAME; for JBoss Binary Distribution on Linux
+.Procedure: Installing the Restcomm SIP Servlets for JBoss Binary Distribution on Linux
 
 It is assumed that the downloaded archive is saved in the home directory, and that a terminal window is open displaying the home directory
-. Create a subdirectory to extract the &SHORT_PLATFORM_NAME;for JBoss files into.
+. Create a subdirectory to extract the Restcomm  SIP Servlets for JBoss files into.
   For ease of identification, it is recommended that the version number of the binary is included in this directory name.
 +
 ----
@@ -108,7 +108,7 @@ NOTE: You can also use `unzip`'-d <unzip_to_location> to extract the zip file's 
 ----
 
 
-.Procedure: Installing the &SHORT_PLATFORM_NAME; for JBoss Binary Distribution on 
+.Procedure: Installing the Restcomm  for JBoss Binary Distribution on 
 
 For this procedure, it is assumed that the downloaded archive is saved in the [path]_My Downloads_ folder.
 . Create a directory in [path]_My Downloads_ to extract the zip file's contents into.
@@ -126,7 +126,7 @@ C:\Users\<user>\My Downloads\-jboss-<version>>jar -xvf ""
 ----
 
 
-. It is recommended that the folder holding the &SHORT_PLATFORM_NAME;for JBoss files (in this example, the folder named [path]_-jboss-<version>_) is moved to a user-defined location for storing executable programs.
+. It is recommended that the folder holding the Restcomm for JBoss files (in this example, the folder named [path]_-jboss-<version>_) is moved to a user-defined location for storing executable programs.
   For example, the [path]_Program Files_ folder.
 . Consider deleting the archive, if free disk space is an issue.
 +
@@ -138,11 +138,11 @@ C:\Users\<user>\My Downloads\-jboss-<version>>delete ""
 [[_bssswjicar_binary_sip_servlets_server_with_jboss_setting_the_jboss_home_environment_variable]]
 == Setting the JBOSS_HOME Environment Variable
 
-Configuring &SHORT_PLATFORM_NAME;for JBoss consists of setting the [var]`JBOSS_HOME` environment variable and optionally customizing the &SHORT_PLATFORM_NAME; for JBoss server by adding SIP Connectors, configuring the application router, and logging.
+Configuring Restcomm for JBoss consists of setting the [var]`JBOSS_HOME` environment variable and optionally customizing the Restcomm  for JBoss server by adding SIP Connectors, configuring the application router, and logging.
 
-After setting [var]`JBOSS_HOME` according to the instructions in the following section, refer to <<_bsssc_binary_sip_servlets_server_configuring>> to learn how to configure &SHORT_PLATFORM_NAME; for JBoss.
+After setting [var]`JBOSS_HOME` according to the instructions in the following section, refer to <<_bsssc_binary_sip_servlets_server_configuring>> to learn how to configure Restcomm  for JBoss.
 
-Alternatively, after having set [var]`JBOSS_HOME`, the &SHORT_PLATFORM_NAME; for JBoss server can be run.
+Alternatively, after having set [var]`JBOSS_HOME`, the Restcomm  for JBoss server can be run.
 Return to this section to configure it later. 
 
 :leveloffset: 2
@@ -152,7 +152,7 @@ include::Common_Content/Setting_the_JBOSS_HOME_Environment_Variable.adoc[]
 [[_bssswjicar_binary_sip_servlets_server_with_jboss_configuring]]
 == Configuring
 
-To configure &SHORT_PLATFORM_NAME;for JBoss, refer to <<_bsssc_binary_sip_servlets_server_configuring>>.
+To configure Restcomm for JBoss, refer to <<_bsssc_binary_sip_servlets_server_configuring>>.
 
 [[_bssswjicar_binary_sip_servlets_server_with_jboss_running]]
 == Running
@@ -167,8 +167,8 @@ In the Linux terminal or Command Prompt, a successfully started server will retu
 
 Detailed instructions are given below, arranged by platform.
 
-.Procedure: Running &SHORT_PLATFORM_NAME; for JBoss on Linux
-. Change the working directory to &SHORT_PLATFORM_NAME;for JBoss's installation directory (the one in which the zip file's contents was extracted to)
+.Procedure: Running Restcomm  for JBoss on Linux
+. Change the working directory to Restcomm for JBoss's installation directory (the one in which the zip file's contents was extracted to)
 +
 ----
 downloads]$ cd "-jboss-<version>"
@@ -196,12 +196,12 @@ Instead of executing the Bourne shell script to start the server, the [path]_run
 ----
 ====
 
-.Procedure: Running &SHORT_PLATFORM_NAME; for JBoss on 
+.Procedure: Running Restcomm  for JBoss on 
 
-There are several ways to start &SHORT_PLATFORM_NAME;for JBoss on Windows.
+There are several ways to start Restcomm for JBoss on Windows.
 All of the following methods accomplish the same task.
 . Using Windows Explorer, navigate to the [path]_bin_ subdirectory in the installation directory.
-. The preferred way to start &SHORT_PLATFORM_NAME;for JBoss from the Command Prompt.
+. The preferred way to start Restcomm for JBoss from the Command Prompt.
   The command line interface displays details of the startup process, including any problems encountered during the startup process.
 +
 Open the Command Prompt via the [label]#Start# menu and navigate to the correct folder:
@@ -271,7 +271,7 @@ Shutdown complete
 Halting VM
 ----
 
-.Procedure: Stopping &SHORT_PLATFORM_NAME; for JBoss on Linux
+.Procedure: Stopping Restcomm  for JBoss on Linux
 . Change the working directory to the binary distribution's install directory.
 +
 ----
@@ -301,7 +301,7 @@ The [path]_shutdown.jar_ executable Java archive with the [option]`-S` option ca
 ====
 
 .Procedure: Stopping &CMD_PLATFORM_NAME; for JBoss on Windows
-. Stopping the JBoss Application Server on Windows consists in executing either the [path]_shutdown.bat_ or the [path]_shutdown.jar_ executable file in the [path]_bin_ subdirectory of the &SHORT_PLATFORM_NAME; for JBoss binary distribution.
+. Stopping the JBoss Application Server on Windows consists in executing either the [path]_shutdown.bat_ or the [path]_shutdown.jar_ executable file in the [path]_bin_ subdirectory of the Restcomm  for JBoss binary distribution.
   Ensure the [option]`-S` option (the short option for [option]`--shutdown`) is included in the command line argument.
 +
 ----
@@ -319,4 +319,4 @@ C:\Users\<user>\My Downloads\-jboss-<version>>java -jar bin\shutdown.jar -S
 [[_bssswjicar_binary_sip_servlets_server_with_jboss_uninstalling]]
 == Uninstalling
 
-To uninstall &SHORT_PLATFORM_NAME;for JBoss, delete the directory containing the binary distribution.
+To uninstall Restcomm for JBoss, delete the directory containing the binary distribution.

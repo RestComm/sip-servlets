@@ -1,8 +1,8 @@
 
 [[_getting_started_with_mss_tomcat_as7]]
-= Getting Started with &SHORT_PLATFORM_NAME; for Tomcat 7  
+= Getting Started with Restcomm SIP Servlets for Tomcat 7  
 
-You can download the latest &SHORT_PLATFORM_NAME;for Tomcat 7  link: https://code.google.com/p/sipservlets/wiki/Downloads?tm=2[Download Latest Version of  for Tomcat 7 ]
+You can download the latest Restcomm SIP Servlets for Tomcat 7  link: https://code.google.com/p/sipservlets/wiki/Downloads?tm=2[Download Latest Version of  for Tomcat 7 ]
 
 
 The content of the downloaded file can be extracted to any location you prefer on your computer.
@@ -23,14 +23,14 @@ configtest.bat                shutdown.bat      version.bat
 configtest.sh                 shutdown.sh       version.sh
 ----
 
-You can start &SHORT_PLATFORM_NAME;for Tomcat 7 by going to $CATALINA_HOME/bin directory and typing the following:  
+You can start Restcomm SIP Servlets for Tomcat 7 by going to $CATALINA_HOME/bin directory and typing the following:  
 
 ----
 
 sudo ./catalina.sh run
 ----
 
-The startup process is slightly different from &SHORT_PLATFORM_NAME;for JBoss AS7.
+The startup process is slightly different from Restcomm SIP Servlets for JBoss AS7.
 If you see an output like the one below, you know that Tomcat is correctly started.
 This is a truncated log from the startup process. 
 
@@ -46,13 +46,11 @@ INFO: Server startup in 3608 ms
 If you get an error message about environment variables or Java, make sure you have the CATALINA environment variables set.
  
 
-Setting Environment Variables - JAVA and CATALINA 
+link:Common_Content/Setting_the_JBOSS_HOME_Environment_Variable.adoc[Setting Environment Variables - JAVA and CATALINA]
 
-<<_setting_catalina_home_env_linux_windows>>
+== Testing Click2CallAsync with Restcomm  for Tomcat 7 
 
-== Testing Click2CallAsync with &SHORT_PLATFORM_NAME; for Tomcat 7 
-
-If &SHORT_PLATFORM_NAME;for Tomcat 7 is started and running, you should be able to use your web browser to access the welcome page at this url http://127.0.0.1:8080/ This will show you a screenshot similar to the one below. 
+If Restcomm SIP Servlets for Tomcat 7 is started and running, you should be able to use your web browser to access the welcome page at this url http://127.0.0.1:8080/ This will show you a screenshot similar to the one below. 
 
 
 
@@ -63,13 +61,13 @@ image::images/welcome-page-MSS-Tomcat-7.png[]
 Deploying your application once the server is running is simple.
 You need to copy your .War files to the  $CATALINA_HOME/webapps directory. 
 
-There is a pre-installed sample SIP application that you can use to test your &SHORT_PLATFORM_NAME;Tomcat 7 configuration.
+There is a pre-installed sample SIP application that you can use to test your Restcomm SIP Servlets Tomcat 7 configuration.
 The application is also located in the $CATALINA_HOME/webapps directory 
 
 Start your web browser and go to the link, http://127.0.0.1:8080/Click2CallAsync/
 
 
-. Sample Application Name
+.Sample Application Name
 [NOTE]
 ====
 Note that the application name is case-sensitive and will not work if you try to access it as http://127.0.0.1:8080/click2callasync/
@@ -89,7 +87,7 @@ In order to use the application, you can download a softphone and start multiple
 In this guide, the softphone that will be used is Linphone.
 The configuration is as follows: 
 
-. Multiple Instances of Linphone
+.Multiple Instances of Linphone
 [NOTE]
 ====
 On some Linux systems, you might need to use a different user profile in order to start a second instance of Linphone.
@@ -128,7 +126,7 @@ On the Manage SIP Accounts tab,
 Leave the rest of the settings as default.
 ----
 
-Once the softphones are configured and are successfully registered with the &SHORT_PLATFORM_NAME;for Tomcat 7 server, you will see a screenshot like the one below in the web browser at this url http://127.0.0.1:8080/Click2CallAsync/
+Once the softphones are configured and are successfully registered with the Restcomm SIP Servlets for Tomcat 7 server, you will see a screenshot like the one below in the web browser at this url http://127.0.0.1:8080/Click2CallAsync/
 
 
 
@@ -138,23 +136,23 @@ image::images/click2callasync-tomcat-registered-clients.png[]
 
 
 You can make calls using the application and the softphones you configured will start ringing.
-It is important to start &SHORT_PLATFORM_NAME;for Tomcat 7 in a terminal using the (./catalina.sh run) script.
+It is important to start Restcomm SIP Servlets for Tomcat 7 in a terminal using the (./catalina.sh run) script.
 It will help with troubleshooting SIP calls.
 The logs you see on the terminal will let you know when a softphone registers with the Tomcat server and you will also be able to see the status of call setup and shutdown. 
 
-.Stopping &SHORT_PLATFORM_NAME; for Tomcat 7 
+.Stopping Restcomm SIP Servlets for Tomcat 7 
 The best way to stop a server is using the CTRL-D on the terminal in which the server was started.
-If you started the &SHORT_PLATFORM_NAME;for Tomcat 7 server using the $CATALINA_HOME/bin/startup.sh, you can stop the server using $CATALINA_HOME/bin/shutdown.sh 
+If you started the Restcomm SIP Servlets for Tomcat 7 server using the $CATALINA_HOME/bin/startup.sh, you can stop the server using $CATALINA_HOME/bin/shutdown.sh 
 
 [[_bssswticar_sip_servlets_server_with_tomcat_installing_configuring_and_running]]
 == Tomcat for Windows 
 
-=== Installing the &SHORT_PLATFORM_NAME; for Tomcat 7 Binary Distribution on Windows
+=== Installing the Restcomm SIP Servlets for Tomcat 7 Binary Distribution on Windows
 
 
 . For this example, we'll assume that you downloaded the binary distribution zip file to the [path]_My Downloads_ folder.
   First, using Windows Explorer, create a subdirectory in [path]_My Downloads_ to extract the zip file's contents into.
-  When you name this folder, it is good practice to include the version number; if you do so, remember to correctly match it with the version of the &SHORT_PLATFORM_NAME; for Tomcat binary distribution you downloaded.
+  When you name this folder, it is good practice to include the version number; if you do so, remember to correctly match it with the version of the Restcomm SIP Servlets for Tomcat binary distribution you downloaded.
   In these instructions, we will refer to this folder as [path]_-tomcat-<version>_.
 . Double-click the downloaded zip file, selecting as the destination folder the one you just created to hold the zip file's contents.
 +
@@ -177,7 +175,7 @@ C:\Users\Me\My Downloads\-tomcat-<version>>jar -xvf ""
 ----
 
 
-. At this point, you may want to move the folder holding the &SHORT_PLATFORM_NAME;for Tomcat binary files (in this example, the folder named [path]_-tomcat-<version>_) to another location.
+. At this point, you may want to move the folder holding the Restcomm SIP Servlets for Tomcat binary files (in this example, the folder named [path]_-tomcat-<version>_) to another location.
   This step is not strictly necessary, but it is probably a good idea to move the installation folder from [path]_My Downloads_ to a user-defined location for storing runnable programs.
   Any location will suffice, however.
 . You may want to delete the zip file after extracting its contents in order to free disk space:
@@ -190,10 +188,10 @@ C:\Users\Me\My Downloads\-tomcat-<version>>delete ""
 [[_bssswticar_binary_sip_servlets_server_with_tomcat_configuring]]
 === Configuring
 
-Configuring &SHORT_PLATFORM_NAME;for Tomcat consists in setting the [var]`CATALINA_HOME` environment variable and then, optionally, customizing your &SHORT_PLATFORM_NAME; for Tomcat container by adding SIP Connectors, configuring the application router, and configuring logging.
-See <<_bsssc_binary_sip_servlets_server_configuring>> to learn what and how to configure &SHORT_PLATFORM_NAME; for Tomcat.
+Configuring Restcomm SIP Servlets for Tomcat consists in setting the [var]`CATALINA_HOME` environment variable and then, optionally, customizing your Restcomm SIP Servlets for Tomcat container by adding SIP Connectors, configuring the application router, and configuring logging.
+See <<_bsssc_binary_sip_servlets_server_configuring>> to learn what and how to configure Restcomm SIP Servlets for Tomcat.
 
-Alternatively, you can simply run your &SHORT_PLATFORM_NAME;for Tomcat container now and return to this section to configure it later.
+Alternatively, you can simply run your Restcomm SIP Servlets for Tomcat container now and return to this section to configure it later.
 
 [[_bssswticar_binary_sip_servlets_server_with_tomcat_running]]
 === Running
@@ -211,7 +209,7 @@ Using JRE_HOME:       /etc/java-config-2/current-system-vm
 
 Detailed instructions are given below, arranged by platform.
 
-.Procedure: Running &SHORT_PLATFORM_NAME; for Tomcat on Windows
+.Procedure: Running Restcomm SIP Servlets for Tomcat on Windows
 . There are several different ways to start the Tomcat Servlet Container on Windows.
   All of the following methods accomplish the same task.
 +
@@ -248,7 +246,7 @@ Using CATALINA_TMPDIR: /home/user/temp/apps/sip_servlets_server/temp
 Using JRE_HOME:       /etc/java-config-2/current-system-vm
 ----
 
-.Procedure: Stopping &SHORT_PLATFORM_NAME; for Tomcat on Windows
+.Procedure: Stopping Restcomm SIP Servlets for Tomcat on Windows
 . Stopping the Tomcat Servlet Container on Windows consists in executing the [path]_shutdown.bat_ executable batch script in the [path]_bin_ subdirectory of the SIP Servlets-customized Tomcat binary distribution:
 +
 ----

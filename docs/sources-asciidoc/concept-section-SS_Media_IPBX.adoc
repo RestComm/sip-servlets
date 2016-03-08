@@ -4,10 +4,10 @@
 
 The Media IPBX provides an extensible and customizable SIP PBX solution, based on the Seam Telco Framework (STF).  While the PBX is currently provided as a capability demonstration, the ultimate goal is to transition Media IPBX into a fully-fledged SIP PBX solution.
 
-Media IPBX terminates all calls to &PLATFORM_NAME;Media Server conference endpoints, which provides flexibility in manipulating established calls including server-side conferencing and ring-back tones.
+Media IPBX terminates all calls to Restcomm Media Server conference endpoints, which provides flexibility in manipulating established calls including server-side conferencing and ring-back tones.
 The PBX can also be implemented as a Session Border Controller.
 
-NOTE: Media IPBX is compatible with &PLATFORM_NAME;SIP Servlets with JBoss AS 4.2.3.
+NOTE: Media IPBX is compatible with Restcomm SIP Servlets with JBoss AS 4.2.3.
 Versions prior to this release do not support Media IPBX.
 
 Media IPBX provides the following major features: 

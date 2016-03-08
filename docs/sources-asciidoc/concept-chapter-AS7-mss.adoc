@@ -1,11 +1,11 @@
 
 [[_getting_started_with_mss_jboss_as7]]
-= Getting Started with &SHORT_PLATFORM_NAME; for JBoss AS7 
+= Getting Started with Restcomm for JBoss AS7 
 
-. Features not yet available on &SHORT_PLATFORM_NAME; for JBoss AS7 
+.Features not yet available on Restcomm for JBoss AS7 
 [NOTE]
 ====
-* SIP Clustering and Failover  
+* SIP Failover  
 
 * SNMP  
 
@@ -18,32 +18,28 @@ Even though Jopr monitoring is not available, there is a Command Line Interface 
 As the features become available, this guide will be updated to reflect the changes.
  
 
-== Downloading and Starting &SHORT_PLATFORM_NAME; for JBoss AS7
+== Downloading and Starting Restcomm SIP Servlets for JBoss AS7
 
 If you have been working with JBoss for some time, you will quickly notice that the JBoss AS7 iteration has gone through a lot of changes.
-This guide will help you understand how you can quickly get started with JBoss AS7 within the &SHORT_PLATFORM_NAME;framework. 
+This guide will help you understand how you can quickly get started with JBoss AS7 within the Restcomm framework. 
 
-You can go to the link below to download the latest &SHORT_PLATFORM_NAME;for JBoss AS7: link: https://code.google.com/p/sipservlets/wiki/Downloads?tm=2[Download Latest Version of  for JBoss AS7 ]
+You can go to the link below to download the latest Restcomm SIP Servlets for JBoss AS7: link: https://github.com/RestComm/sip-servlets/releases/latest[Download Latest Version of Restcomm SIP Servlets for JBoss AS7 ]
 
 
 You will need to extract the content of the file into a directory on your local system.
-The root directory of the &SHORT_PLATFORM_NAME;for JBoss AS7 that you downloaded will be referred to in this guide as $JBOSS_HOME.
+The root directory of the Restcomm SIP Servlets for JBoss AS7 that you downloaded will be referred to in this guide as $JBOSS_HOME.
  
 
-If this is your first time working with &SHORT_PLATFORM_NAME;for JBoss, you will need to make sure you have Java Run Time or JDK installed on your computer.
+If this is your first time working with Restcomm SIP Servlets for JBoss, you will need to make sure you have Java Run Time or JDK installed on your computer.
 You will also need to have the environment variables set.
 See the links below to  learn how to get JRE or JDK setup on your system.
  
 
-Installing and Configuring JDK 
+link:Common_Content/Java_Development_Kit-Installing_Configuring_and_Running.adoc[Installing and Configuring JDK]
 
-<<_install_configure_jdk>>
+link:Common_Content/Setting_the_JBOSS_HOME_Environment_Variable.adoc[Setting Environment Variables]
 
-Setting Environment Variables 
-
-<<_setting_jboss_env_variable_windows_unix>>
-
-. Starting &SHORT_PLATFORM_NAME; for JBoss AS7 
+. Starting Restcomm SIP Servlets for JBoss AS7 
 To start the server do the following:
 
 ----
@@ -79,7 +75,7 @@ With the standard startup script, you will not have access to any SIP functional
 This is because of the modular approach implemented in JBoss AS7.
 There is a configuration file that needs to be used to activate additional functionalities like SIP and High Availability. 
 
-In order to start the &SHORT_PLATFORM_NAME;for JBoss AS7 with SIP functionalities, you need to append the startup script with the SIP configuration file.
+In order to start the Restcomm SIP Servlets for JBoss AS7 with SIP functionalities, you need to append the startup script with the SIP configuration file.
 The configuration files are located in the $JBOSS_HOME/standalone/configuration directory.
 You can see the content of the directory below 
 
@@ -91,8 +87,8 @@ dars                          standalone-full-ha.xml    standalone.xml
 logging.properties            standalone-full.xml       standalone_xml_history
 ----
 
-.Starting &SHORT_PLATFORM_NAME; for JBoss AS7 with SIP
-If you want to start &SHORT_PLATFORM_NAME;with SIP services activated, you need to go to the $JBOSS_HOME/bin directory.
+.Starting Restcomm SIP Servlets for JBoss AS7 with SIP
+If you want to start Restcomm SIP Servlets with SIP services activated, you need to go to the $JBOSS_HOME/bin directory.
 Type the following command: 
 
 ----
@@ -109,11 +105,11 @@ Type the following command:
 20:43:21,648 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015874: JBoss AS 7.1.2.Final "Steropes" started in 26560ms - Started 232 of 321 services (88 services are passive or on-demand)
 ----
 
-The click2call SIP sample application bundled with &SHORT_PLATFORM_NAME;will become available at this url http://127.0.0.1:8080/click2call.
+The click2call SIP sample application bundled with Restcomm SIP Servlets will become available at this url http://127.0.0.1:8080/click2call.
 You can configure multiple SIP softphones to use the sample application.
 See the section below for how to configure and test the SIP sample application. 
 
-== Testing Click2Call with &SHORT_PLATFORM_NAME; for JBOSS AS7 
+== Testing Click2Call with Restcomm SIP Servlets for JBOSS AS7 
 
 Once the server is started as stated in the previous section, you can configure multiple instances of any SIP softphone you prefer.
 In this example, Linphone will be used. 
@@ -157,7 +153,7 @@ A correctly configured Linphone will look like the screenshot below.
 image::images/linphone-registration-port-5080.png[]
 
 
-Once the phones are successfully registered with the &SHORT_PLATFORM_NAME;for JBoss AS7 server, you can check the result in the sample SIP application at this url, http://127.0.0.1:8080/click2call
+Once the phones are successfully registered with the Restcomm SIP Servlets for JBoss AS7 server, you can check the result in the sample SIP application at this url, http://127.0.0.1:8080/click2call
 
 
 
@@ -166,10 +162,10 @@ Once the phones are successfully registered with the &SHORT_PLATFORM_NAME;for JB
 image::images/click2call-JbossAS7-registered-clients.png[]
 
 
-You can make calls from the sample click2call application and see the logs in the shell terminal you used to start the &SHORT_PLATFORM_NAME;for JBoss AS7 server.
+You can make calls from the sample click2call application and see the logs in the shell terminal you used to start the Restcomm SIP Servlets for JBoss AS7 server.
  
 
-==  Command Line Interface for &SHORT_PLATFORM_NAME; JBoss AS7
+==  Command Line Interface for Restcomm SIP Servlets JBoss AS7
 
 Part of the task of any administrator who has to manage a JBoss server will be to monitor services offered to clients.
 There is a command line interface bundled with JBoss AS7 which can be accessed by going to the $JBOSS_HOME/bin directory.
@@ -179,7 +175,7 @@ You need to make sure that the JBoss server is running on your system and listen
 The section below will work you through steps to familiarize yourself with the CLI.
  
 
-There are so many features available with the &SHORT_PLATFORM_NAME;for JBoss AS7 CLI.
+There are so many features available with the Restcomm SIP Servlets for JBoss AS7 CLI.
 The example below will concentrate on getting data from the SIP you started using the [path]_ ./standalone.sh -c standalone-sip.xml _ script.
  
 
@@ -211,7 +207,7 @@ When you see the [standalone@localhost:9999 /] at the prompt, you are successful
 .Navigating the CLI 
 [NOTE]
 ====
-Moving around the &SHORT_PLATFORM_NAME;for JBoss AS7 CLI is similar to normal file system with a few exceptions.
+Moving around the Restcomm SIP Servlets for JBoss AS7 CLI is similar to normal file system with a few exceptions.
 You can use commands like, (ls, cd, cd..) to navigate around the CLI 
 ====
 
@@ -297,7 +293,7 @@ image::images/sip-servlets-management-console-AS7.png[]
 
 == Accessing Management Console 
 
-&SHORT_PLATFORM_NAME;for JBoss AS7 provides a management console that can be useful for accessing vital information about your server.
+Restcomm SIP Servlets for JBoss AS7 provides a management console that can be useful for accessing vital information about your server.
 In the welcome page that appears when you access http://127.0.0.1:8080, there is a link that points to  the Administration Console.
  
 
@@ -326,17 +322,17 @@ The screenshot below shows you what the Administration Console looks like.
 image::images/admin-console-AS7-homepage.png[]
 
 
-. Deleting Administration Console User Account
+.Deleting Administration Console User Account
 [NOTE]
 ====
 Deleting the user account isn't very intuitive.
 In the event that you will need to remove an account and create another one, you can remove the account from the mgmt-users.properties file.
-It is located in the $&SHORT_PLATFORM_NAME;_JBoss_HOME/standalone/configuration directory.
+It is located in the $Restcomm_JBoss_HOME/standalone/configuration directory.
 If you are running in the domain mode, you will need to check the corresponding configuration directory.
  
 ====
 
-=== Installing the &SHORT_PLATFORM_NAME; for JBoss Binary Distribution on 
+=== Installing the Restcomm for JBoss Binary Distribution on 
 
 
 
@@ -345,20 +341,19 @@ For this procedure, it is assumed that the downloaded archive is saved in the [p
   For ease of identification, it is recommended that the version number of the binary is included in the folder name.
   For example, [path]_-jboss-<version>_.
 . Extract the contents of the archive, specifying the destination folder as the one created in the previous step.
-  You can either use Winzip or the opensource tool called 7-Zip to extract the content of the donwloaded &SHORT_PLATFORM_NAME;for JBoss AS7 file 
-. It is recommended that the folder holding the &SHORT_PLATFORM_NAME;for JBoss files (in this example, the folder named [path]_-jboss-<version>_) is moved to a user-defined location for storing executable programs.
+  You can either use Winzip or the opensource tool called 7-Zip to extract the content of the donwloaded Restcomm SIP Servlets for JBoss AS7 file 
+. It is recommended that the folder holding the Restcomm SIP Servlets for JBoss files (in this example, the folder named [path]_-jboss-<version>_) is moved to a user-defined location for storing executable programs.
   For example, the [path]_Program Files_ folder.
 
--->
 
 
+.Procedure: Running Restcomm SIP Servlets for JBoss on 
 
-.Procedure: Running &SHORT_PLATFORM_NAME; for JBoss on 
-
-There are several ways to start &SHORT_PLATFORM_NAME;for JBoss on Windows.
+There are several ways to start Restcomm SIP Servlets for JBoss on Windows.
 All of the following methods accomplish the same task.
+
 . Using Windows Explorer, navigate to the [path]_bin_ subdirectory in the installation directory.
-. The preferred way to start &SHORT_PLATFORM_NAME;for JBoss from the Command Prompt.
+. The preferred way to start Restcomm SIP Servlets for JBoss from the Command Prompt.
   The command line interface displays details of the startup process, including any problems encountered during the startup process.
 +
 Open the Command Prompt via the [label]#Start# menu and navigate to the correct folder:
@@ -367,7 +362,7 @@ Open the Command Prompt via the [label]#Start# menu and navigate to the correct 
 C:\Users\<user>My Downloads> cd "-jboss-<version>"
 ----
 
-Start the JBoss Application Server by executing one of the following files: 
+. Start the JBoss Application Server by executing one of the following files: 
 
 * [path]_run.bat_ batch file:
 +

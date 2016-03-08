@@ -6,7 +6,7 @@
 
 == Description of DFC Application Router
 
-Instead of using the &PLATFORM_NAME;Default Application Router, any SIP Servlets 1.1 compliant Application Router can be used, including the eCharts http://echarts.org/EChartsSipServletManual/sip-echartsse4.html#x6-140004.1[DFC Application Router].
+Instead of using the Restcomm Default Application Router, any SIP Servlets 1.1 compliant Application Router can be used, including the eCharts http://echarts.org/EChartsSipServletManual/sip-echartsse4.html#x6-140004.1[DFC Application Router].
 
 == Installing the DFC Application Router
 
@@ -20,10 +20,10 @@ Drop the [path]_dfcar.jar_ from the ECharts distribution package in the `TOMCAT_
 
 . Remove the DAR
 +
-Remove the &PLATFORM_NAME;Default Application Router located in `TOMCAT_HOME/lib/sip-servlets-application-router-*.jar`.
+Remove the Restcomm Default Application Router located in `TOMCAT_HOME/lib/sip-servlets-application-router-*.jar`.
 
 
-Please see the following link to learn how to deploy jar files in &SHORT_PLATFORM_NAME;for JBoss AS7.
+Please see the following link to learn how to deploy jar files in Restcomm for JBoss AS7.
  
 
 .Procedure: Installing DFCAR on JBoss AS7
@@ -50,7 +50,7 @@ Create a `module.xml` file under the same directory with the following contents
 
 . Remove the DAR
 +
-Remove the &PLATFORM_NAME;Default Application Router located in  `JBOSS_HOME/modules/system/layers/base/org/mobicents/dar`.
+Remove the Restcomm Default Application Router located in  `JBOSS_HOME/modules/system/layers/base/org/mobicents/dar`.
 
 . Use the DFC DAR
 +

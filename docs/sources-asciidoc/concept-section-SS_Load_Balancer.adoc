@@ -6,7 +6,7 @@
 image::images/mss-MSSSIPLoadBalancer-dia-StarNetworkTopology.jpg[]
 
 The SIP Load Balancer is used to balance the load of SIP service requests and responses between nodes in a SIP Servlets Server cluster.
-Both &SHORT_PLATFORM_NAME;for JBoss and &SHORT_PLATFORM_NAME;for Tomcat servers can be used in conjunction with the SIP Load Balancer to increase the performance and availability of SIP services and applications. 
+Both Restcomm for JBoss and Restcomm for Tomcat servers can be used in conjunction with the SIP Load Balancer to increase the performance and availability of SIP services and applications. 
 
 In terms of functionality, the SIP Load Balancer is a simple stateless proxy server that intelligently forwards SIP session requests and responses between User Agents (UAs) on a Wide Area Network (WAN), and SIP Servlets Server nodes, which are almost always located on a Local Area Network (LAN). All SIP requests and responses pass through the SIP Load Balancer.
 
@@ -21,15 +21,15 @@ In terms of functionality, the SIP Load Balancer is a simple stateless proxy ser
 &nbsp;
 
 .Software Prerequisites
-A JAIN SIP HA-enabled application server such as  &PLATFORM_NAME; JAIN SLEE or  &PLATFORM_NAME; SIP Servlets is required. ::
+A JAIN SIP HA-enabled application server such as  Restcomm  JAIN SLEE or  Restcomm  SIP Servlets is required. ::
   Running the SIP Load Balancer requires at least two instances of the application server as cluster nodes nodes.
   Therefore, before configuring the SIP Load Balancer, we should make sure we've installed a the SIP application server first.
-  The &PLATFORM_NAME;SIP load balancer will work with a SIP Servlets-enabled JBoss Application Server _or_ a JAIN SLEE application server with SIP RA.
+  The Restcomm SIP load balancer will work with a SIP Servlets-enabled JBoss Application Server _or_ a JAIN SLEE application server with SIP RA.
 
 [[_sslb_binary_sip_load_balancer_downloading]]
 === Downloading
 
-The load balancer is located in the [path]_sip-balancer_ top-level directory of the &SHORT_PLATFORM_NAME; distribution.
+The load balancer is located in the [path]_sip-balancer_ top-level directory of the Restcomm  distribution.
 You will find the following files in the directory:
 
 SIP load balancer executable JAR file::
@@ -49,7 +49,7 @@ It is recommended that the file is placed in the directory containing other JAR 
 
 Configuring the SIP load balancer and the two SIP Servlets-enabled Server nodes is described in <<_sslb_configuring_the_sip_load_balancer_and_servlet_server_nodes>>.
 
-.Procedure: Configuring the &PLATFORM_NAME; SIP Load Balancer and SIP Server Nodes
+.Procedure: Configuring the Restcomm  SIP Load Balancer and SIP Server Nodes
 . Configure lb.properties Configuration Properties File
 +
 Configure the SIP Load Balancer's Configuration Properties file by substituting valid values for your personal setup. <<_sslb_complete_sample_lb.properties_file>>  shows a sample [path]_lb.properties_ file, with key element descriptions provided after the example.
@@ -261,7 +261,7 @@ The JVM option `-DlogLevel=DEBUG` will allow you to switch all loggig categories
 +
 Ensure the following attributes are configured for the `<service>` element in [path]_server.xml_ for Tomcat or in the mobicents `subsystem` element for JBoss AS7.
 +
-* The `sipPathName` attribute must contain the following value `org.mobicents.ha.balancing.only` to indicate that the server will be using the &PLATFORM_NAME; JAIN SIP HA SIP Stack which is an extension of the JAIN SIP Stack offering integration with the Mobicents Load Balancer and transparent replication.
+* The `sipPathName` attribute must contain the following value `org.mobicents.ha.balancing.only` to indicate that the server will be using the Restcomm  JAIN SIP HA SIP Stack which is an extension of the JAIN SIP Stack offering integration with the Mobicents Load Balancer and transparent replication.
 
 . Configure the [path]_mss-sip-stack.properties_ configuration file
 +
@@ -282,9 +282,9 @@ Ensure the following attributes are configured for the `<service>` element in [p
 .Configuration File Locations
 [NOTE]
 ====
-On &SHORT_PLATFORM_NAME;for Tomcat server installations, [path]_server.xml_ is located in [path]_<install_directory>/conf_.
+On Restcomm for Tomcat server installations, [path]_server.xml_ is located in [path]_<install_directory>/conf_.
 
-On &SHORT_PLATFORM_NAME;for JBoss server installations, the default [path]_standalone-sip.xml_ configuration file is located in [path]_standalone/configuration_ or the default [path]_domain-sip.xml_ configuration file located in [path]_domain/configuration_ for cluster configurations
+On Restcomm for JBoss server installations, the default [path]_standalone-sip.xml_ configuration file is located in [path]_standalone/configuration_ or the default [path]_domain-sip.xml_ configuration file located in [path]_domain/configuration_ for cluster configurations
 ====
 
 .Easy Node Configuration with JMX
@@ -304,10 +304,10 @@ heartBeatInterval::
 
 ===== Apache HTTP Load Balancer
 
-The &SHORT_PLATFORM_NAME;SIP Load Balancer can work in concert with HTTP load balancers such as `mod_jk`.
+The Restcomm SIP Load Balancer can work in concert with HTTP load balancers such as `mod_jk`.
 Whenever an HTTP session is bound to a particular node, an instruction is sent to the SIP Load Balancer to direct the SIP calls from the same application session to the same node. 
 
-It is sufficient to configure `mod_jk` to work for HTTP in JBoss in order to enable cooperative load balancing. &SHORT_PLATFORM_NAME; will read the configuration and will use it without any extra configuration.
+It is sufficient to configure `mod_jk` to work for HTTP in JBoss in order to enable cooperative load balancing. Restcomm  will read the configuration and will use it without any extra configuration.
 You can read more about configuring `mod_jk` with JBoss in your JBoss Application Server documentation.
 
 Alternatively you may disable this behaviour and make the HTTP load balancer follow the decisions made by the SIP load balancer with the httpFollowsSip flag.
@@ -451,7 +451,7 @@ IP load-balancing is often used when the other load-balancers' capacity is excee
 Routing decisions are made  based on OSI Layer 2, 3 or 4 data.
 This type of load balancer only examines low-level TCP, UDP or ethernet packet structures including MAC addresses, IP addresses, ports, and protocol types (TCP or UDP or other). 
 
-An IP  load balancer never reads the payload of the TCP/IP packets and therefore never parses SIP or HTTP (or any protocol above OSI Layer 4).  Because an IP load balancing device is not SIP or HTTP aware in any way, it is much more performant than `mod_jk` or the &SHORT_PLATFORM_NAME; SIP load-balancer.
+An IP  load balancer never reads the payload of the TCP/IP packets and therefore never parses SIP or HTTP (or any protocol above OSI Layer 4).  Because an IP load balancing device is not SIP or HTTP aware in any way, it is much more performant than `mod_jk` or the Restcomm  SIP load-balancer.
  
 
 === Technical overview
@@ -465,19 +465,19 @@ There are many hardware vendors as well.
 
 One main drawback relating to  IP load balancers is that they can not make routing decisions based on SIP messages and (with some exceptions) they can not work cooperatively with HTTP or other load balancers.
 
-=== Configuring &SHORT_PLATFORM_NAME; Cluster for pure IP Load Balancing
+=== Configuring Restcomm  Cluster for pure IP Load Balancing
 
 WARNING: Pure IP load balancing is not a recommented option.
 It is advised to use a distributed load balancer instead.
 Proper operation with pure IP load balancing depends on the ability of the IP load balancer to establish request affinity based on IP addresses and ports.
 
-First you need to remove the SIP load balancers from any configuration in &SHORT_PLATFORM_NAME;.
+First you need to remove the SIP load balancers from any configuration in Restcomm .
 In particular the `org.mobicents.ha.javax.sip.BALANCERS`  attribute in [path]_mss-sip-stack.properties_.
 You should remove the balancers attribute from the Service tag of  jboss.web service.
 This simply removes the default load balancer from the system and the traffic bypasses the SIP load-balancer.
-Next you must configure &SHORT_PLATFORM_NAME; to put the IP load balancer IP address in the `Via`, `Contact` and other system headers where  the IP address of the server machine is required.
+Next you must configure Restcomm  to put the IP load balancer IP address in the `Via`, `Contact` and other system headers where  the IP address of the server machine is required.
 This will ensure that any responses or subsequent SIP requests follow the same path, but always hit  the load balancer instead of particular cluster node that may fail.
-To specify the IP load balancer address in &SHORT_PLATFORM_NAME; your should edit this file on Tomcat [path]_CATALINA_HOME/conf/server.xml_ and specify `staticServerAddress` such as: 
+To specify the IP load balancer address in Restcomm  your should edit this file on Tomcat [path]_CATALINA_HOME/conf/server.xml_ and specify `staticServerAddress` such as: 
 
 [source]
 ----
@@ -511,7 +511,7 @@ The SIP Load Balancer reparses, alters and forwards the message back to the orig
 This entire proxying and provisioning process is carried out independent of the User Agent, which is only concerned with the SIP service or application it is using. 
 
 By using the Load Balancer, SIP traffic is balanced across a pool of available SIP Servers, increasing the overall throughput of the SIP service or application running on either individual nodes of the cluster.
-In the case of a &SHORT_PLATFORM_NAME;server with `</distributed>` capabilities, load balancing advantages are applied across the entire cluster. 
+In the case of a Restcomm server with `</distributed>` capabilities, load balancing advantages are applied across the entire cluster. 
 
 The SIP Load Balancer is also able to failover requests mid-call from unavailable nodes to available ones, thus increasing the reliability of the SIP service or application.
 The Load Balancer increases throughput and reliability by dynamically provisioning SIP service requests and responses across responsive nodes in a cluster.
@@ -588,9 +588,9 @@ With consistent hash algorithms there is no state to be preserved in the SIP/HTT
 image::images/bidirectional-distributed-sip-lb.gif[]
 
 [[_sslb_sip_load_balancer_implementation]]
-== Implementation of the &PLATFORM_NAME; Load Balancer
+== Implementation of the Restcomm  Load Balancer
 
-Each individual &PLATFORM_NAME;SIP Server in the cluster is responsible for contacting the SIP load balancer and relaying its health status and regular "heartbeats".  
+Each individual Restcomm SIP Server in the cluster is responsible for contacting the SIP load balancer and relaying its health status and regular "heartbeats".  
 
 From these health status reports and heartbeats, the SIP Load Balancer creates and maintains a list of all available and healthy nodes in the cluster.
 The Load Balancer forwards SIP requests between these cluster nodes, providing that the provisioning algorithm reports that each node is healthy and is still sending heartbeats. 

@@ -1,0 +1,79 @@
+
+= Setting the JBOSS_HOME Environment Variable
+
+The [app]` Platform` ([app]``) is built on top of the [app]`JBoss Application Server` ([app]`JBoss AS`). You do not need to set the [var]`JBOSS_HOME` environment variable to run any of the [app]` Platform` servers _unless_ [var]`JBOSS_HOME` is _already_ set. 
+
+The best way to know for sure whether [var]`JBOSS_HOME` was set previously or not is to perform a simple check which may save you time and frustration.
+
+.Checking to See If JBOSS_HOME is Set on Unix
+At the command line, `echo`			`$JBOSS_HOME` to see if it is currently defined in your environment:
+
+----
+~]$ echo $JBOSS_HOME
+----
+
+The [app]` Platform` and most Restcomm SIP Servlets servers are built on top of the [app]`JBoss Application Server` ([app]`JBoss AS`). When the [app]` Platform` or Restcomm SIP Servlets  servers are built _from source_, then [var]`JBOSS_HOME` _must_ be set, because the Restcomm SIP Servlets  files are installed into (or "`over top of`" if you prefer) a clean [app]`JBoss AS` installation, and the build process assumes that the location pointed to by the [var]`JBOSS_HOME` environment variable at the time of building is the [app]`JBoss AS` installation into which you want it to install the Restcomm SIP Servlets  files. 
+
+This guide does not detail building the [app]` Platform` or any Restcomm SIP Servlets  servers from source.
+It is nevertheless useful to understand the role played by [app]`JBoss AS` and [var]`JBOSS_HOME` in the Restcomm SIP Servlets  ecosystem.
+
+The immediately-following section considers whether you need to set [var]`JBOSS_HOME` at all and, if so, when.
+The subsequent sections detail how to set [var]`JBOSS_HOME` on Unix and Windows 
+
+IMPORTANT: Even if you fall into the category below of _not needing_ to set [var]`JBOSS_HOME`, you may want to for various reasons anyway.
+Also, even if you are instructed that you do _not need_ to set [var]`JBOSS_HOME`, it is good practice nonetheless to check and make sure that [var]`JBOSS_HOME` actually _isn't_ set or defined on your system for some reason.
+This can save you both time and frustration. 
+
+You _DO NOT NEED_ to set [var]`JBOSS_HOME` if...
+
+* ...you have installed the [app]` Platform` binary distribution. 
+* ...you have installed a Restcomm SIP Servlets server binary distribution _which bundles [app]`JBoss AS`._			
+
+You _MUST_ set [var]`JBOSS_HOME` if...
+
+* ...you are installing the [app]` Platform` or any of the Restcomm SIP Servlets  servers _from source_. 
+* ...you are installing the [app]` Platform` binary distribution, or one of the Restcomm SIP Servlets  server binary distributions, which _do not_ bundle [app]`JBoss AS`. 
+
+Naturally, if you installed the [app]` Platform` or one of the Restcomm SIP Servlets  server binary releases which _do not_ bundle [app]`JBoss AS`, yet requires it to run, then you should http://docs.jboss.org/jbossas/docs/Installation_And_Getting_Started_Guide/5/html_single/index.html[install JBoss AS
+		] before setting [var]`JBOSS_HOME` or proceeding with anything else. 
+
+.Setting the JBOSS_HOME Environment Variable on Unix
+The [var]`JBOSS_HOME` environment variable must point to the directory which contains all of the files for the [app]` Platform` or individual Restcomm SIP Servlets  server that you installed.
+As another hint, this topmost directory contains a [path]_bin_ subdirectory. 
+
+Setting [var]`JBOSS_HOME` in your personal [path]_~/.bashrc_ startup script carries the advantage of retaining effect over reboots.
+Each time you log in, the environment variable is sure to be set for you, as a user.
+On Unix, it is possible to set [var]`JBOSS_HOME` as a system-wide environment variable, by defining it in [path]_/etc/bashrc_, but this method is neither recommended nor detailed in these instructions. 
+
+.Procedure: To Set JBOSS_HOME on Unix...
+. Open the [path]_~/.bashrc_ startup script, which is a hidden file in your home directory, in a text editor, and insert the following line on its own line while substituting for the actual install location on your system: 
++
+----
+export JBOSS_HOME="/home/<username>/<path>/<to>/<install_directory>"
+----
+
+. Save and close the [path]_.bashrc_ startup script. 
+. You should `source` the [path]_.bashrc_ script to force your change to take effect, so that [var]`JBOSS_HOME` becomes set for the current sessionfootnote:[Note that any other terminals which were opened prior to your having altered .bashrc will need to source
+  ~/.bashrc as well should they require access to JBOSS_HOME.]. 
++
+----
+~]$ source ~/.bashrc
+----
+
+. Finally, ensure that [var]`JBOSS_HOME` is set in the current session, and actually points to the correct location: 
++
+NOTE: The command line usage below is based upon a binary installation of the [app]` Platform`.
+In this sample output, [var]`JBOSS_HOME` has been set correctly to the [replaceable]`topmost_directory` of the [app]`` installation.
+Note that if you are installing one of the standalone [app]`` servers (with [app]`JBoss AS` bundled!), then [var]`JBOSS_HOME` would point to the [replaceable]`topmost_directory` of your server installation. 
++
+----
+~]$ echo $JBOSS_HOME
+/home/silas/
+----
+
+
+.Setting the JBOSS_HOME Environment Variable on Windows
+The [var]`JBOSS_HOME` environment variable must point to the directory which contains all of the files for the Restcomm SIP Servlets Platform or individual Restcomm SIP Servlets server that you installed.
+As another hint, this topmost directory contains a [path]_bin_ subdirectory. 
+
+For information on how to set environment variables in recent versions of Windows, refer to http://support.microsoft.com/kb/931715. 

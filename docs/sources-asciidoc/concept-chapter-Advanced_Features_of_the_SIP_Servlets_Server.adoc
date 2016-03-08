@@ -7,7 +7,7 @@
 :experimental:
 :sourcedir: .
 
-The advanced features of SIP Servlets include Concurrency and  Congestion Control, load balancing with the &PLATFORM_NAME;Load Balancer, and, exclusively for &SHORT_PLATFORM_NAME;for JBoss, clustering and failover support.
+The advanced features of SIP Servlets include Concurrency and  Congestion Control, load balancing with the Restcomm Load Balancer, and, exclusively for Restcomm for JBoss, clustering and failover support.
 
 :leveloffset: 1
 include::concept-section-SS_Media_Support.adoc[]
@@ -43,7 +43,7 @@ include::concept-section-SS_JSLEE_Interop.adoc[]
 
 == Eclipse IDE Tools
 
-The SIP Servlets Eclipse tools assist developers in creating JSR-289 applications with &PLATFORM_NAME;.
+The SIP Servlets Eclipse tools assist developers in creating JSR-289 applications with Restcomm.
 You can use the Dynamic Web Project wizard for converged applications to get started with an empty project, and then test your application with a real SIP Phone right from the IDE.
 
 .SIP Servlets Eclipse IDE Tools
@@ -56,7 +56,7 @@ Eclipse 3.4 is required.
 === Installation
 
 The standard Eclipse update site installation mechanism is leveraged.
-The &PLATFORM_NAME;Update Site is at the following location: http://mobicents.googlecode.com/svn/downloads/sip-servlets-eclipse-update-site.
+The Restcomm Update Site is at the following location: http://mobicents.googlecode.com/svn/downloads/sip-servlets-eclipse-update-site.
 After adding this update site to Eclipse you can proceed with the regular Eclipse Plug-in Installation.
 If you need help, the process is demonstrated in http://www.youtube.com/watch?v=LZOmLEC2IeQ[this video].
 

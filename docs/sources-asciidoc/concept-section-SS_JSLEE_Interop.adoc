@@ -20,7 +20,7 @@ JSLEE is an event driven application server with protocol agnostic architecture,
 SIP Servlets applications are generally simpler to implement and accelerate time to market for Web and SIP deployment scenarios.
 JSLEE has a steeper learning curve and covers a wider set of target deployment environments.
 
-As JBoss is the only vendor to implement both specifications through &PLATFORM_NAME;, this makes it a natural fit to build converged and interoperable JSLEE/SIP Servlets applications that are able to comply with standards in a portable manner.
+As JBoss is the only vendor to implement both specifications through Restcomm , this makes it a natural fit to build converged and interoperable JSLEE/SIP Servlets applications that are able to comply with standards in a portable manner.
 We built an application that could leverage standards all the way without resorting to vendor proprietary extensions by making SIP Servlets and JSLEE work together. http://mobicents.googlecode.com/files/deruelle-JSleeSipServletsInteroperability-final.pdf[Our "JSLEE and SIP-Servlets Interoperability with Mobicents Communication Platform" paper] describes our approach and the possible different approaches we have identified to achieve the goal of interoperability between SIP Servlets and JSLEE.
 
 You can also use our https://code.google.com/p/sipservlets/source/browse/#git%2Fsip-servlets-examples%2Fjslee-sips-interop[JSLEE/SIP Servlets interoperability example], showcasing our approach.

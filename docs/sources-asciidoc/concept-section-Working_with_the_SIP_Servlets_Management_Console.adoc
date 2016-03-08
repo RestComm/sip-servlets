@@ -2,7 +2,7 @@
 [[_wwtssmc_working_with_the_sip_servlets_management_console]]
 = Working with the SIP Servlets Management Console
 
-Once installed, the &SHORT_PLATFORM_NAME;for JBoss or &SHORT_PLATFORM_NAME;for Tomcat instance can be accessed and configured using the SIP Servlets Management Console.
+Once installed, the Restcomm for JBoss or Restcomm for Tomcat instance can be accessed and configured using the SIP Servlets Management Console.
 The management console is available at http://localhost:8080/sip-servlets-management/.
 
 .The SIP Servlets Management Console

@@ -3,7 +3,7 @@
 = Concurrency and Congestion Control
 
 Concurrency and Congestion control refer to settings that define the way in which messages are processed under heavy load.
-The way &PLATFORM_NAME;SIP Servlets Server processes messages in a production environment is crucial to ensure quality of service for customers.
+The way Restcomm SIP Servlets Server processes messages in a production environment is crucial to ensure quality of service for customers.
 
 Concurrency control mode tuning affects the way in which the SIP Servlets Server processes messages, whereas Congestion Control tuning affects the point at which the server begins rejecting new requests.
 Both of these parameters can be set using the following methods: 
@@ -19,7 +19,7 @@ Both of these parameters can be set using the following methods:
 The JSR 289 expert group does not specify how concurrency control should be implemented.
  
 
-&PLATFORM_NAME;SIP Servlets for JBoss and &PLATFORM_NAME;SIP Servlets for Tomcat have concurrency control implemented as a configurable mode, which defines the way in which the SIP Servlets Server processes messages.
+Restcomm SIP Servlets for JBoss and Restcomm SIP Servlets for Tomcat have concurrency control implemented as a configurable mode, which defines the way in which the SIP Servlets Server processes messages.
 
 It has to be noted that this concurrency control mechanism is not cluster aware and will work per node only, it is not a cluster wide lock.
 
@@ -40,7 +40,7 @@ SipApplicationSession::
   Of all the available methods, this mode is the best choice for guaranteed  thread-safety. 
 
 .Congestion Control
-&PLATFORM_NAME;Sip Servlets currently provides the following  congestion control mechanisms:
+Restcomm Sip Servlets currently provides the following  congestion control mechanisms:
 
 .Changing Congestion Control Settings 
 [NOTE]
@@ -107,4 +107,4 @@ Making your changes permanent in [path]_standalone-sip.xml_ or [path]_server.xml
   Instructions follow, grouped by the SIP Servlets Server you are running:
 
 Tuning Parameters from the dispatcher MBean::
-  Navigate to the `dispatcher` MBean from &PLATFORM_NAME; SIP Servlets for JBoss's JMX console. 
+  Navigate to the `dispatcher` MBean from Restcomm  SIP Servlets for JBoss's JMX console. 

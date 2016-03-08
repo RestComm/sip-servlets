@@ -7,14 +7,9 @@
 :experimental:
 :sourcedir: .
 
-:leveloffset: 1
-include::concept-chapter-AS7-mss.adoc[]
-:leveloffset: 0
+link:concept-chapter-AS7-mss.adoc[Getting Started with Restcomm SIP Servlets for JBoss AS7]
 
-:leveloffset: 1
-include::task-section-binary-SIP_Servlets_Server_with_Tomcat-Installing_Configuring_and_Running.adoc[]
-:leveloffset: 0
+link:task-section-binary-SIP_Servlets_Server_with_Tomcat-Installing_Configuring_and_Running.adoc[Getting Started with Restcomm SIP Servlets for Tomcat]
 
-:leveloffset: 1
-include::task-section-SIP_Servlets_Server-Configuring.adoc[]
-:leveloffset: 0
+link:task-section-SIP_Servlets_Server-Configuring.adoc[Sip Connectors]
+
