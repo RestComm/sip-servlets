@@ -1,6 +1,13 @@
 
 [[_getting_started_with_mss_jboss_as7]]
 = Getting Started with Restcomm for JBoss AS7 
+:doctype: book
+:sectnums:
+:toc: left
+:icons: font
+:experimental:
+:sourcedir: .
+
 
 .Features not yet available on Restcomm for JBoss AS7 
 [NOTE]
@@ -164,7 +171,7 @@ image::images/click2call-JbossAS7-registered-clients.png[]
 
 You can make calls from the sample click2call application and see the logs in the shell terminal you used to start the Restcomm SIP Servlets for JBoss AS7 server.
  
-
+[[_getting_started_with_mss_jboss_as7_cli]]
 ==  Command Line Interface for Restcomm SIP Servlets JBoss AS7
 
 Part of the task of any administrator who has to manage a JBoss server will be to monitor services offered to clients.

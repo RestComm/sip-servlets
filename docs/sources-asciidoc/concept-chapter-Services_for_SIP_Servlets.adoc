@@ -1,6 +1,12 @@
 
 [[_sfss_services_for_sip_servlets]]
 = Operating the Example Applications
+:doctype: book
+:sectnums:
+:toc: left
+:icons: font
+:experimental:
+:sourcedir: .
 
 .Important Information  
 [NOTE]
@@ -45,7 +51,6 @@ Here is the current list of hard-coded contacts and their location URIs:
 * `sip:receiver@127.0.0.1:6090`
 
 [[_sfss_binary_location_service__installing_configuring_and_running]]
-=== Unknown Title!
 
 .Downloading
 The Location Service is comprised of two archive files, a Web Archive (WAR) and a Default Application Router (DAR) configuration file, which you need to add to your installed SIP Servlets Server.
@@ -77,11 +82,40 @@ Restcomm  for Tomcat AS7::
 
 Restcomm  for JBoss::
 
+Open the $JBOSS_HOME/standalone/configuration/standalone-sip.xml configuration file and find the mobicents subsystem element. 
+
+.Editing MSS for JBoss's standalone-sip.xml for the Location Service
+====
+In the $JBOSS_HOME/standalone/configuration/standalone-sip.xml file search for the line 
+
+ <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" 
+application-router="dars/mobicents-dar.properties" 
+
+and replace it with the line below
+
+ <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0"
+ application-router="dars/locationservice-dar.properties" 
+====
+
 Restcomm  for Tomcat::
   Open the [path]_$CATALINA_HOME/conf/server.xml_
   configuration file and find the `Service`
   element.
   Add an attribute to it called ``darConfigurationFileLocation``, and set it to ``conf/dars/locationservice-dar.properties``:
+
+.Editing MSS for Tomcat's server.xml for the Location Service
+====
+In the $JBOSS_HOME/standalone/configuration/standalone-sip.xml file search for the line 
+
+ <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" 
+application-router="dars/mobicents-dar.properties" 
+
+and replace it with the line below
+
+ <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0"
+ application-router="dars/locationservice-dar.properties" 
+====
+
 
 .Running
 Once the WAR and DAR files have been placed in the right directories, and the JBoss Application Server or Tomcat Servlet Container knows where to find them (which you specified in the [path]_standalone-sip.xml_ and [path]_server.xml_ file), then you should go ahead and run the SIP Servlets Server.
@@ -166,6 +200,20 @@ charging_sdk]$ unzip ChargingSDK-1_0_D31E.zip
 .Configuration
 
 Restcomm  for JBoss::
+Open the $JBOSS_HOME/standalone/configuration/standalone-sip.xml configuration file and find the mobicents subsystem element. 
+
+.Editing the standalone-sip.xml for the Diameter Event-Changer Service
+====
+In the $JBOSS_HOME/standalone/configuration/standalone-sip.xml file search for the line 
+
+ <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" 
+application-router="dars/mobicents-dar.properties" 
+
+and replace it with the line below
+
+ <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0"
+ application-router="dars/diametereventcharging-dar.properties" 
+====
 
 .Running
 The following procedure describes how to run the Diameter Event-Changing Service.
@@ -281,11 +329,39 @@ Restcomm  for Tomcat::
 
 Restcomm  for JBoss::
 
+Open the $JBOSS_HOME/standalone/configuration/standalone-sip.xml configuration file and find the mobicents subsystem element. 
+
+.Editing MSS for JBoss's standalone-sip.xml for the Location Service
+====
+In the $JBOSS_HOME/standalone/configuration/standalone-sip.xml file search for the line 
+
+ <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" 
+application-router="dars/mobicents-dar.properties" 
+
+and replace it with the line below
+
+ <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0"
+ application-router="dars/call-blocking-servlet-dar.properties" 
+====
+
 Restcomm  for Tomcat::
   Open the [path]_$CATALINA_HOME/conf/server.xml_
   configuration file and find the `Service`
   element.
   Add an attribute to it called ``darConfigurationFileLocation``, and set it to ``conf/dars/call-blocking-servlet-dar.properties``:
+
+.Editing MSS for Tomcat's server.xml for the Location Service
+====
+In the $JBOSS_HOME/standalone/configuration/standalone-sip.xml file search for the line 
+
+ <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" 
+application-router="dars/mobicents-dar.properties" 
+
+and replace it with the line below
+
+ <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0"
+ application-router="dars/call-blocking-servlet-dar.properties" 
+====
 
 .Running
 Once the WAR and DAR files have been placed in the right directories, and the JBoss Application Server or Tomcat Servlet Container knows where to find them (which you specified in a [path]_server.xml_ and the [path]_standalone-sip.xml_  files), then you should go ahead and run the SIP Servlets Server.
@@ -356,11 +432,39 @@ Restcomm  for Tomcat::
 
 Restcomm  for JBoss::
 
+Open the $JBOSS_HOME/standalone/configuration/standalone-sip.xml configuration file and find the mobicents subsystem element. 
+
+.Editing MSS for JBoss's standalone-sip.xml for the Location Service
+====
+In the $JBOSS_HOME/standalone/configuration/standalone-sip.xml file search for the line 
+
+ <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" 
+application-router="dars/mobicents-dar.properties" 
+
+and replace it with the line below
+
+ <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0"
+ application-router="dars/call-forwarding-b2bua-servlet.properties" 
+====
+
 Restcomm  for Tomcat::
   Open the [path]_$CATALINA_HOME/conf/server.xml_
   configuration file and find the `Service`
   element.
   Add an attribute to it called ``darConfigurationFileLocation``, and set it to ``conf/dars/call-forwarding-b2bua-servlet-dar.properties``:
+
+.Editing MSS for Tomcat's server.xml for the Location Service
+====
+In the $JBOSS_HOME/standalone/configuration/standalone-sip.xml file search for the line 
+
+ <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" 
+application-router="dars/mobicents-dar.properties" 
+
+and replace it with the line below
+
+ <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0"
+ application-router="dars/call-forwarding-b2bua-servlet-dar.properties" 
+====
 
 .Running
 Once the WAR and DAR files have been placed in the right directories, and the JBoss Application Server or Tomcat Servlet Container knows where to find them (which you specified in a [path]_standalone-sip.xml_ and [path]_server.xml_  files), then you should go ahead and run the SIP Servlets Server.
@@ -437,14 +541,41 @@ Restcomm  for Tomcat::
 
 .Configuring
 
-Restcomm  for JBoss::
-  Make sure that the configuration file only contains one ``darConfigurationFileLocation`` attribute: your new one.
+RRestcomm  for JBoss::
+
+Open the $JBOSS_HOME/standalone/configuration/standalone-sip.xml configuration file and find the mobicents subsystem element. 
+
+.Editing MSS for JBoss's standalone-sip.xml for the Location Service
+====
+In the $JBOSS_HOME/standalone/configuration/standalone-sip.xml file search for the line 
+
+ <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" 
+application-router="dars/mobicents-dar.properties" 
+
+and replace it with the line below
+
+ <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0"
+ application-router="dars/call-forwarding-b2bua-servlet.properties" 
+====
 
 Restcomm  for Tomcat::
   Open the [path]_$CATALINA_HOME/conf/server.xml_
   configuration file and find the `Service`
   element.
-  Add an attribute to it called ``darConfigurationFileLocation``, and set it to ``conf/dars/call-controller-servlet-dar.properties ``:
+  Add an attribute to it called ``darConfigurationFileLocation``, and set it to ``conf/dars/call-controller-servlet-dar.properties``:
+
+.Editing MSS for Tomcat's server.xml for the Location Service
+====
+In the $JBOSS_HOME/standalone/configuration/standalone-sip.xml file search for the line 
+
+ <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" 
+application-router="dars/mobicents-dar.properties" 
+
+and replace it with the line below
+
+ <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0"
+ application-router="dars/call-controller-servlet-dar.properties" 
+====
 
 .Running
 Once the WAR and DAR files have been placed in the right directories, and the JBoss Application Server or Tomcat Servlet Container knows where to find them (which you specified in a [path]_server.xml_ file), then you should go ahead and run the SIP Servlets Server.
@@ -486,10 +617,5 @@ Neither of the SIP soft-phones needs to be registered.
 NOTE: <<_ssea_sip_servlet_example_applications>>
 provides more information about other service examples available.
 
-:leveloffset: 1
-include::concept-section-SS_Media_IPBX.adoc[]
-:leveloffset: 0
+link:concept-chapter-SS_click2call.adoc[Click To Call]
 
-:leveloffset: 1
-include::concept-chapter-SS_click2call.adoc[]
-:leveloffset: 0

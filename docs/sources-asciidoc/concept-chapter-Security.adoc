@@ -12,10 +12,7 @@ To protect user information, SIP Security can be enabled on the server, and with
 
 There are essentially two levels of security that can be enabled on the server, the communication between the server and other SIP entities and securing the application and its content.
 
-:leveloffset: 1
-include::concept-section-SS_SIP_Servlet_Security.adoc[]
-:leveloffset: 0
+link:concept-section-SS_SIP_Servlet_Security.adoc[SIP Servlets Application Security]
 
-:leveloffset: 1
-include::concept-section-SS_TLS.adoc[]
-:leveloffset: 0
+link:concept-section-SS_TLS.adoc[SIP Servlets TLS Configuration]
+

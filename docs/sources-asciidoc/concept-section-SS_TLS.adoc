@@ -1,6 +1,12 @@
 
 [[_sss_tls]]
 = TLS
+:doctype: book
+:sectnums:
+:toc: left
+:icons: font
+:experimental:
+:sourcedir: .
 
 In order to configure TLS you will have to obtain a public/private key, a X.509 certificate, add those to the Java keystore and optionally add certificates from a known CA (certicate authority). The entire process can be confusing but in order to get a basic setup for testing purposes up and running with minimal effort, this section starts off with a simple quick start.
 However, for production environment you need to obtain an officially signed certificate from a known CA and that process is outlined in section <<_sss_tls_production_setup,Production Setup>>.
@@ -17,6 +23,9 @@ At a high-level, we will execute the following three steps:
 . Generate a public/private key pair and a self signed certificate and add those to the Java keystore.
 . Configure the SIP Servlet Container to load our certificate from the keystore.
 . Test!
+
+Let's follow each step in order:
+
 . Generate certificate
 +
 Generating a new key-pair and a certificate can be done in a few different ways with a few different tools but here we will just use the java keytool that comes with the JDK.
@@ -47,7 +56,7 @@ See more about the Java keytool here: http://docs.oracle.com/javase/6/docs/techn
 +
 The SIP Servlet Container relies on the JAIN SIP stack to support it with TLS capabilities.
 As such, it is the JAIN SIP stack that we need to configure to have it read our certificate we added to the key store.
-The various configuration options are described in the javadoc of the http://ci.jboss.org/jenkins/job/jain-sip/lastSuccessfulBuild/artifact/javadoc/gov/nist/javax/sip/SipStackImpl.html[SipStackImpl]                        class but for this quickstart, we will be using the following ones: 
+The various configuration options are described in the javadoc of the https://mobicents.ci.cloudbees.com/job/JAIN-SIP/lastSuccessfulBuild/artifact/javadoc/gov/nist/javax/sip/SipStackImpl.html[SipStackImpl]   class but for this quickstart, we will be using the following ones: 
 +
 
 
@@ -58,16 +67,18 @@ The various configuration options are described in the javadoc of the http://ci.
 * `gov.nist.javax.sip.TLS_CLIENT_AUTH_TYPE` – which type of authentication we will require of the client (for now, the client authentication type will be set to Disabled).        
 +
 The configuration options are JVM parameters and you will have to add these to the command line when you start the server: 
++
 [source]
 ----
 ./bin/run.sh -Djavax.net.ssl.keyStorePassword=mysecret -Dgov.nist.javax.sip.TLS_CLIENT_AUTH_TYPE=Disabled -Djavax.net.ssl.keyStore=/path/to/your/keystore/myserver.jks -Djavax.net.ssl.trustStorePassword=mysecret -Djavax.net.ssl.trustStore=/path/to/your/keystore/myserver.jks
 ----
-+
 Once the server is up, we are ready to verify that we can get a TLS connection using the certificate we previously added in the first step. 
 +
-Note: for this first part of the quickstart we will not require a certificate from the client since this involves more configuration.
-This is controlled by the `gov.nist.javax.sip.TLS_CLIENT_AUTH_TYPE parameter`. 
-
+[NOTE]
+====
+for this first part of the quickstart we will not require a certificate from the client since this involves more configuration.
+This is controlled by the `gov.nist.javax.sip.TLS_CLIENT_AUTH_TYPE parameter`.
+====
 . Test!
 +
 To verify your setup there are a few different tools that you can use. 
@@ -81,6 +92,7 @@ To verify your setup there are a few different tools that you can use.
 Using openssl:
 +
 Assuming that your server is running on localhost and is listening for TLS on port 5081 the command would be: 
++
 [source]
 ----
 openssl s_client -host 127.0.0.1 -port 5081
@@ -103,10 +115,14 @@ At a high-level, these are the tasks we need to execute:
 . Generate a public/private key pair for the client along with a certificate.
 . The server need to add the client certificate to its keystore as a trusted certificate.
 . Start the server with client authenticating enabled.
+
+Let's follow each step in order:
+
 . Generate Client Certificate
 +
 We will use the Java keytool for this step in the same we did for for the server side in the previous quikstart.
 The command is exactly the same and the only difference is that we store the information in a new keystore called [class]`myclient.jks`. 
++
 [source]
 ----
 keytool -genkeypair -alias myclient -keyalg RSA -keysize 1024 -keypass secret -validity 365 -storetype jks -keystore myclient.jks -storepass secret -v -dname "CN=John Doe, OU=Engineering, O=Some Work, L=Some City, S=Some State, C=US"
@@ -115,10 +131,12 @@ keytool -genkeypair -alias myclient -keyalg RSA -keysize 1024 -keypass secret -v
 We have now generated a new keystore containing the clients authentication information.
 However, the server needs to import the client certificate into its trusted keystore so we need to extract the certificate out of the client key store.
 This can also be done using the Java keytool. 
++
 [source]
 ----
 keytool -exportcert -alias myclient -file client.cert -keystore myclient.jks -storepass secret -rfc
-----The certificate is saved in file 'client.cert' and we will use this file in the next step. 
+----
+The certificate is saved in file 'client.cert' and we will use this file in the next step. 
 
 . Re-configure the server
 +
@@ -289,4 +307,4 @@ To make that the WebSockets connection is not refused with a self-signed certifi
 
 . Test!
 +
-Go to your WebRTC favorite example through https://localhost:8443/webrtc/, and use link:wss://localhost:5083 to connect over Secure SIP Over WebSockets.
+Go to your WebRTC favorite example through https://localhost:8443/webrtc/, and use link:wss://localhost:5083[wss://localhost:5083] to connect over Secure SIP Over WebSockets.

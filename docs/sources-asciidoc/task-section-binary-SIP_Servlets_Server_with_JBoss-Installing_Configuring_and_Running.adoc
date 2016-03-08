@@ -1,6 +1,13 @@
 
 [[_bssswjicar_binary_sip_servlets_server_with_jboss_installing_configuring_and_running]]
 = SIP Servlet-Enabled JBoss Application Server: Installing, Configuring and Running
+:doctype: book
+:sectnums:
+:toc: left
+:icons: font
+:experimental:
+:sourcedir: .
+
 
 The Restcomm SIP Servlets Server can run on either the JBoss Application Server or the Tomcat Servlet Container.
 This section details how to install the SIP Servlets Server on top of the JBoss Application Server.

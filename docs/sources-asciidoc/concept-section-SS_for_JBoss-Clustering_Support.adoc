@@ -1,6 +1,13 @@
 
 [[_ssfjcs_ss_for_jboss_clustering_support]]
 =  Understanding Restcomm  High Availabilty 
+= Enterprise Monitoring and Management
+:doctype: book
+:sectnums:
+:toc: left
+:icons: font
+:experimental:
+:sourcedir: .
 
 .High Availability in Restcomm for JBoss AS7 
 [NOTE]

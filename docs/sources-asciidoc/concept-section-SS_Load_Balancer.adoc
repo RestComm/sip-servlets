@@ -1,6 +1,12 @@
 
 [[_sslb_mss_load_balancer]]
 = Load Balancer
+:doctype: book
+:sectnums:
+:toc: left
+:icons: font
+:experimental:
+:sourcedir: .
 
 .Star Cluster Topology.
 image::images/mss-MSSSIPLoadBalancer-dia-StarNetworkTopology.jpg[]
@@ -49,12 +55,14 @@ It is recommended that the file is placed in the directory containing other JAR 
 
 Configuring the SIP load balancer and the two SIP Servlets-enabled Server nodes is described in <<_sslb_configuring_the_sip_load_balancer_and_servlet_server_nodes>>.
 
+[[_sslb_configuring_the_sip_load_balancer_and_servlet_server_nodes]]
 .Procedure: Configuring the Restcomm  SIP Load Balancer and SIP Server Nodes
 . Configure lb.properties Configuration Properties File
 +
 Configure the SIP Load Balancer's Configuration Properties file by substituting valid values for your personal setup. <<_sslb_complete_sample_lb.properties_file>>  shows a sample [path]_lb.properties_ file, with key element descriptions provided after the example.
 The lines beginning with the pound sign are comments.
 +
+[[_sslb_complete_sample_lb.properties_file]]
 .Complete Sample lb.properties File
 ====
 [source]
@@ -246,8 +254,8 @@ heartbeatInterval::
   The hearbeat interval  must be much smaller than the interval specified in the JAIN SIP property on the server machines - `org.mobicents.ha.javax.sip.HEARTBEAT_INTERVAL`
 +
 NOTE: The remaining keys and properties in the configuration properties file can be used to tune the JAIN SIP stack, but are not specifically required for load balancing.
-To assist with tuning, a comprehensive list of implementing classes for the SIP Stack is available from the http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/javax/sip/SipStack.html[Interface SIP Stack page on nist.gov].
-For a comprehensive list of properties associated with the SIP Stack implementation, refer to http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/gov/nist/javax/sip/SipStackImpl.html[Class SipStackImpl page on nist.gov].
+To assist with tuning, a comprehensive list of implementing classes for the SIP Stack is available from the https://mobicents.ci.cloudbees.com/job/JAIN-SIP/lastSuccessfulBuild/artifact/javadoc/javax/sip/SipStack.html[Interface SIP Stack].
+For a comprehensive list of properties associated with the SIP Stack implementation, refer to https://mobicents.ci.cloudbees.com/job/JAIN-SIP/lastSuccessfulBuild/artifact/javadoc/gov/nist/javax/sip/SipStackImpl.html[Class SipStackImpl].
 
 . Configure logging
 +
@@ -276,8 +284,6 @@ Ensure the following attributes are configured for the `<service>` element in [p
   The elector is used to define which load balancer will receive outgoing requests, which are out of dialog or in dialog with null state.
   Currently only one elector implementation is available, `org.mobicents.ha.javax.sip.RoundRobinLoadBalancerElector`, which, as the class name says, uses round robin algorythm to select the balancer.
 
-
-==== Unknown Title!
 
 .Configuration File Locations
 [NOTE]
@@ -575,7 +581,14 @@ org.mobicents.tools.sip.balancer.ClusterSubdomainAffinityAlgorithm ::
   This algorithm is not distributable, but supports grouping server nodes to act as a subcluster.
   Any call of a node that belongs to a cluster group will be preferentially failed over to a node from the same group.
   To configure a group you can just add the `subclusterMap` property in the load balancer properties and listing  the IP addresses of the nodes.
-  The groups are enclosed in parentheses and the IP  addresses are separate by commas as follows:
+  The nodes specified in a group do not have to alive and nodes that are not specified are still allowed to join the cluster. Otherwise the algorthim behaves exactly as the default Call-ID affinity algorthim.
+  The groups are enclosed in parentheses and the IP addresses are separate by commas as follows:
+[source]
+----
+  subclusterMap=( 192.168.1.1, 192.168.1.2 ) ( 10.10.10.10,  20.20.20.20,  30.30.30.30)
+----
+  
+  
 
 == Distributed load balancing
 
@@ -616,5 +629,6 @@ Simply edit the balancers connection string in your SIP Server - the list is sep
 <<_figure_mss_basic_ip_and_port_cluster_configuration>> describes a basic IP and Port Cluster Configuration.
 In the diagram, the SIP Load balancer is the server with the IP address of `192.168.1.1`.
 
+[[_figure_mss_basic_ip_and_port_cluster_configuration]]
 .Basic IP and Port Cluster Configuration
 image::images/mss-MSSSIPLoadBalancer-dia-ClusterIPsAndPorts.jpg[]

@@ -67,14 +67,14 @@ The  size of the  SIP message queue is a tunable parameter, which defaults to `1
 * If the SIP Message queue becomes full, the container immediately begins rejecting  new SIP requests until the queue clears.
   This is achieved by using one of the following methods:
 +
-* Sending a `503` SIP error code  to the originating application.
-* Dropping  incoming messages (according to the specified  congestion control policy).
+** Sending a `503` SIP error code  to the originating application.
+** Dropping  incoming messages (according to the specified  congestion control policy).
 
 * If the container exceeds the  configurable memory threshold (90% by  default), new  SIP requests are rejected   until the memory usage falls below the specified memory threshold.
   This is achieved by using one of the following methods:
 +
-* Sending a `503` SIP error code  to the originating application.
-* Dropping  incoming messages (according to the specified  congestion control policy).
+** Sending a `503` SIP error code  to the originating application.
+** Dropping  incoming messages (according to the specified  congestion control policy).
 
 
 A background task gathers information about the current server congestion.
@@ -97,14 +97,63 @@ The concurrency and congestion control settings can be configured through the SI
 * From the Embedded Jopr integrated management platform.
 
 Tuning Parameters with the SIP Servlets Management Console::
-  The easiest way to configure the [label]#SIP Message Queue Size# and [label]#Concurrency Control Mode#        tunable parameters is to open the `SIP Servlets Management Console` in your browser (by going to http://localhost:8080/sip-servlets-management), making your changes, and then clicking btn:[Apply]. 
+  The easiest way to configure the [label]#SIP Message Queue Size# and [label]#Concurrency Control Mode#        tunable parameters is to open the `SIP Servlets Management Console` in your browser (by going to http://localhost:8080/sip-servlets-management), making your changes, and then clicking button *Apply*. 
 
 .SIP Servlets Management Console Concurrency and Congestion Control Tuning Parameters
 image::images/mss-MSSSManagementConsole-ss-ServerSettings.png[]
+
+WARNING: Concurrency and congestion control settings altered through the SIP Servlets Management Console are not saved to the server.xml on Tomcat, only on JBoss AS7 through the standalone-sip.xmlconfiguration file.
+To make settings persistent, append the settings to the server.xml file directly.
 
 Making your changes permanent in [path]_standalone-sip.xml_ or [path]_server.xml_ by manual editing::
   Alternatively, you can edit your server's [path]_standalone-sip.xml_ or [path]_server.xml_ configuration file, which has the benefit of making your chosen settings changes permanent for Tomcat.
   Instructions follow, grouped by the SIP Servlets Server you are running:
 
+.Procedure: Tuning RestComm SIP Servlets for JBoss Server Settings for Concurrency and Congestion Control
+
+. Open standalone-sip.xml File
++
+Open the $JBOSS_HOME/standalone/configuration/standalone-sip.xml configuration file in a text editor.
+. Extract from stanalone-sip.xml file with conccurency configuration
++
+[source]
+----
+<subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" application-router="dars/mobicents-dar.properties" stack-properties="mss-sip-stack.properties" path-name="gov.nist" app-dispatcher-class="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl" concurrency-control-mode="SipApplicationSession" congestion-control-interval="-1">
+	<connector name="sip-udp" protocol="SIP/2.0" scheme="sip" socket-binding="sip-udp"/>
+	<connector name="sip-tcp" protocol="SIP/2.0" scheme="sip" socket-binding="sip-tcp"/>
+	<connector name="sip-tls" protocol="SIP/2.0" scheme="sip" socket-binding="sip-tls"/>
+	<connector name="sip-tls" protocol="SIP/2.0" scheme="sip" socket-binding="sip-ws"/>
+	<connector name="sip-tls" protocol="SIP/2.0" scheme="sip" socket-binding="sip-wss"/>
+</subsystem>
+----
+
+.Procedure: Tuning RestComm SIP Servlets for Tomcat Server Settings for Concurrency and Congestion Control
+. Open server.xml File
++
+Open the $CATALINA_HOME/conf/server.xml configuration file in your text editor.
+. Add Parameters to <service> Element
++
+Locate the <service> element, and add the concurrencyControlMode and/or sipMessageQueueSize attributes.
++
+Possible values for the concurrencyControlMode attribute include: None, SipSession or SipApplicationSession. SipSession is the value of this attribute when it is not present—and overridden—in server.xml.
+
+. Define the Correct Attribute Values
++
+The following default values for the concurrency and congestion control parameters are used regardless of whether the attributes are defined in the server.xml file:
++
+* sipMessageQueueSize="1500"
+* backToNormalSipMessageQueueSize="1300"
+* congestionControlCheckingInterval="30000" (30 seconds, in milliseconds)
+* memoryThreshold="95" (in percentage)
+* backToNormalMemoryThreshold="90" (in percentage)
+* congestionControlPolicy="ErrorResponse"
++
+Experimentation is required for these tuning parameters depending on the operating system and server.
+
 Tuning Parameters from the dispatcher MBean::
-  Navigate to the `dispatcher` MBean from Restcomm  SIP Servlets for JBoss's JMX console. 
+
+Navigate to the `dispatcher` MBean from Restcomm  SIP Servlets for JBoss's JMX console.
++
+All changes performed at run time are effective immediately, but do not persist across reboots for Tomcat, only on JBoss AS7. the server.xml must be appended with the settings in order to make the configuration persistent.
++
+When editing the dispatcher MBean from RestComm SIP Servlets for JBoss's JMX console, values allowed for the concurrency control mode are *None*, *SipSession* or *SipApplicationSession*.

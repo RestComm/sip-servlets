@@ -162,7 +162,9 @@ Once the 2 soft phone clients are configured with the SIP details,  you can go b
 
 
 .Registered Sip Clients
-image::images/click2call_mobicents_sip_servlets_registered_clients.png[]   Before you can make calls, you will need to specify the contact details of the person you want to call.
+image::images/click2call_mobicents_sip_servlets_registered_clients.png[]  
+
+Before you can make calls, you will need to specify the contact details of the person you want to call.
 It is just like entering the phone number.
 Because this is a SIP based setting, you will need to enter the SIP address instead of the phone number.
  
@@ -186,5 +188,7 @@ The phone contact number will be
 
 
 .3CXPhone Contact User Details
-image::images/click2call_3cxphone_contact_user_detail.png[]  Once you have both contact sip details configured, you can start to make calls and fully use the Click2call application.
+image::images/click2call_3cxphone_contact_user_detail.png[]  
+
+Once you have both contact sip details configured, you can start to make calls and fully use the Click2call application.
  

@@ -1,6 +1,12 @@
 
 [[_sss_sip_servlet_security]]
 = SIP Servlets Application Security
+:doctype: book
+:sectnums:
+:toc: left
+:icons: font
+:experimental:
+:sourcedir: .
 
 Application security varies depending on the server type used.
 The following procedures describe how to configure the JBoss AS7 and Tomcat servers to enable Security.
@@ -8,8 +14,8 @@ The following procedures describe how to configure the JBoss AS7 and Tomcat serv
 .Procedure: Enable SIP Application Security in JBoss AS7
 . Add Security Policy to Server Configuraton
 +
-. Open the configuration file located in `$JBOSS_HOME/standalone/configuration/standalone-sip.xml` 
-. Append a security domain to the under the `<security-domains>`:
+.. Open the configuration file located in `$JBOSS_HOME/standalone/configuration/standalone-sip.xml` 
+.. Append a security domain to the under the `<security-domains>`:
 +
 [source,xml]
 ----
@@ -33,14 +39,14 @@ The following procedures describe how to configure the JBoss AS7 and Tomcat serv
 
 . Create SIP Server User Properties File
 +
-. Open a terminal and navigate to the `$JBOSS_HOME/standalone/configuration` directory:
+.. Open a terminal and navigate to the `$JBOSS_HOME/standalone/configuration` directory:
 +
 [source]
 ----
 home]$ cd standalone/configuration
 ----
 
-. Create and open a `sip-servlets-users.properties` file and append the user lines to the file:
+.. Create and open a `sip-servlets-users.properties` file and append the user lines to the file:
 +
 [source]
 ----
@@ -50,19 +56,19 @@ home]$ cd standalone/configuration
   admin=<A1_cryptographic_string>
 ----
 
-. To create <A1_cryptographic_string>, execute the following command in a terminal:
+.. To create <A1_cryptographic_string>, execute the following command in a terminal:
 +
 [source]
 ----
 home]$ java -cp ../../modules/system/layers/base/org/picketbox/main/picketbox-4.0.15.Final.jar org.jboss.security.auth.callback.RFC2617Digest admin sip-servlets <password>
 ----
 
-. Copy the A1 hash, and paste it into the admin parameter in the previous step.
-. Save and close `sip-servlets-users.properties`.
+.. Copy the A1 hash, and paste it into the admin parameter in the previous step.
+.. Save and close `sip-servlets-users.properties`.
 
 . Create the SIP Server Roles File
 +
-. Create and open `sip-servlets-roles.properties` (using your preferred editor) and append the following information to the file:
+.. Create and open `sip-servlets-roles.properties` (using your preferred editor) and append the following information to the file:
 +
 [source]
 ----
@@ -76,8 +82,8 @@ admin=caller,role1,role2,..
 
 . Add the Security Domain to the SIP Application
 +
-. Open the `jboss-web.xml` file for the SIP application to which security is required.
-. Add the  element as a child of the  element:
+.. Open the `jboss-web.xml` file for the SIP application to which security is required.
+.. Add the  element as a child of the  element:
 +
 [source,xml]
 ----
@@ -91,8 +97,8 @@ admin=caller,role1,role2,..
 
 . Add Security Constraints to the SIP Application
 +
-. Open the `sip.xml` file for the SIP application.
-. Add the  element as a child of the  element:
+.. Open the `sip.xml` file for the SIP application.
+.. Add the  element as a child of the  element:
 +
 [source,xml]
 ----
@@ -122,14 +128,14 @@ admin=caller,role1,role2,..
 .Procedure: Enable SIP Application Security in Tomcat Server
 . Activate the Memory Realm in Catalina:
 +
-. Open a terminal and navigate to the [path]_/conf_          directory:
+.. Open a terminal and navigate to the [path]_/conf_          directory:
 +
 [source]
 ----
 home]$ cd server/default/<tomcat_home>/conf/
 ----
 
-. Open `server.xml` and uncomment the following line:
+.. Open `server.xml` and uncomment the following line:
 +
 [source,xml]
 ----
@@ -139,7 +145,7 @@ home]$ cd server/default/<tomcat_home>/conf/
 
 . Update SIP Server User Properties File
 +
-. In the [path]_/conf_ directory, open `tomcat-users.xml` (using your preferred editor) and append the following  child element:
+.. In the [path]_/conf_ directory, open `tomcat-users.xml` (using your preferred editor) and append the following  child element:
 +
 [source,xml]
 ----
@@ -149,8 +155,8 @@ home]$ cd server/default/<tomcat_home>/conf/
 
 . Add Security Constraints to the SIP Application
 +
-. Open the `sip.xml` file for the SIP application to which security is required.
-. Add the  child element to the  element:
+.. Open the `sip.xml` file for the SIP application to which security is required.
+.. Add the  child element to the  element:
 +
 [source,xml]
 ----

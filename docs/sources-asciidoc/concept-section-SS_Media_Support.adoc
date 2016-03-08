@@ -15,6 +15,6 @@ Restcomm Media Server provides an implementation of the http://jcp.org/en/jsr/de
 
 The following examples demonstrate its usage:
 
-* http://www.mobicents.org/mss-jsr309-demo.html[Media Example] : a SIP Servlet application showing how to use media capabilities (Media playback, Recording, Text to Speech with FreeTTS and DTMF detection).
-* http://www.mobicents.org/conference-demo-jsr309.html[Conference Demo] : a Conference Media Server demo application built on GWT with server-push updates.
-* http://www.mobicents.org/shopping-demo-jsr309.html[Shopping Example] : a Converged JEE Application showing SEAM integration, JEE, Media integration with TTS and DTMF support.
+* https://github.com/RestComm/sip-servlets/wiki/MediaDemo[Media Example] : a SIP Servlet application showing how to use media capabilities (Media playback, Recording, Text to Speech with FreeTTS and DTMF detection).
+* https://github.com/RestComm/sip-servlets/wiki/ConferenceDemo[Conference Demo] : a Conference Media Server demo application built on GWT with server-push updates.
+* https://github.com/RestComm/sip-servlets/wiki/ShoppingDemo[Shopping Example] : a Converged JEE Application showing SEAM integration, JEE, Media integration with TTS and DTMF support.
