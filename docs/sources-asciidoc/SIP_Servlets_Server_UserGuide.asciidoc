@@ -1,9 +1,0 @@
-
-
-++++++++++++++++++++++++++++++++++++++
-<!-- This document was created with Syntext Serna Free. -->
-++++++++++++++++++++++++++++++++++++++
-    
-
-== Clustering and High Availability
-

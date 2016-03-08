@@ -1,0 +1,7 @@
+
+[[_sscacc_mss_jsr289_extensions]]
+= &PLATFORM_NAME; vendor-specific Extensions to JSR 289
+
+&PLATFORM_NAME;provide Extensions for applications or external systems to interact with the &PLATFORM_NAME;SIP Servlets container as well as Extensions not defined in the specification in the JSR 289 specification that can prove useful and might be proposed for inclusion in a next release of the SIP Servlets specification 
+
+http://ci.jboss.org/jenkins/view/Mobicents/job/MobicentsBooks/lastSuccessfulBuild/artifact/api-docs/jsr289/extensions/index.html[Javadoc for  JSR 289 Extensions]

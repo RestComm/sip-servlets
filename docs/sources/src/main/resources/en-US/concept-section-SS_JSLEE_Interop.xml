@@ -16,7 +16,7 @@
   programming framework, while JSLEE is a complete, self sufficient application
   platform. The fact that SIP Servlets is focused on SIP and
   Java EE makes it a natural fit to build JEE converged applications.</para>
-  <para><table frame="all" id="tab-ss_vs_jslee">
+  <para><!--table frame="all" id="tab-ss_vs_jslee">
       <title>SIP Servlets / JAIN SLEE Comparison Table</title>
       <tgroup cols="2" colsep="1" rowsep="1" align="left">
         <colspec colname="c1"/>
@@ -117,7 +117,7 @@
           </row>
         </tbody>
       </tgroup>
-    </table></para>
+    </table--></para>
   <para>JSLEE and SIP Servlets target different audiences with different needs,
   but they can be complementary in a number of real world cases.</para>
   <para>SIP Servlets focuses on SIP and its integration with Java EE. It is

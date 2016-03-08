@@ -1,0 +1,20 @@
+[[_sssicar_sip_servlets_server_installing_configuring_and_running]]
+= SIP Servlets Server-Installing, Configuring and Running
+:doctype: book
+:sectnums:
+:toc: left
+:icons: font
+:experimental:
+:sourcedir: .
+
+:leveloffset: 1
+include::concept-chapter-AS7-mss.adoc[]
+:leveloffset: 0
+
+:leveloffset: 1
+include::task-section-binary-SIP_Servlets_Server_with_Tomcat-Installing_Configuring_and_Running.adoc[]
+:leveloffset: 0
+
+:leveloffset: 1
+include::task-section-SIP_Servlets_Server-Configuring.adoc[]
+:leveloffset: 0

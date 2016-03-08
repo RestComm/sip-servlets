@@ -1,0 +1,91 @@
+
+[[_saimse_sip_and_ims_extensions]]
+= SIP and IMS Extensions
+
+SIP Extensions in the SIP Servlets Server are based on the Internet Engineering Task Force's (IETF) Request for Comments (RFC) protocol recommendations. <<_tab_sse_supported_sip_extensions>> lists the supported RFCs for the SIP Servlets Server.
+
+.Supported SIP Extensions
+[cols="1,1,1", frame="all", options="header"]
+|===
+| Extension
+| RFC Number
+| Description
+| RFC 3263
+
+| RFC 2916
+
+| RFC 2976
+
+| RFC 2460
+
+| RFC 3911
+
+| RFC 3428
+
+| RFC 3327
+
+| RFC 3262
+
+| RFC 3903
+
+| RFC 3326
+
+| RFC 3515
+
+| RFC 3891
+
+| RFC 3489
+
+| RFC 3265
+
+| RFC 3581
+
+| RFC 4662
+
+| RFC 4916
+|===
+
+IMS Private Header (P-Header) Extensions are provided according to the recommendations of the http://www.3gpp.org/[3rd Generation Partnering Project (3GPP)] and the IETF.
+P-Header extensions are primarily used to store information about the networks a call traverses, including security or call charging details.
+
+<<_tab_sse_ims_p_header_extensions>> describes the list of supported P-Headers, including links to the relevant ITEF memorandum where available.
+
+.IMS P-Header Extensions
+[cols="1,1", frame="all", options="header"]
+|===
+| Extension
+| Description
+
+
+| PAssertedIdentityHeader
+
+| Contains information used by "trust domains", according to Spec(T) specifications detailed in RFC 3324.
+
+| PAssociatedURIHeader
+
+| PathHeader
+
+
+
+
+| PMediaAuthorizationHeader
+
+| PPreferredIdentityHeader
+
+
+| PProfileKeyHeader
+
+| PrivacyHeader
+
+| PServedUserHeader
+
+| PUserDatabaseHeader
+
+| PVisitedNetworkIDHeader
+
+| SecurityClientHeader, SecurityServerHeader, SecurityVerifyHeader
+
+| ServiceRouteHeader
+
+| WWWAuthenticateHeaderIms
+|===

@@ -23,15 +23,16 @@ You can download the <ulink url="http://www.java.com/en/"> Java Runtime Environm
 </para>
 
 <para>
+If you are a developer, you can get the <ulink url="http://www.oracle.com/technetwork/java/archive-139210.html"> Java Development Kit here </ulink>.
+It is recommended that you install the latest version of JDK. You can opt for the JDK Java SE (Standard Edition) for test purposes. 
+Once you have downloaded JDK, you will see an executable like the one below in your download folder. 
+</para>
+
+<para>
 <step>
 Do to the following to open the cmd window
 <screen> menu > Start > Run > CMD</screen>
-
-
 In the black CMD window type 'java -version' You should see something similar to the screenshot below 
-
-
-
 <figure>
 <title>Testing if Java is installed and running</title>
 <mediaobject id="windows_cmd_test_java_running">
@@ -42,12 +43,6 @@ In the black CMD window type 'java -version' You should see something similar to
 </figure>
 
 </step>
-</para>
-
-<para>
-If you are a developer, you can get the <ulink ref="http://www.oracle.com/technetwork/java/archive-139210.html"> Java Development Kit here </ulink>. 
-It is recommended that you install the latest version of JDK. You can opt for the JDK Java SE (Standard Edition) for test purposes. 
-Once you have downloaded JDK, you will see an executable like the one below in your download folder. 
 </para>
 
 <para>
@@ -64,7 +59,7 @@ Double-click the .exe file and follow the menu to complete your installation. <s
 </mediaobject>
 </figure>
 </step>
-</para>
+</para-->
 
 <para>
 JAVA_Home enviroment variable. 
