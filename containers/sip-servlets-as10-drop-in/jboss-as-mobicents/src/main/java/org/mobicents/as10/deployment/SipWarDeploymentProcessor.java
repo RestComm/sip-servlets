@@ -313,7 +313,7 @@ public class SipWarDeploymentProcessor implements DeploymentUnitProcessor {
         }
         final WarMetaData warMetaData = deploymentUnit.getAttachment(WarMetaData.ATTACHMENT_KEY);
         final JBossConvergedSipMetaData sipMetaData = ((JBossConvergedSipMetaData) warMetaData.getMergedJBossWebMetaData());
-        if (sipMetaData != null) {
+        if (sipMetaData != null && sipMetaData.getApplicationName() != null) {
             final String appNameMgmt = sipMetaData.getApplicationName();
             final ServiceName deploymentServiceName = SipSubsystemServices.deploymentServiceName(appNameMgmt);
             try {
