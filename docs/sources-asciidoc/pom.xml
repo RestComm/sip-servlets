@@ -68,14 +68,14 @@
 					<!--doctype>book</doctype-->
 					<attributes>
 					    <imagesdir>./images/..</imagesdir>
-					    <toc>left</toc>
+					    <toc></toc>
 					    <icons>font</icons>
 					    <sectanchors>true</sectanchors>
 					    <idprefix/>
 					    <idseparator>-</idseparator>
 					    <docinfo1>true</docinfo1>
 					    <embedAssets>true</embedAssets>
-					    <stylesheet>${basedir}/src/main/asciidoc/stylesheets/telestax.css</stylesheet>
+					    <!--stylesheet>${basedir}/src/main/asciidoc/stylesheets/telestax.css</stylesheet-->
 					</attributes>
 					<preserveDirectories>true</preserveDirectories>
 				    </configuration>
