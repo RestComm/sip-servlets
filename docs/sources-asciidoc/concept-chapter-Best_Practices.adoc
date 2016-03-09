@@ -26,16 +26,16 @@ In summary, the most important optimization technique is to remove logs, leaving
 
 Check the log configuration file in the following location and review the information.
 
-<<_bsssc_binary_sip_servlets_server_configuring_logging>>  
+link:task-section-SIP_Servlets_Server-Configuring.adoc#_bsssc_binary_sip_servlets_server_configuring_logging[SIP Servlets Server Logging]
 
 === Tuning Restcomm SIP Servlets
 
-* _Congestion Control_: It is recommended that this feature is enabled to avoid overload of the server and that the _sipMessageQueueSize_ and _memoryThreshold_ parameters are tuned according to <<_sscacc_mss_concurrency_and_congestion_control>>.
+* _Congestion Control_: It is recommended that this feature is enabled to avoid overload of the server and that the _sipMessageQueueSize_ and _memoryThreshold_ parameters are tuned according to link:concept-section-SS_Concurrency_and_Congestion_Control.adoc#_sscacc_mss_concurrency_and_congestion_control[Concurrency and Congestion Control].
 * _Concurrency_ : _Default Value: None._  For better performance, it is recommended to leave this value set to `None`.
 
 === Tuning The JAIN SIP Stack
 
-The stack can be fine-tuned by altering the SIP stack properties, defined in the external properties file specified by the _sipStackPropertiesFile_ attribute as described in <<_bsssc_binary_sip_servlets_server_adding_sip_connectors>>.
+The stack can be fine-tuned by altering the SIP stack properties, defined in the external properties file specified by the _sipStackPropertiesFile_ attribute as described in link:task-section-SIP_Servlets_Server-Configuring.adoc##_bsssc_binary_sip_servlets_server_adding_sip_connectors[Configuring SIP Connectors and Bindings].
 
 * _gov.nist.javax.sip.THREAD_POOL_SIZE_          
 +
@@ -117,7 +117,7 @@ It cannot recover once a malformed message is processed, because the stream iter
 Eventually the connection will be closed.
 
 
-The full list of JAIN SIP stack properties is available from http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/javax/sip/SipStack.html[the SIP Stack Properties Home Page]      and the full list of implementation specific properties are available from the http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/gov/nist/javax/sip/SipStackImpl.html[SIP Stack Implementation Home Page].
+The full list of JAIN SIP stack properties is available from https://mobicents.ci.cloudbees.com/job/JAIN-SIP/lastSuccessfulBuild/artifact/javadoc/javax/sip/SipStack.html[the SIP Stack Properties Home Page]      and the full list of implementation specific properties are available from the https://mobicents.ci.cloudbees.com/job/JAIN-SIP/lastSuccessfulBuild/artifact/javadoc/gov/nist/javax/sip/SipStackImpl.html[SIP Stack Implementation Home Page].
 
 === Tuning The JVM
 
@@ -180,7 +180,7 @@ You can increase the network buffers size by adding the following lines to your 
 
 * Execute the following command to set the network interface address:
 +
-`sudo ifconfig [eth0] txqueuelen 1000 # `
+  sudo ifconfig [eth0] txqueuelen 1000 #
 +
 Replace [eth0] with the correct name of the actual network interface you are setting up.
 

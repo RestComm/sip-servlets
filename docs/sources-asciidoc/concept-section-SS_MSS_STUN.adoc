@@ -1,6 +1,13 @@
 
 [[_mssstun_mss_stun]]
 = STUN
+= Enterprise Monitoring and Management
+:doctype: book
+:sectnums:
+:toc: left
+:icons: font
+:experimental:
+:sourcedir: .
 
 The Session Traversal Utilities for NAT (STUN) prococol is used in Network Address Translation (NAT) traversal for real-time voice, video, messaging, and related interactive IP application communications.
 This light-weight, client-server protocol allows applications passing through a NAT to obtain the public IP address for the UDP connections the application uses to connect to remote hosts.
