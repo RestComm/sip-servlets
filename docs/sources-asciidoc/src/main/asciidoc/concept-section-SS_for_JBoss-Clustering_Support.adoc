@@ -1,13 +1,6 @@
 
 [[_ssfjcs_ss_for_jboss_clustering_support]]
-=  Understanding Restcomm  High Availabilty 
-= Enterprise Monitoring and Management
-:doctype: book
-:sectnums:
-:toc: left
-:icons: font
-:experimental:
-:sourcedir: .
+= Understanding Restcomm  High Availabilty 
 
 .High Availability in Restcomm for JBoss AS7 
 [NOTE]
@@ -49,3 +42,9 @@ It is important to note that clustering is also a way to provide failover and en
 The same can be said of load balancing.
 The idea behind all the above mentioned techniques is to provide high availability to connecting clients connecting to applications running on Restcomm .
 In a nutshell, high availability englobes all the above mentioned techniques. 
+
+:leveloffset: 2
+
+include::concept-section-SS_Load_Balancer.adoc[]
+
+:leveloffset: 1

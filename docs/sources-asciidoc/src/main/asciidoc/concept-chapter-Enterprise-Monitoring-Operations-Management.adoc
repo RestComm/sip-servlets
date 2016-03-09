@@ -1,11 +1,5 @@
 [[_emom_enterprise_monitoring_operations_management]]
 = Enterprise Monitoring and Management
-:doctype: book
-:sectnums:
-:toc: left
-:icons: font
-:experimental:
-:sourcedir: .
 
 There is two ways of monitoring Restcomm Sip Servlets : 
 

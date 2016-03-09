@@ -1,12 +1,6 @@
 
 [[_sslb_mss_load_balancer]]
 = Load Balancer
-:doctype: book
-:sectnums:
-:toc: left
-:icons: font
-:experimental:
-:sourcedir: .
 
 .Star Cluster Topology.
 image::images/mss-MSSSIPLoadBalancer-dia-StarNetworkTopology.jpg[]

@@ -1,13 +1,6 @@
 
 [[_getting_started_with_mss_jboss_as7]]
 = Getting Started with Restcomm for JBoss AS7 
-:doctype: book
-:sectnums:
-:toc: left
-:icons: font
-:experimental:
-:sourcedir: .
-
 
 .Features not yet available on Restcomm for JBoss AS7 
 [NOTE]

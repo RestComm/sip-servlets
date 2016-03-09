@@ -1,11 +1,5 @@
 [[_bp_jsr289_errata]]
 = JSR 289 Errata
-:doctype: book
-:sectnums:
-:toc: left
-:icons: font
-:experimental:
-:sourcedir: .
 
 This chapter discusses deviations from the JSR 289 specification by Restcomm SIP Servlets after feedback on usage in real world deployments and from the community.
 

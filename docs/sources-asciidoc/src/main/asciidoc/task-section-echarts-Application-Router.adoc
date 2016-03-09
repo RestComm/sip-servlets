@@ -1,12 +1,6 @@
 
 [[_tsear_echarts_application_router]]
 = DFC Application Router
-:doctype: book
-:sectnums:
-:toc: left
-:icons: font
-:experimental:
-:sourcedir: .
 
 == Description of DFC Application Router
 

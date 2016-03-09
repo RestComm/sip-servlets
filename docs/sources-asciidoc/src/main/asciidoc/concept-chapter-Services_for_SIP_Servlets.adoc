@@ -1,12 +1,6 @@
 
 [[_sfss_services_for_sip_servlets]]
 = Operating the Example Applications
-:doctype: book
-:sectnums:
-:toc: left
-:icons: font
-:experimental:
-:sourcedir: .
 
 .Important Information  
 [NOTE]

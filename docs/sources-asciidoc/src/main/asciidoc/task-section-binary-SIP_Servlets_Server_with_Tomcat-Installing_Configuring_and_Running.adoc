@@ -1,13 +1,6 @@
 
 [[_getting_started_with_mss_tomcat_as7]]
 = Getting Started with Restcomm SIP Servlets for Tomcat 7  
-:doctype: book
-:sectnums:
-:toc: left
-:icons: font
-:experimental:
-:sourcedir: .
-
 
 You can download the latest Restcomm SIP Servlets for Tomcat 7  link: https://code.google.com/p/sipservlets/wiki/Downloads?tm=2[Download Latest Version of  for Tomcat 7 ]
 

@@ -1,11 +1,4 @@
-[[_ittsss_introduction_to_the_sip_servlets_server]]
 = Introduction
-:doctype: book
-:sectnums:
-:toc: left
-:icons: font
-:experimental:
-:sourcedir: .
 
 == Overview of Restcomm SIP Servlets within the Telecommunications Industry
 

@@ -1,11 +1,5 @@
 [[_appendix]]
 = Apendix
-:doctype: book
-:sectnums:
-:toc: left
-:icons: font
-:experimental:
-:sourcedir: .
 
 [[_install_configure_jdk]]
 == Java Development Kit (): Installing, Configuring and Running

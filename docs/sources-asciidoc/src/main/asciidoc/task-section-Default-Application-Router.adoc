@@ -1,12 +1,6 @@
 
 [[_tsdar_default_application_router]]
 = Default Application Router
-:doctype: book
-:sectnums:
-:toc: left
-:icons: font
-:experimental:
-:sourcedir: .
 
 The Application Router is called by the container to select a SIP Servlet application to service an initial request.
 It embodies the logic used to choose which applications to invoke.

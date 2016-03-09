@@ -1,15 +1,13 @@
 [[_sssicar_sip_servlets_server_installing_configuring_and_running]]
 = SIP Servlets Server-Installing, Configuring and Running
-:doctype: book
-:sectnums:
-:toc: left
-:icons: font
-:experimental:
-:sourcedir: .
 
-link:concept-chapter-AS7-mss.adoc[Getting Started with Restcomm SIP Servlets for JBoss AS7]
+:leveloffset: 2
 
-link:task-section-binary-SIP_Servlets_Server_with_Tomcat-Installing_Configuring_and_Running.adoc[Getting Started with Restcomm SIP Servlets for Tomcat]
+include::concept-chapter-AS7-mss.adoc[]
 
-link:task-section-SIP_Servlets_Server-Configuring.adoc[Sip Connectors]
+include::task-section-binary-SIP_Servlets_Server_with_Tomcat-Installing_Configuring_and_Running.adoc[]
+
+include::task-section-SIP_Servlets_Server-Configuring.adoc[]
+
+:leveloffset: 1
 

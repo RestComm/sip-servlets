@@ -1,29 +1,27 @@
 [[_afotsss_advanced_features_of_the_sip_servlets_server]]
 = Advanced Features of the SIP Servlets Server
-:doctype: book
-:sectnums:
-:toc: left
-:icons: font
-:experimental:
-:sourcedir: .
 
 The advanced features of SIP Servlets include Concurrency and  Congestion Control, load balancing and clustering support with the Restcomm Load Balancer.
 
-link:concept-section-SS_Media_Support.adoc[Media Support]
+:leveloffset: 2
 
-link:concept-section-SS_Concurrency_and_Congestion_Control.adoc[Concurrency and Congestion Control]
+include::concept-section-SS_Media_Support.adoc[]
 
-link:concept-section-SS_STUN_Support.adoc[STUN Support]
+include::concept-section-SS_Concurrency_and_Congestion_Control.adoc[]
 
-link:concept-section-SS_JSR289_Extensions.adoc[RestComm vendor-specific Extensions to JSR 289]
+include::concept-section-SS_STUN_Support.adoc[]
 
-link:concept-section-SS_CDI_Telco_Framework.adoc[CDI Telco Framework]
+include::concept-section-SS_JSR289_Extensions.adoc[]
 
-link:concept-section-SS_Diameter_Support.adoc[Diameter Support]
+include::concept-section-SS_CDI_Telco_Framework.adoc[]
 
-link:concept-section-SS_SIP_Extensions.adoc[SIP and IMS Extensions]
+include::concept-section-SS_Diameter_Support.adoc[]
 
-link:concept-section-SS_JSLEE_Interop.adoc[SIP Servlets - JAIN SLEE Interoperability]
+include::concept-section-SS_SIP_Extensions.adoc[]
+
+include::concept-section-SS_JSLEE_Interop.adoc[]
+
+:leveloffset: 1
 
 == Eclipse IDE Tools
 

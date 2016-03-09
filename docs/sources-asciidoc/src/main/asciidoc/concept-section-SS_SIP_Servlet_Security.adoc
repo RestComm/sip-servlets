@@ -1,12 +1,6 @@
 
 [[_sss_sip_servlet_security]]
 = SIP Servlets Application Security
-:doctype: book
-:sectnums:
-:toc: left
-:icons: font
-:experimental:
-:sourcedir: .
 
 Application security varies depending on the server type used.
 The following procedures describe how to configure the JBoss AS7 and Tomcat servers to enable Security.

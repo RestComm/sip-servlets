@@ -1,11 +1,5 @@
 [[_bp_best_practices]]
 = Best Practices
-:doctype: book
-:sectnums:
-:toc: left
-:icons: font
-:experimental:
-:sourcedir: .
 
 This chapter discusses Best Practices related to Restcomm SIP Servlets usage in real world deployments.
 

@@ -1,11 +1,5 @@
 [[_ssea_sip_servlet_example_applications]]
 = SIP Servlet Example Applications
-:doctype: book
-:sectnums:
-:toc: left
-:icons: font
-:experimental:
-:sourcedir: .
 
 The SIP Servlet Server has a selection of examples that demonstrate particular capabilities of the server. <<_tab_ssea_sip_servlet_example_applications>> lists the available examples, their location, and a brief description about the functionality each example demonstrates.
 The examples can also provide a useful starting point for developing SIP Applications, therefore it is encouraged to experiment and adapt the base examples.
@@ -50,4 +44,9 @@ Each example is available in both binary and source formats.
 
 |===
 
-link:concept-chapter-Services_for_SIP_Servlets.adoc[Operating the Example Applications]
+
+:leveloffset: 2
+
+include::concept-chapter-Services_for_SIP_Servlets.adoc[]
+
+:leveloffset: 1

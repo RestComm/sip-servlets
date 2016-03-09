@@ -1,12 +1,6 @@
 
 [[_sss_tls]]
 = TLS
-:doctype: book
-:sectnums:
-:toc: left
-:icons: font
-:experimental:
-:sourcedir: .
 
 In order to configure TLS you will have to obtain a public/private key, a X.509 certificate, add those to the Java keystore and optionally add certificates from a known CA (certicate authority). The entire process can be confusing but in order to get a basic setup for testing purposes up and running with minimal effort, this section starts off with a simple quick start.
 However, for production environment you need to obtain an officially signed certificate from a known CA and that process is outlined in section <<_sss_tls_production_setup,Production Setup>>.

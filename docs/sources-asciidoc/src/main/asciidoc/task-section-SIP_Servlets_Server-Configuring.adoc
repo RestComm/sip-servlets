@@ -1,13 +1,6 @@
 
 [[_bsssc_binary_sip_servlets_server_configuring]]
 =  Sip Connectors 
-:doctype: book
-:sectnums:
-:toc: left
-:icons: font
-:experimental:
-:sourcedir: .
-
 
 Restcomm SIP Servlets comes with default settings that are designed to get your system up and running without the need to know about all the detailed configurations.
 That said, there are situations in which you might like to fine-tune your setttings to adapt it to your needs.
