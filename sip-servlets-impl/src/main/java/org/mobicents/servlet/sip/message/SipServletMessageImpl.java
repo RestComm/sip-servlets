@@ -201,6 +201,9 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		if(sipSession != null && dialog != null) {
 			sipSession.setSessionCreatingDialog(dialog);
 			if(dialog.getApplicationData() == null) {
+				if (logger.isDebugEnabled()) {
+					logger.debug("dialog app data is null, setting it to " + transactionApplicationData);
+				}
 				dialog.setApplicationData(transactionApplicationData);
 			}
 		}

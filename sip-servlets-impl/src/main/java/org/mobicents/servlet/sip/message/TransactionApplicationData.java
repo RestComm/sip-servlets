@@ -232,7 +232,7 @@ public class TransactionApplicationData implements Serializable, MobicentsTransa
 
 	public void cleanUp() {
 		if(logger.isDebugEnabled()) {
-			logger.debug("cleaning up the application data");
+			logger.debug("cleaning up the application data " + this);
 		}
 		initialPoppedRoute = null;
 		proxyBranch = null;
@@ -272,7 +272,7 @@ public class TransactionApplicationData implements Serializable, MobicentsTransa
 				sipSessionKey = sipServletMessage.getSipSessionKey();
 				method = sipServletMessage.getMethod();
 				if(logger.isDebugEnabled()) {
-					logger.debug("cleaning up the application data from the sipservletmessage");
+					logger.debug("cleaning up the application data " + this + " from the sipservletmessage " + sipServletMessage);
 				}
 				sipServletMessage.cleanUp();
 				if(sipServletMessage instanceof SipServletRequestImpl) {

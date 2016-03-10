@@ -1543,10 +1543,19 @@ public class SipSessionImpl implements MobicentsSipSession {
 				((TransactionApplicationData)sessionCreatingDialog.getApplicationData()).getSipServletMessage() != null) {
 			TransactionApplicationData dialogAppData = ((TransactionApplicationData)sessionCreatingDialog.getApplicationData());
 			SipServletMessageImpl sipServletMessage = dialogAppData.getSipServletMessage();
+			if(logger.isDebugEnabled()) {
+				logger.debug("trying to cleanup message "+ sipServletMessage + " and related dialog app data " + dialogAppData);
+				logger.debug("is dialog established" + (Request.INVITE.equalsIgnoreCase(sipServletMessage.getMethod()) && isAckReceived(((MessageExt)sipServletMessage.getMessage()).getCSeqHeader().getSeqNumber())));
+				logger.debug("is dialog creating method " + JainSipUtils.DIALOG_CREATING_METHODS.contains(sipServletMessage.getMethod()));
+				logger.debug("is dialog terminating method " + JainSipUtils.DIALOG_TERMINATING_METHODS.contains(sipServletMessage.getMethod()));
+			}
 			// https://telestax.atlassian.net/browse/MSS-153  
-			// if we are not an INVITE Based Dialog or we are INVITE but ACK have been received, we can clean up the app data of its servletmessage to clean memory
-			if(!Request.INVITE.equalsIgnoreCase(sipServletMessage.getMethod()) ||
+			// if we are not an INVITE Based Dialog (but still dialog creating or terminating) or we are INVITE but ACK have been received, we can clean up the app data of its servletmessage to clean memory
+			if((!Request.INVITE.equalsIgnoreCase(sipServletMessage.getMethod()) && (JainSipUtils.DIALOG_CREATING_METHODS.contains(sipServletMessage.getMethod()) || JainSipUtils.DIALOG_TERMINATING_METHODS.contains(sipServletMessage.getMethod()))) ||
 				(Request.INVITE.equalsIgnoreCase(sipServletMessage.getMethod()) && isAckReceived(((MessageExt)sipServletMessage.getMessage()).getCSeqHeader().getSeqNumber()))) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("cleanDialogInformation app data and message"+ sessionCreatingDialog);
+				}
 				dialogAppData.cleanUpMessage();
 				dialogAppData.cleanUp();
 				if(logger.isDebugEnabled()) {
