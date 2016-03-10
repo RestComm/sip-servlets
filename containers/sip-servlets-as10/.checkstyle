@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<fileset-config file-format-version="1.2.0" simple-config="true" sync-formatter="false">
+  <local-check-config name="appngin" location="C:\work\gits\checkstyles\undertow\checkstyle.xml" type="external" description="">
+    <property name="checkstyle.cache.file" value="c:\work\gits\checkstyles\undertow\cache.file "/>
+    <additional-data name="protect-config-file" value="false"/>
+  </local-check-config>
+  <local-check-config name="Mobicents" location="C:\work\gits\checkstyles\checkstyle.commscale\src\main\resources\checkstyle\checkstyle.xml" type="external" description="">
+    <property name="checkstyle.cache.file" value="c:\work\gits\checkstyles\checkstyle.commscale\cache\cache.file"/>
+    <additional-data name="protect-config-file" value="false"/>
+  </local-check-config>
+  <fileset name="all" enabled="true" check-config-name="Mobicents" local="true">
+    <file-match-pattern match-pattern="." include-pattern="true"/>
+  </fileset>
+</fileset-config>
