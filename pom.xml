@@ -434,7 +434,7 @@
 			<id>as8</id>
 			<modules>
 				<module>containers/sip-servlets-as8</module>
-				<module>containers/sip-servlets-as8-drop-in/jboss-as-mobicents</module>
+				<module>containers/sip-servlets-as8-drop-in/jboss-as-restcomm</module>
 				<module>containers/sip-servlets-as8-drop-in/build-restcomm-modules</module>
 			</modules>
 			<properties>				
@@ -455,7 +455,7 @@
 			<id>as10</id>
 			<modules>
 				<module>containers/sip-servlets-as10</module>
-				<module>containers/sip-servlets-as10-drop-in/jboss-as-mobicents</module>
+				<module>containers/sip-servlets-as10-drop-in/jboss-as-restcomm</module>
 				<module>containers/sip-servlets-as10-drop-in/build-restcomm-modules</module>
 			</modules>
 			<properties>				
