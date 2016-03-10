@@ -76,7 +76,7 @@
 					    <idseparator>-</idseparator>
 					    <docinfo1>true</docinfo1>
 					    <embedAssets>true</embedAssets>
-					    <!--stylesheet>${basedir}/src/main/asciidoc/stylesheets/telestax.css</stylesheet-->
+					    <stylesheet>${basedir}/src/main/asciidoc/stylesheets/telestax.css</stylesheet>
 					</attributes>
 					<preserveDirectories>true</preserveDirectories>
 				    </configuration>
