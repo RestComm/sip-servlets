@@ -7,8 +7,6 @@ That said, there are situations in which you might like to fine-tune your settti
 That is what the following section will help you achieve.
 You will get a better understand of SIP connectors and how to make them work for you. 
 
-&nbsp;
-
 [[_bsssc_binary_sip_servlets_server_adding_sip_connectors]]
 == Configuring SIP Connectors and Bindings
 

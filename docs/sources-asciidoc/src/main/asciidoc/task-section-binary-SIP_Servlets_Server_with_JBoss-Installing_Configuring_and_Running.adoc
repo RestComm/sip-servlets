@@ -31,8 +31,6 @@ include::Common_Content/Java_Development_Kit-Installing_Configuring_and_Running.
 [[_bssswjicar_binary_sip_servlets_server_with_jboss_preinstall_requirements_and_prerequisites]]
 == Pre-install Requirements and Prerequisites
 
-&nbsp;
-
 .Hardware Requirements
 Sufficient Disk Space::
   Once unzipped, version &VERSION;of the Restcomm SIP Servlets for JBoss binary release requires a minimum of &SSS_MSS4J_SIZE;free disk space.

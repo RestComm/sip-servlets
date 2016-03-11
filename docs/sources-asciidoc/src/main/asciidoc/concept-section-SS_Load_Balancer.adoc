@@ -13,12 +13,8 @@ In terms of functionality, the SIP Load Balancer is a simple stateless proxy ser
 [[_sslb_binary_sip_load_balancer_installing_configuring_and_running]]
 == SIP Load Balancer: Installing, Configuring and Running
 
-&nbsp;
-
 [[_sslb_binary_sip_load_balancer_preinstall_requirements_and_prerequisites]]
 === Pre-Install Requirements and Prerequisites
-
-&nbsp;
 
 .Software Prerequisites
 A JAIN SIP HA-enabled application server such as  Restcomm  JAIN SLEE or  Restcomm  SIP Servlets is required. ::
@@ -59,7 +55,7 @@ The lines beginning with the pound sign are comments.
 [[_sslb_complete_sample_lb.properties_file]]
 .Complete Sample lb.properties File
 ====
-[source]
+
 ----
 
 #  Load Balancer Settings
