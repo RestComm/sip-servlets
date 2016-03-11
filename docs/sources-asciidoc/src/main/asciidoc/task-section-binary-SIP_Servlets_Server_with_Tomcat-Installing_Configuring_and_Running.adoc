@@ -158,7 +158,7 @@ If you started the Restcomm SIP Servlets for Tomcat 7 server using the $CATALINA
 +
 a. Alternatively, it is also possible to use Java's `jar -xvf` command to extract the binary distribution files from the zip archive.
   To use this method instead, first move the downloaded zip file from [path]_My Downloads_ to the folder that you just created to hold the SIP Servlets Server files.
-a. Then, open the Windows Command Prompt and navigate to the folder holding the archive using the `cd` command.
+b. Then, open the Windows Command Prompt and navigate to the folder holding the archive using the `cd` command.
 +
 .Opening the Command Prompt from Windows Explorer
 [NOTE]
@@ -168,7 +168,7 @@ Hold down the kbd:[Shift] key and right-click on either a folder, the desktop, o
 This will cause an  context menu item to appear, which can be used to open the Command Prompt with the current working directory set to either the folder you opened, or opened it from.
 ====
 
-a. Finally, use the `jar -xvf` command to extract the archive contents into the current folder.
+c. Finally, use the `jar -xvf` command to extract the archive contents into the current folder.
 +
 ----
 C:\Users\Me\My Downloads\-tomcat-<version>>jar -xvf ""
@@ -225,7 +225,7 @@ a. As mentioned above, the best way to start the Tomcat Servlet Container is by 
 C:\Users\Me\My Downloads> cd "-tomcat-<version>"
 ----
 
-a. Start the Tomcat Servlet Container by running the executable [path]_startup.bat_ batch file:
+d. Start the Tomcat Servlet Container by running the executable [path]_startup.bat_ batch file:
 +
 ----
 C:\Users\Me\My Downloads\-tomcat-<version>>bin\startup.bat
