@@ -225,7 +225,7 @@ a. As mentioned above, the best way to start the Tomcat Servlet Container is by 
 C:\Users\Me\My Downloads> cd "-tomcat-<version>"
 ----
 
-d. Start the Tomcat Servlet Container by running the executable [path]_startup.bat_ batch file:
+b. Start the Tomcat Servlet Container by running the executable [path]_startup.bat_ batch file:
 +
 ----
 C:\Users\Me\My Downloads\-tomcat-<version>>bin\startup.bat
