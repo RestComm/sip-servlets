@@ -592,7 +592,7 @@ With consistent hash and `jvmRoute`-based balancer algorithms it doesn't matter 
 With consistent hash algorithms there is no state to be preserved in the SIP/HTTP balancers.
 
 .Example deployment: IP load balancers serving both directions for incoming/outgoing requests in a cluster
-image::images/bidirectional-distributed-sip-lb.gif[]
+image::images/bidirectional-distributed-sip-lb.png[]
 
 [[_sslb_sip_load_balancer_implementation]]
 == Implementation of the Restcomm  Load Balancer
