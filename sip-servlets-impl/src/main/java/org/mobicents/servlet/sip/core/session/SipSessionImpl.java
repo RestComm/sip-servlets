@@ -1053,6 +1053,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		sipSessionAttributeMap = null;
 //		key = null;
 		if(sessionCreatingDialog != null) {
+			cleanDialogInformation(true);
 			// terminating dialog to make sure there is not retention, if the app didn't send a BYE for invite tx by example
 			if(!DialogState.TERMINATED.equals(sessionCreatingDialog.getState())) {
 				sessionCreatingDialog.delete();
@@ -1535,9 +1536,10 @@ public class SipSessionImpl implements MobicentsSipSession {
 		}
 	}
 	
-	public void cleanDialogInformation() {
+	public void cleanDialogInformation(boolean terminate) {
 		if(logger.isDebugEnabled()) {
 			logger.debug("cleanDialogInformation "+ sessionCreatingDialog);
+			logger.debug("cleanDialogInformation terminate "+ terminate);
 		}
 		if(sessionCreatingDialog != null && sessionCreatingDialog.getApplicationData() != null && 
 				((TransactionApplicationData)sessionCreatingDialog.getApplicationData()).getSipServletMessage() != null) {
@@ -1545,14 +1547,33 @@ public class SipSessionImpl implements MobicentsSipSession {
 			SipServletMessageImpl sipServletMessage = dialogAppData.getSipServletMessage();
 			if(logger.isDebugEnabled()) {
 				logger.debug("trying to cleanup message "+ sipServletMessage + " and related dialog app data " + dialogAppData);
-				logger.debug("is dialog established" + (Request.INVITE.equalsIgnoreCase(sipServletMessage.getMethod()) && isAckReceived(((MessageExt)sipServletMessage.getMessage()).getCSeqHeader().getSeqNumber())));
+				logger.debug("is dialog established " + (Request.INVITE.equalsIgnoreCase(sipServletMessage.getMethod()) && isAckReceived(((MessageExt)sipServletMessage.getMessage()).getCSeqHeader().getSeqNumber())));
 				logger.debug("is dialog creating method " + JainSipUtils.DIALOG_CREATING_METHODS.contains(sipServletMessage.getMethod()));
 				logger.debug("is dialog terminating method " + JainSipUtils.DIALOG_TERMINATING_METHODS.contains(sipServletMessage.getMethod()));
 			}
+			boolean cleanDialog = false;
+			if((Request.INVITE.equalsIgnoreCase(sipServletMessage.getMethod()) && isAckReceived(((MessageExt)sipServletMessage.getMessage()).getCSeqHeader().getSeqNumber()))) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("cleaning INVITE and ack received for it for dialog "+ sessionCreatingDialog);
+				}
+				cleanDialog = true;
+			}
+			if(!Request.INVITE.equalsIgnoreCase(sipServletMessage.getMethod())) {
+				if(JainSipUtils.DIALOG_CREATING_METHODS.contains(sipServletMessage.getMethod())) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("cleaning non INVITE Dialog creating method " + sipServletMessage.getMethod());
+					}
+					cleanDialog = true;
+				} 
+				// Dialog Terminating request will be cleaned up on invalidation
+			}
+			if(logger.isDebugEnabled()) {
+				logger.debug("cleanDialog "+ cleanDialog);
+				logger.debug("cleanDialog terminate "+ terminate);
+			}
 			// https://telestax.atlassian.net/browse/MSS-153  
 			// if we are not an INVITE Based Dialog (but still dialog creating or terminating) or we are INVITE but ACK have been received, we can clean up the app data of its servletmessage to clean memory
-			if((!Request.INVITE.equalsIgnoreCase(sipServletMessage.getMethod()) && (JainSipUtils.DIALOG_CREATING_METHODS.contains(sipServletMessage.getMethod()) || JainSipUtils.DIALOG_TERMINATING_METHODS.contains(sipServletMessage.getMethod()))) ||
-				(Request.INVITE.equalsIgnoreCase(sipServletMessage.getMethod()) && isAckReceived(((MessageExt)sipServletMessage.getMessage()).getCSeqHeader().getSeqNumber()))) {
+			if(cleanDialog || terminate) {
 				if(logger.isDebugEnabled()) {
 					logger.debug("cleanDialogInformation app data and message"+ sessionCreatingDialog);
 				}
