@@ -1,0 +1,77 @@
+[[_emom_enterprise_monitoring_operations_management]]
+= Enterprise Monitoring and Management
+
+There is two ways of monitoring Restcomm Sip Servlets : 
+
+* Through JMX
+* Through the industry standard Simple Network Management Protocol - SNMP
+* Through the Restcomm Sip Servlets Management Console.  
+
+== JMX Monitoring
+
+The default mechanism for monitoring Restcomm Sip Servlets is using the Java Management Extensions (JMX) technology.
+The Oracle website includes the list of options and how to configure JMX Remote on Java 7  http://docs.oracle.com/javase/7/docs/technotes/guides/management/agent.html        
+
+Please find below, the list of SIP Specific metrics that can be monitored through JMX  
+
+=== SIP Stack Monitoring Metrics
+
+JMX Name `Domain=org.mobicents.jain.sip,name=Mobicents-SIP-Servlets,type=sip-stack` provides the following metrics : 
+
+* `NumberOfClientTransactions` : Active number of SIP Client Transactions.
+* `NumberOfServerTransactions` : Active number of SIP Server Transactions.
+* `NumberOfDialogTransactions` : Active number of SIP Dialogs.
+* `LocalMode` : whether the stack is using replication or not.
+
+=== Container SIP Core Router (SipApplicationDispatcher) Monitoring Metrics
+
+JMX Name `Domain=<server_name>,type=SipApplicationDispatcher` provides the following metrics : 
+
+* `RequestsProcessedByMethod` : Number of incoming SIP requests that have been processed by SIP Method name (INVITE, BYE, INFO, ...).
+* `ResponsesProcessedByStatusCode` : Number of incoming SIP responses that have been processed by status code (1xx, 2xx, 3xx, ...).
+
+* `RequestsSentByMethod` : Number of outgoing SIP requests that have been sent by SIP Method name (INVITE, BYE, INFO, ...).
+* `ResponsesSentByStatusCode` : Number of outgoing SIP responses that have been sent by status code (1xx, 2xx, 3xx, ...).
+
+=== Application Level Monitoring Metrics
+
+JMX Name `Domain=<server_name>,path=<application_context_name>,type=SipManager,host=<host_name>` provides the following metrics : 
+
+* `expiredSipSessions` : Number of SIP sessions that have expired
+* `expiredSipApplicationSessions` : Number of SIP Application sessions that have expired
+* `sipSessionAverageAliveTime` : the average time (in seconds) that expired SIP sessions had been alive.
+* `sipApplicationSessionAverageAliveTime` : the average time (in seconds) that expired SIP Application sessions had been alive.
+* `sipSessionCounter` : Number of SIP Sessions created.
+* `sipApplicationSessionCounter` : Number of SIP Application Sessions created.
+* `activeSipSessions` : Number of currently active SIP Sessions.
+* `activeSipApplicationSessions` : Number of currently active SIP Application Sessions.
+* `rejectedSipSessions` : Number of SIP session creations that failed due to maxActiveSipSessions.
+* `rejectedSipApplicationSessions` : Number of SIP Application session creations that failed due to maxActiveSipApplicationSessions.
+* `numberOfSipSessionCreationPerSecond` : Number of SIP sessions per second that have been created.
+* `numberOfSipApplicationSessionCreationPerSecond` : Number of SIP Application sessions per second that have been created.
+
+=== JMX Monitoring for Restcomm  for JBoss AS7/EAP6
+
+Follow the link https://community.jboss.org/wiki/UsingJconsoleToConnectToJMXOnAS7[To Connect JConsole to JMX on AS7/EAP6]. 
+
+.SNMP Monitoring for Restcomm  for JBoss AS7 
+[NOTE]
+====
+The SNMP feature is not yet implemented in Restcomm for JBoss AS7.
+This guide will be updated when SNMP monitoring feature become available.
+In the meantime, see the chapter below for information about the CLI. 
+
+link:concept-chapter-AS7-mss.adoc#_getting_started_with_mss_jboss_as7_cli[Getting Started with Restcomm SIP Servlets for AS7 CLI]
+====
+
+=== JMX Monitoring for Restcomm  for Tomcat 7
+
+Follow the link http://tomcat.apache.org/tomcat-7.0-doc/monitoring.html[To Connect JConsole to JMX on Tomcat 7]. 
+
+.SNMP Monitoring for Restcomm  for Tomcat 7 
+[NOTE]
+====
+The SNMP feature is not yet implemented in Restcomm for Tomcat 7.
+This guide will be updated when SNMP monitoring feature become available.
+ 
+====

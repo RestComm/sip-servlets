@@ -1,0 +1,10 @@
+[[_bp_jsr289_errata]]
+= JSR 289 Errata
+
+This chapter discusses deviations from the JSR 289 specification by Restcomm SIP Servlets after feedback on usage in real world deployments and from the community.
+
+[[_errata_deviations]]
+== Restcomm SIP Servlets Deviations from JSR 289
+
+* _Correlation of Responses to Proxy Branches _: It seems the javadoc for https://mobicents.ci.cloudbees.com/job/RestcommSipServlets-Release/lastSuccessfulBuild/artifact/documentation/jsr289-apidocs/javadocs/javax/servlet/sip/SipServlet.html#doResponse(javax.servlet.sip.SipServletResponse)[Speed Dial] contains an error, SipServlet.doBranchResponse() shouldn't be included as it contradicts the last sentence from the spec 10.2.4.2 Correlating responses to proxy branches : "Note that if the doBranchResponse() is not overridden then doResponse() method will be invoked only for the best final response as before",  If SipServlet.doBranchResponse() handling is done in SipServlet.doResponse() and the servlet overrides SipServlet.doResponse() then it will receive intermediate final responses  as well as the best final response which is not the desired behavior, so the doBranchResponse() handling is done in SipServlet.doService() method allowing applications  not overriding doResponse or doService to receive both intermediate final responses  on the doBranchResponse as well as the best final response on doResponse but this fixes the issue of intermediate final responses being delivered to doResponse in case the servlet overrides it. 
+* _SipServletResponse typo_ : _ SipServletResponse.SC_TEMPORARLY_UNAVAILABLE_  should be replaced by SC_TEMPORARILY_UNAVAILABLE.

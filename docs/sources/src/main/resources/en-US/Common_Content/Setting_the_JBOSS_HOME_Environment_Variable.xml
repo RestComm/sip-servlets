@@ -15,7 +15,6 @@
 		<para>At the command line, <command>echo</command>
 			<userinput>$JBOSS_HOME</userinput> to see if it is currently defined in your environment:</para>
 	</formalpara>
-	<!--  ~]$ echo $JBOSS_HOME  -->
 	<screen>~]$ echo $JBOSS_HOME</screen>
 	<para>The <application>&PLATFORM_NAME; Platform</application> and most &PLATFORM_NAME; servers are built on top of the <application>JBoss Application Server</application> (<application>JBoss AS</application>). When the <application>&PLATFORM_NAME; Platform</application> or &PLATFORM_NAME; servers are built <emphasis>from source</emphasis>, then <envar>JBOSS_HOME</envar> <emphasis>must</emphasis> be set, because the &PLATFORM_NAME; files are installed into (or <quote>over top of</quote> if you prefer) a clean <application>JBoss AS</application> installation, and the build process assumes that the location pointed to by the <envar>JBOSS_HOME</envar> environment variable at the time of building is the <application>JBoss AS</application> installation into which you want it to install the &PLATFORM_NAME; files.
 	</para>
@@ -28,7 +27,7 @@
 			Even if you fall into the category below of <emphasis>not needing</emphasis> to set <envar>JBOSS_HOME</envar>, you may want to for various reasons anyway. Also, even if you are instructed that you do <emphasis>not need</emphasis> to set <envar>JBOSS_HOME</envar>, it is good practice nonetheless to check and make sure that <envar>JBOSS_HOME</envar> actually <emphasis>isn&#39;t</emphasis> set or defined on your system for some reason. This can save you both time and frustration.
 		</para>
 	</important>
-	<bridgehead>You <emphasis>DO NOT NEED</emphasis> to set <envar>JBOSS_HOME</envar> if...</bridgehead>
+	<para>You <emphasis>DO NOT NEED</emphasis> to set <envar>JBOSS_HOME</envar> if...</para>
 	<itemizedlist>
 		<listitem>
 			<para>
@@ -41,7 +40,7 @@
 			</para>
 		</listitem>
 	</itemizedlist>
-	<bridgehead>You <emphasis>MUST</emphasis> set <envar>JBOSS_HOME</envar> if...</bridgehead>
+	<para>You <emphasis>MUST</emphasis> set <envar>JBOSS_HOME</envar> if...</para>
 	<itemizedlist>
 		<listitem>
 			<para>
@@ -74,7 +73,6 @@
 			<para>
 				Open the <filename>~/.bashrc</filename> startup script, which is a hidden file in your home directory, in a text editor, and insert the following line on its own line while substituting for the actual install location on your system:
 			</para>
-			<!--  export JBOSS_HOME="/home/<replaceable>&lt;username&gt;</replaceable>/<replaceable>&lt;path&gt;</replaceable>/<replaceable>&lt;to&gt;</replaceable>/<replaceable>&lt;install_directory&gt;</replaceable>"  -->
 			<screen>export JBOSS_HOME="/home/&lt;username&gt;/&lt;path&gt;/&lt;to&gt;/&lt;install_directory&gt;"</screen>
 		</step>
 		<step>
@@ -91,7 +89,6 @@
 				</para>
 				</footnote>.
 			</para>
-			<!--  ~]$ source ~/.bashrc  -->
 			<screen>~]$ source ~/.bashrc</screen>
 		</step>
 		<step>
@@ -103,8 +100,6 @@
 					The command line usage below is based upon a binary installation of the <application>&PLATFORM_NAME; Platform</application>. In this sample output, <envar>JBOSS_HOME</envar> has been set correctly to the <replaceable>topmost_directory</replaceable> of the <application>&PLATFORM_NAME;</application> installation. Note that if you are installing one of the standalone <application>&PLATFORM_NAME;</application> servers (with <application>JBoss AS</application> bundled!), then <envar>JBOSS_HOME</envar> would point to the <replaceable>topmost_directory</replaceable> of your server installation.
 				</para>
 			</note>
-			<!--  ~]$ echo $JBOSS_HOME
-/home/silas/&HOME_LIN;  -->
 			<screen>~]$ echo $JBOSS_HOME
 /home/silas/&HOME_LIN;</screen>
 		</step>

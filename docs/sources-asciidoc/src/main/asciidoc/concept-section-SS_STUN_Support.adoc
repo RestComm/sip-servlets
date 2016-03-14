@@ -1,0 +1,52 @@
+
+[[_mssstun_mss_stun]]
+= STUN Support
+
+The Session Traversal Utilities for NAT (STUN) prococol is used in Network Address Translation (NAT) traversal for real-time voice, video, messaging, and related interactive IP application communications.
+This light-weight, client-server protocol allows applications passing through a NAT to obtain the public IP address for the UDP connections the application uses to connect to remote hosts.
+
+STUN support is provided at the SIP connector level, using the https://stun4j.dev.java.net/[STUN for Java] project.
+The STUN for Java project provides a Java implementation of the STUN Protocol (RFC 3489), which allows each SIP connector to select whether it should use STUN to discover a public IP address, and then use this address in the SIP messages sent through the connector.
+
+To make a SIP connector STUN-enabled, three attributes must be appended to the  child element in the [path]_server.xml_ or  child element in [path]_standalone-sip.xml_  file.
+The properties are:
+
+* useStun="true"
++
+Enables STUN support for this connector.
+Ensure that the `ipAddress` attribute is not set to `127.0.0.1`.
+
+* stunServerAddress="<Public_STUN_Server>"
++
+STUN server address used to discover the public IP address of this SIP Connector.
+See <<_tab_pss_public_stun_servers>> for a suggested list of public STUN servers.
+
+* stunServerPort="3478"
++
+STUN server port of the STUN server used in the `stunServerAddress` attribute.
+Both TCP and UDP protocols communicate with STUN servers using this port only.
+
+
+NOTE: A complete list of available SIP connector attributes and their descriptions is located in the link:task-section-SIP_Servlets_Server-Configuring.adoc#_bsssc_binary_sip_servlets_server_adding_sip_connectors[Configuring SIP Connectors and Bindings] section of this guide.
+
+A number of public STUN servers are available, and can be specified in the `stunServerAddress`.
+Depending on the router firmware used, the STUN reply packets' MAPPED_ADDRESS may be changed to the router's WAN port.
+To alleviate this problem, certain public STUN servers provide XOR_MAPPED_ADDRESS support. <<_tab_pss_public_stun_servers>>  provides a selection of public STUN servers.
+
+[[_tab_pss_public_stun_servers]]
+.Public STUN Servers
+[cols="1,1,1", frame="all", options="header"]
+|===
+| Server Address | XOR Support | DNS SRV Record
+| stun.ekiga.net | Yes | Yes
+| stun.fwdnet.net | No | Yes
+| stun.ideasip.com | No	| Yes
+| stun01.sipphone.com | Yes | No
+| stun.softjoys.com | No | No
+| stun.voipbuster.com | No | No
+| stun.voxgratia.org | No | No
+| stun.xten.com | Yes | Yes
+| stunserver.org | Yes | Yes
+|===
+
+NOTE: For more information about NAT traversal best practices, refer to link:concept-chapter-Best_Practices.adoc#_bp_best_practices_nat[NAT Traversal.].

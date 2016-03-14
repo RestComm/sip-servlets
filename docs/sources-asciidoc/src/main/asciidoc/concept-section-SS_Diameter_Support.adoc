@@ -1,0 +1,8 @@
+
+[[_ssds_diameter_support]]
+= Diameter Support
+
+The Diameter Protocol (http://www.ietf.org/rfc/rfc3588.txt[RFC 3588]) is a computer networking protocol for Authentication, Authorization, and Accounting (AAA). The Diameter version included in Restcomm  SIP Servlets currently support Base, Sh, Ro and Rf.
+
+For more information regarding Diameter support, refer to the https://github.com/Restcomm/jdiameter/[Diameter Home Page].
+For a list of Diameter examples, refer to link:concept-chapter-SS_Examples.adoc#_ssea_sip_servlet_example_applications[SIP Servlet Example Applications].

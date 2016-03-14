@@ -1,0 +1,22 @@
+
+[[_wwtssmc_working_with_the_sip_servlets_management_console]]
+= Working with the SIP Servlets Management Console
+
+Once installed, the Restcomm for JBoss or Restcomm for Tomcat instance can be accessed and configured using the SIP Servlets Management Console.
+The management console is available at http://localhost:8080/sip-servlets-management/.
+
+.The SIP Servlets Management Console
+image::images/mss-MSSSManagementConsole-ss-ManagementConsole.png[]
+
+Information on how to use the SIP Servlets Management Console is available from the [label]#Help# link on the top main menu bar.
+Clicking [label]#Help# displays a [label]#Default Application Router Help# pop-up that can be repositioned and resized by dragging.
+
+.SIP Servlets Management Console: Default Application Router Help
+image::images/mss-MSSSManagementConsole-ss-Help.png[]
+
+Recent versions of the SIP Servlets Management Console feature a [label]#Server Settings# tab, in which concurrency and congestion control settings can be tuned.
+
+.Tunable SIP Servlets Server Settings
+image::images/mss-MSSSManagementConsole-ss-ServerSettings.png[]
+
+For more information on concurrency and congestion control tuning, refer to <<_sscacc_configuring_the_concurrency_and_congestion_control_settings>>.

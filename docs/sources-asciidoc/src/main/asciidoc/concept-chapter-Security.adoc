@@ -1,0 +1,16 @@
+[[_ssecurity_sip_servlet_security]]
+= Security
+
+The information present in SIP requests often contains sensitive user information.
+To protect user information, SIP Security can be enabled on the server, and within the SIP application to mitigate the risk of unauthorised access to the information.
+
+There are essentially two levels of security that can be enabled on the server, the communication between the server and other SIP entities and securing the application and its content.
+
+:leveloffset: 2
+
+include::concept-section-SS_SIP_Servlet_Security.adoc[]
+
+include::concept-section-SS_TLS.adoc[]
+
+:leveloffset: 1
+

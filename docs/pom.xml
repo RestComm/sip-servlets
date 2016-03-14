@@ -14,17 +14,17 @@
 	<packaging>pom</packaging>
 	
 	<modules>
-		<module>sources</module>
+		<module>sources-asciidoc</module>
 	</modules>
 
 	<profiles>
 		<profile>
 			<id>all</id>			
 			<modules>
-				<module>sources-restcomm</module>
-				<module>sources-telscale</module>
+				<module>sources-asciidoc</module>
+				<!--module>sources-telscale</module>
 				<module>jdocbook-restcomm</module>
-				<module>jdocbook-telscale</module>
+				<module>jdocbook-telscale</module-->
 			</modules>
 		</profile>
 		<profile>
@@ -33,15 +33,15 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>			
 			<modules>
-				<module>sources-restcomm</module>
-				<module>jdocbook-restcomm</module>				
+				<module>sources-asciidoc</module>
+				<!--module>jdocbook-restcomm</module-->				
 			</modules>
 		</profile>
 		<profile>
 			<id>telscale</id>
 			<modules>
-				<module>sources-telscale</module>
-				<module>jdocbook-telscale</module>
+				<module>sources-asciidoc</module>
+				<!--module>jdocbook-restcomm</module-->				
 			</modules>
 		</profile>
 	</profiles>

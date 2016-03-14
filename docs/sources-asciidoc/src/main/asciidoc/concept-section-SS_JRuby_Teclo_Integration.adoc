@@ -1,0 +1,13 @@
+
+[[_jruby_telco_integration]]
+= JRuby/Rails Integration with Torquebox Telco Framework
+
+Restcomm Sip Servlets is compatible with the http://torquebox.org/[Torquebox] Telco Framework JRuby on Rails integration.
+The framework allows you to create powerful, pure or converged VoIP JRuby on Rails applications.
+
+JRuby features a powerful and well deployed scripting language that allows you to modify your application at runtime (this is true even for the SIP and Media part that Restcomm SIP Servlets offer) without restarting the server.
+In addition, TorqueBox is a new kind of Ruby application platform that integrates popular technologies such as Ruby-on-Rails, while extending the footprint of Ruby applications to include support for Job Scheduling, Task Queues, SOAP Handling, and other capabilities.
+
+To obtain more information about building pure JRuby-Rails applications that  leverage Restcomm SIP Servlets SIP and media capabilities, refer to the http://torquebox.org/documentation/browse/LATEST/telecom.html[Torquebox User Documentation].
+
+Check this http://jeanderuelle.blogspot.com/2009/03/my-jruby-rails-app-on-jboss-can-make.html[blog post] to help you create your first pure Torquebox JRuby Telco application and our http://www.mobicents.org/mss-pure-jruby-telco.html[pure JRuby on Rails TorqueBox Telco example] showcasing this integration.

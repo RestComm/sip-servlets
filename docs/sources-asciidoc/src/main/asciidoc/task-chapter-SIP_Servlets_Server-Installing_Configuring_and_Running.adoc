@@ -1,0 +1,13 @@
+[[_sssicar_sip_servlets_server_installing_configuring_and_running]]
+= SIP Servlets Server-Installing, Configuring and Running
+
+:leveloffset: 2
+
+include::concept-chapter-AS7-mss.adoc[]
+
+include::task-section-binary-SIP_Servlets_Server_with_Tomcat-Installing_Configuring_and_Running.adoc[]
+
+include::task-section-SIP_Servlets_Server-Configuring.adoc[]
+
+:leveloffset: 1
+

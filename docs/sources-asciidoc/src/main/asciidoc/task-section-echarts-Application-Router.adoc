@@ -1,0 +1,69 @@
+
+[[_tsear_echarts_application_router]]
+= DFC Application Router
+
+== Description of DFC Application Router
+
+Instead of using the Restcomm Default Application Router, any SIP Servlets 1.1 compliant Application Router can be used, including the eCharts http://echarts.org/EChartsSipServletManual/sip-echartsse4.html#x6-140004.1[DFC Application Router].
+
+== Installing the DFC Application Router
+
+Detailed instructions are available from http://echarts.org/Blog/Running-E4SS-apps-on-Mobicents-SIP-Servlets.html[the eCharts website].
+The following procedure describe how to install the eCharts DFC Application Router (DFCAR) on a variety of SIP Servlet Server platforms.
+
+.Procedure: Installing DFCAR on Tomcat
+. Deploy the DFCAR
++
+Drop the [path]_dfcar.jar_ from the ECharts distribution package in the `TOMCAT_HOME/lib` directory.
+
+. Remove the DAR
++
+Remove the Restcomm Default Application Router located in `TOMCAT_HOME/lib/sip-servlets-application-router-*.jar`.
+
+
+Please see the following link to learn how to deploy jar files in Restcomm for JBoss AS7.
+ 
+
+.Procedure: Installing DFCAR on JBoss AS7
+. Deploy the DFCAR
++
+Create a directory under `JBOSS_HOME/modules/system/layers/base/org/echarts/`
++
+Drop the [path]_dfcar.jar_ from the ECharts distribution package in the ``JBOSS_HOME/modules/system/layers/base/org/echarts/ ``directory.
++
+Create a `module.xml` file under the same directory with the following contents
++
+[source]
+----
+<module xmlns="urn:jboss:module:1.1" name="org.echarts">
+<resources>
+<resource-root path="dfcar.jar"/>
+</resources>
+<dependencies>
+<module name="org.apache.log4j"/>
+<module name="org.mobicents.javax.servlet.sip"/>
+</dependencies>
+</module>
+----
+
+. Remove the DAR
++
+Remove the Restcomm Default Application Router located in  `JBOSS_HOME/modules/system/layers/base/org/mobicents/dar`.
+
+. Use the DFC DAR
++
+In `JBOSS_HOME/modules/system/layers/base/org/jboss/as/web/main/module.xml`, replace the following line 
++
+[source]
+----
+<module name="org.mobicents.dar" export="true"/>
+----
++
+by this one
++
+[source]
+----
+<module name="org.echarts" export="true"/>
+----
++
+

@@ -1,0 +1,7 @@
+
+[[_sscacc_mss_jsr289_extensions]]
+= Restcomm vendor-specific Extensions to JSR 289
+
+Restcomm provide Extensions for applications or external systems to interact with the Restcomm SIP Servlets container as well as Extensions not defined in the specification in the JSR 289 specification that can prove useful and might be proposed for inclusion in a next release of the SIP Servlets specification 
+
+https://mobicents.ci.cloudbees.com/job/RestcommSipServlets-Release/lastSuccessfulBuild/artifact/documentation/jsr289-extensions-apidocs/index.html[Javadoc for JSR 289 Extensions]

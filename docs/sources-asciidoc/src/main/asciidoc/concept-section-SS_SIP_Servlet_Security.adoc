@@ -1,0 +1,175 @@
+
+[[_sss_sip_servlet_security]]
+= SIP Servlets Application Security
+
+Application security varies depending on the server type used.
+The following procedures describe how to configure the JBoss AS7 and Tomcat servers to enable Security.
+
+.Procedure: Enable SIP Application Security in JBoss AS7
+. Add Security Policy to Server Configuraton
++
+.. Open the configuration file located in `$JBOSS_HOME/standalone/configuration/standalone-sip.xml` 
+.. Append a security domain to the under the `<security-domains>`:
++
+[source,xml]
+----
+
+<security-domain name="sip-servlets">
+	<authentication> 
+		<login-module code="UsersRoles" flag="required"> 
+		    <module-option name="usersProperties" value="${jboss.server.config.dir}/sip-servlets-users.properties"/> 
+		    <module-option name="rolesProperties" value="${jboss.server.config.dir}/sip-servlets-roles.properties"/> 
+		    <module-option name="hashAlgorithm" value="MD5"/>
+	        <module-option name="hashEncoding" value="RFC2617"/>
+	        <module-option name="hashUserPassword" value="false"/>
+           	<module-option name="hashStorePassword" value="true"/>
+	        <module-option name="passwordIsA1Hash" value="true"/>
+	        <module-option name="storeDigestCallback" value="org.jboss.security.auth.callback.RFC2617Digest"/>
+		</login-module> 
+	</authentication> 
+</security-domain>
+----
+
+
+. Create SIP Server User Properties File
++
+.. Open a terminal and navigate to the `$JBOSS_HOME/standalone/configuration` directory:
++
+[source]
+----
+home]$ cd standalone/configuration
+----
+
+.. Create and open a `sip-servlets-users.properties` file and append the user lines to the file:
++
+[source]
+----
+ 
+  # A sample users.properties file, this line creates user "admin" with 
+  # password "admin" for "sip-servlets-realm"
+  admin=<A1_cryptographic_string>
+----
+
+.. To create <A1_cryptographic_string>, execute the following command in a terminal:
++
+[source]
+----
+home]$ java -cp ../../modules/system/layers/base/org/picketbox/main/picketbox-4.0.15.Final.jar org.jboss.security.auth.callback.RFC2617Digest admin sip-servlets <password>
+----
+
+.. Copy the A1 hash, and paste it into the admin parameter in the previous step.
+.. Save and close `sip-servlets-users.properties`.
+
+. Create the SIP Server Roles File
++
+.. Create and open `sip-servlets-roles.properties` (using your preferred editor) and append the following information to the file:
++
+[source]
+----
+ 
+# A sample roles.properties file for use with some roles
+# Each line in this file assigns roles to the users defined in 
+# sip-servlets-users.properties
+admin=caller,role1,role2,..
+----
+
+
+. Add the Security Domain to the SIP Application
++
+.. Open the `jboss-web.xml` file for the SIP application to which security is required.
+.. Add the  element as a child of the  element:
++
+[source,xml]
+----
+
+
+<jboss-web>
+      <security-domain>sip-servlets</security-domain>
+</jboss-web>
+----
+
+
+. Add Security Constraints to the SIP Application
++
+.. Open the `sip.xml` file for the SIP application.
+.. Add the  element as a child of the  element:
++
+[source,xml]
+----
+
+
+<security-constraint>
+	<display-name>REGISTER Method Security Constraint</display-name>
+	<resource-collection>
+	   	<resource-name>SimpleSipServlet</resource-name>
+	    <description>Require authenticated REGSITER requests</description>
+	    <servlet-name>SimpleSipServlet</servlet-name>
+	    <sip-method>REGISTER</sip-method>   
+	</resource-collection>   
+	<auth-constraint>      
+	  	<role-name>caller</role-name>  
+	</auth-constraint>
+</security-constraint>
+	 
+<login-config> 
+   	<auth-method>DIGEST</auth-method> 
+   	<realm-name>sip-servlets</realm-name> 
+ </login-config>
+----
+
+
+
+.Procedure: Enable SIP Application Security in Tomcat Server
+. Activate the Memory Realm in Catalina:
++
+.. Open a terminal and navigate to the [path]_/conf_          directory:
++
+[source]
+----
+home]$ cd server/default/<tomcat_home>/conf/
+----
+
+.. Open `server.xml` and uncomment the following line:
++
+[source,xml]
+----
+<!--<Realm className="org.apache.catalina.realm.MemoryRealm"/>-->
+----
+
+
+. Update SIP Server User Properties File
++
+.. In the [path]_/conf_ directory, open `tomcat-users.xml` (using your preferred editor) and append the following  child element:
++
+[source,xml]
+----
+<user name="user" password="password" roles="caller"/>
+----
+
+
+. Add Security Constraints to the SIP Application
++
+.. Open the `sip.xml` file for the SIP application to which security is required.
+.. Add the  child element to the  element:
++
+[source,xml]
+----
+
+<security-constraint>
+  <display-name>REGISTER Method Security Constraint</display-name>
+  <resource-collection>
+    <resource-name>SimpleSipServlet</resource-name>
+    <description>Require authenticated REGISTER requests</description>
+    <servlet-name>SimpleSipServlet</servlet-name>
+    <sip-method>REGISTER</sip-method>
+  </resource-collection>
+  <auth-constraint>
+    <role-name>caller</role-name>
+  </auth-constraint>
+</security-constraint>
+<login-config>
+  <auth-method>DIGEST</auth-method>
+  <realm-name>sip-servlets-realm</realm-name>
+</login-config>
+----
+

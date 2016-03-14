@@ -1,0 +1,227 @@
+[[_appendix]]
+= Apendix
+
+[[_install_configure_jdk]]
+== Java Development Kit (): Installing, Configuring and Running
+
+The [app]` Platform` is written in Java; therefore, before running any [app]`` server, you must have a working Java Runtime Environment () or Java Development Kit () installed on your system.
+In addition, the JRE or JDK you are using to run [app]`` must be version 5 or higherfootnote:[At this point in time, it is possible to run most  servers, such as the JAIN SLEE Server, using a Java 6 JRE or JDK. Be aware, however, that presently the XML Document Management Server does not run on Java 6. We suggest checking the  web site, forums or discussion pages if you need to inquire about the status of running the XML Document Management Server with Java 6.]. 
+
+[[_jre_or_jdk_32bit_or_64bit]]
+===  JRE versus JDK - 32-Bit versus 64-Bit
+
+.Should I Install the JRE or JDK?
+Although you can run [app]`` servers using the Java Runtime Environment, we assume that most users are developers interested in developing Java-based, [app]``-driven solutions.
+Therefore, in this guide we take the tact of showing how to install the full Java Development Kit. 
+
+.Should I Install the 32-Bit or the 64-Bit JDK, and Does It Matter?
+Briefly stated: if you are running on a 64-Bit Linux or Windows platform, you should consider installing and running the 64-bit JDK over the 32-bit one.
+Here are some heuristics for determining whether you would rather run the 64-bit Java Virtual Machine (JVM) over its 32-bit cousin for your application: 
+
+* Wider datapath: the pipe between RAM and CPU is doubled, which improves the performance of memory-bound applications when using a 64-bit JVM. 
+* 64-bit memory addressing gives virtually unlimited (1 exabyte) heap allocation.
+  However large heaps affect garbage collection. 
+* Applications that run with more than 1.5 GB of RAM (including free space for garbage collection optimization) should utilize the 64-bit JVM. 
+* Applications that run on a 32-bit JVM and do not require more than minimal heap sizes will gain nothing from a 64-bit JVM.
+  Barring memory issues, 64-bit hardware with the same relative clock speed and architecture is not likely to run Java applications faster than their 32-bit cousin. 
+
+Note that the following instructions detail how to download and install the 32-bit JDK, although the steps are nearly identical for installing the 64-bit version. 
+
+=== Downloading JDK 
+
+
+You can download the Sun JDK 5.0 (Java 2 Development Kit) from Sun's website: http://java.sun.com/javase/downloads/index_jdk5.jsp.
+Click on the [label]#Download# link next to "JDK 5.0 Update [replaceable]`<x>`" (where [replaceable]`<x>` is the latest minor version release number). On the next page, select your language and platform (both architecture--whether 32- or 64-bit--and operating system), read and agree to the `Java Development Kit 5.0 License Agreement`, and proceed to the download page. 
+
+The Sun website will present two download alternatives to you: one is an RPM inside a self-extracting file (for example, [path]_jdk-1_5_0_16-linux-i586-rpm.bin_), and the other is merely a self-extracting file (e.g. [path]_jdk-1_5_0_16-linux-i586.bin_). If you are installing the JDK on Red Hat Enterprise Linux, Fedora, or another RPM-based Linux system, we suggest that you download the self-extracting file containing the RPM package, which will set up and use the SysV service scripts in addition to installing the JDK.
+We also suggest installing the self-extracting RPM file if you will be running [app]`` in a production environment. 
+
+.Installing
+The following procedures detail how to install the Java Development Kit on both Linux and Windows. 
+
+.Procedure: Installing the JDK on Linux
+. Regardless of which file you downloaded, you can install it on Linux by simply making sure the file is executable and then running it: 
++
+----
+~]$ chmod +x "jdk-1_5_0_<minor_version>-linux-<architecture>-rpm.bin"
+~]$ ./"jdk-1_5_0_<minor_version>-linux-<architecture>-rpm.bin"
+----
+
+
+.Moving from Non-RPM Installer to SysV Service Scripts
+[NOTE]
+====
+If you download the non-RPM self-extracting file (and installed it), and you are running on an RPM-based system, you can still set up the SysV service scripts by downloading and installing one of the `-compat` packages from the JPackage project.
+Remember to download the `-compat` package which corresponds correctly to the minor release number of the JDK you installed.
+The compat packages are available from link:ftp://jpackage.hmdc.harvard.edu/JPackage/1.7/generic/RPMS.non-free/. 
+====
+
+IMPORTANT: You do not need to install a `-compat` package in addition to the JDK if you installed the self-extracting RPM file! The `-compat` package merely performs the same SysV service script set up that the RPM version of the JDK installer does. 
+
+[[_install_jdk_on_windows]]
+=== Installing JDK on Windows
+
+
+. Using Explorer, simply double-click the downloaded self-extracting installer and follow the instructions to install the JDK. 
+
+.Configuring
+Configuring your system for the JDK consists in two tasks: setting the [var]`JAVA_HOME` environment variable, and ensuring that the system is using the proper JDK (or JRE) using the `alternatives` command.
+Setting [var]`JAVA_HOME` usually overrides the values for `java`, `javac` and `java_sdk_1.5.0` in `alternatives`, but we will set them all just to be safe and consistent. 
+
+[[_setting_env_linux]]
+=== Setting Linux JAVA_HOME Environment Variables 
+
+Setting the [var]`JAVA_HOME` Environment Variable on Generic Linux::
+  After installing the JDK, you must ensure that the [var]`JAVA_HOME` environment variable exists and points to the location of your JDK installation. 
+
+[[_setting_correct_java_version]]
+=== Setting the Correct Java Version 
+
+Setting [var]`java`, [var]`javac` and [var]`java_sdk_1.5.0` Using the `alternatives` command ::
+  _As the root user_, call `/usr/sbin/alternatives` with the [option]`--config java` option to select between JDKs and JREs installed on your system: 
+
+[[_setting_env_windows]]
+=== Setting JAVA_HOME Environment Variables on Windows
+
+Setting the [var]`JAVA_HOME` Environment Variable on Windows::
+  For information on how to set environment variables in Windows, refer to http://support.microsoft.com/kb/931715. 
+
+[[_install_jdk_linux_windows]]
+===  Uninstalling JDK on Linux and Windows
+
+.Uninstalling
+There is usually no reason (other than space concerns) to remove a particular JDK from your system, given that you can switch between JDKs and JREs easily using `alternatives`, and/or by setting [var]`JAVA_HOME`. 
+
+.Uninstalling the JDK on Linux
+On RPM-based systems, you can uninstall the JDK using the `yum remove <jdk_rpm_name>
+			` command. 
+
+.Uninstalling the JDK on Windows
+On Windows systems, check the JDK entry in the `Start` menu for an uninstall command, or use `Add/Remove Programs`. 
+
+[[_setting_jboss_env_variable_windows_unix]]
+=== Setting the JBOSS_HOME Environment Variable
+
+The [app]` Platform` ([app]``) is built on top of the [app]`JBoss Application Server` ([app]`JBoss AS`). You do not need to set the [var]`JBOSS_HOME` environment variable to run any of the [app]` Platform` servers _unless_ [var]`JBOSS_HOME` is _already_ set. 
+
+The best way to know for sure whether [var]`JBOSS_HOME` was set previously or not is to perform a simple check which may save you time and frustration.
+
+.Checking to See If JBOSS_HOME is Set on Unix
+At the command line, `echo`			`$JBOSS_HOME` to see if it is currently defined in your environment:
+
+----
+~]$ echo $JBOSS_HOME
+----
+
+The [app]` Platform` and most &PLATFORM_NAME; servers are built on top of the [app]`JBoss Application Server` ([app]`JBoss AS`). When the [app]` Platform` or &PLATFORM_NAME; servers are built _from source_, then [var]`JBOSS_HOME` _must_ be set, because the &PLATFORM_NAME; files are installed into (or "`over top of`" if you prefer) a clean [app]`JBoss AS` installation, and the build process assumes that the location pointed to by the [var]`JBOSS_HOME` environment variable at the time of building is the [app]`JBoss AS` installation into which you want it to install the &PLATFORM_NAME; files. 
+
+This guide does not detail building the [app]` Platform` or any &PLATFORM_NAME; servers from source.
+It is nevertheless useful to understand the role played by [app]`JBoss AS` and [var]`JBOSS_HOME` in the &PLATFORM_NAME; ecosystem.
+
+The immediately-following section considers whether you need to set [var]`JBOSS_HOME` at all and, if so, when.
+The subsequent sections detail how to set [var]`JBOSS_HOME` on Unix and Windows 
+
+IMPORTANT: Even if you fall into the category below of _not needing_ to set [var]`JBOSS_HOME`, you may want to for various reasons anyway.
+Also, even if you are instructed that you do _not need_ to set [var]`JBOSS_HOME`, it is good practice nonetheless to check and make sure that [var]`JBOSS_HOME` actually _isn't_ set or defined on your system for some reason.
+This can save you both time and frustration. 
+
+You _DO NOT NEED_ to set [var]`JBOSS_HOME` if...
+
+* ...you have installed the [app]` Platform` binary distribution. 
+* ...you have installed a &PLATFORM_NAME;server binary distribution _which bundles [app]`JBoss AS`._			
+
+You _MUST_ set [var]`JBOSS_HOME` if...
+
+* ...you are installing the [app]` Platform` or any of the &PLATFORM_NAME; servers _from source_. 
+* ...you are installing the [app]` Platform` binary distribution, or one of the &PLATFORM_NAME; server binary distributions, which _do not_ bundle [app]`JBoss AS`. 
+
+Naturally, if you installed the [app]` Platform` or one of the &PLATFORM_NAME; server binary releases which _do not_ bundle [app]`JBoss AS`, yet requires it to run, then you should http://docs.jboss.org/jbossas/docs/Installation_And_Getting_Started_Guide/5/html_single/index.html[install JBoss AS
+		] before setting [var]`JBOSS_HOME` or proceeding with anything else. 
+
+.Setting the JBOSS_HOME Environment Variable on Unix
+The [var]`JBOSS_HOME` environment variable must point to the directory which contains all of the files for the [app]` Platform` or individual &PLATFORM_NAME; server that you installed.
+As another hint, this topmost directory contains a [path]_bin_ subdirectory. 
+
+Setting [var]`JBOSS_HOME` in your personal [path]_~/.bashrc_ startup script carries the advantage of retaining effect over reboots.
+Each time you log in, the environment variable is sure to be set for you, as a user.
+On Unix, it is possible to set [var]`JBOSS_HOME` as a system-wide environment variable, by defining it in [path]_/etc/bashrc_, but this method is neither recommended nor detailed in these instructions. 
+
+.Procedure: To Set JBOSS_HOME on Unix...
+. Open the [path]_~/.bashrc_ startup script, which is a hidden file in your home directory, in a text editor, and insert the following line on its own line while substituting for the actual install location on your system: 
++
+----
+export JBOSS_HOME="/home/<username>/<path>/<to>/<install_directory>"
+----
+
+. Save and close the [path]_.bashrc_ startup script. 
+. You should `source` the [path]_.bashrc_ script to force your change to take effect, so that [var]`JBOSS_HOME` becomes set for the current sessionfootnote:[Note that any other terminals which were opened prior to your having altered .bashrc will need to source
+  ~/.bashrc as well should they require access to JBOSS_HOME.]. 
++
+----
+~]$ source ~/.bashrc
+----
+
+. Finally, ensure that [var]`JBOSS_HOME` is set in the current session, and actually points to the correct location: 
++
+NOTE: The command line usage below is based upon a binary installation of the [app]` Platform`.
+In this sample output, [var]`JBOSS_HOME` has been set correctly to the [replaceable]`topmost_directory` of the [app]`` installation.
+Note that if you are installing one of the standalone [app]`` servers (with [app]`JBoss AS` bundled!), then [var]`JBOSS_HOME` would point to the [replaceable]`topmost_directory` of your server installation. 
++
+----
+~]$ echo $JBOSS_HOME
+/home/silas/
+----
+
+
+.Setting the JBOSS_HOME Environment Variable on Windows
+The [var]`JBOSS_HOME` environment variable must point to the directory which contains all of the files for the &PLATFORM_NAME;Platform or individual &PLATFORM_NAME;server that you installed.
+As another hint, this topmost directory contains a [path]_bin_ subdirectory. 
+
+For information on how to set environment variables in recent versions of Windows, refer to http://support.microsoft.com/kb/931715. 
+
+[[_setting_catalina_home_env_linux_windows]]
+=== Setting CATALINA_HOME on Linux and Windows
+
+.Procedure: Setting the [var]`CATALINA_HOME` Environment Variable on Linux
+. The [var]`CATALINA_HOME` environment variable must point to the location of your Tomcat installation.
+  Any &PLATFORM_NAME; server which runs on top of the Tomcat servlet container has a topmost directory, i.e.
+  the directory in which you unzipped the zip file to install the server, and underneath that directory, a [path]_bin_ directory. [var]`CATALINA_HOME` must be set to the topmost directory of your &PLATFORM_NAME; server installation.
++
+Setting this variable in your personal [path]_~/.bashrc_ file has the advantage that it will always be set (for you, as a user) each time you log in or reboot the system.
+To do so, open [path]_~/.bashrc_ in a text editor (or create the file if it doesn't already exist) and insert the following line anywhere in the file, taking care to substitute [path]_<sip_server>_ for the topmost directory of the &PLATFORM_NAME; server you installed:
++
+----
+export CATALINA_HOME="/home/<username>/<path>/<to>/<sip_server>"
+----
++
+Save and close [path]_.bashrc_.
+
+. You can--and should--`source` your [path]_.bashrc_ file to make your change take effect (so that [var]`CATALINA_HOME` is set) for the current session:
++
+----
+~]$ source ~/.bashrc
+----
+
+. Finally, make sure that [var]`CATALINA_HOME` has been set correctly (that it leads to the right directory), and has taken effect in the current session.
++
+The following command will show the path to the directory pointed to by [var]`CATALINA_HOME`:
++
+----
+~]$ echo $CATALINA_HOME
+----
++
+To be absolutely sure, change your directory to the one pointed to by [var]`CATALINA_HOME`:
++
+----
+~]$ cd $CATALINA_HOME && pwd
+----
+
+
+.Procedure: Setting the [var]`CATALINA_HOME` Environment Variable on Windows
+. The [var]`CATALINA_HOME` environment variable must point to the location of your Tomcat installation.
+  Any &PLATFORM_NAME; server which runs on top of the Tomcat servlet container has a topmost directory, i.e.
+  the directory in which you unzipped the zip file to install the server, and underneath that directory, a [path]_bin_ directory. [var]`CATALINA_HOME` must be set to the topmost directory of your &PLATFORM_NAME; server installation.
++
+If you are planning on running the Tomcat container as the Administrator, then you should, of course, set the [var]`CATALINA_HOME` environment variable _as the administrator_, and if you planning to run Tomcat as a normal user, then set [var]`CATALINA_HOME` as a user environment variable.
++
+For information on how to set environment variables in Windows, refer to http://support.microsoft.com/kb/931715.

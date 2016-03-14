@@ -1,0 +1,20 @@
+
+[[_mipbx_media_support]]
+= Media Support
+
+Restcomm SIP Servlets provides support for applications to set up calls through SIP by implementing the SIP Servlets 1.1 Specification.
+
+As most Telco services have the need for managing and controlling media (for example, to play announcements, mix calls and recognize DTMF), Restcomm SIP Servlets allows applications to control media through JSR 309.
+
+== JSR 309: Media Server Control API
+
+This specification is a protocol agnostic API for Media Server Control.
+It provides a portable interface to create media rich applications with IVR, Conferencing, Speech Recognition, and similar features.
+
+Restcomm Media Server provides an implementation of the http://jcp.org/en/jsr/detail?id=309[JSR 309 specification] using the MGCP protocol, to allow any Media Server (located in the same Virtual Machine or on a remote server) supporting MGCP to be controlled.
+
+The following examples demonstrate its usage:
+
+* https://github.com/RestComm/sip-servlets/wiki/MediaDemo[Media Example] : a SIP Servlet application showing how to use media capabilities (Media playback, Recording, Text to Speech with FreeTTS and DTMF detection).
+* https://github.com/RestComm/sip-servlets/wiki/ConferenceDemo[Conference Demo] : a Conference Media Server demo application built on GWT with server-push updates.
+* https://github.com/RestComm/sip-servlets/wiki/ShoppingDemo[Shopping Example] : a Converged JEE Application showing SEAM integration, JEE, Media integration with TTS and DTMF support.

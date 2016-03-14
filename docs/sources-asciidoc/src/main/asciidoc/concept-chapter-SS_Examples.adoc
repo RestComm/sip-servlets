@@ -1,0 +1,52 @@
+[[_ssea_sip_servlet_example_applications]]
+= SIP Servlet Example Applications
+
+The SIP Servlet Server has a selection of examples that demonstrate particular capabilities of the server. <<_tab_ssea_sip_servlet_example_applications>> lists the available examples, their location, and a brief description about the functionality each example demonstrates.
+The examples can also provide a useful starting point for developing SIP Applications, therefore it is encouraged to experiment and adapt the base examples.
+Each example is available in both binary and source formats.
+
+[[_tab_ssea_sip_servlet_example_applications]]
+.Available Examples
+[cols="1,1", frame="all", options="header"]
+|===
+| Example | Description
+| Call Blocking | Demonstrates how to block calls by specifying that the INVITE SIP Extension checks the From address to see if it is specified in the block list. If the blocked SIP address matches, the Call Blocking application send a FORBIDDEN response.
+
+| Call Forwarding | Demonstrates how to forward calls by specifying that the INVITE SIP Extension checks the To address to see if it is specified in the forward list. If the SIP address matches, the application acts as a back-to-back user agent (B2BUA).
+
+| Call Controller | Call Blocking and Call Forwarding are merged to create a new service.
+
+| Speed Dial | Demonstrates how to implement speed dialing for SIP addresses. The demonstration uses a static list of speed dial numbers. The numbers are translated into a complete address based on prior configuration. The SIP addresses are proxied without record-routing, or supervised mode.
+
+| Location Service | Demonstrates a location service that performs a lookup based on the request URI, into a hard-coded list of addresses. The request is proxied to the set of destination addresses associated with that URI.
+
+| Composed Speed Dial and Location | Speed Dial and Location are merged to create a new service. Speed Dial proxies the speed dial number to a SIP address, then Location Service proxies the call to the actual location of the call recipient.
+
+| Click to Call | Demonstrates how SIP Servlets can be used along with HTTP servlets as a converged application to place calls from a web portal. The example is a modified version of the click to dial example from the Sailfin project, but has been reworked to comply with JSR 289.
+
+| Chat Server | Demonstrates MESSAGE SIP Extension support. This example is based on the chatroom server demonstration from the BEA dev2dev project, and has been modified to meet JSR 289 requirements.
+
+| Media JSR 309 Example | Demonstrates how the Sip Servlets Application Developers can leverage the JSR-309 API, which provides to application developers multimedia capabilities with a generic media server (MS) abstraction interface. This example is only compatible with JBoss AS5. The solution is know to work with Twinkle and linphone SIP soft-phones.
+
+| Shopping | Demonstrates integration with Seam and Java Enterprise Edition (JEE), and JSR 309 Media integration with text to speech (TTS) and dual-tone multi-frequency (DTMF) tones. The demonstration builds on the Converged Demo example, and adds support for the SIP Servlets v1.1 specification.
+
+| Diameter Event Charging Service | Demonstrates how the Diameter Event Charging, and the Location service, can be used to perform fixed-rated charging of calls (event charging). When a call is initiated, a debit of ten euros is applied to the A Party account. If the call is rejected by the B Party, or A Party hangs up before B Party can answer the call, the ten euro charge is credited to the A Party account.
+
+| Diameter Sh OpenIMS Integration | Demonstrates the integration between RestComm and OpenIMS, using the Diameter Sh interface to receive profile updates and SIP.
+
+| Diameter Ro/Rf IIntegration | A Diameter Ro/Rf service that performs online call charging.
+
+| Conference | Demonstrates the capabilities of the Media Server, such as endpoint composition and conferencing, as well as proving that SIP Servlets are capable of working seamlessly with any third-party web framework, without repackaging or modifying the deployment descriptors. The demonstration uses Google's GWT Ajax framework with server-push updates to provide a desktop-like user interface experience and JSR 309 for Media Control.
+
+| Alerting Application | This application was developed so that the JBoss RHQ/Jopr Enterprise Management Solution would be able to notify system administrators when a monitoring alert is fired by Jopr/RHQ.
+
+| SIP Presence Client Application | A Call Blocking application interoperating with the PLATFORM_NAME; SIP Presence Service (Technology Preview) to fetch the blocked contacts through XCAP.
+
+|===
+
+
+:leveloffset: 2
+
+include::concept-chapter-Services_for_SIP_Servlets.adoc[]
+
+:leveloffset: 1

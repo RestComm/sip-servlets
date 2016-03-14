@@ -1,0 +1,88 @@
+
+= Java Development Kit (): Installing, Configuring and Running
+
+The [app]` Platform` is written in Java; therefore, before running any [app]`` server, you must have a working Java Runtime Environment () or Java Development Kit () installed on your system.
+In addition, the JRE or JDK you are using to run [app]`` must be version 5 or higherfootnote:[At this point in time, it is possible to run most  servers, such as the JAIN SLEE Server, using a Java 6 JRE or JDK. Be aware, however, that presently the XML Document Management Server does not run on Java 6. We suggest checking the  web site, forums or discussion pages if you need to inquire about the status of running the XML Document Management Server with Java 6.]. 
+
+.Should I Install the JRE or JDK?
+Although you can run [app]`` servers using the Java Runtime Environment, we assume that most users are developers interested in developing Java-based, [app]``-driven solutions.
+Therefore, in this guide we take the tact of showing how to install the full Java Development Kit. 
+
+.Should I Install the 32-Bit or the 64-Bit JDK, and Does It Matter?
+Briefly stated: if you are running on a 64-Bit Linux or Windows platform, you should consider installing and running the 64-bit JDK over the 32-bit one.
+Here are some heuristics for determining whether you would rather run the 64-bit Java Virtual Machine (JVM) over its 32-bit cousin for your application: 
+
+* Wider datapath: the pipe between RAM and CPU is doubled, which improves the performance of memory-bound applications when using a 64-bit JVM. 
+* 64-bit memory addressing gives virtually unlimited (1 exabyte) heap allocation.
+  However large heaps affect garbage collection. 
+* Applications that run with more than 1.5 GB of RAM (including free space for garbage collection optimization) should utilize the 64-bit JVM. 
+* Applications that run on a 32-bit JVM and do not require more than minimal heap sizes will gain nothing from a 64-bit JVM.
+  Barring memory issues, 64-bit hardware with the same relative clock speed and architecture is not likely to run Java applications faster than their 32-bit cousin. 
+
+Note that the following instructions detail how to download and install the 32-bit JDK, although the steps are nearly identical for installing the 64-bit version. 
+
+.Downloading
+You can download the Sun JDK 5.0 (Java 2 Development Kit) from Sun's website: http://java.sun.com/javase/downloads/index_jdk5.jsp.
+Click on the [label]#Download# link next to "JDK 5.0 Update [replaceable]`<x>`" (where [replaceable]`<x>` is the latest minor version release number). On the next page, select your language and platform (both architecture--whether 32- or 64-bit--and operating system), read and agree to the `Java Development Kit 5.0 License Agreement`, and proceed to the download page. 
+
+The Sun website will present two download alternatives to you: one is an RPM inside a self-extracting file (for example, [path]_jdk-1_5_0_16-linux-i586-rpm.bin_), and the other is merely a self-extracting file (e.g. [path]_jdk-1_5_0_16-linux-i586.bin_). If you are installing the JDK on Red Hat Enterprise Linux, Fedora, or another RPM-based Linux system, we suggest that you download the self-extracting file containing the RPM package, which will set up and use the SysV service scripts in addition to installing the JDK.
+We also suggest installing the self-extracting RPM file if you will be running [app]`` in a production environment. 
+
+.Installing
+The following procedures detail how to install the Java Development Kit on both Linux and Windows. 
+
+.Procedure: Installing the JDK on Linux
+. Regardless of which file you downloaded, you can install it on Linux by simply making sure the file is executable and then running it: 
++
+----
+~]$ chmod +x "jdk-1_5_0_<minor_version>-linux-<architecture>-rpm.bin"
+~]$ ./"jdk-1_5_0_<minor_version>-linux-<architecture>-rpm.bin"
+----
+
+
+.You Installed Using the Non-RPM Installer, but Want the SysV Service Scripts
+[NOTE]
+====
+If you download the non-RPM self-extracting file (and installed it), and you are running on an RPM-based system, you can still set up the SysV service scripts by downloading and installing one of the `-compat` packages from the JPackage project.
+Remember to download the `-compat` package which corresponds correctly to the minor release number of the JDK you installed.
+The compat packages are available from link:ftp://jpackage.hmdc.harvard.edu/JPackage/1.7/generic/RPMS.non-free/. 
+====
+
+IMPORTANT: You do not need to install a `-compat` package in addition to the JDK if you installed the self-extracting RPM file! The `-compat` package merely performs the same SysV service script set up that the RPM version of the JDK installer does. 
+
+.Procedure: Installing the JDK on Windows
+. Using Explorer, simply double-click the downloaded self-extracting installer and follow the instructions to install the JDK. 
+
+.Configuring
+Configuring your system for the JDK consists in two tasks: setting the [var]`JAVA_HOME` environment variable, and ensuring that the system is using the proper JDK (or JRE) using the `alternatives` command.
+Setting [var]`JAVA_HOME` usually overrides the values for `java`, `javac` and `java_sdk_1.5.0` in `alternatives`, but we will set them all just to be safe and consistent. 
+
+Setting the [var]`JAVA_HOME` Environment Variable on Generic Linux::
+  After installing the JDK, you must ensure that the [var]`JAVA_HOME` environment variable exists and points to the location of your JDK installation. 
+
+Setting [var]`java`, [var]`javac` and [var]`java_sdk_1.5.0` Using the `alternatives` command ::
+  _As the root user_, call `/usr/sbin/alternatives` with the [option]`--config java` option to select between JDKs and JREs installed on your system: 
+
+Setting the [var]`JAVA_HOME` Environment Variable on Windows::
+  For information on how to set environment variables in Windows, refer to http://support.microsoft.com/kb/931715. 
+
+.Testing
+Finally, to make sure that you are using the correct JDK or Java version (5 or higher), and that the java executable is in your [var]`PATH`, run the `java -version
+			` command in the terminal from your home directory: 
+
+----
+~]$ java -version
+java version "1.5.0_16"
+Java(TM) 2 Runtime Environment, Standard Edition (build 1.5.0_16-b03)
+Java HotSpot(TM) Client VM (build 1.5.0_16-b03, mixed mode, sharing)
+----
+
+.Uninstalling
+There is usually no reason (other than space concerns) to remove a particular JDK from your system, given that you can switch between JDKs and JREs easily using `alternatives`, and/or by setting [var]`JAVA_HOME`. 
+
+.Uninstalling the JDK on Linux
+On RPM-based systems, you can uninstall the JDK using the `yum remove <jdk_rpm_name>
+			` command. 
+
+.Uninstalling the JDK on Windows
+On Windows systems, check the JDK entry in the `Start` menu for an uninstall command, or use `Add/Remove Programs`. 

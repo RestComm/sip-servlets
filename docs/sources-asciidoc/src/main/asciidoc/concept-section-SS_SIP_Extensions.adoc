@@ -1,0 +1,60 @@
+
+[[_saimse_sip_and_ims_extensions]]
+= SIP and IMS Extensions
+
+SIP Extensions in the SIP Servlets Server are based on the Internet Engineering Task Force's (IETF) Request for Comments (RFC) protocol recommendations. <<_tab_sse_supported_sip_extensions>> lists the supported RFCs for the SIP Servlets Server.
+
+[[_tab_sse_supported_sip_extensions]]
+.Supported SIP Extensions
+[cols="1,1,1", frame="all", options="header"]
+|===
+| Extension | RFC Number | Description
+| DNS | RFC 3263 | SIP: Locating SIP Servers
+| ENUM | RFC 2916 | E.164 number and DNS
+| INFO | RFC 2976 | The SIP INFO Method
+| IPv6 | RFC 2460 | Internet Protocol, Version 6 (IPv6) Specification
+| JOIN | RFC 3911 | The SIP "Join" Header
+| MESSAGE | RFC 3428 | SIP Extension for Instant Messaging
+| PATH | RFC 3327 | SIP Extension Header Field for Registering Non-Adjacent Contacts
+| PRACK | RFC 3262 | Reliability of Provisional Responses in the SIP
+| PUBLISH | RFC 3903 | SIP Extension for Event State Publication
+| REASON | RFC 3326 | The Reason Header Field for the Session Initiation Protocol (SIP)
+| REFER | RFC 3515 | The SIP Refer Method
+| REPLACES | RFC 3891 | The SIP "Replaces" Header
+| STUN | RFC 3489 | STUN - Simple Traversal of User Datagram Protocol (UDP) through Network Address Translators (NATs)
+| SUBSCRIBE/NOTIFY | RFC 3265 | SIP-specific Event Notification
+| Symmetric Response Routing | RFC 3581 | An Extension to the Session Initiation Protocol (SIP) for Symmetric Response Routing
+| Multipart type | RFC 4662 | A Session Initiation Protocol (SIP) Event Notification
+| To/From Header Modification | RFC 4916 | Connected Identity in the Session Initiation Protocol (SIP)
+|===
+
+IMS Private Header (P-Header) Extensions are provided according to the recommendations of the http://www.3gpp.org/[3rd Generation Partnering Project (3GPP)] and the IETF.
+P-Header extensions are primarily used to store information about the networks a call traverses, including security or call charging details.
+
+<<_tab_sse_ims_p_header_extensions>> describes the list of supported P-Headers, including links to the relevant ITEF memorandum where available.
+
+[[_tab_sse_ims_p_header_extensions]]
+.IMS P-Header Extensions
+[cols="1,1", frame="all", options="header"]
+|===
+| AuthorizationHeaderIMS | Defines a new auth-param for the Authorization header used in REGISTER requests.
+| PAccessNetworkInfoHeader | Contains information regarding the access network the User Agent (UA) uses to connect to the SIP Proxy. The information contained in this header may be sensitive, such as the cell ID, so it is important to secure all SIP application that interface with this header.
+| PAssertedIdentityHeader | Contains an identity resulting from an authentication process, derived from a SIP network intermediary. The identity may be based on SIP Digest authentication.
+| PAssertedServiceHeader | Contains information used by "trust domains", according to Spec(T) specifications detailed in RFC 3324.
+| PAssociatedURIHeader | Contains a list of URIs that are allocated to the user. The header is defined in the 200 OK response to a REGISTER request. It allows the User Agent Client (UAC) to determine the URIs the service provider has associated to the user's address-of-record URI.
+| PathHeader | SIP Extension header, with syntax similar to the RecordRoute header. Used in conjunction with SIP REGISTER requests and 200 class messages in response to REGISTER responses.
+| PCalledPartyIDHeader | Typically inserted en-route into an INVITE request by the proxy, the header is populated with the Request_URI received by the proxy in the request. The header allows the User Agent Server (UAS) to identify which address-of-record the invitation was sent to, and can be used to render distinctive audio-visual alert notes based on the URI.
+| PChargingFunctionAddressesHeader | Contains a list of one or more of the Charging Collection Function (CCF) and the Event Charging Function (ECF) addresses. The CCF and ECF addresses may be passed during the establishment of a dialog, or in a standalone transaction.
+| PChargingVectorHeader | Contains a unique charging identifier and correlation information, which is used by network operators to correctly charge for routing events through their networks.
+| PMediaAuthorizationHeader | Contains one or more session-specific media authorization tokens, which are used for QoS of the media streams.
+| PPreferredIdentityHeader | Contains a SIP URI and an optional display-name. For example, "James May" <sip:james@domain.com>. This header is used by trusted proxy servers to identify the user to other trusted proxies, and can be used to select the correct SIP URI in the case of multiple user identities.
+| PPreferredServiceHeader | Used by the PAssertedService Header to determine the preferred user service. Multiple PPreferreedService headers may be present in a single request.
+| PProfileKeyHeader | Contains a key used by a proxy to query the user database for a given profile. The key may contain wildcards that are used as part of the query into the database.
+| PrivacyHeader | Contains values that determine whether particular header information is deemed as private by the UA for requests and responses.
+| PServedUserHeader | Contains an identity of the user that represents the served user. The header is added to the initial requests for a dialog or standalone request, which are then routed between nodes in a trusted domain.
+| PUserDatabaseHeader | Contains the address of the HSS handling the user that generated the request. The header field is added to request routed from an Interrogating Call Session Control Function (I-CSCF) to a Serving Call Session Control Function (S-CSCF).
+| PVisitedNetworkIDHeader | Contains the identifier of a visited network. The identifier is a text string or token than it known by both the registrar or the home proxy at the home network, and the proxies in the visited network.
+| SecurityClientHeader, SecurityServerHeader, SecurityVerifyHeader | Contains information used to negotiate the security mechanisms between a UAC, and other SIP entities including UAS, proxy and registrar.
+| ServiceRouteHeader | Contains a route vector that will direct requests through a specified sequence of proxies. The header may be included by a registrar in response to a REGISTER request.
+| WWWAuthenticateHeaderIms | Extends the WWWAuthenticateResponse header functionality by defining an additional authorization parameter (auth-param).
+|===
