@@ -763,14 +763,19 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 		// Update the last proxied request
 		request.setRoutingState(RoutingState.PROXIED);
 		if(!request.getMethod().equalsIgnoreCase(Request.ACK) ) {
-		proxy.setOriginalRequest(request);
-		this.originalRequest = request;
+			proxy.setOriginalRequest(request);
+			this.originalRequest = request;
 		}
 		
 		// No proxy params, sine the target is already in the Route headers
 //		final ProxyParams params = new ProxyParams(null, null, null, null);
-		final Request clonedRequest = 
-			ProxyUtils.createProxiedRequest(request, this, null, null, null, null);
+		Request clonedRequest = null;
+		if(request.getMethod().equalsIgnoreCase(Request.NOTIFY) || request.getMethod().equalsIgnoreCase(Request.SUBSCRIBE)) {
+			// https://github.com/RestComm/sip-servlets/issues/121 http://tools.ietf.org/html/rfc6665#section-4.3
+			clonedRequest = ProxyUtils.createProxiedRequest(request, this, null, outboundInterface, recordRouteURI, null);
+		} else {
+			clonedRequest = ProxyUtils.createProxiedRequest(request, this, null, null, null, null);
+		}
 
 //      There is no need for that, it makes application composition fail (The subsequent request is not dispatched to the next application since the route header is removed)
 //		RouteHeader routeHeader = (RouteHeader) clonedRequest.getHeader(RouteHeader.NAME);

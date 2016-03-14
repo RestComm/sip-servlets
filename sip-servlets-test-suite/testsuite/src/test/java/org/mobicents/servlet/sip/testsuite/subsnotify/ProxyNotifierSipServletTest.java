@@ -27,6 +27,8 @@ import javax.sip.InvalidArgumentException;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
+import javax.sip.header.RecordRouteHeader;
+import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
@@ -137,8 +139,13 @@ public class ProxyNotifierSipServletTest extends SipServletTestCase {
 		sender.sendSipRequest(Request.SUBSCRIBE, fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT*2);
 		assertEquals(202, sender.getFinalResponseStatus());					
-		assertEquals(3, sender.notifyCount);					
-		
+		assertEquals(3, sender.notifyCount);	
+		// https://github.com/RestComm/sip-servlets/issues/121
+		for(Request request:sender.allRequests) {
+			if(request.getMethod().equals("NOTIFY")) {
+				assertNotNull(request.getHeader(RecordRouteHeader.NAME));
+			}
+		}				
 	}
 	
 	/*
