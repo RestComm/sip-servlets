@@ -90,7 +90,7 @@ public interface MobicentsSipSession extends SipSession, SipSessionExt {
 	void removeOngoingTransaction(Transaction transaction);
 	void addOngoingTransaction(Transaction transaction);
 	
-	void cleanDialogInformation();
+	void cleanDialogInformation(boolean terminate);
 
 	Serializable getStateInfo();
 	void setStateInfo(Serializable stateInfo);

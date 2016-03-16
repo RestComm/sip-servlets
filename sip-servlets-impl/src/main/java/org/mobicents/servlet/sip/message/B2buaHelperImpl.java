@@ -948,10 +948,10 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 								}
 							}
 							if(linkedRequest.getSipSession().getOngoingTransactions().isEmpty()) {
-								linkedRequest.getSipSession().cleanDialogInformation();
+								linkedRequest.getSipSession().cleanDialogInformation(false);
 							}
 							if(sipServletRequestImpl.getSipSession().getOngoingTransactions().isEmpty()) {
-								sipServletRequestImpl.getSipSession().cleanDialogInformation();
+								sipServletRequestImpl.getSipSession().cleanDialogInformation(false);
 							}
 							if(!force && linkedRequest.getSipSession().isValidInternal() &&
 									// https://code.google.com/p/sipservlets/issues/detail?id=279

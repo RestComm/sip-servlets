@@ -179,7 +179,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 					logger.debug("newly found transaction = " + tx);
 				}
 				if(tx != null) {
-					tmpOriginalRequest = (SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest(tx.getRequest(), null, null, null, false);
+					tmpOriginalRequest = (SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest(tx.getRequest(), null, clientTransaction, dialog, false);
 					if(logger.isDebugEnabled()) {
 						logger.debug("Original message from newly found tx = " + tmpOriginalRequest);
 					}

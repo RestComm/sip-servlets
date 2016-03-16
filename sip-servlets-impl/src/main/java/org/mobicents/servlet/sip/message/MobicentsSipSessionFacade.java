@@ -573,7 +573,7 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
     }
     
     @Override
-	public void cleanDialogInformation() {
-		this.cleanDialogInformation();
+	public void cleanDialogInformation(boolean terminate) {
+		this.cleanDialogInformation(terminate);
 	}
 }

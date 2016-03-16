@@ -1565,6 +1565,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			getAsynchronousExecutor().execute(new Runnable() {
 				public void run() {
 					try {
+						if(logger.isDebugEnabled()) {
+							logger.info("transaction " + transaction + " terminated => " + sipServletMessageImpl);
+						}		
+						
 						MobicentsB2BUAHelper b2buaHelperImpl = null;
 						if(sipSession != null) {
 							b2buaHelperImpl = sipSession.getB2buaHelper();
@@ -1609,8 +1613,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 										}
 										if(nullifyAppData) {
 											tad.cleanUp();
-											if(b2buaHelperImpl == null) {
-												sipSession.cleanDialogInformation();
+											if(b2buaHelperImpl == null && tad.getSipServletMessage() instanceof SipServletRequestImpl) {
+												sipSession.cleanDialogInformation(false);
 											}
 											transaction.setApplicationData(null);
 										}
