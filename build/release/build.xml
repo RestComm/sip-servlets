@@ -454,7 +454,11 @@
 	
 	<target name="copy-documentation">
 		<copy overwrite="true" todir="${mss.home}/docs/restcomm-sip-servlets">
-			<fileset dir="${base.path}/../../docs/jdocbook-restcomm/target/docbook/publish/en-US/" />
+			<fileset dir="${base.path}/../../docs/sources-asciidoc/target/generated-docs/html-book/" />
+		</copy>
+
+		<copy overwrite="true" todir="${mss.home}/docs/restcomm-sip-servlets">
+			<fileset dir="${base.path}/../../docs/sources-asciidoc/target/generated-docs/pdf/" />
 		</copy>
 		
 		<!--delete dir="${docs.stage.dir}" /-->
