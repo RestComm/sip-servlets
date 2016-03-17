@@ -34,7 +34,8 @@ public class AddressTest extends junit.framework.TestCase {
 	static String[][] equal = {
 			{"\"Alice\" <sip:%61lice@bea.com;transport=TCP;lr>;q=0.6;expires=3601", "\"Alice02\" <sip:alice@BeA.CoM;Transport=tcp;lr>;q=0.6;expires=3601"},
 			{"<sip:%61lice@bea.com;transport=TCP;lr>;expires=3601;q=0.6", " <sip:alice@BeA.CoM;Transport=tcp;lr>;q=0.6;expires=3601"},
-			{"<sip:%61lice@bea.com;transport=TCP;lr>;q=0.6", "<sip:alice@BeA.CoM;Transport=tcp;lr>;q=0.6;expires=3601"}
+			{"<sip:%61lice@bea.com;transport=TCP;lr>;q=0.6", "<sip:alice@BeA.CoM;Transport=tcp;lr>;q=0.6;expires=3601"},
+			{"<sip:%61lice@bea.com;transport=TCP;lr>;q=1.0", "<sip:alice@BeA.CoM;Transport=tcp;lr>;q=1;expires=3601"}
 	};
 	
 	static String[][] different = {

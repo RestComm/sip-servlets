@@ -371,9 +371,20 @@ public class AddressImpl extends ParameterableImpl implements Address {
 				
 				String p1 = parameters.get(pname);
 				String p2 = other.parameters.get(pname);
-				
+
 				// those present in both must match (case-insensitive)
-				if (p1!=null && p2!=null && !RFC2396UrlDecoder.decode(p1).equalsIgnoreCase(RFC2396UrlDecoder.decode(p2))) return false;
+				if (p1!=null && p2!=null) {
+					if(Q_PARAM_NAME.equalsIgnoreCase(pname)) {
+						// https://github.com/RestComm/sip-servlets/issues/123
+						float p1Float = Float.valueOf(p1);
+						float p2Float = Float.valueOf(p2);
+						if(p1Float != p2Float) {
+							return false;
+						}
+					} else if(!RFC2396UrlDecoder.decode(p1).equalsIgnoreCase(RFC2396UrlDecoder.decode(p2))) {
+						return false;
+					}
+				}
 			}
 		}
 		return true;
