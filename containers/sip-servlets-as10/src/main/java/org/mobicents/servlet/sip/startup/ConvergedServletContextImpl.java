@@ -186,7 +186,7 @@ public final class ConvergedServletContextImpl implements ServletContext {
                 //call access after creation to set LastAccessTime at sipAppSession.
                 httpSession.access();
                 //add delegate to InMemorySession to call sipAppSession.access(), when necessary:
-                ((ConvergedInMemorySessionManager)sessionManager).addConvergedSessionDeletegateToSession(c, exchange, httpSession.getConvergedSessionDelegate());
+                ((ConvergedInMemorySessionManager)sessionManager).addConvergedSessionDeletegateToSession(newSession.getId(), httpSession.getConvergedSessionDelegate());
 
                 exchange.putAttachment(sessionAttachmentKey, httpSession);
             }

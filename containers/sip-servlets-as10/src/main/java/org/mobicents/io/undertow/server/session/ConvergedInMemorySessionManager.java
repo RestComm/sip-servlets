@@ -172,13 +172,11 @@ public class ConvergedInMemorySessionManager implements SessionManager, SessionM
 
     //this method should be called after session is created by sessionManager.createSession()
     //FIXME:kakonyii. sessionManager.createSession() is also called from  io.undertow.util.Sessions.getOrCreateSession(), so this method should be called from there also
-    public void addConvergedSessionDeletegateToSession(SessionConfig sessionCookieConfig, HttpServerExchange serverExchange, ConvergedSessionDelegate convergedSessionDelegate){
-        String sessionId = sessionCookieConfig.findSessionId(serverExchange);
+    public void addConvergedSessionDeletegateToSession(String sessionId, ConvergedSessionDelegate convergedSessionDelegate){
         ConvergedInMemorySession sess = sessions.get(sessionId);
         if(sess!=null){
             sess.addConvergedSessionDelegate(convergedSessionDelegate);
         }
-
     }
 
     @Override

@@ -21,7 +21,6 @@ package org.mobicents.as10.deployment;
 import static org.mobicents.as10.SipMessages.MESSAGES;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -39,7 +38,6 @@ import org.jboss.as.web.common.WarMetaData;
 import org.jboss.dmr.ModelNode;
 import org.jboss.logging.Logger;
 import org.jboss.metadata.merge.web.jboss.JBossWebMetaDataMerger;
-import org.jboss.metadata.web.jboss.JBossServletMetaData;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.metadata.web.spec.ListenerMetaData;
 import org.jboss.metadata.web.spec.ServletMetaData;
@@ -94,8 +92,8 @@ public class SipWarDeploymentProcessor implements DeploymentUnitProcessor {
         if (metaData == null) {
             return;
         }
-        mergeSipMetaDataAndSipAnnMetaData(deploymentUnit);
-        processDeployment(deploymentUnit, phaseContext.getServiceTarget());
+        JBossConvergedSipMetaData mergedMetaData  =  mergeSipMetaDataAndSipAnnMetaData(deploymentUnit);
+        processDeployment(deploymentUnit, phaseContext.getServiceTarget(), mergedMetaData);
     }
 
     @Override
@@ -103,13 +101,13 @@ public class SipWarDeploymentProcessor implements DeploymentUnitProcessor {
         // TODO
     }
     
-    //merte DD and annotation meta data and store in WarMetaData.mergedJBossWebMetaData based on SIPWebContext code
-    private void mergeSipMetaDataAndSipAnnMetaData(final DeploymentUnit deploymentUnit) {
+    //merge DD and annotation meta data and store in WarMetaData.mergedJBossWebMetaData based on SIPWebContext code
+    private JBossConvergedSipMetaData mergeSipMetaDataAndSipAnnMetaData(final DeploymentUnit deploymentUnit) {
     	final WarMetaData warMetaData = deploymentUnit.getAttachment(WarMetaData.ATTACHMENT_KEY);
         SipMetaData sipMetaData = deploymentUnit.getAttachment(SipMetaData.ATTACHMENT_KEY);
         SipAnnotationMetaData sipAnnotationMetaData = deploymentUnit.getAttachment(SipAnnotationMetaData.ATTACHMENT_KEY);
         
-        JBossWebMetaData mergedMetaData = new JBossConvergedSipMetaData();
+        JBossConvergedSipMetaData mergedMetaData = new JBossConvergedSipMetaData();
         final JBossWebMetaData override = warMetaData.getJBossWebMetaData();
         final WebMetaData original = null;
         JBossWebMetaDataMerger.merge(mergedMetaData, override, original);
@@ -119,13 +117,16 @@ public class SipWarDeploymentProcessor implements DeploymentUnitProcessor {
             // When no sip.xml but annotations only, Application is not recognized as SIP App by AS7
             sipMetaData = new Sip11MetaData();
         }
-        try {
-			augmentAnnotations(mergedMetaData, sipMetaData, sipAnnotationMetaData);
-		} catch (ServletException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	warMetaData.setMergedJBossWebMetaData(mergedMetaData);
+        if (sipMetaData != null) {
+	        try {
+				augmentAnnotations(mergedMetaData, sipMetaData, sipAnnotationMetaData);
+			} catch (ServletException e) {
+				logger.error("Error while augmenting annotation: " + e.getMessage(), e);
+			}
+        } else {
+        	logger.debug("Deployment does not consist SIP application.");
+        }
+        return mergedMetaData;
     }
     
     private void augmentAnnotations(JBossWebMetaData mergedMetaData, SipMetaData sipMetaData,
@@ -304,17 +305,16 @@ public class SipWarDeploymentProcessor implements DeploymentUnitProcessor {
         JBossSipMetaDataMerger.merge((JBossConvergedSipMetaData) mergedMetaData, null, sipMetaData);
     } 
 
-    protected void processDeployment(final DeploymentUnit deploymentUnit, final ServiceTarget serviceTarget)
+    protected void processDeployment(final DeploymentUnit deploymentUnit, final ServiceTarget serviceTarget, final JBossConvergedSipMetaData mergedSipMetaData)
             throws DeploymentUnitProcessingException {
         final VirtualFile deploymentRoot = deploymentUnit.getAttachment(Attachments.DEPLOYMENT_ROOT).getRoot();
         final Module module = deploymentUnit.getAttachment(Attachments.MODULE);
         if (module == null) {
             throw new DeploymentUnitProcessingException(MESSAGES.failedToResolveModule(deploymentRoot));
         }
-        final WarMetaData warMetaData = deploymentUnit.getAttachment(WarMetaData.ATTACHMENT_KEY);
-        final JBossConvergedSipMetaData sipMetaData = ((JBossConvergedSipMetaData) warMetaData.getMergedJBossWebMetaData());
-        if (sipMetaData != null && sipMetaData.getApplicationName() != null) {
-            final String appNameMgmt = sipMetaData.getApplicationName();
+        
+        if (mergedSipMetaData != null && mergedSipMetaData.getApplicationName() != null) {
+            final String appNameMgmt = mergedSipMetaData.getApplicationName();
             final ServiceName deploymentServiceName = SipSubsystemServices.deploymentServiceName(appNameMgmt);
             try {
                 final SipDeploymentService sipDeploymentService = new SipDeploymentService(deploymentUnit);
@@ -348,7 +348,7 @@ public class SipWarDeploymentProcessor implements DeploymentUnitProcessor {
             final DeploymentResourceSupport  deploymentResourceSupport = deploymentUnit.getAttachment(Attachments.DEPLOYMENT_RESOURCE_SUPPORT);
    		    final ModelNode node = deploymentResourceSupport.getDeploymentSubsystemModel(SipExtension.SUBSYSTEM_NAME);
             node.get(SipDeploymentDefinition.APP_NAME.getName()).set("".equals(appNameMgmt) ? "/" : appNameMgmt);
-            processManagement(deploymentUnit, sipMetaData);
+            processManagement(deploymentUnit, mergedSipMetaData);
         } else {
 
         }
