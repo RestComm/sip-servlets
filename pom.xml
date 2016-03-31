@@ -92,7 +92,7 @@
 		<jain-sip-ri.version>1.2.269</jain-sip-ri.version>
 		<restcomm.cluster.version>1.15.26</restcomm.cluster.version>
 		<restcomm.balancer.version>2.0.23</restcomm.balancer.version>
-		<restcomm.jain.sip.ha.version>1.5.22</restcomm.jain.sip.ha.version>
+		<restcomm.jain.sip.ha.version>1.5.23</restcomm.jain.sip.ha.version>
 		<restcomm.jain.sip.ext.version>1.3.23</restcomm.jain.sip.ext.version>
 		<restcomm.commons.version>1.0.134</restcomm.commons.version>
 		<tomcat-7.version>7.0.64</tomcat-7.version>
