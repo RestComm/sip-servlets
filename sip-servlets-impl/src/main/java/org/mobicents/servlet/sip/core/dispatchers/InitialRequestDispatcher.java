@@ -20,7 +20,6 @@
 package org.mobicents.servlet.sip.core.dispatchers;
 
 import gov.nist.javax.sip.SipStackExt;
-import gov.nist.javax.sip.address.GenericURI;
 import gov.nist.javax.sip.header.extensions.JoinHeader;
 import gov.nist.javax.sip.header.extensions.ReplacesHeader;
 
