@@ -110,6 +110,8 @@ public class RFC2396UrlDecoder {
 	}
 
 	
+    private static final char UTF8_ESCAPE_CHAR = '%';
+    
     /**
      * Decode a path.
      *
@@ -132,16 +134,23 @@ public class RFC2396UrlDecoder {
 //    		throw new NullPointerException("uri cannot be null !");
     		return null;
     	}
+        
+        //optimization for uri with no escaped chars
+        //fixes https://github.com/RestComm/sip-servlets/issues/124
+        if (uri.indexOf(UTF8_ESCAPE_CHAR) < 0) {
+            return uri;
+        }
+        
         StringBuffer translatedUri = new StringBuffer(uri.length());
         byte[] encodedchars = new byte[uri.length() / 3];
         int i = 0;
         int length = uri.length();
         int encodedcharsLength = 0;
         while (i < length) {
-            if (uri.charAt(i) == '%') {
+            if (uri.charAt(i) == UTF8_ESCAPE_CHAR) {
                 //we must process all consecutive %-encoded characters in one go, because they represent
                 //an UTF-8 encoded string, and in UTF-8 one character can be encoded as multiple bytes
-                while (i < length && uri.charAt(i) == '%') {
+                while (i < length && uri.charAt(i) == UTF8_ESCAPE_CHAR) {
                     if (i + 2 < length) {
                         try {
                             byte x = (byte)Integer.parseInt(uri.substring(i + 1, i + 3), 16);
