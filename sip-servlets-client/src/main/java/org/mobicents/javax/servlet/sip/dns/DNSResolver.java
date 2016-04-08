@@ -22,6 +22,7 @@
 
 package org.mobicents.javax.servlet.sip.dns;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.sip.SipURI;
@@ -68,6 +69,15 @@ public interface DNSResolver {
 	 * @return list of IP Addresses corresponding to that hostname
 	 */
 	Set<String> resolveHost(String host);
+        
+	/**
+	 * Discovers servers according to RFC 3263 and/or ENUM support for the given uri passed in parameters
+	 * @param uri the uri for which the DNS lookups have to be done
+	 * @return a List of SipURI that have to be tried each one in turn.
+	 */
+	List<SipURI> locateURIs(SipURI uri);        
+        
+        
 	
 	void setDnsTimeout(int timeout);
 	int getDnsTimeout();

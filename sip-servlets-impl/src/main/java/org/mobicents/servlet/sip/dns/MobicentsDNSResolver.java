@@ -22,14 +22,18 @@
 
 package org.mobicents.servlet.sip.dns;
 
+import java.text.ParseException;
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
-
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
+import javax.sip.SipFactory;
+import javax.sip.address.AddressFactory;
 import javax.sip.address.Hop;
-
+import org.apache.log4j.Logger;
 import org.mobicents.ext.javax.sip.dns.DNSServerLocator;
 import org.mobicents.javax.servlet.sip.dns.DNSResolver;
 import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
@@ -41,11 +45,19 @@ import org.mobicents.servlet.sip.address.URIImpl;
  *
  */
 public class MobicentsDNSResolver implements DNSResolver {
-
+        private static final Logger logger = Logger.getLogger(MobicentsDNSResolver.class
+            .getName());
+        
 	private DNSServerLocator dnsServerLocator;
+        private AddressFactory createAddressFactory;
 
 	public MobicentsDNSResolver(DNSServerLocator dnsServerLocator) {
 		this.dnsServerLocator = dnsServerLocator;
+                try {
+                    createAddressFactory = SipFactory.getInstance().createAddressFactory();
+                } catch (Exception e) {
+                    logger.warn("Error getting address factory", e);
+                }
 	}
 	
 	/* (non-Javadoc)
@@ -79,5 +91,33 @@ public class MobicentsDNSResolver implements DNSResolver {
 		return ipAddresses;
 	}
 
-	
+        /* (non-Javadoc)
+         * @see org.mobicents.javax.servlet.sip.dns.DNSResolver#locateURIs(javax.servlet.sip.URI)
+         */        
+        @Override
+        public List<SipURI> locateURIs(SipURI uri) {
+            List<SipURI> uris = new CopyOnWriteArrayList();
+            if (uri instanceof SipURIImpl && createAddressFactory != null) {
+                SipURIImpl uriImpl = (SipURIImpl) uri;
+                Queue<Hop> hops = dnsServerLocator.locateHops(uriImpl.getSipURI());
+                if(hops != null) {
+                    for (Hop hop : hops) {
+                        javax.sip.address.SipURI createSipURI;
+                        try {
+                            //use null as user so this uri may be used potentially
+                            //as Route Header
+                            createSipURI = createAddressFactory.createSipURI(null, hop.getHost());
+                            createSipURI.setPort(hop.getPort());
+                            createSipURI.setTransportParam(hop.getTransport());
+                            SipURI sipURI = new SipURIImpl(createSipURI, ModifiableRule.NotModifiable);
+                            uris.add(sipURI);
+                        } catch (ParseException ex) {
+                            logger.debug("Error creating SipURI.", ex);
+                        }
+                    }
+                }
+            }
+            return uris;
+        }
+
 }
