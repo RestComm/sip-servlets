@@ -34,4 +34,8 @@ public interface ConvergedServletContainer extends ServletContainer{
             return new ConvergedServletContainerImpl();
         }
     }
+
+    public void addConvergedDeployment(String deploymentName);
+    public void removeConvergedDeployment(String deploymentName);
+    public boolean isConvergedDeployment(String deploymentName);
 }
