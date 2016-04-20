@@ -44,6 +44,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletRequest;
+import javax.servlet.ServletRequestWrapper;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -59,13 +60,14 @@ import org.mobicents.servlet.sip.startup.ConvergedServletContextImpl;
  *
  * @author kakonyi.istvan@alerant.hu
  * */
-public class ConvergedHttpServletRequestFacade implements HttpServletRequest{
+public class ConvergedHttpServletRequestFacade extends ServletRequestWrapper implements HttpServletRequest{
 
     private final HttpServletRequestImpl httpServletRequest;
     private final ServletContextImpl originalServletContext;
     private ConvergedServletContextImpl servletContext;
 
     public ConvergedHttpServletRequestFacade(HttpServletRequestImpl httpServletRequest, final ConvergedServletContextImpl servletContext){
+        super(httpServletRequest);
         this.httpServletRequest = httpServletRequest;
         this.originalServletContext = httpServletRequest.getServletContext();
         this.servletContext = servletContext;
