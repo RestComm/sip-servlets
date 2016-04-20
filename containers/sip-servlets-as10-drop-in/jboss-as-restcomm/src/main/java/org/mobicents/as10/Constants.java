@@ -33,6 +33,7 @@ public interface Constants {
     String APPLICATION_ROUTER = "application-router";
     String BACK_TO_NORMAL_MEMORY_THRESHOLD = "back-to-normal-memory-threshold";
     String BASE_TIMER_INTERVAL = "base-timer-interval";
+    String CALL_ID_MAX_LENGTH = "call-id-max-length";
     String CA_CERTIFICATE_FILE = "ca-certificate-file";
     String CA_CERTIFICATE_PASSWORD = "ca-certificate-password";
     String CA_REVOCATION_URL = "ca-revocation-url";
@@ -59,8 +60,6 @@ public interface Constants {
     String DNS_SERVER_LOCATOR_CLASS = "dns-server-locator-class";
     String DNS_TIMEOUT = "dns-timeout";
     String DNS_RESOLVER_CLASS = "dns-resolver-class";
-    String CALL_ID_MAX_LENGTH = "call-id-max-length";
-    String TAG_HASH_MAX_LENGTH = "tag-hash-max-length";
     String DIRECTORY = "directory";
     String DISABLED = "disabled";
     String DISPLAY_SOURCE_FRAGMENT = "display-source-fragment";
@@ -137,6 +136,7 @@ public interface Constants {
     String SUBSYSTEM = "subsystem";
     String T2_INTERVAL = "t2-interval";
     String T4_INTERVAL = "t4-interval";
+    String TAG_HASH_MAX_LENGTH = "tag-hash-max-length";
     String TAG_POOLING = "tag-pooling";
     String TARGET_VM = "target-vm";
     String TEST = "test";

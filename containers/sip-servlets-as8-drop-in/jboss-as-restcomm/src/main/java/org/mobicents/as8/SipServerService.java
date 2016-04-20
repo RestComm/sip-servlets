@@ -239,6 +239,8 @@ class SipServerService implements SipServer, Service<SipServer> {
         }
         sipService.setDialogPendingRequestChecking(dialogPendingRequestChecking);
         sipService.setDnsServerLocatorClass(dnsServerLocatorClass);
+        sipService.setCallIdMaxLength(callIdMaxLength);
+        sipService.setTagHashMaxLength(tagHashMaxLength);
         sipService.setDnsTimeout(dnsTimeout);
         sipService.setDnsResolverClass(dnsResolverClass);
         sipService.setCanceledTimerTasksPurgePeriod(canceledTimerTasksPurgePeriod);
