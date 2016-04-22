@@ -1557,7 +1557,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 				 branchId != null && 
 				 sessionCreatingTransactionRequest.getTransaction() != null &&  
 				// https://github.com/RestComm/sip-servlets/issues/101 fix the equals comparison
-				branchId.equals(sessionCreatingTransactionRequest.getTransaction())) {
+				branchId.equals(sessionCreatingTransactionRequest.getTransaction().getBranchId())) {
 			final String sessionCreatingTransactionRequestMethod = sessionCreatingTransactionRequest.getMethod();
 			if(logger.isDebugEnabled()) {
 				logger.debug("Session " + key + ": cleaning up "+ sessionCreatingTransactionRequest 
