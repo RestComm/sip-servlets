@@ -22,7 +22,7 @@
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   -->
 
-<module xmlns="urn:jboss:module:1.1" name="org.mobicents.as10">
+<module xmlns="urn:jboss:module:1.3" name="org.mobicents.as10">
     <properties>
         <property name="jboss.api" value="private"/>
     </properties>
@@ -40,9 +40,20 @@
         <module name="org.mobicents.libs"/>
         <module name="javax.servlet.api"/>
         <module name="org.mobicents.javax.servlet.sip"/>
-        <module name="com.bea.sipservlet" services="import"/>
+        <module name="org.mobicents.dar" services="import"/>
         <module name="org.jboss.as.server"/>
+        <!-- new entries starts-->
         <module name="org.jboss.as.web"/>
+        <module name="org.jboss.as.web-common"/>
+        <module name="io.undertow.core"/>
+        <module name="io.undertow.servlet"/>
+        <module name="org.wildfly.extension.undertow"/>
+        <module name="org.wildfly.extension.io"/>
+        <module name="org.jboss.xnio"/>
+        <module name="org.jboss.xnio.nio"/>
+	<module name="javax.ejb.api"/>
+        <module name="javax.annotation.api"/>	
+        <!-- new entries ends-->
         <module name="javax.api"/>
         <module name="org.jboss.as.network"/>
         <module name="org.jboss.metadata"/>
