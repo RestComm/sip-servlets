@@ -34,6 +34,7 @@ import io.undertow.util.RedirectBuilder;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.ServletResponseWrapper;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
@@ -44,12 +45,13 @@ import org.mobicents.servlet.sip.startup.ConvergedServletContextImpl;
  *
  * @author kakonyi.istvan@alerant.hu
  * */
-public class ConvergedHttpServletResponseFacade implements HttpServletResponse{
+public class ConvergedHttpServletResponseFacade extends ServletResponseWrapper implements HttpServletResponse{
     private final HttpServletResponseImpl httpServletResponse;
     private final ServletContextImpl originalServletContext;
     private volatile ConvergedServletContextImpl servletContext;
 
     public ConvergedHttpServletResponseFacade(HttpServletResponseImpl httpServletResponse, final ConvergedServletContextImpl servletContext) {
+        super(httpServletResponse);
         this.httpServletResponse = httpServletResponse;
         this.originalServletContext = servletContext.getDelegatedContext();
         this.servletContext = servletContext;
