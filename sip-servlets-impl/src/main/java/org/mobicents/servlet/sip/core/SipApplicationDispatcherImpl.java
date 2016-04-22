@@ -1552,7 +1552,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		}
 		final Transaction transaction = eventTransaction;
 		if(logger.isDebugEnabled()) {
-			logger.info("transaction " + transaction + " terminated => " + transaction.getRequest().toString());
+			logger.info("transaction " + transaction + " terminated => " + transaction.getRequest());
 		}		
 		
 		final TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();

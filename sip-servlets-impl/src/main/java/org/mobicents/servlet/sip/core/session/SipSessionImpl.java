@@ -1551,22 +1551,26 @@ public class SipSessionImpl implements MobicentsSipSession {
 		
 		updateReadyToInvalidate(transaction);
 		// nullify the sessionCreatingTransactionRequest only after updateReadyToInvalidate as it is used for error response checking
+		
+		final String branchId = transaction.getBranchId();
 		if(sessionCreatingTransactionRequest != null && 
-				transaction.getBranchId() != null && 
-				sessionCreatingTransactionRequest.getTransaction() != null &&  
+				 branchId != null && 
+				 sessionCreatingTransactionRequest.getTransaction() != null &&  
 				// https://github.com/RestComm/sip-servlets/issues/101 fix the equals comparison
-				transaction.getBranchId().equals(sessionCreatingTransactionRequest.getTransaction().getBranchId())) {
+				branchId.equals(sessionCreatingTransactionRequest.getTransaction())) {
+			final String sessionCreatingTransactionRequestMethod = sessionCreatingTransactionRequest.getMethod();
 			if(logger.isDebugEnabled()) {
 				logger.debug("Session " + key + ": cleaning up "+ sessionCreatingTransactionRequest 
-						+ " since transaction " + transaction + " with branch id " + transaction.getBranchId() 
+						+ " since transaction " + transaction + " with branch id " + branchId 
 						+ " is the same as sessionCreatingRequestTransaction " + sessionCreatingTransactionRequest.getTransaction() 
-						+ " with branch id " + sessionCreatingTransactionRequest.getTransaction().getBranchId());
+						+ " with branch id " + sessionCreatingTransactionRequest.getTransaction().getBranchId()
+						+ " and method " + sessionCreatingTransactionRequestMethod);
 			}
 			sessionCreatingTransactionRequest.cleanUp();
 			// https://telestax.atlassian.net/browse/MSS-153 improve performance by cleaning the request for dialog based requests
 			// or proxy case or dialog creating methods
-			if(sessionCreatingDialog != null || proxy != null || JainSipUtils.DIALOG_CREATING_METHODS.contains(sessionCreatingTransactionRequest.getMethod())) {
-				if(logger.isDebugEnabled()) {
+			if(sessionCreatingDialog != null || proxy != null || JainSipUtils.DIALOG_CREATING_METHODS.contains(sessionCreatingTransactionRequestMethod)) {
+				if(logger.isDebugEnabled() && sessionCreatingTransactionRequest != null) {
 					logger.debug("nullifying  sessionCreatingTransactionRequest" + sessionCreatingTransactionRequest 
 							+ " from Session " + key);
 				}
