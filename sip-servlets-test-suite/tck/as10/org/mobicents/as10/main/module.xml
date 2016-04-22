@@ -40,7 +40,7 @@
         <module name="org.mobicents.libs"/>
         <module name="javax.servlet.api"/>
         <module name="org.mobicents.javax.servlet.sip"/>
-        <module name="org.mobicents.dar" services="import"/>
+        <module name="com.bea.sipservlet" services="import"/>
         <module name="org.jboss.as.server"/>
         <!-- new entries starts-->
         <module name="org.jboss.as.web"/>
