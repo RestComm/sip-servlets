@@ -175,9 +175,11 @@ public class UndertowSipDeploymentProcessor implements DeploymentUnitProcessor {
 
 	private void removeFromConvergedDeployments(ServiceRegistry serviceRegistry, String deploymentName) {
 		ServiceName containerServiceName = ConvergedServletContainerService.SERVICE_NAME;
-		ConvergedServletContainerService containerService = (ConvergedServletContainerService) serviceRegistry
-				.getService(containerServiceName).getValue();
-		containerService.removeConvergedDeployment(deploymentName);
+		ServiceController<ConvergedServletContainerService> sc = (ServiceController<ConvergedServletContainerService>)serviceRegistry.getService(containerServiceName);
+		if (sc != null) {
+			ConvergedServletContainerService containerService = sc.getValue();
+			containerService.removeConvergedDeployment(deploymentName);
+		}
 	}
 
 	private boolean isSipDeployment(DeploymentUnit deploymentUnit) {
