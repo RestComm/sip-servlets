@@ -18,14 +18,29 @@
  */
 package org.mobicents.servlet.sip.undertow;
 
+import java.lang.reflect.Field;
+import java.util.List;
+
+import io.undertow.server.handlers.resource.ResourceChangeListener;
+import io.undertow.server.handlers.resource.ResourceManager;
+import io.undertow.servlet.UndertowServletMessages;
+import io.undertow.servlet.api.DeploymentManager;
+import io.undertow.servlet.api.InstanceFactory;
+import io.undertow.servlet.api.InstanceHandle;
+import io.undertow.servlet.api.LifecycleInterceptor;
 import io.undertow.servlet.api.ServletInfo;
+import io.undertow.servlet.core.DeploymentManagerImpl;
 import io.undertow.servlet.core.ManagedServlet;
-import io.undertow.servlet.spec.ServletContextImpl;
+import io.undertow.servlet.spec.ServletConfigImpl;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
+import javax.servlet.SingleThreadModel;
+import javax.servlet.UnavailableException;
 
+import org.mobicents.io.undertow.servlet.core.LifecyleInterceptorInvocation;
 import org.mobicents.servlet.sip.core.MobicentsSipServlet;
+import org.mobicents.servlet.sip.startup.ConvergedServletContextImpl;
 
 /**
  *
@@ -52,8 +67,19 @@ public class SipServletImpl extends ManagedServlet implements MobicentsSipServle
     private String displayName;
     private String description;
 
-    public SipServletImpl(ServletInfo servletInfo, ServletContextImpl servletContext) {
-        super(servletInfo, servletContext);
+    private final ConvergedServletContextImpl servletContext;
+    private final InstanceStrategy instanceStrategy;
+
+    public SipServletImpl(ServletInfo servletInfo, ConvergedServletContextImpl servletContext) {
+        super(servletInfo, servletContext.getDelegatedContext());
+        this.servletContext = servletContext;
+
+        if (SingleThreadModel.class.isAssignableFrom(servletInfo.getServletClass())) {
+            instanceStrategy = new SingleThreadModelPoolStrategy(servletInfo.getInstanceFactory(), servletInfo, servletContext);
+        } else {
+            instanceStrategy = new DefaultInstanceStrategy(servletInfo.getInstanceFactory(), servletInfo, servletContext);
+        }
+
     }
 
     /**
@@ -162,13 +188,13 @@ public class SipServletImpl extends ManagedServlet implements MobicentsSipServle
 
     @Override
     public Servlet allocate() throws ServletException {
-        return super.getServlet().getInstance();
+        return getServlet().getInstance();
     }
 
     @Override
     public void deallocate(Servlet servlet) throws ServletException {
-        if (super.getServlet().getInstance() == servlet) {
-            super.getServlet().release();
+        if (getServlet().getInstance() == servlet) {
+            getServlet().release();
         }
     }
 
@@ -182,4 +208,205 @@ public class SipServletImpl extends ManagedServlet implements MobicentsSipServle
         return super.getServletInfo().getLoadOnStartup();
     }
 
+    public void createServlet() throws ServletException {
+        if (super.isPermanentlyUnavailable()) {
+            return;
+        }
+        try {
+            if (!super.isStarted() && super.getServletInfo().getLoadOnStartup() != null && super.getServletInfo().getLoadOnStartup() >= 0) {
+                instanceStrategy.start();
+
+                //super.started = true;
+                try{
+                    Field startedField = ManagedServlet.class.getDeclaredField("started");
+                    startedField.setAccessible(true);
+                    startedField.set(this, true);
+                    startedField.setAccessible(false);
+                }catch(NoSuchFieldException | IllegalAccessException e){
+                    throw new RuntimeException(e);
+                }
+            }
+        } catch (UnavailableException e) {
+            if (e.isPermanent()) {
+                super.setPermanentlyUnavailable(true);
+                stop();
+            }
+        }
+    }
+
+    public synchronized void stop() {
+        if (super.isStarted()) {
+            instanceStrategy.stop();
+        }
+
+        //super.started = false;
+        try{
+            Field startedField = ManagedServlet.class.getDeclaredField("started");
+            startedField.setAccessible(true);
+            startedField.set(this, false);
+            startedField.setAccessible(false);
+        }catch(NoSuchFieldException | IllegalAccessException e){
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public InstanceHandle<? extends Servlet> getServlet() throws ServletException {
+        if(servletContext.getDeployment().getDeploymentState() != DeploymentManager.State.STARTED) {
+            throw UndertowServletMessages.MESSAGES.deploymentStopped(servletContext.getDeployment().getDeploymentInfo().getDeploymentName());
+        }
+        if (!super.isStarted()) {
+            synchronized (this) {
+                if (!super.isStarted()) {
+                    instanceStrategy.start();
+
+                    //super.started = true;
+                    try{
+                        Field startedField = ManagedServlet.class.getDeclaredField("started");
+                        startedField.setAccessible(true);
+                        startedField.set(this, true);
+                        startedField.setAccessible(false);
+                    }catch(NoSuchFieldException | IllegalAccessException e){
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        }
+        return instanceStrategy.getServlet();
+    }
+
+    /**
+     * interface used to abstract the difference between single thread model servlets and normal servlets
+     */
+    interface InstanceStrategy {
+        void start() throws ServletException;
+
+        void stop();
+
+        InstanceHandle<? extends Servlet> getServlet() throws ServletException;
+    }
+
+    /**
+     * The default servlet pooling strategy that just uses a single instance for all requests
+     */
+    private static class DefaultInstanceStrategy implements InstanceStrategy {
+
+        private final InstanceFactory<? extends Servlet> factory;
+        private final ServletInfo servletInfo;
+        private final ConvergedServletContextImpl servletContext;
+        private volatile InstanceHandle<? extends Servlet> handle;
+        private volatile Servlet instance;
+        private ResourceChangeListener changeListener;
+
+        DefaultInstanceStrategy(final InstanceFactory<? extends Servlet> factory, final ServletInfo servletInfo, final ConvergedServletContextImpl servletContext) {
+            this.factory = factory;
+            this.servletInfo = servletInfo;
+            this.servletContext = servletContext;
+        }
+
+        public synchronized void start() throws ServletException {
+            try {
+                handle = factory.createInstance();
+            } catch (Exception e) {
+                throw UndertowServletMessages.MESSAGES.couldNotInstantiateComponent(servletInfo.getName(), e);
+            }
+            instance = handle.getInstance();
+            new LifecyleInterceptorInvocation(servletContext.getDeployment().getDeploymentInfo().getLifecycleInterceptors(), servletInfo, instance, new ServletConfigImpl(servletInfo, servletContext)).proceed();
+
+            //if a servlet implements FileChangeCallback it will be notified of file change events
+            final ResourceManager resourceManager = servletContext.getDeployment().getDeploymentInfo().getResourceManager();
+            if(instance instanceof ResourceChangeListener && resourceManager.isResourceChangeListenerSupported()) {
+                resourceManager.registerResourceChangeListener(changeListener = (ResourceChangeListener) instance);
+            }
+        }
+
+        public synchronized void stop() {
+            if (handle != null) {
+                final ResourceManager resourceManager = servletContext.getDeployment().getDeploymentInfo().getResourceManager();
+                if(changeListener != null) {
+                    resourceManager.removeResourceChangeListener(changeListener);
+                }
+                invokeDestroy();
+                handle.release();
+            }
+        }
+
+        private void invokeDestroy() {
+            List<LifecycleInterceptor> interceptors = servletContext.getDeployment().getDeploymentInfo().getLifecycleInterceptors();
+            try {
+                new LifecyleInterceptorInvocation(interceptors, servletInfo, instance).proceed();
+            } catch (ServletException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        public InstanceHandle<? extends Servlet> getServlet() {
+            return new InstanceHandle<Servlet>() {
+                @Override
+                public Servlet getInstance() {
+                    return instance;
+                }
+
+                @Override
+                public void release() {
+
+                }
+            };
+        }
+    }
+
+    /**
+     * pooling strategy for single thread model servlet
+     */
+    private static class SingleThreadModelPoolStrategy implements InstanceStrategy {
+
+
+        private final InstanceFactory<? extends Servlet> factory;
+        private final ServletInfo servletInfo;
+        private final ConvergedServletContextImpl servletContext;
+
+        private SingleThreadModelPoolStrategy(final InstanceFactory<? extends Servlet> factory, final ServletInfo servletInfo, final ConvergedServletContextImpl servletContext) {
+            this.factory = factory;
+            this.servletInfo = servletInfo;
+            this.servletContext = servletContext;
+        }
+
+        @Override
+        public void start() {
+
+        }
+
+        @Override
+        public void stop() {
+
+        }
+
+        @Override
+        public InstanceHandle<? extends Servlet> getServlet() throws ServletException {
+            final InstanceHandle<? extends Servlet> instanceHandle;
+            final Servlet instance;
+            //TODO: pooling
+            try {
+                instanceHandle = factory.createInstance();
+            } catch (Exception e) {
+                throw UndertowServletMessages.MESSAGES.couldNotInstantiateComponent(servletInfo.getName(), e);
+            }
+            instance = instanceHandle.getInstance();
+            new LifecyleInterceptorInvocation(servletContext.getDeployment().getDeploymentInfo().getLifecycleInterceptors(), servletInfo, instance, new ServletConfigImpl(servletInfo, servletContext)).proceed();
+
+            return new InstanceHandle<Servlet>() {
+                @Override
+                public Servlet getInstance() {
+                    return instance;
+                }
+
+                @Override
+                public void release() {
+                    instance.destroy();
+                    instanceHandle.release();
+                }
+            };
+
+        }
+    }
 }

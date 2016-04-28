@@ -18,15 +18,6 @@
  */
 package org.mobicents.servlet.sip.startup;
 
-import io.undertow.server.HttpServerExchange;
-import io.undertow.server.session.Session;
-import io.undertow.server.session.SessionConfig;
-import io.undertow.server.session.SessionManager;
-import io.undertow.servlet.api.Deployment;
-import io.undertow.servlet.spec.ServletContextImpl;
-import io.undertow.servlet.spec.SessionCookieConfigImpl;
-import io.undertow.util.AttachmentKey;
-
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -58,9 +49,19 @@ import org.apache.jasper.Constants;
 import org.apache.jasper.security.SecurityUtil;
 import org.mobicents.io.undertow.server.session.ConvergedInMemorySessionManager;
 import org.mobicents.io.undertow.servlet.spec.ConvergedHttpSessionFacade;
+import org.mobicents.servlet.sip.core.MobicentsSipServlet;
 import org.mobicents.servlet.sip.core.session.SipRequestDispatcher;
 import org.mobicents.servlet.sip.undertow.SipContextImpl;
 import org.mobicents.servlet.sip.undertow.SipServletImpl;
+
+import io.undertow.server.HttpServerExchange;
+import io.undertow.server.session.Session;
+import io.undertow.server.session.SessionConfig;
+import io.undertow.server.session.SessionManager;
+import io.undertow.servlet.api.Deployment;
+import io.undertow.servlet.spec.ServletContextImpl;
+import io.undertow.servlet.spec.SessionCookieConfigImpl;
+import io.undertow.util.AttachmentKey;
 
 /**
  * Facade object which masks the internal <code>ApplicationContext</code> object from the web application.
@@ -336,7 +337,7 @@ public final class ConvergedServletContextImpl implements ServletContext {
             return (null);
 
         // Create and return a corresponding request dispatcher
-        Servlet servlet = (Servlet) sipContext.findSipServletByName(name);
+        MobicentsSipServlet servlet = sipContext.findSipServletByName(name);
 
         if (servlet == null)
             return context.getNamedDispatcher(name);
