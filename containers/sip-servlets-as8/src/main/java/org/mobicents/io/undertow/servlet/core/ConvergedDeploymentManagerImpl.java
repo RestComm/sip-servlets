@@ -152,7 +152,7 @@ public class ConvergedDeploymentManagerImpl extends DeploymentManagerImpl{
         }
 
         deploymentInfo.validate();
-        final DeploymentImpl deployment = new DeploymentImpl(this, deploymentInfo, servletContainer);
+        final ConvergedDeploymentImpl deployment = new ConvergedDeploymentImpl(this, deploymentInfo, servletContainer);
 
         //set deployment to parent using reflection
         try{
@@ -169,6 +169,7 @@ public class ConvergedDeploymentManagerImpl extends DeploymentManagerImpl{
 
         //deployment.setServletContext(((ConvergedServletContextImpl)servletContext).getDelegatedContext());
         this.invokeDeploymentMethod(deployment, "setServletContext", new Class[] {ServletContextImpl.class}, new Object[] {((ConvergedServletContextImpl)servletContext).getDelegatedContext()});
+        deployment.setConvergedServletContext((ConvergedServletContextImpl)servletContext);
 
         handleExtensions(deploymentInfo, servletContext);
 

@@ -59,7 +59,7 @@ public class UndertowSipDeploymentInfoService implements Service<UndertowSipDepl
             this.webContext.addDeploymentUnit(this.deploymentUnit);
 
             this.webContext.initDispatcher();
-            this.webContext.prepareServletContextServices();
+            //this.webContext.prepareServletContextServices();
             this.webContext.attachContext();
         } catch (ServletException e) {
             throw new DeploymentUnitProcessingException(e);
