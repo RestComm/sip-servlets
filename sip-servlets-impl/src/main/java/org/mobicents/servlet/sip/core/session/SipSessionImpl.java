@@ -1554,27 +1554,36 @@ public class SipSessionImpl implements MobicentsSipSession {
 		
 		final String branchId = transaction.getBranchId();
 		if(sessionCreatingTransactionRequest != null && 
-				 branchId != null && 
-				 sessionCreatingTransactionRequest.getTransaction() != null &&  
-				// https://github.com/RestComm/sip-servlets/issues/101 fix the equals comparison
-				branchId.equals(sessionCreatingTransactionRequest.getTransaction().getBranchId())) {
-			final String sessionCreatingTransactionRequestMethod = sessionCreatingTransactionRequest.getMethod();
-			if(logger.isDebugEnabled()) {
-				logger.debug("Session " + key + ": cleaning up "+ sessionCreatingTransactionRequest 
-						+ " since transaction " + transaction + " with branch id " + branchId 
-						+ " is the same as sessionCreatingRequestTransaction " + sessionCreatingTransactionRequest.getTransaction() 
-						+ " with branch id " + sessionCreatingTransactionRequest.getTransaction().getBranchId()
-						+ " and method " + sessionCreatingTransactionRequestMethod);
+				 branchId != null) {
+			
+			// https://github.com/RestComm/sip-servlets/issues/101 fix for NPE happening due to concurrent behavior cleaning the transaction 
+			final Transaction sessionCreatingTransactionRequestTransaction = sessionCreatingTransactionRequest.getTransaction();
+			String sessionCreatingTransactionRequestTransactionBranchId = null;
+			if(sessionCreatingTransactionRequestTransaction != null) {
+				sessionCreatingTransactionRequestTransactionBranchId = sessionCreatingTransactionRequestTransaction.getBranchId();
 			}
-			sessionCreatingTransactionRequest.cleanUp();
-			// https://telestax.atlassian.net/browse/MSS-153 improve performance by cleaning the request for dialog based requests
-			// or proxy case or dialog creating methods
-			if(sessionCreatingDialog != null || proxy != null || JainSipUtils.DIALOG_CREATING_METHODS.contains(sessionCreatingTransactionRequestMethod)) {
-				if(logger.isDebugEnabled() && sessionCreatingTransactionRequest != null) {
-					logger.debug("nullifying  sessionCreatingTransactionRequest" + sessionCreatingTransactionRequest 
-							+ " from Session " + key);
+			final String sessionCreatingTransactionRequestMethod = sessionCreatingTransactionRequest.getMethod();
+			
+			if(sessionCreatingTransactionRequestTransaction != null &&  
+					branchId.equals(sessionCreatingTransactionRequestTransactionBranchId)) {
+			
+				if(logger.isDebugEnabled()) {
+					logger.debug("Session " + key + ": cleaning up "+ sessionCreatingTransactionRequest 
+							+ " since transaction " + transaction + " with branch id " + branchId 
+							+ " is the same as sessionCreatingRequestTransaction " +  sessionCreatingTransactionRequestTransaction
+							+ " with branch id " + sessionCreatingTransactionRequestTransactionBranchId
+							+ " and method " + sessionCreatingTransactionRequestMethod);
 				}
-				sessionCreatingTransactionRequest = null;
+				sessionCreatingTransactionRequest.cleanUp();
+				// https://telestax.atlassian.net/browse/MSS-153 improve performance by cleaning the request for dialog based requests
+				// or proxy case or dialog creating methods
+				if(sessionCreatingDialog != null || proxy != null || JainSipUtils.DIALOG_CREATING_METHODS.contains(sessionCreatingTransactionRequestMethod)) {
+					if(logger.isDebugEnabled() && sessionCreatingTransactionRequest != null) {
+						logger.debug("nullifying  sessionCreatingTransactionRequest" + sessionCreatingTransactionRequest 
+								+ " from Session " + key);
+					}
+					sessionCreatingTransactionRequest = null;
+				}
 			}
 		}
 	}
