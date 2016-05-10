@@ -333,7 +333,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 				if(sipConnector.getStaticServerAddress() != null) {
 					sipApplicationDispatcher.addHostName(sipConnector.getStaticServerAddress() + ":" + sipConnector.getStaticServerPort());
 					if(logger.isDebugEnabled()) {
-						logger.debug("Adding hostname for IP load balancer " + sipConnector.getStaticServerAddress());
+						logger.debug("Adding hostname for IP load balancer " + sipConnector.getStaticServerAddress() + ":" + sipConnector.getStaticServerPort());
 					}
 				}
 				

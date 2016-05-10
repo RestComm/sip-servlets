@@ -1116,6 +1116,9 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 					throw new IllegalArgumentException("couldn't parse the outbound interface " + outboundInterface, e);
 				}
 				matchingListeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(outboundInterfaceURI, false);
+				if(logger.isDebugEnabled()) {
+					logger.debug("Matching listening point " + matchingListeningPoint);
+				}
 			}
 			if(matchingListeningPoint == null) {
 				if(logger.isDebugEnabled()) {
@@ -1123,6 +1126,9 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 				}
 				matchingListeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(
 						transport, false);
+				if(logger.isDebugEnabled()) {
+					logger.debug("Matching listening point " + matchingListeningPoint);
+				}
 			}
 			
 			final SipProvider sipProvider = matchingListeningPoint.getSipProvider();
@@ -1170,6 +1176,10 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 				if(isInitial() || dialog == null) {		
 				    //Issue: https://code.google.com/p/sipservlets/issues/detail?id=284
 				    //Issue: https://telestax.atlassian.net/browse/MSS-121
+					if(logger.isDebugEnabled()) {
+						logger.debug("bypassLoadBalancer: " + session.getBypassLoadBalancer() + ", sipFactoryImpl UseLoadBalancer: " + sipFactoryImpl.isUseLoadBalancer()
+								+ ", matchingListeningPoint: " + matchingListeningPoint);
+					}
 					if(!session.getBypassLoadBalancer() && sipFactoryImpl.isUseLoadBalancer()) {
 						if(matchingListeningPoint != null && matchingListeningPoint.isUseLoadBalancer()) {
 							if(logger.isDebugEnabled()) {

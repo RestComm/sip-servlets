@@ -1727,8 +1727,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		MobicentsExtendedListeningPoint listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(host, port, transport);		
 		if((hostNames.contains(host) || hostNames.contains(host+":" + port) || listeningPoint != null)) {
 			if(logger.isDebugEnabled()) {
-				logger.debug("hostNames.contains(host)=" + 
+				logger.debug("hostNames.contains(" + host + ")=" + 
 						hostNames.contains(host) +
+						"hostNames.contains(" + host + ":" + port + ")=" + 
+								hostNames.contains(host+":" + port) +
 						" | listeningPoint found = " +
 						listeningPoint);
 			}
