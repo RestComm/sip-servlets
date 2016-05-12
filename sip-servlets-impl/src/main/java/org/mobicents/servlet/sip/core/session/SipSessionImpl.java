@@ -2632,6 +2632,9 @@ public class SipSessionImpl implements MobicentsSipSession {
      */
     @Override
     public void setBypassLoadBalancer(boolean bypassLoadBalancer) {
+    	if(logger.isDebugEnabled()) {
+			logger.debug("setting bypassLoadBalancer: " + bypassLoadBalancer + " on the sip session " + key);
+		}
         this.bypassLoadBalancer = bypassLoadBalancer;
     }
     /* (non-Javadoc)
@@ -2646,6 +2649,9 @@ public class SipSessionImpl implements MobicentsSipSession {
      */
     @Override
     public void setBypassProxy(boolean bypassProxy) {
+    	if(logger.isDebugEnabled()) {
+			logger.debug("setting bypassProxy: " + bypassProxy + " on the sip session " + key);
+		}
         this.bypassProxy = bypassProxy;
     }
     /* (non-Javadoc)
