@@ -68,6 +68,18 @@ signalingTransport (use socket-binding element)::
   Specifies the transport on which the container will be able to receive SIP messages.
   Supported Values are "udp", "tcp", "tls" and "ws".
 
+use-load-balancer::
+  Enable to specify if that particular connector will be using the Load Balancer for outbound traffic. The Load Balancer to be used is defined by the next `load-balancer` attributes below
+
+load-balancer-address ::
+  Specifies the Load Balancer address used to route outbound traffic for this SIP Connector.
+
+load-balancer-rmi-port::
+  Specifies the RMI Port used to connect to the Load Balancer for this SIP Connector. This enables the connector to advertise to the Load Balancer the IP and Port it is listening on so that the Load Balancer can route traffic to that connector as well.
+
+load-balancer-sip-port::
+  Specifies the SIP Port of the Load Balancer to use for outbound traffic for this SIP Connector. This enables the connector to choose to which Load Balancer it sends outbound traffic. This is particularly useful for supporting different Load Balancers over different network interfaces
+
 use-stun::
   Enables Session Traversal Utilities for NAT (STUN) support for this Connector.
   The attribute defaults to "false". If set to "true", ensure that the `ipAddress` attribute is _not_ set to `127.0.0.1`.
@@ -134,6 +146,18 @@ protocol::
 signalingTransport::
   Specifies the transport on which the container will be able to receive SIP messages.
   For example, "udp".
+
+useLoadBalancer::
+  Enable to specify if that particular connector will be using the Load Balancer for outbound traffic. The Load Balancer to be used is defined by the next `loadBalancer` attributes below
+
+loadBalancerAddress ::
+  Specifies the Load Balancer address used to route outbound traffic for this SIP Connector.
+
+loadBalancerRmiPort::
+  Specifies the RMI Port used to connect to the Load Balancer for this SIP Connector. This enables the connector to advertise to the Load Balancer the IP and Port it is listening on so that the Load Balancer can route traffic to that connector as well.
+
+loadBalancerSipPort::
+  Specifies the SIP Port of the Load Balancer to use for outbound traffic for this SIP Connector. This enables the connector to choose to which Load Balancer it sends outbound traffic. This is particularly useful for supporting different Load Balancers over different network interfaces
 
 useStun::
   Enables Session Traversal Utilities for NAT (STUN) support for this Connector.
