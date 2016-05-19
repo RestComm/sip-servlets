@@ -214,6 +214,15 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
             case USE_LOAD_BALANCER:
             	SipConnectorDefinition.USE_LOAD_BALANCER.parseAndSetParameter(value, connector, reader);
             	break;
+            case LOAD_BALANCER_ADDRESS:
+            	SipConnectorDefinition.LOAD_BALANCER_ADDRESS.parseAndSetParameter(value, connector, reader);
+            	break;
+            case LOAD_BALANCER_RMI_PORT:
+            	SipConnectorDefinition.LOAD_BALANCER_RMI_PORT.parseAndSetParameter(value, connector, reader);
+            	break;
+            case LOAD_BALANCER_SIP_PORT:
+            	SipConnectorDefinition.LOAD_BALANCER_SIP_PORT.parseAndSetParameter(value, connector, reader);
+            	break;
             case USE_STATIC_ADDRESS:
             	SipConnectorDefinition.USE_STATIC_ADDRESS.parseAndSetParameter(value, connector, reader);
             	break;

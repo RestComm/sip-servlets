@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-  <name>jboss-as7-mobicents</name>
-  <comment>&gt;JBoss Application Server: Mobicents Sip Servlets Adaptation Layer. NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
+  <name>jboss-as7-restcomm</name>
+  <comment>&gt;JBoss Application Server: Restcomm Sip Servlets Adaptation Layer. NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
   <projects>
     <project>sip-servlets-impl</project>
     <project>sip-servlets-spec</project>

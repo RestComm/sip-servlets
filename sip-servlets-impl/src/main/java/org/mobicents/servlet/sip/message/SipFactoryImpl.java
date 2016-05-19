@@ -900,13 +900,26 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 			int port = -1; 
 			OutboundProxy proxy = StaticServiceHolder.sipStandardService.getOutboundProxy();
 			if(proxy == null) {
-				if(transport.equalsIgnoreCase("ws")){
-					//This is a WebSocket request through LB, no need to add Route header.
-					return;
-				} else {
-					host = loadBalancerToUse.getAddress().getHostAddress();
-					port = loadBalancerToUse.getSipPort();
-				}
+//				if(transport.equalsIgnoreCase("ws") || transport.equalsIgnoreCase("wss")){
+//					if(logger.isDebugEnabled()) {
+//						logger.debug("This is a WebSocket request through LB, no need to add Route header");
+//					}
+//					return;
+//				} else {
+					if(mobicentsExtendedListeningPoint.getLoadBalancer() == null) {
+						host = loadBalancerToUse.getAddress().getHostAddress();
+						port = loadBalancerToUse.getSipPort();
+						if(logger.isDebugEnabled()) {
+							logger.debug("Using global load balancer " + host + ":" + port);
+						}
+					} else {
+						host = mobicentsExtendedListeningPoint.getLoadBalancer().getAddress().getHostAddress();
+						port = mobicentsExtendedListeningPoint.getLoadBalancer().getSipPort();
+						if(logger.isDebugEnabled()) {
+							logger.debug("Using specifc load balancer " + host + ":" + port + " from listening Point " + mobicentsExtendedListeningPoint);
+						}
+					}
+//				}
 			} else {				
 				host = proxy.getHost();
 				port = proxy.getPort();				

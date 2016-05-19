@@ -84,6 +84,9 @@ public class SipConnector implements Serializable {
 	private boolean useStaticAddress;
 	private boolean replaceStaticServerAddressForInternalRoutingRequest = true;
 	private boolean useLoadBalancer;
+	private String loadBalancerAddress;
+	private int loadBalancerRmiPort;
+	private int loadBalancerSipPort;
 	
 	/**
 	 * @return the Transport
@@ -388,4 +391,45 @@ public class SipConnector implements Serializable {
 		this.hostNames = hostNames;
 	}
 
+	/**
+	 * @return the loadBalancerAddress
+	 */
+	public String getLoadBalancerAddress() {
+		return loadBalancerAddress;
+	}
+
+	/**
+	 * @param loadBalancerAddress the loadBalancerAddress to set
+	 */
+	public void setLoadBalancerAddress(String loadBalancerAddress) {
+		this.loadBalancerAddress = loadBalancerAddress;
+	}
+
+	/**
+	 * @return the loadBalancerRmiPort
+	 */
+	public int getLoadBalancerRmiPort() {
+		return loadBalancerRmiPort;
+	}
+
+	/**
+	 * @param loadBalancerRmiPort the loadBalancerRmiPort to set
+	 */
+	public void setLoadBalancerRmiPort(int loadBalancerRmiPort) {
+		this.loadBalancerRmiPort = loadBalancerRmiPort;
+	}
+
+	/**
+	 * @return the loadBalancerSipPort
+	 */
+	public int getLoadBalancerSipPort() {
+		return loadBalancerSipPort;
+	}
+
+	/**
+	 * @param loadBalancerSipPort the loadBalancerSipPort to set
+	 */
+	public void setLoadBalancerSipPort(int loadBalancerSipPort) {
+		this.loadBalancerSipPort = loadBalancerSipPort;
+	}
 }

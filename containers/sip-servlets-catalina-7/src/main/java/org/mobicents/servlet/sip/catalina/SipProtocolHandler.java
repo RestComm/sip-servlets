@@ -51,6 +51,7 @@ import org.apache.log4j.Logger;
 import org.apache.tomcat.util.modeler.Registry;
 import org.mobicents.ha.javax.sip.ClusteredSipStack;
 import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingService;
+import org.mobicents.ha.javax.sip.SipLoadBalancer;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
@@ -150,7 +151,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 						logger.debug("SipConnector " + extendedListeningPoint.getListeningPoint() + " remove to use Load Balancer for outbound traffic");
 					}
 					LoadBalancerHeartBeatingService loadBalancerHeartBeatingService = ((ClusteredSipStack)sipStack).getLoadBalancerHeartBeatingService();
-					loadBalancerHeartBeatingService.removeSipConnector(extendedListeningPoint.getListeningPoint());
+					loadBalancerHeartBeatingService.removeSipConnector(extendedListeningPoint.getListeningPoint(), extendedListeningPoint.getLoadBalancer());
 				}
 				extendedListeningPoint = null;
 			}				
@@ -293,15 +294,6 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 			} else {
 				createSipProvider = true;
 			}
-			// https://github.com/RestComm/sip-servlets/issues/111
-			if(sipConnector.isUseLoadBalancer() && sipStack instanceof ClusteredSipStack && 
-					((ClusteredSipStack)sipStack).getLoadBalancerHeartBeatingService() != null) {
-				if(logger.isDebugEnabled()) {
-					logger.debug("SipConnector " + listeningPoint + " set to use Load Balancer for outbound traffic");
-				}
-				LoadBalancerHeartBeatingService loadBalancerHeartBeatingService = ((ClusteredSipStack)sipStack).getLoadBalancerHeartBeatingService();
-				loadBalancerHeartBeatingService.addSipConnector(listeningPoint);
-			}
 			
 			if(createSipProvider) {
 				sipProvider = sipStack.createSipProvider(listeningPoint);
@@ -315,7 +307,37 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 			extendedListeningPoint.setGlobalIpAddress(globalIpAddress);
 			extendedListeningPoint.setGlobalPort(globalPort);
 			extendedListeningPoint.setUseLoadBalancer(sipConnector.isUseLoadBalancer());
-			
+
+			// https://github.com/RestComm/sip-servlets/issues/111
+            LoadBalancerHeartBeatingService loadBalancerHeartBeatingService = null;
+ 			if(sipConnector.isUseLoadBalancer() && sipStack instanceof ClusteredSipStack && 
+ 					((ClusteredSipStack)sipStack).getLoadBalancerHeartBeatingService() != null) {
+ 				if(logger.isDebugEnabled()) {
+ 					logger.debug("SipConnector " + listeningPoint + " set to use Load Balancer for outbound traffic");
+ 				}
+ 				loadBalancerHeartBeatingService = ((ClusteredSipStack)sipStack).getLoadBalancerHeartBeatingService();
+ 				// https://github.com/RestComm/sip-servlets/issues/137
+ 				if(sipConnector.getLoadBalancerAddress() != null && loadBalancerHeartBeatingService != null) {
+ 	            	InetAddress loadBalancerAddress = null;
+ 	        		try {
+ 	        			loadBalancerAddress = InetAddress.getByName(sipConnector.getLoadBalancerAddress());
+ 	        		} catch (UnknownHostException e) {
+ 	        			throw new IllegalArgumentException(
+ 	        					"Something wrong with load balancer host creation.", e);
+ 	        		}		
+ 	            	SipLoadBalancer loadBalancer = new SipLoadBalancer(
+ 	            			loadBalancerHeartBeatingService, 
+ 	            			loadBalancerAddress, 
+ 	            			sipConnector.getLoadBalancerSipPort(), 
+ 	            			-1, 
+ 	            			sipConnector.getLoadBalancerRmiPort());
+ 	            	extendedListeningPoint.setLoadBalancer(loadBalancer);
+ 	            	loadBalancerHeartBeatingService.addSipConnector(listeningPoint, loadBalancer);
+ 	            } else {
+ 	            	loadBalancerHeartBeatingService.addSipConnector(listeningPoint);
+ 	            }
+ 			}
+ 			
 			//make the extended listening Point available to the service implementation			
 			setAttribute(ExtendedListeningPoint.class.getSimpleName(), extendedListeningPoint);
 			SipApplicationDispatcher sipApplicationDispatcher = (SipApplicationDispatcher)

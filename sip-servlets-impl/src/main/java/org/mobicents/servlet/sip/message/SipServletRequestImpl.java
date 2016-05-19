@@ -1182,9 +1182,6 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 					}
 					if(!session.getBypassLoadBalancer() && sipFactoryImpl.isUseLoadBalancer()) {
 						if(matchingListeningPoint != null && matchingListeningPoint.isUseLoadBalancer()) {
-							if(logger.isDebugEnabled()) {
-								logger.debug("Using listeningPoint " + matchingListeningPoint + " for load balancer " + sipFactoryImpl.getLoadBalancerToUse());
-							}
 							sipFactoryImpl.addLoadBalancerRouteHeader(request, matchingListeningPoint);
 							addDNSRoute = false;
 							if(logger.isDebugEnabled()) {

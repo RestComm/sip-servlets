@@ -428,10 +428,20 @@ public class SipSessionImpl implements MobicentsSipSession {
 							// https://github.com/RestComm/sip-servlets/issues/111
 							MobicentsExtendedListeningPoint listeningPoint = JainSipUtils.findListeningPoint(sipFactory.getSipNetworkInterfaceManager(), methodRequest, outboundInterface);
 							if(listeningPoint != null && listeningPoint.isUseLoadBalancer()) {
-								if(logger.isDebugEnabled()) {
-									logger.debug("Using listeningPoint " + listeningPoint + " for load balancer " + sipFactory.getLoadBalancerToUse());
+								// https://github.com/RestComm/sip-servlets/issues/137
+								SipLoadBalancer loadBalancerToUse = null; 
+								if(listeningPoint.getLoadBalancer() == null) {
+									loadBalancerToUse = sipFactory.getLoadBalancerToUse();
+									if(logger.isDebugEnabled()) {
+										logger.debug("Using listeningPoint " + listeningPoint + " for global load balancer " + sipFactory.getLoadBalancerToUse());
+									}
+								} else {
+									loadBalancerToUse = listeningPoint.getLoadBalancer();
+									if(logger.isDebugEnabled()) {
+										logger.debug("Using listeningPoint " + listeningPoint + " for connector specific load balancer " + listeningPoint.getLoadBalancer());
+									}
 								}
-								SipLoadBalancer loadBalancerToUse = sipFactory.getLoadBalancerToUse();
+								
 								javax.sip.address.SipURI sipURI = SipFactoryImpl.addressFactory.createSipURI(userName, loadBalancerToUse.getAddress().getHostAddress());
 								sipURI.setHost(loadBalancerToUse.getAddress().getHostAddress());
 								sipURI.setPort(loadBalancerToUse.getSipPort());
