@@ -301,16 +301,6 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 				createSipProvider = true;
 			}
 			
-			LoadBalancerHeartBeatingService loadBalancerHeartBeatingService = null;
-			if(sipConnector.isUseLoadBalancer() && sipStack instanceof ClusteredSipStack && 
-					((ClusteredSipStack)sipStack).getLoadBalancerHeartBeatingService() != null) {
-				if(logger.isDebugEnabled()) {
-					logger.debug("SipConnector " + listeningPoint + " set to use Load Balancer for outbound traffic");
-				}
-				loadBalancerHeartBeatingService = ((ClusteredSipStack)sipStack).getLoadBalancerHeartBeatingService();
-				loadBalancerHeartBeatingService.addSipConnector(listeningPoint);
-			}
-			
 			if(createSipProvider) {
 				sipProvider = sipStack.createSipProvider(listeningPoint);
 			} else {
@@ -323,22 +313,35 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 			extendedListeningPoint.setGlobalIpAddress(globalIpAddress);
 			extendedListeningPoint.setGlobalPort(globalPort);
 			extendedListeningPoint.setUseLoadBalancer(sipConnector.isUseLoadBalancer());
-			if(sipConnector.getLoadBalancerAddress() != null && loadBalancerHeartBeatingService != null) {
-            	InetAddress loadBalancerAddress = null;
-        		try {
-        			loadBalancerAddress = InetAddress.getByName(sipConnector.getLoadBalancerAddress());
-        		} catch (UnknownHostException e) {
-        			throw new IllegalArgumentException(
-        					"Something wrong with load balancer host creation.", e);
-        		}		
-            	SipLoadBalancer loadBalancer = new SipLoadBalancer(
-            			loadBalancerHeartBeatingService, 
-            			loadBalancerAddress, 
-            			sipConnector.getLoadBalancerSipPort(), 
-            			-1, 
-            			sipConnector.getLoadBalancerRmiPort());
-            	extendedListeningPoint.setLoadBalancer(loadBalancer);
-            }
+			 // https://github.com/RestComm/sip-servlets/issues/111
+            LoadBalancerHeartBeatingService loadBalancerHeartBeatingService = null;
+ 			if(sipConnector.isUseLoadBalancer() && sipStack instanceof ClusteredSipStack && 
+ 					((ClusteredSipStack)sipStack).getLoadBalancerHeartBeatingService() != null) {
+ 				if(logger.isDebugEnabled()) {
+ 					logger.debug("SipConnector " + listeningPoint + " set to use Load Balancer for outbound traffic");
+ 				}
+ 				loadBalancerHeartBeatingService = ((ClusteredSipStack)sipStack).getLoadBalancerHeartBeatingService();
+ 				// https://github.com/RestComm/sip-servlets/issues/137
+ 				if(sipConnector.getLoadBalancerAddress() != null && loadBalancerHeartBeatingService != null) {
+ 	            	InetAddress loadBalancerAddress = null;
+ 	        		try {
+ 	        			loadBalancerAddress = InetAddress.getByName(sipConnector.getLoadBalancerAddress());
+ 	        		} catch (UnknownHostException e) {
+ 	        			throw new IllegalArgumentException(
+ 	        					"Something wrong with load balancer host creation.", e);
+ 	        		}		
+ 	            	SipLoadBalancer loadBalancer = new SipLoadBalancer(
+ 	            			loadBalancerHeartBeatingService, 
+ 	            			loadBalancerAddress, 
+ 	            			sipConnector.getLoadBalancerSipPort(), 
+ 	            			-1, 
+ 	            			sipConnector.getLoadBalancerRmiPort());
+ 	            	extendedListeningPoint.setLoadBalancer(loadBalancer);
+ 	            	loadBalancerHeartBeatingService.addSipConnector(listeningPoint, loadBalancer);
+ 	            } else {
+ 	            	loadBalancerHeartBeatingService.addSipConnector(listeningPoint);
+ 	            }
+ 			}
 			
 			//make the extended listening Point available to the service implementation			
 			setAttribute(ExtendedListeningPoint.class.getSimpleName(), extendedListeningPoint);
