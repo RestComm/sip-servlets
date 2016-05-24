@@ -448,13 +448,21 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 		addTransaction(originalRequest);
 		
 		URI destination = null;
-		if(targetURI != null) {
-			try {
-				destination = proxy.getSipFactoryImpl().createURI(targetURI);
-			} catch (ServletParseException e) {
-				logger.error("A problem occured while setting the target URI while proxying a request " + targetURI, e);
-			}
-		}				
+                //app may have modified the branch request, so give it priority
+                //fixes https://github.com/RestComm/sip-servlets/issues/131
+                if (outgoingRequest.getRequestURI().equals(this.getProxy().getOriginalRequest().getRequestURI()))
+                {
+                    if(targetURI != null) {
+                            try {
+                                    destination = proxy.getSipFactoryImpl().createURI(targetURI);
+                            } catch (ServletParseException e) {
+                                    logger.error("A problem occured while setting the target URI while proxying a request " + targetURI, e);
+                            }
+                    }                    
+                } else {
+                    //the app has mofified the requestURI after branch creation..
+                     destination = outgoingRequest.getRequestURI();
+                }
 		Request cloned = ProxyUtils.createProxiedRequest(
 				outgoingRequest,
 				this,
