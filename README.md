@@ -1,6 +1,8 @@
 RestComm Sip Servlets
 ============
 
+[![Join the chat at https://gitter.im/RestComm/sip-servlets](https://badges.gitter.im/RestComm/sip-servlets.svg)](https://gitter.im/RestComm/sip-servlets?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 RestComm SIP Servlets is a SIP, IMS and WebRTC Application Server. 
 RestComm SIP Servlets facilitates the shift towards Cloud Communications by enabling deployment and autoscaling of real time SIP Servlets applications across all major IaaS (Infrastructure as a Service) providers or on premises.
 It also brings realtime communications (messaging, voice & video) to your Browser using [HTML5 WebRTC](http://webrtc.org) and [SIP Over WebSockets](http://tools.ietf.org/html/rfc7118) !
