@@ -40,6 +40,7 @@
 	<description>&gt;JBoss Application Server: Restcomm Sip Servlets Adaptation Layer</description>
 
     <properties>
+    	<!--  <jboss.version>7.5.0.Final-redhat-21</jboss.version>	-->
         <junit.version>4.1</junit.version>
     </properties>
 
@@ -215,7 +216,60 @@
             <artifactId>log4j</artifactId>
             <scope>provided</scope>
         </dependency>
+        
+        <dependency>
+            <groupId>org.jboss.as</groupId>
+            <artifactId>jboss-as-clustering-infinispan</artifactId>
+            <!-- <version>${jboss.version}</version> -->
+            <version>7.5.0.Final-redhat-21</version>
+            <!-- <version>7.2.0.Final</version> -->
+            <scope>provided</scope>
+        </dependency>
 
+		<dependency>
+            <groupId>org.jboss.as</groupId>
+            <artifactId>jboss-as-clustering-impl</artifactId>
+            <!-- <version>${jboss.version}</version> -->
+            <version>7.5.0.Final-redhat-21</version>
+            <!-- <version>7.2.0.Final</version> -->
+            <scope>provided</scope>
+        </dependency>
+        
+        <!-- 
+		<dependency>
+			<groupId>org.infinispan</groupId>
+			<artifactId>infinispan-tree</artifactId>
+			<version>5.2.11.Final</version>
+			<scope>provided</scope>
+		</dependency>
+         -->
+         
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging-processor</artifactId>
+            <!-- This is a compile-time dependency of this project, but is not needed at compile or runtime by other
+                  projects that depend on this project.-->
+            <version>1.1.0.Final</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.jboss.as</groupId>
+            <artifactId>jboss-as-clustering-web-infinispan</artifactId>
+            <scope>provided</scope>
+            <!-- <version>7.2.0.Final</version>-->
+            <version>7.5.0.Final-redhat-21</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.as</groupId>
+            <artifactId>jboss-as-clustering-web-spi</artifactId>
+            <scope>provided</scope>
+            <!-- <version>7.2.0.Final</version>-->
+            <version>7.5.0.Final-redhat-21</version>
+        </dependency>
+        
     </dependencies>
 
     <profiles>
