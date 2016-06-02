@@ -1163,7 +1163,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 					logger.debug("couldn't find any session with sessionKey " + sessionKey);
 				} else {
 					logger.debug("reloaded session session " + sipSession + " with sessionKey " + sessionKey);
-				}
+				} 
 			}
 		} 
 		return sipSession; 
@@ -1181,7 +1181,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
             this.sessionKey = session.getKey();
         } else {
             this.sessionKey = null;
-        } 
+        }
 	}
 
 	/**
@@ -1621,6 +1621,30 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	 * @return
 	 */
 	public abstract ModifiableRule getModifiableRule(String headerName);
+
+        private static final String SYS_HDR_MOD_OVERRIDE ="org.restcomm.servlets.sip.OVERRIDE_SYSTEM_HEADER_MODIFICATION";
+
+        /**
+         * Allows to override the System header modifiable rule assignment.
+         * 
+         * @return if the InitParameter is present at servletContext, or null
+         * otherwise
+         */
+        protected ModifiableRule retrieveModifiableOverriden() {
+            ModifiableRule overridenRule = null;
+            //use local var to prevent potential concurent cleanup
+            SipSession session = getSession();
+            if (session != null && session.getServletContext() != null) {
+                String overridenRuleStr = session.getServletContext().getInitParameter(SYS_HDR_MOD_OVERRIDE);
+                if (overridenRuleStr != null)
+                {
+                    overridenRule = ModifiableRule.valueOf(overridenRuleStr);
+                }
+            }
+            return overridenRule;            
+        }
+        
+        
 
 	/**
 	 * Applications must not add, delete, or modify so-called "system" headers.
@@ -2246,7 +2270,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			if (other.message != null)
 				return false;
 		} else if (!message.equals(other.message))
-			return false;
+                    return false;
 		return true;
 	}
 

@@ -199,10 +199,14 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 		}
 		isFinalResponseGenerated = false;
 	}
-
+        
 	@Override
 	public ModifiableRule getModifiableRule(String headerName) {
-
+                ModifiableRule overriden = retrieveModifiableOverriden();
+                if ( overriden != null ) {
+                    return overriden;
+                }
+                
 		String hName = getFullHeaderName(headerName);
 
 		/*
@@ -2497,7 +2501,7 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 		subscriberURI = null;
 //		lastFinalResponse = null;
 //		lastInformationalResponse = null;		
-		linkedRequest = null;		
+		linkedRequest = null;
 	}
 	
 	public void cleanUpLastResponses() {
