@@ -156,7 +156,7 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 		if(name.equalsIgnoreCase("branch") && isModifiable == ModifiableRule.Via) {
 			throw new IllegalStateException("it is forbidden to set the branch parameter on the Via Header");
 		}
-		//Fix from abondar for Issue 494 and angelo.marletta for Issue 502      
+		//Fix from abondar for Issue 494 and angelo.marletta for Issue 502	  
 		this.parameters.put(name.toLowerCase(), value);
 		if(header != null) {
 			try {
@@ -174,77 +174,98 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 	
 	private static final String QUOTABLE_PARAMETER_NAME ="org.restcomm.servlets.sip.QUOTABLE_PARAMETER_NAME";
 	/**
-     * Verify that the parameter is in the known list of parameters that its value need to be quoted
-     * 
-     * @return 
-     * true: if the Parameter name is present at servletContext and its value can be quoted, else return false
-     * otherwise
-     */
+	 * Verify that the parameter is in the known list of parameters that its value need to be quoted
+	 * 
+	 * @return 
+	 * true: if the Parameter name is present at servletContext and its value can be quoted, else return false
+	 * otherwise
+	 */
 	protected boolean isQuotableParameter(String name, String value){
-		boolean isQuotable = false;
 		if (sipSession != null && sipSession.getServletContext() != null){
+			// get list of parameter names which are splited by comma.
 			String quotableParamNames = sipSession.getServletContext().getInitParameter(QUOTABLE_PARAMETER_NAME);
 			if (quotableParamNames != null){
 				String[] paramNames = quotableParamNames.split(",");
 				for (int i = 0; i < paramNames.length; i++){
 					if (name.equalsIgnoreCase(paramNames[i])){
 						if(isQuotableString(value)){
-							isQuotable = true;
+							return true;
 						}
+						break;
 					}
 				}
 			}
 		}
-		return isQuotable;
+		return false;
 	}
 	
 	/**
-     * Verify that the string is quotable string base on RFC 3261
-     * 
-     * @return 
-     * true: if the Parameter value can be quoted base on condition which is stated in RFC 3261, else return false
-     * otherwise
-     */
+	 * Verify that the string is quotable string base on RFC 3261
+	 * 
+	 * @return 
+	 * true: if the Parameter value can be quoted base on condition which is stated in RFC 3261, else return false
+	 * otherwise
+	 */
+	private final static char CR = 0x0D;
+	private final static char LF = 0x0A;
+	private final static char TAB = 0x09;
+	private final static char VT = 0x0B;
+	private final static char FF = 0x0C;
+	private final static char SPACE = 0X20;
+	private final static char DQUOTE = '"';
+	private final static char BACKSLASH = '\\';
+	
 	protected boolean isQuotableString(String value){
-	    if (value.length() == 0){
-	        return true;
-	    }
-	    char c = value.charAt(0);
-	    for (int i = 0; i < value.length(); i++){
-	        c = value.charAt(i);
-	        if (c == '\\'){
-	            i++;
-	            if (i == value.length()){
-	                //Quotable String cannot be ended by an escape
-	                return false;
-	            }
+		if (value.length() == 0){
+			return true;
+		}
+		
+		char c = value.charAt(0);
+		for (int i = 0; i < value.length(); i++){
+			
+			if ((i - 1) >= 0){
+				c = value.charAt(i - 1);
+				if (c == BACKSLASH || c == CR || c == LF){
+					// if previous is backslash, CR or LF, the current char is already check, skip this index.
+					continue;
+				}
+			}
+			
+			c = value.charAt(i);
+			
+			if (c == BACKSLASH){
+				if ((i + 1)>= value.length()){
+					//Quotable String cannot be ended by an escape
+					return false;
+				}
 
-	            char c1 = value.charAt(i);
-	            if(c1 == 0x0d /* CR*/|| c1 == 0x0a /* LF*/){
-	                // CR, LF are not allowed to be escaped
-	                return false;
-	            }
-	        }
-	        else if (c == 0x0d /* CR*/ || c == 0x0a /* LF*/){
-	            i++;
-	            char c1 = value.charAt(i);
-	            if (c1 == 0x09 /* TAB*/||/***********************************/
-	                c1 == 0x0A /* LF*/||
-	                c1 == 0x0B /* VT*/||//  LINEAR WHITE SPACE
-	                c1 == 0x0C /* FF*/||
-	                c1 == 0x0D /* CR*/||
-	                c1 == 0x20)/* space*/{/************************************/
-	                return false;
-	            }
-	        }
-	        else if (c == '"'){
-	            // Double quotes must be escaped if they appear in a quotable
-	            // string
-	            return false;
-	        }
-	    }
-	    // the rest of case is quotable stirng
-	    return true;
+				char c1 = value.charAt(i + 1);
+				if(c1 == CR || c1 == LF){
+					// CR, LF are not allowed to be escaped
+					return false;
+				}
+			}
+			else if (c == CR || c == LF){
+				if ((i + 1) < value.length()){
+					char c1 = value.charAt(i + 1);
+					if (c1 == TAB||/***********************************/
+						c1 == LF ||
+						c1 == VT ||//  LINEAR WHITE SPACE
+						c1 == FF ||
+						c1 == CR ||
+						c1 == SPACE){/************************************/
+						return false;
+					}
+				}
+			}
+			else if (c == DQUOTE){
+				// Double quotes must be escaped if they appear in a quotable
+				// string
+				return false;
+			}
+		}
+		// the rest is quotable string
+		return true;
 	}
 
 	/*

@@ -45,7 +45,7 @@ public class SipFactoryTest extends junit.framework.TestCase {
 	 * @throws ServletParseException
 	 */
 	public void testSessionExpires() throws ServletParseException {
-		Parameterable p = sipFactory.createParameterable("3600");
+		Parameterable p = sipFactory.createParameterable("3600", null);
 		p.setParameter("refresher", "uac");
 		System.out.println(p.toString());
 	}
