@@ -479,7 +479,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 					throw new ServletParseException("Bad address " + first);
 				}
 			} else {
-				Parameterable parametrable = createParameterable(first, first.getName(), message instanceof Request);
+				Parameterable parametrable = createParameterable(first, first.getName(), message instanceof Request, getSession());
 				try {
 					logger.debug("parametrable Value " + parametrable.getValue());					
 					if(this.isCommitted()) {
@@ -527,7 +527,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 					throw new ServletParseException("Bad header", ex);
 				}
 			}  else {
-				Parameterable parametrable = createParameterable(header, header.getName(), message instanceof Request);
+				Parameterable parametrable = createParameterable(header, header.getName(), message instanceof Request, getSession());
 				try {
 					AddressImpl addressImpl = new AddressImpl(SipFactoryImpl.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), getModifiableRule(hName));
 					retval.add(addressImpl);
@@ -929,7 +929,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			return null;
 		}
 		
-		return createParameterable(h, getFullHeaderName(name), message instanceof Request);
+		return createParameterable(h, getFullHeaderName(name), message instanceof Request, getSession());
 	}
 
 	/*
@@ -946,7 +946,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 
 		while (headers != null && headers.hasNext())
 			result.add(createParameterable(headers.next(),
-					getFullHeaderName(name), message instanceof Request));
+					getFullHeaderName(name), message instanceof Request, getSession()));
 
 		if(!isParameterable(name)) {
 			throw new ServletParseException(name + " header is not parameterable !");
@@ -1854,7 +1854,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		return count;
 	}
 
-	protected static Parameterable createParameterable(Header header, String hName, boolean isRequest)
+	protected static Parameterable createParameterable(Header header, String hName, boolean isRequest, SipSession sipSession)
 			throws ServletParseException {
 		String whole = header.toString();
 		if (logger.isDebugEnabled())
@@ -2041,7 +2041,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			logger.debug("modifiableRule for [" + hName + "] from ["
 					+ whole + "] is " + modifiableRule);
 		ParameterableHeaderImpl parameterable = new ParameterableHeaderImpl(
-				header, value, paramMap, modifiableRule);
+				header, value, paramMap, modifiableRule, sipSession);
 		return parameterable;
 	}
 

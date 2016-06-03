@@ -67,6 +67,7 @@ import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.MessageFactory;
 import javax.sip.message.Request;
+import javax.servlet.sip.SipSession;
 
 import org.apache.log4j.Logger;
 import org.mobicents.ha.javax.sip.SipLoadBalancer;
@@ -766,20 +767,20 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 	/**
 	 * {@inheritDoc}
 	 */
-	public Parameterable createParameterable(String value) throws ServletParseException {
+	public Parameterable createParameterable(String value, SipSession sipSession) throws ServletParseException {
 		try {			 
 			Header header = SipFactoryImpl.headerFactory.createHeader(ContactHeader.NAME, value);
-			return SipServletMessageImpl.createParameterable(header, SipServletMessageImpl.getFullHeaderName(header.getName()), true);
+			return SipServletMessageImpl.createParameterable(header, SipServletMessageImpl.getFullHeaderName(header.getName()), true, sipSession);
 		} catch (ParseException e) {
 			try {
 				Header header = SipFactoryImpl.headerFactory.createHeader(ContentTypeHeader.NAME, value);
-				return SipServletMessageImpl.createParameterable(header, SipServletMessageImpl.getFullHeaderName(header.getName()), true);
+				return SipServletMessageImpl.createParameterable(header, SipServletMessageImpl.getFullHeaderName(header.getName()), true, sipSession);
 			} catch (ParseException pe) {
 				// Contribution from Nishihara, Naoki from Japan for Issue http://code.google.com/p/mobicents/issues/detail?id=1856
 				// Cannot create a parameterable header for Session-Expires
 				try {
 					Header header = SipFactoryImpl.headerFactory.createHeader(ContentDispositionHeader.NAME, value);
-					return SipServletMessageImpl.createParameterable(header, SipServletMessageImpl.getFullHeaderName(header.getName()), true);
+					return SipServletMessageImpl.createParameterable(header, SipServletMessageImpl.getFullHeaderName(header.getName()), true, sipSession);
 				} catch (ParseException pe2) {
 					throw new ServletParseException("Impossible to parse the following parameterable "+ value , pe2);
 				}

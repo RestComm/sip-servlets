@@ -28,6 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sip.header.Header;
 import javax.sip.header.Parameters;
+import javax.servlet.sip.SipSession;
 
 import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 
@@ -45,9 +46,9 @@ public class ParameterableHeaderImpl extends ParameterableImpl {
 		super();
 	}
 
-	public ParameterableHeaderImpl(Header header, String value, Map<String, String> params, ModifiableRule isModifiable) {
+	public ParameterableHeaderImpl(Header header, String value, Map<String, String> params, ModifiableRule isModifiable, SipSession sipSession) {
 		// General form of parametrable header
-		super(header, params, isModifiable);
+		super(header, params, isModifiable, sipSession);
 		this.value = value;
 	}
 

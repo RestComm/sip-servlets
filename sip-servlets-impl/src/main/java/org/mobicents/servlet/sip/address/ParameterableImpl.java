@@ -25,6 +25,7 @@ package org.mobicents.servlet.sip.address;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.sip.Parameterable;
 import javax.sip.header.Header;
 import javax.sip.header.Parameters;
+import javax.servlet.sip.SipSession;
 
 import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 
@@ -58,6 +60,8 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 	
 	protected ModifiableRule isModifiable = ModifiableRule.Modifiable;
 	
+	protected SipSession sipSession;
+	
 	protected ParameterableImpl() {
 		this.parameters = new ConcurrentHashMap<String, String>();	
 	}
@@ -67,8 +71,9 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 	 * @param value - initial value of parametrable value
 	 * @param parameters - parameter map - it can be null;
 	 */
-	public ParameterableImpl(Header header, Map<String, String> params, ModifiableRule isModifiable) {
+	public ParameterableImpl(Header header, Map<String, String> params, ModifiableRule isModifiable, SipSession sipSession) {
 		this.isModifiable = isModifiable;
+		this.sipSession = sipSession;
 		if(header instanceof Parameters) {
 			this.header = (Parameters) header;
 		}
@@ -155,11 +160,91 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 		this.parameters.put(name.toLowerCase(), value);
 		if(header != null) {
 			try {
-				header.setParameter(name, "".equals(value) ? null : value);
+				if (isQuotableParameter(name, value)){
+					header.setQuotedParameter(name, value);
+				}
+				else{
+					header.setParameter(name, "".equals(value) ? null : value);
+				}
 			} catch (ParseException e) {
 				throw new IllegalArgumentException("Problem setting parameter",e);
 			}
 		}
+	}
+	
+	private static final String QUOTABLE_PARAMETER_NAME ="org.restcomm.servlets.sip.QUOTABLE_PARAMETER_NAME";
+	/**
+     * Verify that the parameter is in the known list of parameters that its value need to be quoted
+     * 
+     * @return 
+     * true: if the Parameter name is present at servletContext and its value can be quoted, else return false
+     * otherwise
+     */
+	protected boolean isQuotableParameter(String name, String value){
+		boolean isQuotable = false;
+		if (sipSession != null && sipSession.getServletContext() != null){
+			String quotableParamNames = sipSession.getServletContext().getInitParameter(QUOTABLE_PARAMETER_NAME);
+			if (quotableParamNames != null){
+				String[] paramNames = quotableParamNames.split(",");
+				for (int i = 0; i < paramNames.length; i++){
+					if (name.equalsIgnoreCase(paramNames[i])){
+						if(isQuotableString(value)){
+							isQuotable = true;
+						}
+					}
+				}
+			}
+		}
+		return isQuotable;
+	}
+	
+	/**
+     * Verify that the string is quotable string base on RFC 3261
+     * 
+     * @return 
+     * true: if the Parameter value can be quoted base on condition which is stated in RFC 3261, else return false
+     * otherwise
+     */
+	protected boolean isQuotableString(String value){
+	    if (value.length() == 0){
+	        return true;
+	    }
+	    char c = value.charAt(0);
+	    for (int i = 0; i < value.length(); i++){
+	        c = value.charAt(i);
+	        if (c == '\\'){
+	            i++;
+	            if (i == value.length()){
+	                //Quotable String cannot be ended by an escape
+	                return false;
+	            }
+
+	            char c1 = value.charAt(i);
+	            if(c1 == 0x0d /* CR*/|| c1 == 0x0a /* LF*/){
+	                // CR, LF are not allowed to be escaped
+	                return false;
+	            }
+	        }
+	        else if (c == 0x0d /* CR*/ || c == 0x0a /* LF*/){
+	            i++;
+	            char c1 = value.charAt(i);
+	            if (c1 == 0x09 /* TAB*/||/***********************************/
+	                c1 == 0x0A /* LF*/||
+	                c1 == 0x0B /* VT*/||//  LINEAR WHITE SPACE
+	                c1 == 0x0C /* FF*/||
+	                c1 == 0x0D /* CR*/||
+	                c1 == 0x20)/* space*/{/************************************/
+	                return false;
+	            }
+	        }
+	        else if (c == '"'){
+	            // Double quotes must be escaped if they appear in a quotable
+	            // string
+	            return false;
+	        }
+	    }
+	    // the rest of case is quotable stirng
+	    return true;
 	}
 
 	/*

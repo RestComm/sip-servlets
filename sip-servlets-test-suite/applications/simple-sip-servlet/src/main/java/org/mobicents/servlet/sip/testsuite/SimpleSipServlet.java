@@ -550,7 +550,7 @@ public class SimpleSipServlet
 					sipServletResponse.send();
 					return;
 				}
-				contact = sipFactory.createParameterable("sip:user@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080;flagparam");
+				contact = sipFactory.createParameterable("sip:user@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080;flagparam", request.getSession());
 				contactStringified = contact.toString().trim();
 				logger.info("Contact Header with flag param " + contactStringified);
 				if(contactStringified.endsWith("flagparam=")) {
@@ -899,7 +899,7 @@ public class SimpleSipServlet
 		} else {
 			SipApplicationSession app = sipFactory.createApplicationSession();
 			register = sipFactory.createRequest(app, "REGISTER", "sip:testRegisterSavedSession@simple-servlet.com", "sip:you@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5058");
-			Parameterable contact = sipFactory.createParameterable("sip:john@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":6090;expires=900");
+			Parameterable contact = sipFactory.createParameterable("sip:john@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":6090;expires=900", register.getSession());
 			register.addParameterableHeader("Contact", contact, true);
 			registerSipSession = register.getSession();
 			logger.info("saved session instance : " + registerSipSession);
@@ -918,7 +918,7 @@ public class SimpleSipServlet
 		} else {
 			SipApplicationSession app = sipFactory.createApplicationSession();
 			register = sipFactory.createRequest(app, "REGISTER", "sip:testRegisterCSeq@simple-servlet.com", "sip:you@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5058");
-			Parameterable contact = sipFactory.createParameterable("sip:john@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":6090;expires=900");
+			Parameterable contact = sipFactory.createParameterable("sip:john@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":6090;expires=900", register.getSession());
 			register.addParameterableHeader("Contact", contact, true);			
 		}
 		register.setHeader("Expires", "3600");

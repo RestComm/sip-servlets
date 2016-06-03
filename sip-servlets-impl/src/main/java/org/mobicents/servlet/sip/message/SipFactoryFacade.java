@@ -31,6 +31,7 @@ import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
+import javax.servlet.sip.SipSession;
 
 import org.apache.log4j.Logger;
 import org.mobicents.javax.servlet.sip.SipFactoryExt;
@@ -129,8 +130,8 @@ public class SipFactoryFacade implements SipFactoryExt, Serializable {
 	/* (non-Javadoc)
 	 * @see javax.servlet.sip.SipFactory#createParameterable(java.lang.String)
 	 */
-	public Parameterable createParameterable(String s) throws ServletParseException {
-		return sipFactoryImpl.createParameterable(s);
+	public Parameterable createParameterable(String s, SipSession sipSession) throws ServletParseException {
+		return sipFactoryImpl.createParameterable(s, sipSession);
 	}
 
 	/* (non-Javadoc)
