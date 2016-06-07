@@ -92,6 +92,7 @@ public class LifecyleInterceptorInvocation implements LifecycleInterceptor.Lifec
         this.list = list;
         this.servlet = null;
         this.servletConfig = null;
+        this.convergedServletConfig = null;
         this.filter = filter;
         this.filterConfig = null;
         this.filterInfo = filterInfo;
