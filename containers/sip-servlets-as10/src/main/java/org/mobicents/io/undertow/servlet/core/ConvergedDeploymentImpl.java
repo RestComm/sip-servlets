@@ -33,15 +33,16 @@ import io.undertow.servlet.core.DeploymentImpl;
 import io.undertow.servlet.core.Lifecycle;
 import io.undertow.servlet.core.ManagedServlets;
 
-public class ConvergedDeploymentImpl extends DeploymentImpl{
+public class ConvergedDeploymentImpl extends DeploymentImpl {
 
-	private final List<Lifecycle> lifecycleObjects = new ArrayList<>();
-	private final ConvergedManagedServlets servlets;
+    private final List<Lifecycle> lifecycleObjects = new ArrayList<>();
+    private final ConvergedManagedServlets servlets;
     private volatile ConvergedServletContextImpl convergedServletContext;
-    
-    public ConvergedDeploymentImpl(DeploymentManager deploymentManager, final DeploymentInfo deploymentInfo, ServletContainer servletContainer) {
-        super(deploymentManager,deploymentInfo,servletContainer);
-        this.servlets = new ConvergedManagedServlets(this, super.getServletPaths());
+
+    public ConvergedDeploymentImpl(DeploymentManager deploymentManager, final DeploymentInfo deploymentInfo,
+            ServletContainer servletContainer) {
+        super(deploymentManager, deploymentInfo, servletContainer);
+        this.servlets = new ConvergedManagedServlets(this, getServletPaths());
     }
 
     public ManagedServlets getServlets() {
@@ -68,10 +69,10 @@ public class ConvergedDeploymentImpl extends DeploymentImpl{
         return Collections.unmodifiableList(lifecycleObjects);
     }
 
-    void destroy(){
+    void destroy() {
         getApplicationListeners().contextDestroyed();
         getApplicationListeners().stop();
-        if (convergedServletContext!=null){
+        if (convergedServletContext != null) {
             convergedServletContext.destroy();
         }
         convergedServletContext = null;

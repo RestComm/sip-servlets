@@ -47,7 +47,7 @@ import io.undertow.servlet.spec.ServletConfigImpl;
  * for jboss as8 (wildfly) by:
  *
  * @author kakonyi.istvan@alerant.hu
- *
+ * @author balogh.gabor@alerant.hu
  */
 public class SipServletImpl extends ManagedServlet implements MobicentsSipServlet {
 
@@ -68,7 +68,6 @@ public class SipServletImpl extends ManagedServlet implements MobicentsSipServle
 
     private final ConvergedServletContextImpl servletContext;
     private final InstanceStrategy instanceStrategy;
-
 
     public SipServletImpl(ServletInfo servletInfo, ConvergedServletContextImpl servletContext) {
         super(servletInfo, servletContext.getDelegatedContext());
@@ -213,16 +212,17 @@ public class SipServletImpl extends ManagedServlet implements MobicentsSipServle
             return;
         }
         try {
-            if (!super.isStarted() && super.getServletInfo().getLoadOnStartup() != null && super.getServletInfo().getLoadOnStartup() >= 0) {
+            if (!super.isStarted() && super.getServletInfo().getLoadOnStartup() != null
+                    && super.getServletInfo().getLoadOnStartup() >= 0) {
                 instanceStrategy.start();
 
-                //super.started = true;
-                try{
+                // super.started = true;
+                try {
                     Field startedField = ManagedServlet.class.getDeclaredField("started");
                     startedField.setAccessible(true);
                     startedField.set(this, true);
                     startedField.setAccessible(false);
-                }catch(NoSuchFieldException | IllegalAccessException e){
+                } catch (NoSuchFieldException | IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -239,34 +239,35 @@ public class SipServletImpl extends ManagedServlet implements MobicentsSipServle
             instanceStrategy.stop();
         }
 
-        //super.started = false;
-        try{
+        // super.started = false;
+        try {
             Field startedField = ManagedServlet.class.getDeclaredField("started");
             startedField.setAccessible(true);
             startedField.set(this, false);
             startedField.setAccessible(false);
-        }catch(NoSuchFieldException | IllegalAccessException e){
+        } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
 
     }
 
     public InstanceHandle<? extends Servlet> getServlet() throws ServletException {
-        if(servletContext.getDeployment().getDeploymentState() != DeploymentManager.State.STARTED) {
-            throw UndertowServletMessages.MESSAGES.deploymentStopped(servletContext.getDeployment().getDeploymentInfo().getDeploymentName());
+        if (servletContext.getDeployment().getDeploymentState() != DeploymentManager.State.STARTED) {
+            throw UndertowServletMessages.MESSAGES
+                    .deploymentStopped(servletContext.getDeployment().getDeploymentInfo().getDeploymentName());
         }
         if (!super.isStarted()) {
             synchronized (this) {
                 if (!super.isStarted()) {
                     instanceStrategy.start();
 
-                    //super.started = true;
-                    try{
+                    // super.started = true;
+                    try {
                         Field startedField = ManagedServlet.class.getDeclaredField("started");
                         startedField.setAccessible(true);
                         startedField.set(this, true);
                         startedField.setAccessible(false);
-                    }catch(NoSuchFieldException | IllegalAccessException e){
+                    } catch (NoSuchFieldException | IllegalAccessException e) {
                         throw new RuntimeException(e);
                     }
                 }
@@ -298,7 +299,8 @@ public class SipServletImpl extends ManagedServlet implements MobicentsSipServle
         private volatile Servlet instance;
         private ResourceChangeListener changeListener;
 
-        DefaultInstanceStrategy(final InstanceFactory<? extends Servlet> factory, final ServletInfo servletInfo, final ConvergedServletContextImpl servletContext) {
+        DefaultInstanceStrategy(final InstanceFactory<? extends Servlet> factory, final ServletInfo servletInfo,
+                final ConvergedServletContextImpl servletContext) {
             this.factory = factory;
             this.servletInfo = servletInfo;
             this.servletContext = servletContext;
@@ -311,11 +313,13 @@ public class SipServletImpl extends ManagedServlet implements MobicentsSipServle
                 throw UndertowServletMessages.MESSAGES.couldNotInstantiateComponent(servletInfo.getName(), e);
             }
             instance = handle.getInstance();
-            new LifecyleInterceptorInvocation(servletContext.getDeployment().getDeploymentInfo().getLifecycleInterceptors(), servletInfo, instance, new ServletConfigImpl(servletInfo, servletContext)).proceed();
+            new LifecyleInterceptorInvocation(servletContext.getDeployment().getDeploymentInfo().getLifecycleInterceptors(),
+                    servletInfo, instance, new ServletConfigImpl(servletInfo, servletContext.getDelegatedContext()),
+                    new ServletConfigImpl(servletInfo, servletContext)).proceed();
 
-            //if a servlet implements FileChangeCallback it will be notified of file change events
+            // if a servlet implements FileChangeCallback it will be notified of file change events
             final ResourceManager resourceManager = servletContext.getDeployment().getDeploymentInfo().getResourceManager();
-            if(instance instanceof ResourceChangeListener && resourceManager.isResourceChangeListenerSupported()) {
+            if (instance instanceof ResourceChangeListener && resourceManager.isResourceChangeListenerSupported()) {
                 resourceManager.registerResourceChangeListener(changeListener = (ResourceChangeListener) instance);
             }
         }
@@ -323,7 +327,7 @@ public class SipServletImpl extends ManagedServlet implements MobicentsSipServle
         public synchronized void stop() {
             if (handle != null) {
                 final ResourceManager resourceManager = servletContext.getDeployment().getDeploymentInfo().getResourceManager();
-                if(changeListener != null) {
+                if (changeListener != null) {
                     resourceManager.removeResourceChangeListener(changeListener);
                 }
                 invokeDestroy();
@@ -332,7 +336,8 @@ public class SipServletImpl extends ManagedServlet implements MobicentsSipServle
         }
 
         private void invokeDestroy() {
-            List<LifecycleInterceptor> interceptors = servletContext.getDeployment().getDeploymentInfo().getLifecycleInterceptors();
+            List<LifecycleInterceptor> interceptors = servletContext.getDeployment().getDeploymentInfo()
+                    .getLifecycleInterceptors();
             try {
                 new LifecyleInterceptorInvocation(interceptors, servletInfo, instance).proceed();
             } catch (ServletException e) {
@@ -360,12 +365,12 @@ public class SipServletImpl extends ManagedServlet implements MobicentsSipServle
      */
     private static class SingleThreadModelPoolStrategy implements InstanceStrategy {
 
-
         private final InstanceFactory<? extends Servlet> factory;
         private final ServletInfo servletInfo;
         private final ConvergedServletContextImpl servletContext;
 
-        private SingleThreadModelPoolStrategy(final InstanceFactory<? extends Servlet> factory, final ServletInfo servletInfo, final ConvergedServletContextImpl servletContext) {
+        private SingleThreadModelPoolStrategy(final InstanceFactory<? extends Servlet> factory, final ServletInfo servletInfo,
+                final ConvergedServletContextImpl servletContext) {
             this.factory = factory;
             this.servletInfo = servletInfo;
             this.servletContext = servletContext;
@@ -385,14 +390,16 @@ public class SipServletImpl extends ManagedServlet implements MobicentsSipServle
         public InstanceHandle<? extends Servlet> getServlet() throws ServletException {
             final InstanceHandle<? extends Servlet> instanceHandle;
             final Servlet instance;
-            //TODO: pooling
+            // TODO: pooling
             try {
                 instanceHandle = factory.createInstance();
             } catch (Exception e) {
                 throw UndertowServletMessages.MESSAGES.couldNotInstantiateComponent(servletInfo.getName(), e);
             }
             instance = instanceHandle.getInstance();
-            new LifecyleInterceptorInvocation(servletContext.getDeployment().getDeploymentInfo().getLifecycleInterceptors(), servletInfo, instance, new ServletConfigImpl(servletInfo, servletContext)).proceed();
+            new LifecyleInterceptorInvocation(servletContext.getDeployment().getDeploymentInfo().getLifecycleInterceptors(),
+                    servletInfo, instance, new ServletConfigImpl(servletInfo, servletContext.getDelegatedContext()),
+                    new ServletConfigImpl(servletInfo, servletContext)).proceed();
 
             return new InstanceHandle<Servlet>() {
                 @Override
