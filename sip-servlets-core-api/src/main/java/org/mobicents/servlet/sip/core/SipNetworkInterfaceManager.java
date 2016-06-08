@@ -25,6 +25,7 @@ package org.mobicents.servlet.sip.core;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
 import javax.sip.message.Message;
 

@@ -128,8 +128,8 @@ public class SimpleWebServlet extends HttpServlet {
         	return;
         }
         
-        URI to = sipFactory.createAddress(toAddr).getURI();
-        URI from = sipFactory.createAddress(fromAddr).getURI();              
+        URI to = sipFactory.createAddress(toAddr, null).getURI();
+        URI from = sipFactory.createAddress(fromAddr, null).getURI();              
 
         // Create app session and request
         SipApplicationSession appSession = 
@@ -143,7 +143,7 @@ public class SimpleWebServlet extends HttpServlet {
         SipServletRequest req = sipFactory.createRequest(appSession, "INVITE", from, to);
         
         // Set some attribute
-        req.getSession().setAttribute("SecondPartyAddress", sipFactory.createAddress(fromAddr));
+        req.getSession().setAttribute("SecondPartyAddress", sipFactory.createAddress(fromAddr, null));
         if(invalidateHttpSession != null) {
         	req.getSession().setAttribute("invalidateHttpSession", request.getSession().getId());
         }
@@ -250,7 +250,7 @@ public class SimpleWebServlet extends HttpServlet {
 					"MESSAGE", 
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
-			SipURI sipUri=storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+			SipURI sipUri=storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080", null);
 			sipServletRequest.setRequestURI(sipUri);
 			sipServletRequest.setContentLength(content.length());
 			sipServletRequest.setContent(content, CONTENT_TYPE);

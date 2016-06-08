@@ -471,9 +471,9 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			if (first instanceof HeaderAddress) {
 				try {
 					if(this.isCommitted()) {
-						return new AddressImpl((HeaderAddress) first, ModifiableRule.NotModifiable);
+						return new AddressImpl((HeaderAddress) first, ModifiableRule.NotModifiable, getSession());
 					} else {
-						return new AddressImpl((HeaderAddress) first, getModifiableRule(hName));
+						return new AddressImpl((HeaderAddress) first, getModifiableRule(hName), getSession());
 					}
 				} catch (ParseException e) {
 					throw new ServletParseException("Bad address " + first);
@@ -483,9 +483,9 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 				try {
 					logger.debug("parametrable Value " + parametrable.getValue());					
 					if(this.isCommitted()) {
-						return new AddressImpl(SipFactoryImpl.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), ModifiableRule.NotModifiable);
+						return new AddressImpl(SipFactoryImpl.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), ModifiableRule.NotModifiable, getSession());
 					} else {
-						return new AddressImpl(SipFactoryImpl.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), getModifiableRule(hName));
+						return new AddressImpl(SipFactoryImpl.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), getModifiableRule(hName), getSession());
 					}
 				} catch (ParseException e) {
 					throw new ServletParseException("Impossible to parse the following header " + name + " as an address.", e);
@@ -521,7 +521,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 				HeaderAddress aph = (HeaderAddress) header;
 				try {
 					AddressImpl addressImpl = new AddressImpl(
-							aph, getModifiableRule(hName));
+							aph, getModifiableRule(hName), getSession());
 					retval.add(addressImpl);
 				} catch (ParseException ex) {
 					throw new ServletParseException("Bad header", ex);
@@ -529,7 +529,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			}  else {
 				Parameterable parametrable = createParameterable(header, header.getName(), message instanceof Request, getSession());
 				try {
-					AddressImpl addressImpl = new AddressImpl(SipFactoryImpl.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), getModifiableRule(hName));
+					AddressImpl addressImpl = new AddressImpl(SipFactoryImpl.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), getModifiableRule(hName), getSession());
 					retval.add(addressImpl);
 				} catch (ParseException e) {
 					throw new ServletParseException("Impossible to parse the following header " + name + " as an address.", e);
@@ -831,7 +831,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 //		AddressImpl address = new AddressImpl(from.getAddress(), AddressImpl.getParameters((Parameters)from), ModifiableRule.From);
 		// https://code.google.com/p/sipservlets/issues/detail?id=245
         try {
-            return new AddressImpl(from, ModifiableRule.From);
+            return new AddressImpl(from, ModifiableRule.From, getSession());
         } catch (ParseException e) {
             throw new IllegalArgumentException("Couldn't parse From Header " + from, e);
         }
@@ -1205,7 +1205,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		// return new AddressImpl(to.getAddress(), AddressImpl.getParameters((Parameters)to), ModifiableRule.To);
 		// https://code.google.com/p/sipservlets/issues/detail?id=245
 		try {
-            return new AddressImpl(to, ModifiableRule.From);
+            return new AddressImpl(to, ModifiableRule.From, getSession());
         } catch (ParseException e) {
             throw new IllegalArgumentException("Couldn't parse From Header " + to, e);
         }

@@ -98,7 +98,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			IOException {
 		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 		req.getProxy().setAddToPath(true);
-		URI uri1 = sipFactory.createAddress("sip:receiver@" + host + ":5057").getURI();
+		URI uri1 = sipFactory.createAddress("sip:receiver@" + host + ":5057", null).getURI();
 		((ProxyExt)req.getProxy()).setSipOutboundSupport(true);
 		req.getProxy().proxyTo(uri1);
 	}
@@ -136,14 +136,14 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			sipFactoryExt.setRouteOrphanRequests(true);
 			Object o = getServletContext().getAttribute(javax.servlet.sip.SipServlet. OUTBOUND_INTERFACES);
 			request.getProxy().setRecordRoute(true);
-			request.getProxy().proxyTo(sipFactory.createURI("sip:a@127.0.0.1:5090;transport=udp"));
+			request.getProxy().proxyTo(sipFactory.createURI("sip:a@127.0.0.1:5090;transport=udp", null));
 			return;
 		}
 		if(request.getFrom().toString().contains("proxy-tcp")) {
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 			Object o = getServletContext().getAttribute(javax.servlet.sip.SipServlet. OUTBOUND_INTERFACES);
 			request.getProxy().setRecordRoute(true);
-			request.getProxy().proxyTo(sipFactory.createURI("sip:a@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090;transport=tcp"));
+			request.getProxy().proxyTo(sipFactory.createURI("sip:a@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090;transport=tcp", null));
 			return;
 		}
 		
@@ -151,7 +151,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 			Object o = getServletContext().getAttribute(javax.servlet.sip.SipServlet. OUTBOUND_INTERFACES);
 			request.getProxy().setRecordRoute(true);
-			request.getProxy().proxyTo(sipFactory.createURI("sip:a@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090;transport=udp"));
+			request.getProxy().proxyTo(sipFactory.createURI("sip:a@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090;transport=udp", null));
 			return;
 		}
 		
@@ -159,7 +159,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 			Object o = getServletContext().getAttribute(javax.servlet.sip.SipServlet. OUTBOUND_INTERFACES);
 			request.getProxy().setRecordRoute(true);
-			request.getProxy().proxyTo(sipFactory.createURI("sip:a@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"));
+			request.getProxy().proxyTo(sipFactory.createURI("sip:a@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090", null));
 			return;
 		}
 				
@@ -167,7 +167,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 			Object o = getServletContext().getAttribute(javax.servlet.sip.SipServlet. OUTBOUND_INTERFACES);
 			request.getProxy().setRecordRoute(true);
-			request.getProxy().proxyTo(sipFactory.createURI("sips:a@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090;transport=tls"));
+			request.getProxy().proxyTo(sipFactory.createURI("sips:a@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090;transport=tls", null));
 			return;
 		}
 		String error = (String) request.getApplicationSession().getAttribute(ERROR);
@@ -211,9 +211,9 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			logger.info("using Host Name for proxy test");
 		}
 
-		URI uri1 = sipFactory.createAddress("sip:receiver@" + host + ":5057").getURI();		
-		URI uri2 = sipFactory.createAddress("sip:cutme@" + host + ":5056").getURI();
-		URI uri3 = sipFactory.createAddress("sip:nonexist@" + host + ":5856").getURI();
+		URI uri1 = sipFactory.createAddress("sip:receiver@" + host + ":5057", null).getURI();		
+		URI uri2 = sipFactory.createAddress("sip:cutme@" + host + ":5056", null).getURI();
+		URI uri3 = sipFactory.createAddress("sip:nonexist@" + host + ":5856", null).getURI();
 		String via = request.getHeader("Via");
 		String transport = "udp";
 		if(via.contains("TCP") || via.contains("tcp")) {
@@ -230,7 +230,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		}
 		
 		if(from.contains("forward-sender-downstream-proxy")) {
-			URI uri = sipFactory.createAddress("sip:receiver@" + host + ":5070").getURI();
+			URI uri = sipFactory.createAddress("sip:receiver@" + host + ":5070", null).getURI();
 			Proxy proxy = request.getProxy();
 			proxy.setParallel(false);
 			proxy.setRecordRoute(true);
@@ -251,7 +251,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 				if(request.getHeader("Max-Forwards").equalsIgnoreCase("70")) {
 					logger.info("proxying to downstream app server on port 5069");
 					// only the first hop proxy to the second server or the second server will endlessly route to itself
-					URI uriAppServer = sipFactory.createAddress("sip:receiver@" + host + ":5069").getURI();	
+					URI uriAppServer = sipFactory.createAddress("sip:receiver@" + host + ":5069", null).getURI();	
 					request.pushRoute((SipURI)uriAppServer);
 					proxy.proxyTo(request.getRequestURI());
 					return;
@@ -319,7 +319,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			if(fromURI.getUser().contains(INVITE_INBOUND)) {
 				((ProxyExt)proxy).setSipOutboundSupport(true);
 				uris.clear();
-				SipURI sipURI = sipFactory.createSipURI("receiver", host );
+				SipURI sipURI = sipFactory.createSipURI("receiver", host, null);
 				sipURI.setPort(5080);
 				if(via.contains("TCP") || via.contains("tcp")) {					
 					sipURI.setTransportParam("tcp");
@@ -366,7 +366,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			proxy.setSupervised(true);
 			if(recordRoute) {
 				if(fromURI.getUser().contains("record-route-uri")) {
-					((ProxyExt)proxy).setRecordRouteURI(sipFactory.createSipURI(null, "localhost"));
+					((ProxyExt)proxy).setRecordRouteURI(sipFactory.createSipURI(null, "localhost", null));
 				}
 				proxy.getRecordRouteURI().setParameter("testparamname", "TESTVALUE");
 				if((via.contains("TCP") || via.contains("tcp")) && fromURI.getUser().contains("tcp-record-route-tcp")) {
@@ -376,7 +376,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			}		
 			proxy.setParallel(true);
 			if(CHECK_URI.equals(fromURI.getUser())) {
-				Address routeAddress = sipFactory.createAddress("sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5057");
+				Address routeAddress = sipFactory.createAddress("sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5057", null);
 				request.pushRoute(routeAddress);
 				Address ra = request.getAddressHeader("Route");
 				logger.info("doInvite: ra = " + ra);
@@ -424,7 +424,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		}
 		if(from.contains("unique-location-urn-route")) {
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
-			URI uri1 = sipFactory.createAddress("sip:receiver@" + host + ":5057").getURI();
+			URI uri1 = sipFactory.createAddress("sip:receiver@" + host + ":5057", null).getURI();
 			if(from.contains("tcp")) {
 				((SipURI)uri1).setTransportParam("tcp");
 			}
@@ -456,7 +456,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		if(sipServletRequestExt.isOrphan()) return;
 		if(from.contains("unique-location-urn-route")) {
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
-			URI uri1 = sipFactory.createAddress("sip:receiver@" + host + ":5057").getURI();
+			URI uri1 = sipFactory.createAddress("sip:receiver@" + host + ":5057", null).getURI();
 			if(from.contains("tcp")) {
 				((SipURI)uri1).setTransportParam("tcp");
 			}
@@ -588,7 +588,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 			ArrayList<URI> uris = new ArrayList<URI>();
 			// This URi completes and need to be canceled before answering
-			uris.add(sipFactory.createAddress("sip:neutral@" + host + ":5058").getURI());
+			uris.add(sipFactory.createAddress("sip:neutral@" + host + ":5058", null).getURI());
 			List<ProxyBranch> branches = response.getProxy().createProxyBranches(uris);
 			for (ProxyBranch proxyBranch : branches) {
 			    if(response.getFrom().getURI().toString().contains("change-to-user")) {
@@ -672,7 +672,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 					"MESSAGE", 
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
-			SipURI sipUri = sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":"+ port);
+			SipURI sipUri = sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":"+ port, null);
 			sipUri.setTransportParam(transport);
 			sipServletRequest.setRequestURI(sipUri);
 			sipServletRequest.setContentLength(content.length());

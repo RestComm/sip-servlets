@@ -106,7 +106,7 @@ public class SameInstanceSipServlet
 						"MESSAGE", 
 						"sip:sender@sip-servlets.com", 
 						"sip:receiver@sip-servlets.com");
-				SipURI sipUri=sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+				SipURI sipUri=sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080", null);
 				sipServletRequest.setRequestURI(sipUri);
 				sipServletRequest.setContentLength(INSTANCES_DIFFERENT.length());
 				sipServletRequest.setContent(INSTANCES_DIFFERENT, CONTENT_TYPE);
@@ -145,7 +145,7 @@ public class SameInstanceSipServlet
 						"MESSAGE", 
 						"sip:sender@sip-servlets.com", 
 						"sip:receiver@sip-servlets.com");
-				SipURI sipUri=sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+				SipURI sipUri=sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080", null);
 				sipServletRequest.setRequestURI(sipUri);
 				sipServletRequest.setContentLength(INSTANCES_DIFFERENT.length());
 				sipServletRequest.setContent(INSTANCES_DIFFERENT, CONTENT_TYPE);

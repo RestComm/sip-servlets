@@ -78,11 +78,11 @@ public class AppKeySipServlet
 		}
 		
 		if (status == SipServletResponse.SC_OK && "REGISTER".equalsIgnoreCase(sipServletResponse.getMethod())) {
-			URI fromURI = sipFactory.createSipURI("BigGuy", "here.com");
-			URI toURI = sipFactory.createSipURI("LittleGuy", "there.com");
+			URI fromURI = sipFactory.createSipURI("BigGuy", "here.com", null);
+			URI toURI = sipFactory.createSipURI("LittleGuy", "there.com", null);
 			SipServletRequest sipServletRequest = 
 				sipFactory.createRequest(sipServletResponse.getApplicationSession(), "INVITE", fromURI, toURI);
-			SipURI requestURI = sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+			SipURI requestURI = sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080", null);
 			sipServletRequest.setRequestURI(requestURI);
 			String inviteCallId = sipServletRequest.getHeader("Call-ID");
 			String registerCallId = (String) sipServletResponse.getApplicationSession().getAttribute("CallId");
@@ -120,11 +120,11 @@ public class AppKeySipServlet
 			sipApplicationSession = sipSessionsUtil.getApplicationSessionByKey(appKeyName, true);
 		}
 		
-		URI fromURI = sipFactory.createSipURI("BigGuy", "here.com");
-		URI toURI = sipFactory.createSipURI("BigGuy", "there.com");
+		URI fromURI = sipFactory.createSipURI("BigGuy", "here.com", null);
+		URI toURI = sipFactory.createSipURI("BigGuy", "there.com", null);
 		SipServletRequest sipServletRequest = 
 			sipFactory.createRequest(sipApplicationSession, "REGISTER", fromURI, toURI);
-		SipURI requestURI = sipFactory.createSipURI("BigGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+		SipURI requestURI = sipFactory.createSipURI("BigGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080", null);
 		sipServletRequest.setRequestURI(requestURI);
 		//Storing the Call id for future comparison
 		sipApplicationSession.setAttribute("CallId", sipServletRequest.getHeader("Call-ID"));

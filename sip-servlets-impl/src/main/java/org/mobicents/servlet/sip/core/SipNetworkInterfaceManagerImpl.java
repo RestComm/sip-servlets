@@ -39,6 +39,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.print.attribute.standard.OrientationRequested;
+import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
 import javax.sip.ListeningPoint;
 import javax.sip.address.Hop;
@@ -403,7 +405,7 @@ public class SipNetworkInterfaceManagerImpl implements SipNetworkInterfaceManage
 							null, ipAddress);
 					jainSipURI.setPort(extendedListeningPoint.getPort());
 					jainSipURI.setTransportParam(extendedListeningPoint.getTransport());
-					SipURI sipURI = new SipURIImpl(jainSipURI, ModifiableRule.NotModifiable);
+					SipURI sipURI = new SipURIImpl(jainSipURI, ModifiableRule.NotModifiable, null);
 					newlyComputedOutboundInterfaces.add(sipURI);
 					if(logger.isDebugEnabled()) {
 						logger.debug("Outbound Interface : " + jainSipURI);

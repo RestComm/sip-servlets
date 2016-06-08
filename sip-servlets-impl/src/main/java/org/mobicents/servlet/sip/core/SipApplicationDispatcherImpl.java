@@ -844,7 +844,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 				if(transaction != null) {
 					TransactionApplicationData transactionApplicationData = (TransactionApplicationData)transaction.getApplicationData();
 					if(transactionApplicationData != null && transactionApplicationData.getInitialPoppedRoute() == null) {				
-						transactionApplicationData.setInitialPoppedRoute(new AddressImpl(routeHeader.getAddress(), null, ModifiableRule.NotModifiable));
+						transactionApplicationData.setInitialPoppedRoute(new AddressImpl(routeHeader.getAddress(), null, ModifiableRule.NotModifiable, sipServletRequest.getSession()));
 					}
 				}
 			}							

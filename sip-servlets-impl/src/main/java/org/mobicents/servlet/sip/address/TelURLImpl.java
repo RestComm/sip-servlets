@@ -24,6 +24,7 @@ import gov.nist.javax.sip.parser.Lexer;
 import java.text.ParseException;
 import java.util.Iterator;
 
+import javax.servlet.sip.SipSession;
 import javax.servlet.sip.TelURL;
 
 import org.apache.log4j.Logger;
@@ -43,8 +44,8 @@ public class TelURLImpl extends URIImpl implements TelURL {
 
 	private javax.sip.address.TelURL telUrl;		
 
-	public TelURLImpl(javax.sip.address.TelURL telUrl) {
-		super(telUrl);
+	public TelURLImpl(javax.sip.address.TelURL telUrl, SipSession sipSession ) {
+		super(telUrl, sipSession);
 		this.telUrl = telUrl;
 	}
 
@@ -144,7 +145,7 @@ public class TelURLImpl extends URIImpl implements TelURL {
 	 * @see org.mobicents.servlet.sip.address.URIImpl#clone()
 	 */
 	public TelURL clone() {
-		return new TelURLImpl((javax.sip.address.TelURL) this.telUrl.clone());
+		return new TelURLImpl((javax.sip.address.TelURL) this.telUrl.clone(), sipSession);
 	}
 
 	/*

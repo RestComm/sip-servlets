@@ -62,8 +62,9 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 	
 	protected SipSession sipSession;
 	
-	protected ParameterableImpl() {
-		this.parameters = new ConcurrentHashMap<String, String>();	
+	protected ParameterableImpl(SipSession sipSession) {
+		this.parameters = new ConcurrentHashMap<String, String>();
+		this.sipSession = sipSession;
 	}
 	
 	/**

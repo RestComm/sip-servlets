@@ -804,14 +804,14 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
 	public Address getLocalParty() {
 		if(sessionCreatingDialog != null) {
-			return new AddressImpl(sessionCreatingDialog.getLocalParty(), null, ModifiableRule.NotModifiable);
+			return new AddressImpl(sessionCreatingDialog.getLocalParty(), null, ModifiableRule.NotModifiable, this);
 		} else if (sessionCreatingTransactionRequest != null){
 			if(isSessionCreatingTransactionServer) {
 				ToHeader toHeader = (ToHeader) sessionCreatingTransactionRequest.getMessage().getHeader(ToHeader.NAME);
-				return new AddressImpl(toHeader.getAddress(), AddressImpl.getParameters((Parameters)toHeader),  ModifiableRule.NotModifiable);
+				return new AddressImpl(toHeader.getAddress(), AddressImpl.getParameters((Parameters)toHeader),  ModifiableRule.NotModifiable, this);
 			} else {
 				FromHeader fromHeader = (FromHeader)sessionCreatingTransactionRequest.getMessage().getHeader(FromHeader.NAME);
-				return new AddressImpl(fromHeader.getAddress(), AddressImpl.getParameters((Parameters)fromHeader),  ModifiableRule.NotModifiable);
+				return new AddressImpl(fromHeader.getAddress(), AddressImpl.getParameters((Parameters)fromHeader),  ModifiableRule.NotModifiable, this);
 			}			
 		} else {
 			return localParty;
@@ -868,15 +868,15 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
 	public Address getRemoteParty() {
 		if(sessionCreatingDialog != null) {
-			return new AddressImpl(sessionCreatingDialog.getRemoteParty(), null, ModifiableRule.NotModifiable);
+			return new AddressImpl(sessionCreatingDialog.getRemoteParty(), null, ModifiableRule.NotModifiable, this);
 		} else if (sessionCreatingTransactionRequest != null){
 			try {
 				if(!isSessionCreatingTransactionServer) {
 					ToHeader toHeader = (ToHeader)sessionCreatingTransactionRequest.getMessage().getHeader(ToHeader.NAME);
-					return new AddressImpl(toHeader.getAddress(), AddressImpl.getParameters((Parameters)toHeader),  ModifiableRule.NotModifiable);
+					return new AddressImpl(toHeader.getAddress(), AddressImpl.getParameters((Parameters)toHeader),  ModifiableRule.NotModifiable, this);
 				} else {
 					FromHeader fromHeader = (FromHeader)sessionCreatingTransactionRequest.getMessage().getHeader(FromHeader.NAME);
-					return new AddressImpl(fromHeader.getAddress(), AddressImpl.getParameters((Parameters)fromHeader),  ModifiableRule.NotModifiable);
+					return new AddressImpl(fromHeader.getAddress(), AddressImpl.getParameters((Parameters)fromHeader),  ModifiableRule.NotModifiable, this);
 				}
 			} catch(Exception e) {
 				throw new IllegalArgumentException("Error creating Address", e);
@@ -916,7 +916,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 			throw new IllegalStateException("Subscriber URI is only available for outbound sessions.");
 		else {		
 			try {
-				return sipFactory.createURI(subscriberURI);
+				return sipFactory.createURI(subscriberURI, this);
 			} catch (ServletParseException e) {
 				throw new IllegalArgumentException("couldn't parse the outbound interface " + subscriberURI, e);
 			}
@@ -2081,7 +2081,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		if(networkInterface == null) throw new IllegalArgumentException("Network interface for " +
 				address + " not found");		
 		try {
-			outboundInterface = new SipURIImpl(SipFactoryImpl.addressFactory.createSipURI(null, address), ModifiableRule.NotModifiable).toString();
+			outboundInterface = new SipURIImpl(SipFactoryImpl.addressFactory.createSipURI(null, address), ModifiableRule.NotModifiable, this).toString();
 		} catch (ParseException e) {
 			logger.error("couldn't parse the SipURI from USER[" + null
 					+ "] HOST[" + address + "]", e);
@@ -2113,7 +2113,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		if(networkInterface == null) throw new IllegalArgumentException("Network interface for " +
 				address + " not found");
 		try {
-			outboundInterface = new SipURIImpl(SipFactoryImpl.addressFactory.createSipURI(null, address), ModifiableRule.NotModifiable).toString();
+			outboundInterface = new SipURIImpl(SipFactoryImpl.addressFactory.createSipURI(null, address), ModifiableRule.NotModifiable, this).toString();
 		} catch (ParseException e) {
 			logger.error("couldn't parse the SipURI from USER[" + null
 					+ "] HOST[" + address + "]", e);

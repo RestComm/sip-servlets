@@ -100,7 +100,7 @@ public class ShootistSipServlet
 			if(resp.getHeader("require") != null) {
 				SipServletRequest prack = resp.createPrack();
 				SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
-				SipURI requestURI = sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+				SipURI requestURI = sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080", null);
 				prack.setRequestURI(requestURI);
 				prack.send();
 			}
@@ -327,12 +327,12 @@ public class ShootistSipServlet
 			if(userName.equalsIgnoreCase("nullTest")) {
 				userName = "";
 			}
-			URI fromURI = sipFactory.createSipURI(userName, "here.com");
+			URI fromURI = sipFactory.createSipURI(userName, "here.com", null);
 			URI toURI = null;
 			if(ce.getServletContext().getInitParameter("urlType") != null) {
 				if(ce.getServletContext().getInitParameter("urlType").equalsIgnoreCase("tel")) {
 					try {
-						toURI = sipFactory.createURI("tel:+358-555-1234567");
+						toURI = sipFactory.createURI("tel:+358-555-1234567", null);
 					} catch (ServletParseException e) {
 						logger.error("Impossible to create the tel URL", e);
 					}
@@ -341,23 +341,23 @@ public class ShootistSipServlet
 					}
 					if(ce.getServletContext().getInitParameter("enum") != null) {
 						DNSResolver dnsResolver = (DNSResolver) getServletContext().getAttribute("org.mobicents.servlet.sip.DNS_RESOLVER");
-						toURI = dnsResolver.getSipURI(toURI);
+						toURI = dnsResolver.getSipURI(toURI, null);
 					}
 				} else if(ce.getServletContext().getInitParameter("urlType").equalsIgnoreCase("telAsSip")) {
 					try {
-						toURI = sipFactory.createURI("sip:+34666777888@192.168.0.20:5080");
+						toURI = sipFactory.createURI("sip:+34666777888@192.168.0.20:5080", null);
 					} catch (ServletParseException e) {
 						logger.error("Impossible to create the tel URL as SIP", e);
 					}
 					
 					try {
-						toURI = sipFactory.createAddress("<sip:+34666777888@192.168.0.20:5080>").getURI();
+						toURI = sipFactory.createAddress("<sip:+34666777888@192.168.0.20:5080>", null).getURI();
 					} catch (ServletParseException e) {
 						logger.error("Impossible to create the tel URL as SIP", e);
 					}
 				}
 			} else {
-				toURI = sipFactory.createSipURI("LittleGuy", "there.com");
+				toURI = sipFactory.createSipURI("LittleGuy", "there.com", null);
 			}
 			String toTag = ce.getServletContext().getInitParameter("toTag");
 			if(toTag != null) {
@@ -385,7 +385,7 @@ public class ShootistSipServlet
 					return;
 				}
 			} else {
-				sipServletRequest =	sipFactory.createRequest(sipApplicationSession, method, sipFactory.createAddress(fromURI, "from display"), sipFactory.createAddress(toURI,"to display"));
+				sipServletRequest =	sipFactory.createRequest(sipApplicationSession, method, sipFactory.createAddress(fromURI, "from display", null), sipFactory.createAddress(toURI,"to display", null));
 			}
 			
 			String authHeader = ce.getServletContext().getInitParameter("auth-header");
@@ -402,7 +402,7 @@ public class ShootistSipServlet
 			String routeHeader = ce.getServletContext().getInitParameter("route");
 			if(routeHeader != null) {
 				try {
-					sipServletRequest.pushRoute((SipURI) sipFactory.createURI(routeHeader));
+					sipServletRequest.pushRoute((SipURI) sipFactory.createURI(routeHeader, null));
 				} catch (ServletParseException e) {
 					logger.error("Couldn't create Route Header from " + routeHeader);
 					return; 
@@ -449,7 +449,7 @@ public class ShootistSipServlet
 				if(ce.getServletContext().getInitParameter("host") != null) {
 					host = ce.getServletContext().getInitParameter("host");
 				}
-				SipURI requestURI = sipFactory.createSipURI("LittleGuy", host);
+				SipURI requestURI = sipFactory.createSipURI("LittleGuy", host, null);
 				requestURI.setSecure(ce.getServletContext().getInitParameter("secureRURI")!=null);
 				if(ce.getServletContext().getInitParameter("encodeRequestURI") != null) {
 					sipApplicationSession.encodeURI(requestURI);
@@ -573,7 +573,7 @@ public class ShootistSipServlet
                     sipServletRequest.getFrom().setParameter("epid", "00112233");
                     sipServletRequest.getTo().setParameter("epid", "33221100");
                     
-                    Address address = sipFactory.createAddress(sipFactory.createURI("sip:test@address.example.com"));                
+                    Address address = sipFactory.createAddress(sipFactory.createURI("sip:test@address.example.com", null), null);                
     			    address.setParameter("epid", "bzz");
     			    sipServletRequest.addAddressHeader("TestAddress", address, true);
     
@@ -589,13 +589,13 @@ public class ShootistSipServlet
 			    // https://github.com/Mobicents/sip-servlets/issues/51
                 try {
                 	// Support for https://tools.ietf.org/html/rfc5627
-                	Address address = sipFactory.createAddress("<sip:callee@example.com;gr=urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6>");
+                	Address address = sipFactory.createAddress("<sip:callee@example.com;gr=urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6>", null);
                 	sipServletRequest.addAddressHeader("Contact", address, true);
                 	logger.info("request " + sipServletRequest);
                 	sipServletRequest.removeHeader("Contact");
                 	
                 	// Support for https://tools.ietf.org/html/draft-ietf-sip-gruu-10#section-14.1 for Lync interop
-                	address = sipFactory.createAddress("<sip:caller@example.com;gruu;opaque=hdg7777ad7aflzig8sf7>");
+                	address = sipFactory.createAddress("<sip:caller@example.com;gruu;opaque=hdg7777ad7aflzig8sf7>", null);
                 	sipServletRequest.addAddressHeader("Contact", address, true);
                 	logger.info("request " + sipServletRequest);
     
@@ -754,7 +754,7 @@ public class ShootistSipServlet
 					"MESSAGE", 
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
-			SipURI sipUri=storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+			SipURI sipUri=storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080", null);
 			sipServletRequest.setRequestURI(sipUri);
 			if(content != null) {
 				sipServletRequest.setContentLength(content.length());
@@ -820,10 +820,10 @@ public class ShootistSipServlet
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
 			sipServletRequest.addHeader("Ext", "Test 1, 2 ,3");
-			SipURI sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+			SipURI sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080", sipServletRequest.getSession());
 			if(transport != null) {
 				if(transport.equalsIgnoreCase(ListeningPoint.TCP)) {
-					sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5081");
+					sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5081", sipServletRequest.getSession());
 				}
 				sipUri.setTransportParam(transport);
 			}

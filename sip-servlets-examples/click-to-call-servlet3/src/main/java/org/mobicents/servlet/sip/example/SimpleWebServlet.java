@@ -76,8 +76,8 @@ public class SimpleWebServlet extends HttpServlet
         String fromAddr = request.getParameter("from");
         String bye = request.getParameter("bye");
 
-        URI to = toAddr==null? null : sipFactory.createAddress(toAddr).getURI();
-        URI from = fromAddr==null? null : sipFactory.createAddress(fromAddr).getURI();    
+        URI to = toAddr==null? null : sipFactory.createAddress(toAddr, null).getURI();
+        URI from = fromAddr==null? null : sipFactory.createAddress(fromAddr, null).getURI();    
 
         CallStatusContainer calls = (CallStatusContainer) getServletContext().getAttribute("activeCalls");
 
@@ -114,7 +114,7 @@ public class SimpleWebServlet extends HttpServlet
         	SipServletRequest req = sipFactory.createRequest(appSession, "INVITE", from, to);
 
         	// Set some attribute
-        	req.getSession().setAttribute("SecondPartyAddress", sipFactory.createAddress(fromAddr));
+        	req.getSession().setAttribute("SecondPartyAddress", sipFactory.createAddress(fromAddr, req.getSession()));
         	req.getSession().setAttribute("call", call);
         	
         	// This session will be used to send BYE

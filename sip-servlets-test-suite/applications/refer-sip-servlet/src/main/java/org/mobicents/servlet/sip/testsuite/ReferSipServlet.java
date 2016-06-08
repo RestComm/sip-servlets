@@ -132,9 +132,9 @@ public class ReferSipServlet extends SipServlet implements SipServletListener, T
 			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
 			sipApplicationSession.setAttribute(REFER_SESSION, request.getSession());
 			String inviteUri = request.getHeader("Refer-To");
-			SipURI fromURI = sipFactory.createSipURI("receiver", "example.com");			
-			URI toURI = sipFactory.createURI(inviteUri.substring(1,inviteUri.length()-1));
-			SipURI requestURI = sipFactory.createSipURI(((SipURI)toURI).getUser(), "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090");
+			SipURI fromURI = sipFactory.createSipURI("receiver", "example.com", null);			
+			URI toURI = sipFactory.createURI(inviteUri.substring(1,inviteUri.length()-1), null);
+			SipURI requestURI = sipFactory.createSipURI(((SipURI)toURI).getUser(), "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090", null);
 			SipServletRequest inviteRequest = sipFactory.createRequest(sipApplicationSession, "INVITE", fromURI, toURI);
 			inviteRequest.setRequestURI(requestURI);
 			inviteRequest.setHeader("Referred-By", request.getFrom().getURI().toString());
@@ -179,14 +179,14 @@ public class ReferSipServlet extends SipServlet implements SipServletListener, T
 			if("SIP/2.0 200 OK".equals(content) && req.getHeader("Out-Of-Dialog") == null) {
 				SipServletRequest sipServletRequest = req.getSession().createRequest("REFER");
 				SipFactory sipFactory = (SipFactory)getServletContext().getAttribute(SIP_FACTORY);
-				SipURI requestURI = sipFactory.createSipURI("sender", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+				SipURI requestURI = sipFactory.createSipURI("sender", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080", null);
 				sipServletRequest.setRequestURI(requestURI);
 				sipServletRequest.addHeader("Refer-To", "sip:refer-to@nist.gov");
 				sipServletRequest.send();
 			} else if ("SIP/2.0 100 Subsequent".equals(content)) {
 				SipServletRequest messageRequest = req.getSession().createRequest("MESSAGE");
 				SipFactory sipFactory = (SipFactory)getServletContext().getAttribute(SIP_FACTORY);
-				SipURI requestURI = sipFactory.createSipURI("sender", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+				SipURI requestURI = sipFactory.createSipURI("sender", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080", null);
 				messageRequest.setRequestURI(requestURI);
 				messageRequest.setContentLength(req.getContentLength());
 				messageRequest.setContent("SIP/2.0 100 Subsequent", "text/plain;charset=UTF-8");
@@ -214,11 +214,11 @@ public class ReferSipServlet extends SipServlet implements SipServletListener, T
 	 */
 	public void timeout(ServletTimer timer) {
 		SipFactory sipFactory = (SipFactory) timer.getApplicationSession().getAttribute("sipFactory");		
-		SipURI fromURI = sipFactory.createSipURI("receiver", "nist.gov");			
-		SipURI toURI = sipFactory.createSipURI("sender", "nist.gov");
+		SipURI fromURI = sipFactory.createSipURI("receiver", "nist.gov", null);			
+		SipURI toURI = sipFactory.createSipURI("sender", "nist.gov", null);
 		SipServletRequest sipServletRequest = 
 			sipFactory.createRequest(timer.getApplicationSession(), "REFER", fromURI, toURI);
-		SipURI requestURI = sipFactory.createSipURI("sender", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+		SipURI requestURI = sipFactory.createSipURI("sender", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080", null);
 		sipServletRequest.setRequestURI(requestURI);
 		sipServletRequest.addHeader("Refer-To", "sip:refer-to@nist.gov");		
 		try {
@@ -247,7 +247,7 @@ public class ReferSipServlet extends SipServlet implements SipServletListener, T
 					"MESSAGE", 
 					se.getSession().getLocalParty(), 
 					se.getSession().getRemoteParty());
-			SipURI sipUri=sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+			SipURI sipUri=sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080", null);
 			sipServletRequest.setRequestURI(sipUri);
 			sipServletRequest.setContentLength(SIP_SESSION_READY_TO_BE_INVALIDATED.length());
 			sipServletRequest.setContent(SIP_SESSION_READY_TO_BE_INVALIDATED, CONTENT_TYPE);

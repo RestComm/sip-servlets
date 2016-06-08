@@ -73,32 +73,32 @@ public class LocationServiceSipServlet extends SipServlet {
 		SipFactory sipFactory = (SipFactory)getServletContext().getAttribute(SIP_FACTORY);
 		registeredUsers = new HashMap<String, List<URI>>();
 		List<URI> uriList  = new ArrayList<URI>();
-		uriList.add(sipFactory.createURI("sip:receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"));
-		uriList.add(sipFactory.createURI("sip:receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":6090"));
+		uriList.add(sipFactory.createURI("sip:receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090", null));
+		uriList.add(sipFactory.createURI("sip:receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":6090", null));
 		registeredUsers.put("sip:receiver@sip-servlets.com", uriList);
 		// https://code.google.com/p/sipservlets/issues/detail?id=273
 		uriList  = new ArrayList<URI>();
-		uriList.add(sipFactory.createURI("sip:receiver-prack@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"));
+		uriList.add(sipFactory.createURI("sip:receiver-prack@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090", null));
 		registeredUsers.put("sip:receiver-prack@sip-servlets.com", uriList);
 		uriList  = new ArrayList<URI>();
-		uriList.add(sipFactory.createURI("sip:receiver-prack@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"));
+		uriList.add(sipFactory.createURI("sip:receiver-prack@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090", null));
 		registeredUsers.put("sip:receiver-prack@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090", uriList);
 		
 		uriList  = new ArrayList<URI>();
-		uriList.add(sipFactory.createURI("sip:cancel-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"));
+		uriList.add(sipFactory.createURI("sip:cancel-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090", null));
 		registeredUsers.put("sip:cancel-receiver@sip-servlets.com", uriList);
 		uriList  = new ArrayList<URI>();
-		uriList.add(sipFactory.createURI("sip:cancel-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"));
-		uriList.add(sipFactory.createURI("sip:cancel-receiver2@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5091"));		
+		uriList.add(sipFactory.createURI("sip:cancel-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090", null));
+		uriList.add(sipFactory.createURI("sip:cancel-receiver2@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5091", null));		
 		registeredUsers.put("sip:cancel-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090", uriList);
 		
 		
 		uriList  = new ArrayList<URI>();
-		uriList.add(sipFactory.createURI("sip:receiver-failover@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"));
+		uriList.add(sipFactory.createURI("sip:receiver-failover@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090", null));
 		registeredUsers.put("sip:receiver-failover@sip-servlets.com", uriList);
 		registeredUsers.put("sip:receiver-failover@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090", uriList);
 		uriList  = new ArrayList<URI>();
-		uriList.add(sipFactory.createURI("sip:receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070"));
+		uriList.add(sipFactory.createURI("sip:receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070", null));
 		registeredUsers.put("sip:proxy-b2bua@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070", uriList);
 		
 	}

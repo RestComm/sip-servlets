@@ -42,8 +42,8 @@ public class ParameterableHeaderImpl extends ParameterableImpl {
 	private static final long serialVersionUID = 1L;
 	protected String value = null;
 	
-	public ParameterableHeaderImpl() {
-		super();
+	public ParameterableHeaderImpl(SipSession sipSession) {
+		super(sipSession);
 	}
 
 	public ParameterableHeaderImpl(Header header, String value, Map<String, String> params, ModifiableRule isModifiable, SipSession sipSession) {
@@ -54,7 +54,7 @@ public class ParameterableHeaderImpl extends ParameterableImpl {
 
 	@Override
 	public Object clone() {
-		ParameterableHeaderImpl cloned = new ParameterableHeaderImpl();
+		ParameterableHeaderImpl cloned = new ParameterableHeaderImpl(sipSession);
 		cloned.parameters = cloneParameters(super.parameters);
 		cloned.value = this.value;
 		cloned.header = (Parameters)((Header)super.header).clone();

@@ -361,7 +361,7 @@ public class SimpleSipServlet
 		if(fromString.contains(TEST_TO_TAG)) {
 			//checking if the to tag is not
 			Address fromAddress = request.getFrom();
-			Address toAddress   = sipFactory.createAddress(request.getRequestURI(), request.getTo().getDisplayName());
+			Address toAddress   = sipFactory.createAddress(request.getRequestURI(), request.getTo().getDisplayName(), request.getSession());
 	        SipServletRequest newRequest = sipFactory.createRequest(request.getApplicationSession(), "INVITE", fromAddress, toAddress);
 	        if(newRequest.getTo().getParameter("tag") != null) {
 				logger.error("the ToTag should be empty, sending 500 response");
@@ -737,7 +737,7 @@ public class SimpleSipServlet
 					"MESSAGE", 
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
-			SipURI sipUri=sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+			SipURI sipUri=sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080", request.getSession());
 			sipServletRequest.setRequestURI(sipUri);
 			sipServletRequest.setContentLength(CANCEL_RECEIVED.length());
 			sipServletRequest.setContent(CANCEL_RECEIVED, CONTENT_TYPE);
@@ -786,7 +786,7 @@ public class SimpleSipServlet
 			if(!content.equals(req.getSession().getAttribute("mutable")))
 				response = SipServletResponse.SC_SERVER_INTERNAL_ERROR;
 		} else {
-			SipURI outboundInterface = (SipURI) sipFactory.createURI("sip:" + req.getInitialRemoteAddr()+ ":" + req.getLocalPort() + ";transport=" + req.getTransport());
+			SipURI outboundInterface = (SipURI) sipFactory.createURI("sip:" + req.getInitialRemoteAddr()+ ":" + req.getLocalPort() + ";transport=" + req.getTransport(),req.getSession());
 			((SipSessionExt)req.getSession()).setOutboundInterface(outboundInterface);
 		}
 		SipServletResponse resp = req.createResponse(response);
@@ -963,10 +963,10 @@ public class SimpleSipServlet
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
 			sipServletRequest.addHeader("Ext", "Test 1, 2 ,3");
-			SipURI sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+			SipURI sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080", sipServletRequest.getSession());
 			if(transport != null) {
 				if(transport.equalsIgnoreCase(ListeningPoint.TCP)) {
-					sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5081");
+					sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5081", sipServletRequest.getSession());
 				}
 				sipUri.setTransportParam(transport);
 			}

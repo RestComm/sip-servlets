@@ -32,6 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.sip.Address;
 import javax.servlet.sip.Parameterable;
+import javax.servlet.sip.SipSession;
 import javax.servlet.sip.URI;
 import javax.sip.address.SipURI;
 import javax.sip.header.ContactHeader;
@@ -65,11 +66,13 @@ public class AddressImpl extends ParameterableImpl implements Address {
 		return address;
 	}
 	
-	public AddressImpl() {}
+	public AddressImpl(SipSession sipSession) {
+		super(sipSession);
+	}
 	
 	@SuppressWarnings("unchecked")
-	public AddressImpl (javax.sip.address.Address address, Map<String, String> parameters, ModifiableRule isModifiable) {
-		super();
+	public AddressImpl (javax.sip.address.Address address, Map<String, String> parameters, ModifiableRule isModifiable, SipSession sipSession) {
+		super(sipSession);
 		super.isModifiable = isModifiable;
 		this.address = address;				
 		if(parameters != null) {
@@ -114,7 +117,8 @@ public class AddressImpl extends ParameterableImpl implements Address {
 	 *            </b>
 	 * @throws ParseException
 	 */
-	public AddressImpl(HeaderAddress header, ModifiableRule modifiable) throws ParseException {
+	public AddressImpl(HeaderAddress header, ModifiableRule modifiable, SipSession sipSession) throws ParseException {
+		super(sipSession);
 		if(header instanceof Parameters) {
 			super.header = (Parameters) header;
 		}
@@ -167,11 +171,11 @@ public class AddressImpl extends ParameterableImpl implements Address {
 	public URI getURI() {
 		final javax.sip.address.URI localUri = getAddress().getURI();
 		if (localUri instanceof javax.sip.address.SipURI)
-			return new SipURIImpl((javax.sip.address.SipURI) localUri, isModifiable);
+			return new SipURIImpl((javax.sip.address.SipURI) localUri, isModifiable, sipSession);
 		else if (localUri instanceof javax.sip.address.TelURL)
-			return new TelURLImpl((javax.sip.address.TelURL) localUri);
+			return new TelURLImpl((javax.sip.address.TelURL) localUri, sipSession);
 		else if (localUri instanceof javax.sip.address.URI) {			
-			URI uri = new GenericURIImpl((javax.sip.address.URI) localUri);
+			URI uri = new GenericURIImpl((javax.sip.address.URI) localUri, sipSession);
 			// setting the value to make sure jain sip runs scheme validation on it
 			((Parameterable)uri).setValue(localUri.toString());
 			return uri;
@@ -262,7 +266,7 @@ public class AddressImpl extends ParameterableImpl implements Address {
 	}
 	
 	public Object clone() {
-		AddressImpl retval = new AddressImpl();
+		AddressImpl retval = new AddressImpl(sipSession);
 		retval.address = (javax.sip.address.Address) address.clone();
 		retval.parameters = ParameterableHeaderImpl.cloneParameters(this.parameters);
 		return retval;

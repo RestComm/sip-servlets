@@ -156,7 +156,7 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 		String outboundInterfaceStringified = ((MobicentsSipSession)request.getSession()).getOutboundInterface();
 		if(outboundInterfaceStringified != null) {
 			try {
-				outboundInterface = (SipURI) sipFactoryImpl.createURI(outboundInterfaceStringified);
+				outboundInterface = (SipURI) sipFactoryImpl.createURI(outboundInterfaceStringified, request.getSession());
 			} catch (ServletParseException e) {
 				throw new IllegalArgumentException("couldn't parse the outbound interface " + outboundInterface, e);
 			}
@@ -241,7 +241,7 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 						lastVia = viaHeaders.next();
 					} 
 					String uriString = ((Via)lastVia).getSentBy().toString();
-					SipURI uri = sipFactoryImpl.createSipURI(null, uriString);
+					SipURI uri = sipFactoryImpl.createSipURI(null, uriString, request.getSession());
 					if(lastVia.getTransport() != null) {
 						uri.setTransportParam(lastVia.getTransport());
 					} else {
@@ -404,7 +404,7 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 		if(!this.recordRoutingEnabled) throw new IllegalStateException("You must setRecordRoute(true) before getting URI");
 		if(recordRouteURI == null && recordRouteURIString != null) {
 			try {
-				recordRouteURI = new SipURIImpl(((SipURIImpl)sipFactoryImpl.createURI(recordRouteURIString)).getSipURI(), ModifiableRule.ProxyRecordRouteNotModifiable);
+				recordRouteURI = new SipURIImpl(((SipURIImpl)sipFactoryImpl.createURI(recordRouteURIString, originalRequest.getSession())).getSipURI(), ModifiableRule.ProxyRecordRouteNotModifiable, originalRequest.getSession());
 				recordRouteURIString = null;
 			} catch (ServletParseException e) {
 				logger.error("A problem occured while setting the target URI while proxying a request " + recordRouteURIString, e);
@@ -492,7 +492,7 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 			throw new IllegalStateException("Cannot set a record route on an already started proxy");
 		}
 		if(this.pathURI == null) {
-			this.pathURI = new SipURIImpl ( JainSipUtils.createRecordRouteURI( sipFactoryImpl.getSipNetworkInterfaceManager(), null), ModifiableRule.Modifiable);			
+			this.pathURI = new SipURIImpl ( JainSipUtils.createRecordRouteURI( sipFactoryImpl.getSipNetworkInterfaceManager(), null), ModifiableRule.Modifiable, originalRequest.getSession());			
 			pathURI.setLrParam(true);
 			pathURI.setIsModifiable(ModifiableRule.NotModifiable);
 		}		
@@ -668,10 +668,10 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 				URI contactURI = null;
 				if (addressURI instanceof javax.sip.address.SipURI) {
 					contactURI = new SipURIImpl(
-							(javax.sip.address.SipURI) addressURI, ModifiableRule.NotModifiable);
+							(javax.sip.address.SipURI) addressURI, ModifiableRule.NotModifiable, response.getSession());
 				} else if (addressURI instanceof javax.sip.address.TelURL) {
 					contactURI = new TelURLImpl(
-							(javax.sip.address.TelURL) addressURI);
+							(javax.sip.address.TelURL) addressURI,response.getSession());
 
 				}
 				final ProxyBranchImpl recurseBranch = new ProxyBranchImpl(contactURI, this);

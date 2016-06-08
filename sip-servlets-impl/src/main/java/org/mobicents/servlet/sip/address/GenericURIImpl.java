@@ -24,6 +24,7 @@ package org.mobicents.servlet.sip.address;
 
 import java.text.ParseException;
 
+import javax.servlet.sip.SipSession;
 import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
@@ -39,13 +40,13 @@ public class GenericURIImpl extends URIImpl {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(GenericURIImpl.class.getCanonicalName());
 
-	public GenericURIImpl(javax.sip.address.URI uri) {
-		super(uri);
+	public GenericURIImpl(javax.sip.address.URI uri, SipSession sipSession) {
+		super(uri, sipSession);
 	}
 
 	@Override
 	public URI clone() {		
-		return new GenericURIImpl((javax.sip.address.URI)uri.clone());
+		return new GenericURIImpl((javax.sip.address.URI)uri.clone(), sipSession);
 	}
 
 	/*

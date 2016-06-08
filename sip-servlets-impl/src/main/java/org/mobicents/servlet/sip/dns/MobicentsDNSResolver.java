@@ -28,6 +28,8 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
+
+import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 import javax.sip.SipFactory;
@@ -63,9 +65,9 @@ public class MobicentsDNSResolver implements DNSResolver {
 	/* (non-Javadoc)
 	 * @see org.mobicents.javax.servlet.sip.dns.DNSResolver#getSipURI(javax.servlet.sip.URI)
 	 */
-	public SipURI getSipURI(URI uri) {
+	public SipURI getSipURI(URI uri, SipSession sipSession) {
 		javax.sip.address.SipURI jainSipURI = dnsServerLocator.getSipURI(((URIImpl)uri).getURI());
-		SipURI sipURI = new SipURIImpl(jainSipURI, ModifiableRule.NotModifiable);
+		SipURI sipURI = new SipURIImpl(jainSipURI, ModifiableRule.NotModifiable, sipSession);
 		return sipURI;
 	}
 
@@ -95,7 +97,7 @@ public class MobicentsDNSResolver implements DNSResolver {
          * @see org.mobicents.javax.servlet.sip.dns.DNSResolver#locateURIs(javax.servlet.sip.URI)
          */        
         @Override
-        public List<SipURI> locateURIs(SipURI uri) {
+        public List<SipURI> locateURIs(SipURI uri, SipSession sipSession) {
             List<SipURI> uris = new CopyOnWriteArrayList();
             if (uri instanceof SipURIImpl && createAddressFactory != null) {
                 SipURIImpl uriImpl = (SipURIImpl) uri;
@@ -109,7 +111,7 @@ public class MobicentsDNSResolver implements DNSResolver {
                             createSipURI = createAddressFactory.createSipURI(null, hop.getHost());
                             createSipURI.setPort(hop.getPort());
                             createSipURI.setTransportParam(hop.getTransport());
-                            SipURI sipURI = new SipURIImpl(createSipURI, ModifiableRule.NotModifiable);
+                            SipURI sipURI = new SipURIImpl(createSipURI, ModifiableRule.NotModifiable, sipSession);
                             uris.add(sipURI);
                         } catch (ParseException ex) {
                             logger.debug("Error creating SipURI.", ex);

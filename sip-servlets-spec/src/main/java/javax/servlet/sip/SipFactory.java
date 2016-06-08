@@ -31,17 +31,17 @@ public interface SipFactory{
      * The special argument "*" results in a wildcard Address being returned, that is, an Address for which isWildcard returns true. Such addresses are for use in Contact headers only.
      * The specified address string must be UTF-8 encoded. Furthermore, if the URI component of the address string contains any reserved characters then they must be escaped according to RFC2396 as indicated for createURI(String)
      */
-    javax.servlet.sip.Address createAddress(java.lang.String addr) throws javax.servlet.sip.ServletParseException;
+    javax.servlet.sip.Address createAddress(java.lang.String addr, SipSession sipSession) throws javax.servlet.sip.ServletParseException;
 
     /**
      * Returns an Address with the specified URI and no display name.
      */
-    javax.servlet.sip.Address createAddress(javax.servlet.sip.URI uri);
+    javax.servlet.sip.Address createAddress(javax.servlet.sip.URI uri, SipSession sipSession);
 
     /**
      * Returns a new Address with the specified URI and display name.
      */
-    javax.servlet.sip.Address createAddress(javax.servlet.sip.URI uri, java.lang.String displayName);
+    javax.servlet.sip.Address createAddress(javax.servlet.sip.URI uri, java.lang.String displayName, SipSession sipSession);
 
     /**
      * Returns a new SipApplicationSession. This is useful, for example, when an application is being initialized and wishes to perform some signaling action.
@@ -116,7 +116,7 @@ public interface SipFactory{
      * Constructs a SipURI with the specified user and host components. The scheme will initially be sip but the application may change it to sips by calling setSecure(true) on the returned SipURI. Likewise, the port number of the new URI is left unspecified but may subsequently be set by calling setPort on the returned SipURI.
      * If the specified URI string contains any reserved characters, then they must be escaped according to RFC2396.
      */
-    javax.servlet.sip.SipURI createSipURI(java.lang.String user, java.lang.String host);
+    javax.servlet.sip.SipURI createSipURI(java.lang.String user, java.lang.String host, SipSession sipSession);
 
     /**
      * Returns a URI object corresponding to the specified string, which should represent an escaped SIP, SIPS, or tel URI. The URI may then be used as request URI in SIP requests or as the URI component of
@@ -124,6 +124,6 @@ public interface SipFactory{
      * Implementations must be able to represent URIs of any scheme. This method returns a SipURI object if the specified string is a sip or a sips URI, and a TelURL object if it's a tel URL.
      * If the specified URI string contains any reserved characters, then they must be escaped according to RFC2396.
      */
-    javax.servlet.sip.URI createURI(java.lang.String uri) throws javax.servlet.sip.ServletParseException;
+    javax.servlet.sip.URI createURI(java.lang.String uri, SipSession sipSession) throws javax.servlet.sip.ServletParseException;
 
 }
