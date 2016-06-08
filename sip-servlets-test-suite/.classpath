@@ -27,6 +27,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.50/tomcat-servlet-api-7.0.50.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.50/tomcat-servlet-api-7.0.50-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/junit/junit/4.8.2/junit-4.8.2.jar"/>
 	<classpathentry kind="src" output="applications/simple-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/simple-sip-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/quoted-parameter-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/quoted-parameter-sip-servlet/src/main/java"/>
 	<classpathentry kind="src" output="applications/distributable-servlet/src/main/sipapp/WEB-INF/classes" path="applications/distributable-servlet/src/main/java"/>
 	<classpathentry kind="src" output="applications/same-instance-servlet/src/main/sipapp/WEB-INF/classes" path="applications/same-instance-servlet/src/main/java"/>
 	<classpathentry kind="src" output="applications/no-main-servlet-app/src/main/sipapp/WEB-INF/classes" path="applications/no-main-servlet-app/src/main/java"/>

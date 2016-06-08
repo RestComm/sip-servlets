@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>org.mobicents.servlet.sip.testsuite.QuotedParameterApplication</app-name>
+	<display-name>Quoted Parameter Sip Servlet</display-name>
+	<description>Quoted Parameter Sip Servlet</description>
+	
+	<!--main-servlet>
+		ShootistSipServlet
+	</main-servlet-->
+        <context-param>
+        	<param-name>org.restcomm.servlets.sip.QUOTABLE_PARAMETER_NAME</param-name>
+	        <param-value>rport,headerparam1,param5</param-value>
+    	</context-param>
+	<servlet>
+		<servlet-name>QuotedParameterSipServlet</servlet-name>
+		<display-name>QuotedParameterSipServlet</display-name>
+		<description>Quoted Parameter Sip Servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.testsuite.QuotedParameterSipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<listener>
+		<listener-class>
+			org.mobicents.servlet.sip.testsuite.QuotedParameterSipServlet
+		</listener-class>
+	</listener>
+</sip-app>
