@@ -1099,12 +1099,14 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		MobicentsSipSession session = getSipSession();
 		if (session == null && create) {
 			MobicentsSipApplicationSession sipApplicationSessionImpl = (MobicentsSipApplicationSession)getSipApplicationSession(create);
-			MobicentsSipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(sipApplicationSessionImpl.getKey().getId(), currentApplicationName, message, false);
-			session = sipApplicationSessionImpl.getSipContext().getSipManager().getSipSession(sessionKey, create,
-					sipFactoryImpl, sipApplicationSessionImpl);
-			session.setSessionCreatingTransactionRequest(this);
-			session.setOrphan(isOrphan());
-			sessionKey = session.getKey();
+			if (sipApplicationSessionImpl != null){
+				MobicentsSipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(sipApplicationSessionImpl.getKey().getId(), currentApplicationName, message, false);
+				session = sipApplicationSessionImpl.getSipContext().getSipManager().getSipSession(sessionKey, create,
+						sipFactoryImpl, sipApplicationSessionImpl);
+				session.setSessionCreatingTransactionRequest(this);
+				session.setOrphan(isOrphan());
+				sessionKey = session.getKey();
+			}
 		}
 		
 		if(session != null) {
