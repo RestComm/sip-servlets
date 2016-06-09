@@ -63,7 +63,7 @@ public class SipURITest extends junit.framework.TestCase {
 	}
 	
 	private SipURI sipUri(String uri) throws Exception {
-		return (SipURI) sipFactory.createURI(uri);
+		return (SipURI) sipFactory.createURI(uri, null);
 	}
 	
 	public void testEqual() throws Exception {
@@ -107,7 +107,7 @@ public class SipURITest extends junit.framework.TestCase {
 	}
 	
 	public void testParams() throws Exception {
-		URI uri = sipFactory.createURI("sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+		URI uri = sipFactory.createURI("sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080", null);
 		System.out.println(uri);
 		uri.setParameter("Key", "val");
 		System.out.println(uri);
@@ -123,7 +123,7 @@ public class SipURITest extends junit.framework.TestCase {
 	public void testBrackets() throws Exception {
 		try {
 			String uriString = "<sip:1004@172.16.0.99;user=phone>";
-			sipFactory.createURI(uriString);
+			sipFactory.createURI(uriString, null);
 			fail(uriString + " should throw a ServletParseException because the angle brackets are not allowed");
 		} catch (ServletParseException e) {
 		}				
