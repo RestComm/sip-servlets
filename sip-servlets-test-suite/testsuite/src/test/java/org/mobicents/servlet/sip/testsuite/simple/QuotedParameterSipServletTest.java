@@ -178,7 +178,6 @@ public class QuotedParameterSipServletTest extends SipServletTestCase {
 	
 	
     public void testQuotedAddressParam() throws Exception {
-//      receiver.sendInvite();
     	receiverProtocolObjects =new ProtocolObjects(
 				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 					
@@ -190,26 +189,12 @@ public class QuotedParameterSipServletTest extends SipServletTestCase {
 		Map<String, String> params = new HashMap<String, String>();
 		String userName = "sip:+34666666666@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080;pres-list=mylist";
 		params.put("username", userName);
-		params.put("testFromHeaderQuotedParam", "true");
+		params.put("testFromHeader", "true");
         deployApplication(params);
-		Thread.sleep(TIMEOUT);
-//        receiverProtocolObjects =new ProtocolObjects(
-//                "sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
-//                    
-//        receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
-//        SipProvider receiverProvider = receiver.createProvider();           
-//        receiverProvider.addSipListener(receiver);
-//        receiverProtocolObjects.start();
-//        tomcat.startTomcat();
-//        Map<String, String> params = new HashMap<String, String>();
-//		String userName = "sip:+34666666666@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080;pres-list=mylist";
-//		params.put("username", userName);
-//		params.put("testFromHeaderQuotedParam", "true");
-//        deployApplication(params);
-//        Thread.sleep(TIMEOUT);
-//        assertTrue(receiver.getByeReceived());
-//        assertEquals("00112233", ((MessageExt)receiver.getInviteRequest()).getFromHeader().getParameter("epid"));
-//        assertEquals("33221100", ((MessageExt)receiver.getInviteRequest()).getToHeader().getParameter("epid"));
+        Thread.sleep(TIMEOUT);
+        assertTrue(receiver.getByeReceived());
+        // qparam1 and qparam3 are being defined in sip.xml as the parameters which its value need to be quoted.
+        assertTrue(((MessageExt)receiver.getInviteRequest()).getFromHeader().toString().contains("param0=value0;qparam1=\"value1\";param2=value2;qparam3=\"value3\""));
     }
 
 	@Override

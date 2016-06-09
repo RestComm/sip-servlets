@@ -557,52 +557,15 @@ public class QuotedParameterSipServlet
 				sipServletRequest.getInitialRemotePort();
 				sipServletRequest.getInitialTransport();
 			}
-			if(ce.getServletContext().getInitParameter("testMultipartBytes") != null) {
-			    // https://code.google.com/p/sipservlets/issues/detail?id=169
-			    try {
-                    sipServletRequest.setContent(new String("test Multipart"), "multipart/unknown");
-                } catch (UnsupportedEncodingException e) {
-                    throw new IllegalStateException("couldn't set the content", e);
-                }
-			}
-			if(ce.getServletContext().getInitParameter("testAddressParam") != null) {
+			
+			if(ce.getServletContext().getInitParameter("testFromHeader") != null) {
 			    // https://code.google.com/p/sipservlets/issues/detail?id=245
-                try {
-                    sipServletRequest.getFrom().setDisplayName("Test name");
-                    sipServletRequest.getFrom().setParameter("epid", "00112233");
-                    sipServletRequest.getTo().setParameter("epid", "33221100");
-                    
-                    Address address = sipFactory.createAddress(sipFactory.createURI("sip:test@address.example.com", sipServletRequest.getSession()), sipServletRequest.getSession());                
-    			    address.setParameter("epid", "bzz");
-    			    sipServletRequest.addAddressHeader("TestAddress", address, true);
-    
-    			    logger.info("testAddressParam Test Address" + address);
-    			    logger.info("request " + sipServletRequest);
-                } catch (ServletParseException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+				sipServletRequest.getFrom().setParameter("param0", "value0");
+				sipServletRequest.getFrom().setParameter("qparam1", "value1");
+				sipServletRequest.getFrom().setParameter("param2", "value2");
+				sipServletRequest.getFrom().setParameter("qparam3", "value3");
 			}
-			if(ce.getServletContext().getInitParameter("testGruu") != null) {
-			    logger.info("testGruu Test Address");
-			    // https://github.com/Mobicents/sip-servlets/issues/51
-                try {
-                	// Support for https://tools.ietf.org/html/rfc5627
-                	Address address = sipFactory.createAddress("<sip:callee@example.com;gr=urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6>", sipServletRequest.getSession());
-                	sipServletRequest.addAddressHeader("Contact", address, true);
-                	logger.info("request " + sipServletRequest);
-                	sipServletRequest.removeHeader("Contact");
-                	
-                	// Support for https://tools.ietf.org/html/draft-ietf-sip-gruu-10#section-14.1 for Lync interop
-                	address = sipFactory.createAddress("<sip:caller@example.com;gruu;opaque=hdg7777ad7aflzig8sf7>", sipServletRequest.getSession());
-                	sipServletRequest.addAddressHeader("Contact", address, true);
-                	logger.info("request " + sipServletRequest);
-    
-                } catch (ServletParseException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-			}
+			
 			try {			
 				sipServletRequest.send();
 			} catch (IOException e) {
@@ -621,31 +584,7 @@ public class QuotedParameterSipServlet
 					logger.error("Unexpected exception while sending the INVITE request",e);
 				}
 			}
-			if(ce.getServletContext().getInitParameter("cancel") != null) {
-				SipServletRequest cancelRequest = sipServletRequest.createCancel();
-				sipServletRequest.getApplicationSession().setAttribute(TEST_ERROR_RESPONSE, "true");
-				String timeToWaitString = ce.getServletContext().getInitParameter("servletTimer");
-				if(timeToWaitString == null) {
-					try {
-						Thread.sleep(500);
-						cancelRequest.send();
-					} catch (InterruptedException e) {
-						Thread.currentThread().interrupt();
-					} catch (IOException e) {
-						logger.error(e);
-					}
-				} else if(timeToWaitString.equals("0")) {
-					if(getServletContext().getInitParameter("servletTimer") != null) {
-						timerService.createTimer(sipServletRequest.getApplicationSession(), 0, false, (Serializable) cancelRequest);
-						try {
-							Thread.sleep(2000);
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					} 								
-				}
-			}	
+			
 		} finally {
 			release();
 		}
