@@ -55,7 +55,7 @@ public class UrnSchemeTest extends junit.framework.TestCase {
 	}
 	
 	public void testMobicentsAddress() throws Exception {
-		javax.servlet.sip.Address urnMobicentsAddr = sipFactory.createAddress(urn);
+		javax.servlet.sip.Address urnMobicentsAddr = sipFactory.createAddress(urn, null);
 		assertTrue(urn.equals(urnMobicentsAddr.getURI().toString()));
 		assertTrue(scheme.equals(urnMobicentsAddr.getURI().getScheme()));
 	}
