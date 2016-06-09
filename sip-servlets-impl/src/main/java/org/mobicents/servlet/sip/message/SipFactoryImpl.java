@@ -744,8 +744,8 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 			MobicentsSipSession session = mobicentsSipApplicationSession.getSipContext().getSipManager().
 				getSipSession(key, true, this, mobicentsSipApplicationSession);
 			session.setHandler(handler);
-			session.setLocalParty(new AddressImpl(fromAddress, null, ModifiableRule.NotModifiable,session));
-			session.setRemoteParty(new AddressImpl(toAddress, null, ModifiableRule.NotModifiable, session));
+			session.setLocalParty(new AddressImpl(fromAddress, null, ModifiableRule.NotModifiable, null));
+			session.setRemoteParty(new AddressImpl(toAddress, null, ModifiableRule.NotModifiable, null));
 			
 			// cater to http://code.google.com/p/sipservlets/issues/detail?id=31 to be able to set the rport in applications
 			final SipApplicationDispatcher sipApplicationDispatcher = getSipApplicationDispatcher();
