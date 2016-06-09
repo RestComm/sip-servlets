@@ -2,8 +2,6 @@ package org.jboss.as.clustering.web.infinispan.sip;
 
 import static org.jboss.as.clustering.web.infinispan.sip.InfinispanSipMessages.MESSAGES;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 
 import org.infinispan.AdvancedCache;
@@ -17,44 +15,41 @@ import org.jboss.as.clustering.infinispan.atomic.AtomicMapCache;
 import org.jboss.as.clustering.infinispan.invoker.BatchCacheInvoker;
 import org.jboss.as.clustering.infinispan.invoker.CacheInvoker;
 import org.jboss.as.clustering.infinispan.invoker.RetryingCacheInvoker;
+import org.jboss.as.clustering.infinispan.invoker.TransactionCacheInvoker;
 import org.jboss.as.clustering.infinispan.subsystem.AbstractCacheConfigurationService;
 import org.jboss.as.clustering.infinispan.subsystem.CacheService;
 import org.jboss.as.clustering.infinispan.subsystem.EmbeddedCacheManagerService;
 import org.jboss.as.clustering.lock.SharedLocalYieldingClusterLockManager;
+import org.jboss.as.clustering.lock.impl.SharedLocalYieldingClusterLockManagerService;
 import org.jboss.as.clustering.msc.AsynchronousService;
 import org.jboss.as.clustering.registry.Registry;
-import org.jboss.as.clustering.registry.RegistryService;
 import org.jboss.as.clustering.web.BatchingManager;
 import org.jboss.as.clustering.web.ClusteringNotSupportedException;
 import org.jboss.as.clustering.web.LocalDistributableSessionManager;
 import org.jboss.as.clustering.web.OutgoingDistributableSessionData;
+import org.jboss.as.clustering.web.SessionAttributeMarshaller;
 import org.jboss.as.clustering.web.SessionAttributeMarshallerFactory;
 import org.jboss.as.clustering.web.impl.SessionAttributeMarshallerFactoryImpl;
 import org.jboss.as.clustering.web.impl.TransactionBatchingManager;
-import org.jboss.as.clustering.web.sip.ConvergedSessionAttributeMarshallerFactory;
-import org.jboss.as.clustering.web.sip.DistributedCacheManagerFactoryService;
+import org.jboss.as.clustering.web.infinispan.SessionAttributeStorage;
+import org.jboss.as.clustering.web.infinispan.SessionAttributeStorageFactory;
+import org.jboss.as.clustering.web.infinispan.SessionAttributeStorageFactoryImpl;
+import org.jboss.as.clustering.web.infinispan.WebSessionCacheConfigurationService;
+import org.jboss.as.clustering.web.sip.DistributedConvergedCacheManagerFactoryService;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.metadata.web.jboss.ReplicationConfig;
 import org.jboss.msc.service.ServiceBuilder;
+import org.jboss.msc.service.ServiceBuilder.DependencyType;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceRegistry;
 import org.jboss.msc.service.ServiceTarget;
-import org.jboss.msc.service.ServiceBuilder.DependencyType;
 import org.jboss.msc.value.InjectedValue;
 import org.jboss.tm.XAResourceRecoveryRegistry;
-import org.jboss.as.clustering.infinispan.invoker.TransactionCacheInvoker;
-import org.jboss.as.clustering.lock.AbstractClusterLockSupport;
-import org.jboss.as.clustering.lock.impl.SharedLocalYieldingClusterLockManagerService;
-import org.jboss.as.clustering.web.infinispan.SessionAttributeStorageFactory;
-import org.jboss.as.clustering.web.infinispan.SessionAttributeStorageFactoryImpl;
-import org.jboss.as.clustering.web.SessionAttributeMarshaller;
-import org.jboss.as.clustering.web.infinispan.SessionAttributeStorage;
-import org.jboss.as.clustering.web.infinispan.WebSessionCacheConfigurationService;
 
 public class DistributedCacheConvergedSipManagerFactory extends org.jboss.as.clustering.web.infinispan.DistributedCacheManagerFactory {
 
-	private static final ServiceName JVM_ROUTE_REGISTRY_SERVICE_NAME = DistributedCacheManagerFactoryService.JVM_ROUTE_REGISTRY_ENTRY_PROVIDER_SERVICE_NAME.getParent();
+	private static final ServiceName JVM_ROUTE_REGISTRY_SERVICE_NAME = DistributedConvergedCacheManagerFactoryService.JVM_ROUTE_REGISTRY_ENTRY_PROVIDER_SERVICE_NAME.getParent();
 
 	private SessionAttributeStorageFactory storageFactory = new SessionAttributeStorageFactoryImpl();//todo? atallni ConvergedSessionAttributeMarshallerFactory-ra?
 	private CacheInvoker invoker = new RetryingCacheInvoker(new BatchCacheInvoker(), 10, 100);

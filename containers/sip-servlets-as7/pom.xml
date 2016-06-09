@@ -63,6 +63,14 @@
 			<artifactId>sip-servlets-core-api</artifactId>
 			<version>3.0.0-SNAPSHOT</version>			
 		</dependency>
+		
+		<dependency>
+			<groupId>org.mobicents.servlet.sip.containers</groupId>
+			<artifactId>jboss-as7-restcomm</artifactId>
+			<version>3.0.0-SNAPSHOT</version>			
+		</dependency>
+		
+		
 		<dependency>
 			<groupId>javax.sip</groupId>
 			<artifactId>jain-sip-api</artifactId>
@@ -83,6 +91,7 @@
 			<version>${log4j.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		
 		
 <!-- mobicents sip stack extensions deps -->
 		<dependency>			

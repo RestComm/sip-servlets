@@ -30,6 +30,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledFuture;
@@ -59,6 +60,8 @@ import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.InstanceManager;
+import org.jboss.as.clustering.web.BatchingManager;
+import org.jboss.as.clustering.web.OutgoingDistributableSessionData;
 import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.catalina.CatalinaSipContext;
@@ -102,6 +105,13 @@ import org.mobicents.servlet.sip.listener.SipConnectorListener;
 import org.mobicents.servlet.sip.message.SipFactoryFacade;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.ruby.SipRubyController;
+
+import org.jboss.as.clustering.web.sip.DistributedCacheConvergedSipManager;
+import org.jboss.as.web.session.sip.ClusteredSipSessionManager;
+import org.jboss.as.web.session.sip.ConvergedSessionReplicationContext;
+import org.jboss.as.web.session.sip.SnapshotSipManager;
+import org.jboss.as.web.session.sip.ClusteredSipSession;
+import org.jboss.as.web.session.sip.ClusteredSipApplicationSession;
 
 /**
  * Sip implementation of the <b>Context</b> interface extending the standard
@@ -238,14 +248,17 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 				sipFactoryFacade);
 		if(timerService == null) {
 // FIXME: distributable not supported
-//			if(getDistributable() && hasDistributableManager) {
-//				if(logger.isInfoEnabled()) {
-//					logger.info("Using the Fault Tolerant Timer Service to schedule fault tolerant timers in a distributed environment");
-//				}
-//				timerService = new FaultTolerantTimerServiceImpl((DistributableSipManager)getSipManager());
-//			} else {
-//				timerService = new TimerServiceImpl();
-//			}
+			if(getDistributable() && hasDistributableManager) {
+				if(logger.isInfoEnabled()) {
+					logger.info("Using the Fault Tolerant Timer Service to schedule fault tolerant timers in a distributed environment");
+				}
+				// TODO: ez a sor timer-es cucc: timerService = new FaultTolerantTimerServiceImpl((DistributableSipManager)getSipManager());
+			} else {
+				// TODO: ez a sor timer-es cucc: timerService = new TimerServiceImpl();
+			}
+// FIXME - VEGE: distributable not supported
+			
+			
 			timerService = new TimerServiceImpl(sipApplicationDispatcher.getSipService(), applicationName);
 		}
 		if(proxyTimerService == null) {
@@ -259,14 +272,10 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
             }
 		}
 		if(sasTimerService == null || !sasTimerService.isStarted()) {
-// FIXME: distributable not supported
-//distributable			if(getDistributable() && hasDistributableManager) {
-//				sasTimerService = new FaultTolerantSasTimerService((DistributableSipManager)getSipManager(), 4);
-//			} else {
-//				sasTimerService = new StandardSipApplicationSessionTimerService();
-//			}
 			String sasTimerServiceType = sipApplicationDispatcher.getSipService().getSasTimerServiceImplementationType();
-			if(sasTimerServiceType != null && sasTimerServiceType.equalsIgnoreCase("Standard")) {
+			if(getDistributable() && hasDistributableManager) {
+				// TODO: ez a sor timer-es cucc: sasTimerService = new FaultTolerantSasTimerService((DistributableSipManager)getSipManager(), 4);
+			} else if (sasTimerServiceType != null && sasTimerServiceType.equalsIgnoreCase("Standard")) {
                 sasTimerService = new StandardSipApplicationSessionTimerService(applicationName);
             } else if (sasTimerServiceType != null && sasTimerServiceType.equalsIgnoreCase("Default")) {
                 sasTimerService = new DefaultSipApplicationSessionTimerService(applicationName);
@@ -1169,15 +1178,16 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
     public boolean enterSipAppHa(boolean startCacheActivity) {
     	boolean batchStarted = false;
 // FIXME: distributable not supported
-//		if(getDistributable() && hasDistributableManager) {
-//			batchStarted = startBatchTransaction();
-////			if(bindSessions) {
-////				ConvergedSessionReplicationContext.enterSipappAndBindSessions(sipApplicationSession,
-////				getSipManager(), startCacheActivity);
-////			} else {
-//				ConvergedSessionReplicationContext.enterSipapp(null, null, startCacheActivity);
-////			}
-//		}
+		if(getDistributable() && hasDistributableManager) {
+			batchStarted = startBatchTransaction();
+//			if(bindSessions) {
+//				ConvergedSessionReplicationContext.enterSipappAndBindSessions(sipApplicationSession,
+//				getSipManager(), startCacheActivity);
+//			} else {
+				ConvergedSessionReplicationContext.enterSipapp(null, null, startCacheActivity);
+//			}
+		}
+// FIXME - VEGE: distributable not supported
 		return batchStarted;
 	}
 	
@@ -1187,87 +1197,90 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
      */
 	public void exitSipAppHa(MobicentsSipServletRequest request, MobicentsSipServletResponse response, boolean batchStarted) {	
 // FIXME: distributable not supported
-//		if (getDistributable() && hasDistributableManager) {
-//			if(logger.isInfoEnabled()) {
-//				if(request != null) {
-//					logger.info("We are now after the servlet invocation for request " + request + ", We replicate no matter what " );
-//				} else if (response != null) {
-//					logger.info("We are now after the servlet invocation for request " + response + ", We replicate no matter what " );
-//				} else {
-//					logger.info("We are now after the servlet invocation, We replicate no matter what " );
-//				}
-//			}
-//			try {
-//				ConvergedSessionReplicationContext ctx = ConvergedSessionReplicationContext
-//						.exitSipapp();
-//
-//				final SnapshotSipManager snapshotSipManager = ctx.getSoleSnapshotSipManager();
-//				if(logger.isDebugEnabled()) {
-//					logger.debug("Snapshot Manager " + snapshotSipManager);
-//				}
-//				if (snapshotSipManager != null) {
-//					Set<ClusteredSipSession<? extends OutgoingDistributableSessionData>> sipSessions = ctx.getSipSessions();
-//					for (ClusteredSipSession<? extends OutgoingDistributableSessionData> clusteredSipSession : sipSessions) {
-//						snapshotSipManager.snapshot(clusteredSipSession);
-//					}
-//					Set<ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>> sipApplicationSessions = ctx.getSipApplicationSessions();
-//					for (ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> clusteredSipApplicationSession : sipApplicationSessions) {
-//						snapshotSipManager.snapshot(clusteredSipApplicationSession);
-//					}
-//				} 
-//			} catch (Throwable e) {
-//				logger.error("A problem occured while replicating", e);
-//				// no need to rethrow an exception here as this is not recoverable and this could mess up the concurrency release of the semaphore on the session
-//			} finally {
-//				endBatchTransaction(batchStarted);
-//				if(logger.isDebugEnabled()) {
-//					if(request != null) {
-//						logger.debug("We are now after the replication finishCacheActivity for request " + request + ", We replicate no matter what " );
-//					} else if (response != null) {
-//						logger.debug("We are now after the replication finishCacheActivity for request " + response + ", We replicate no matter what " );
-//					} else {
-//						logger.debug("We are now after the replication finishCacheActivity, We replicate no matter what " );
-//					}
-//				}
-//			}
-//		}
+		if (getDistributable() && hasDistributableManager) {
+			if(logger.isInfoEnabled()) {
+				if(request != null) {
+					logger.info("We are now after the servlet invocation for request " + request + ", We replicate no matter what " );
+				} else if (response != null) {
+					logger.info("We are now after the servlet invocation for request " + response + ", We replicate no matter what " );
+				} else {
+					logger.info("We are now after the servlet invocation, We replicate no matter what " );
+				}
+			}
+			try {
+				ConvergedSessionReplicationContext ctx = ConvergedSessionReplicationContext
+						.exitSipapp();
+
+				final SnapshotSipManager snapshotSipManager = ctx.getSoleSnapshotSipManager();
+				if(logger.isDebugEnabled()) {
+					logger.debug("Snapshot Manager " + snapshotSipManager);
+				}
+				if (snapshotSipManager != null) {
+					Set<ClusteredSipSession<? extends OutgoingDistributableSessionData>> sipSessions = ctx.getSipSessions();
+					for (ClusteredSipSession<? extends OutgoingDistributableSessionData> clusteredSipSession : sipSessions) {
+						snapshotSipManager.snapshot(clusteredSipSession);
+					}
+					Set<ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>> sipApplicationSessions = ctx.getSipApplicationSessions();
+					for (ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> clusteredSipApplicationSession : sipApplicationSessions) {
+						snapshotSipManager.snapshot(clusteredSipApplicationSession);
+					}
+				} 
+			} catch (Throwable e) {
+				logger.error("A problem occured while replicating", e);
+				// no need to rethrow an exception here as this is not recoverable and this could mess up the concurrency release of the semaphore on the session
+			} finally {
+				endBatchTransaction(batchStarted);
+				if(logger.isDebugEnabled()) {
+					if(request != null) {
+						logger.debug("We are now after the replication finishCacheActivity for request " + request + ", We replicate no matter what " );
+					} else if (response != null) {
+						logger.debug("We are now after the replication finishCacheActivity for request " + response + ", We replicate no matter what " );
+					} else {
+						logger.debug("We are now after the replication finishCacheActivity, We replicate no matter what " );
+					}
+				}
+			}
+		}
+// FIXME - VEGE: distributable not supported
 	}
 	
 // FIXME: distributable not supported
-//	private boolean startBatchTransaction() {
-//		DistributedCacheConvergedSipManager distributedConvergedManager = ((ClusteredSipManager) manager)
-//				.getDistributedCacheConvergedSipManager();
-//		BatchingManager tm = distributedConvergedManager.getBatchingManager();
-//		boolean started = false;
-//		try {
-//			if (tm != null && tm.isBatchInProgress() == false) {
-//				tm.startBatch();
-//				started = true;
-//			}
-//		} catch (RuntimeException re) {
-//			throw re;
-//		} catch (Exception e) {
-//			throw new IllegalStateException(
-//					"Failed to initiate batch replication transaction", e);
-//		}
-//
-//		return started;
-//	}
+	private boolean startBatchTransaction() {
+		DistributedCacheConvergedSipManager distributedConvergedManager = ((ClusteredSipSessionManager) manager)
+				.getDistributedCacheConvergedSipManager();
+		BatchingManager tm = distributedConvergedManager.getBatchingManager();
+		boolean started = false;
+		try {
+			if (tm != null && tm.isBatchInProgress() == false) {
+				tm.startBatch();
+				started = true;
+			}
+		} catch (RuntimeException re) {
+			throw re;
+		} catch (Exception e) {
+			throw new IllegalStateException(
+					"Failed to initiate batch replication transaction", e);
+		}
+
+		return started;
+	}
+// FIXME - VEGE: distributable not supported
 	
 // FIXME: distributable not supported
-//	private void endBatchTransaction(boolean wasStarted) {
-//		DistributedCacheConvergedSipManager<? extends OutgoingDistributableSessionData> distributedConvergedManager = ((ClusteredSipManager) manager)
-//				.getDistributedCacheConvergedSipManager();
-//		BatchingManager tm = distributedConvergedManager.getBatchingManager();
-//		try {
-//			if (tm != null && tm.isBatchInProgress() == true && wasStarted) {
-//				tm.endBatch();
-//			}
-//		} catch (Exception e) {
-//			logger.error("Failed to stop batch replication transaction", e);
-//			// no need to rethrow an exception here as this is not recoverable and this could mess up the concurrency release of the semaphore on the session
-//		}
-//	}
+	private void endBatchTransaction(boolean wasStarted) {
+		DistributedCacheConvergedSipManager<? extends OutgoingDistributableSessionData> distributedConvergedManager = ((ClusteredSipSessionManager) manager)
+				.getDistributedCacheConvergedSipManager();
+		BatchingManager tm = distributedConvergedManager.getBatchingManager();
+		try {
+			if (tm != null && tm.isBatchInProgress() == true && wasStarted) {
+				tm.endBatch();
+			}
+		} catch (Exception e) {
+			logger.error("Failed to stop batch replication transaction", e);
+			// no need to rethrow an exception here as this is not recoverable and this could mess up the concurrency release of the semaphore on the session
+		}
+	}
+// FIXME - VEGE: distributable not supported
 	
 	public boolean notifySipContextListeners(SipContextEvent event) {
 		boolean ok = true;

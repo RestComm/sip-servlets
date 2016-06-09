@@ -27,6 +27,7 @@ import java.util.List;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.jboss.metadata.javaee.spec.EmptyMetaData;
 import org.jboss.metadata.javaee.spec.MessageDestinationsMetaData;
 import org.jboss.metadata.javaee.spec.ParamValueMetaData;
 import org.jboss.metadata.javaee.spec.SecurityRolesMetaData;
@@ -65,11 +66,11 @@ public class SipCommonMetaDataParser extends MetaDataElementParser {
             //case DESCRIPTION:
             //    break;
             case DISTRIBUTABLE:
-                // TODO
-                throw unexpectedElement(reader);
-                // smd.setDistributable(new EmptyMetaData());
-                // requireNoContent(reader);
-                // break;
+                // TODO: itt mit kene csinalni? eleg csak annyi ami most itt van? 
+                //throw unexpectedElement(reader);
+                smd.setDistributable(new EmptyMetaData());
+                requireNoContent(reader);
+                break;
             case CONTEXT_PARAM:
                 List<ParamValueMetaData> contextParams = smd.getContextParams();
                 if (contextParams == null) {

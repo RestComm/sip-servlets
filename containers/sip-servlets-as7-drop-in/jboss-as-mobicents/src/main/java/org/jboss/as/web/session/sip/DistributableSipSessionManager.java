@@ -1297,11 +1297,6 @@ ClusteredSipSessionManager<O>, LocalDistributableConvergedSessionManager, Distri
 	/**
 	 * {@inheritDoc}
 	 */
-
-	// TODO: innen folytatni: ez a metodus a jboss7-ben ugy tűnik azért megváltozott, és abból kellene kiindulni, és abba beletenni a módosítást, amit a JBoss-5nél emgcsinált a mobicnets
-	// a jboss-7esben ez a metodus az ennek megfelelő: processExpirationPassivation
-	// látszik is benne h cast-olják a session objektumot!! (amire most épp hibát dob itt alul az eclipse)
-
 	protected void processHttpSessionExpirationPassivation()
 	{      
 		boolean expire = maxInactiveInterval >= 0;

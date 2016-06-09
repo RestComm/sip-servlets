@@ -26,6 +26,7 @@ import java.util.List;
 import javax.management.MBeanServer;
 
 import org.jboss.as.clustering.web.DistributedCacheManagerFactory;
+import org.jboss.as.clustering.web.sip.DistributedConvergedCacheManagerFactoryService;
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
@@ -45,7 +46,6 @@ import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
 import org.jboss.msc.value.InjectedValue;
-import org.mobicents.as7.clustering.sip.MockDistributedCacheManagerFactoryService;
 import org.mobicents.as7.deployment.AttachSipServerServiceProcessor;
 import org.mobicents.as7.deployment.SipAnnotationDeploymentProcessor;
 import org.mobicents.as7.deployment.SipComponentProcessor;
@@ -302,10 +302,11 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         }, OperationContext.Stage.RUNTIME);
 
         final ServiceTarget target = context.getServiceTarget();
-        final DistributedCacheManagerFactory factory = new MockDistributedCacheManagerFactoryService().getValue();
+        //final DistributedCacheManagerFactory factory = new MockDistributedCacheManagerFactoryService().getValue();
+        final DistributedCacheManagerFactory factory = new DistributedConvergedCacheManagerFactoryService().getValue();
         if (factory != null) {
             final InjectedValue<SipServer> server = new InjectedValue<SipServer>();
-            newControllers.add(target.addService(MockDistributedCacheManagerFactoryService.JVM_ROUTE_REGISTRY_ENTRY_PROVIDER_SERVICE_NAME, new JvmRouteRegistryEntryProviderService(server))
+            newControllers.add(target.addService(DistributedConvergedCacheManagerFactoryService.JVM_ROUTE_REGISTRY_ENTRY_PROVIDER_SERVICE_NAME, new JvmRouteRegistryEntryProviderService(server))
                     .addDependency(SipSubsystemServices.JBOSS_SIP, SipServer.class, server)
                     .setInitialMode(Mode.ON_DEMAND)
                     .install());
