@@ -129,7 +129,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 				logger.debug("Removing the Sip Application Dispatcher as a sip listener for listening point " + extendedListeningPoint);
 			}
 			extendedListeningPoint.getSipProvider().removeSipListener(sipApplicationDispatcher);
-			sipApplicationDispatcher.getSipNetworkInterfaceManager().removeExtendedListeningPoint(extendedListeningPoint, null);
+			sipApplicationDispatcher.getSipNetworkInterfaceManager().removeExtendedListeningPoint(extendedListeningPoint);
 		}
 		// removing listening point and sip provider
 		if(sipStack != null) {
