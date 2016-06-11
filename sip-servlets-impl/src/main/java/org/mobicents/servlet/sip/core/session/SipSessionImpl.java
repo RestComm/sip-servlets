@@ -804,14 +804,14 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
 	public Address getLocalParty() {
 		if(sessionCreatingDialog != null) {
-			return new AddressImpl(sessionCreatingDialog.getLocalParty(), null, ModifiableRule.NotModifiable, this);
+			return new AddressImpl(sessionCreatingDialog.getLocalParty(), null, ModifiableRule.NotModifiable, null);
 		} else if (sessionCreatingTransactionRequest != null){
 			if(isSessionCreatingTransactionServer) {
 				ToHeader toHeader = (ToHeader) sessionCreatingTransactionRequest.getMessage().getHeader(ToHeader.NAME);
-				return new AddressImpl(toHeader.getAddress(), AddressImpl.getParameters((Parameters)toHeader),  ModifiableRule.NotModifiable, this);
+				return new AddressImpl(toHeader.getAddress(), AddressImpl.getParameters((Parameters)toHeader),  ModifiableRule.NotModifiable, null);
 			} else {
 				FromHeader fromHeader = (FromHeader)sessionCreatingTransactionRequest.getMessage().getHeader(FromHeader.NAME);
-				return new AddressImpl(fromHeader.getAddress(), AddressImpl.getParameters((Parameters)fromHeader),  ModifiableRule.NotModifiable, this);
+				return new AddressImpl(fromHeader.getAddress(), AddressImpl.getParameters((Parameters)fromHeader),  ModifiableRule.NotModifiable, null);
 			}			
 		} else {
 			return localParty;
@@ -2081,7 +2081,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		if(networkInterface == null) throw new IllegalArgumentException("Network interface for " +
 				address + " not found");		
 		try {
-			outboundInterface = new SipURIImpl(SipFactoryImpl.addressFactory.createSipURI(null, address), ModifiableRule.NotModifiable, this).toString();
+			outboundInterface = new SipURIImpl(SipFactoryImpl.addressFactory.createSipURI(null, address), ModifiableRule.NotModifiable, null).toString();
 		} catch (ParseException e) {
 			logger.error("couldn't parse the SipURI from USER[" + null
 					+ "] HOST[" + address + "]", e);
@@ -2113,7 +2113,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		if(networkInterface == null) throw new IllegalArgumentException("Network interface for " +
 				address + " not found");
 		try {
-			outboundInterface = new SipURIImpl(SipFactoryImpl.addressFactory.createSipURI(null, address), ModifiableRule.NotModifiable, this).toString();
+			outboundInterface = new SipURIImpl(SipFactoryImpl.addressFactory.createSipURI(null, address), ModifiableRule.NotModifiable, null).toString();
 		} catch (ParseException e) {
 			logger.error("couldn't parse the SipURI from USER[" + null
 					+ "] HOST[" + address + "]", e);

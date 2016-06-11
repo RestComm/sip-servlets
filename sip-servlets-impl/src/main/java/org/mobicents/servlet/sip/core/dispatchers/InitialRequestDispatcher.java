@@ -343,7 +343,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 				URI subscriberUri = SipFactoryImpl.addressFactory.createAddress(applicationRouterInfo.getSubscriberURI()).getURI();
 				javax.servlet.sip.URI jainSipSubscriberUri = null; 
 				if(subscriberUri instanceof javax.sip.address.SipURI) {
-					jainSipSubscriberUri= new SipURIImpl((javax.sip.address.SipURI)subscriberUri, ModifiableRule.NotModifiable, sipServletRequest.getSession());
+					jainSipSubscriberUri= new SipURIImpl((javax.sip.address.SipURI)subscriberUri, ModifiableRule.NotModifiable, null);
 				} else if (subscriberUri instanceof javax.sip.address.TelURL) {
 					jainSipSubscriberUri = new TelURLImpl((javax.sip.address.TelURL)subscriberUri, sipServletRequest.getSession());
 				} else {

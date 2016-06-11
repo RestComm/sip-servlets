@@ -97,7 +97,7 @@ public class MobicentsDNSResolver implements DNSResolver {
          * @see org.mobicents.javax.servlet.sip.dns.DNSResolver#locateURIs(javax.servlet.sip.URI)
          */        
         @Override
-        public List<SipURI> locateURIs(SipURI uri, SipSession sipSession) {
+        public List<SipURI> locateURIs(SipURI uri) {
             List<SipURI> uris = new CopyOnWriteArrayList();
             if (uri instanceof SipURIImpl && createAddressFactory != null) {
                 SipURIImpl uriImpl = (SipURIImpl) uri;
@@ -111,7 +111,7 @@ public class MobicentsDNSResolver implements DNSResolver {
                             createSipURI = createAddressFactory.createSipURI(null, hop.getHost());
                             createSipURI.setPort(hop.getPort());
                             createSipURI.setTransportParam(hop.getTransport());
-                            SipURI sipURI = new SipURIImpl(createSipURI, ModifiableRule.NotModifiable, sipSession);
+                            SipURI sipURI = new SipURIImpl(createSipURI, ModifiableRule.NotModifiable, null);
                             uris.add(sipURI);
                         } catch (ParseException ex) {
                             logger.debug("Error creating SipURI.", ex);

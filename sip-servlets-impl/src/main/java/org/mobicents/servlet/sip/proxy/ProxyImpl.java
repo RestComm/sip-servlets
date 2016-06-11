@@ -404,7 +404,7 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 		if(!this.recordRoutingEnabled) throw new IllegalStateException("You must setRecordRoute(true) before getting URI");
 		if(recordRouteURI == null && recordRouteURIString != null) {
 			try {
-				recordRouteURI = new SipURIImpl(((SipURIImpl)sipFactoryImpl.createURI(recordRouteURIString, originalRequest.getSession())).getSipURI(), ModifiableRule.ProxyRecordRouteNotModifiable, originalRequest.getSession());
+				recordRouteURI = new SipURIImpl(((SipURIImpl)sipFactoryImpl.createURI(recordRouteURIString, originalRequest.getSession())).getSipURI(), ModifiableRule.ProxyRecordRouteNotModifiable, null);
 				recordRouteURIString = null;
 			} catch (ServletParseException e) {
 				logger.error("A problem occured while setting the target URI while proxying a request " + recordRouteURIString, e);
@@ -668,7 +668,7 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 				URI contactURI = null;
 				if (addressURI instanceof javax.sip.address.SipURI) {
 					contactURI = new SipURIImpl(
-							(javax.sip.address.SipURI) addressURI, ModifiableRule.NotModifiable, response.getSession());
+							(javax.sip.address.SipURI) addressURI, ModifiableRule.NotModifiable, null);
 				} else if (addressURI instanceof javax.sip.address.TelURL) {
 					contactURI = new TelURLImpl(
 							(javax.sip.address.TelURL) addressURI,response.getSession());

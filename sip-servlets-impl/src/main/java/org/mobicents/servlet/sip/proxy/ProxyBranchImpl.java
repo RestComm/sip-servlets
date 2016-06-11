@@ -1114,7 +1114,7 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 			throw new IllegalStateException("Cannot set a record route on an already started proxy");
 		}
 		if(this.pathURI == null) {
-			this.pathURI = new SipURIImpl (JainSipUtils.createRecordRouteURI( proxy.getSipFactoryImpl().getSipNetworkInterfaceManager(), null), ModifiableRule.NotModifiable, originalRequest.getSession());
+			this.pathURI = new SipURIImpl (JainSipUtils.createRecordRouteURI( proxy.getSipFactoryImpl().getSipNetworkInterfaceManager(), null), ModifiableRule.NotModifiable, null);
 		}		
 		this.isAddToPath = isAddToPath;
 	}

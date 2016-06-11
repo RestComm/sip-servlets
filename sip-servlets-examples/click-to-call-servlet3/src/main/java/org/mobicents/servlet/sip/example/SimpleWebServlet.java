@@ -76,20 +76,26 @@ public class SimpleWebServlet extends HttpServlet
         String fromAddr = request.getParameter("from");
         String bye = request.getParameter("bye");
 
-        URI to = toAddr==null? null : sipFactory.createAddress(toAddr, null).getURI();
-        URI from = fromAddr==null? null : sipFactory.createAddress(fromAddr, null).getURI();    
-
         CallStatusContainer calls = (CallStatusContainer) getServletContext().getAttribute("activeCalls");
 
         // Create app session and request
         SipApplicationSession appSession = 
         	((ConvergedHttpSession)request.getSession()).getApplicationSession();
-
+        
+        Iterator it = (Iterator) appSession.getSessions("sip");
+        SipSession session = null;
+        if (it.hasNext()){
+        	session = (SipSession) it.next();
+        }
+        
+        URI to = toAddr==null? null : sipFactory.createAddress(toAddr, session).getURI();
+        URI from = fromAddr==null? null : sipFactory.createAddress(fromAddr, session).getURI();
+        
         if(bye != null) {
         	if(bye.equals("all")) {
-        		Iterator it = (Iterator) appSession.getSessions("sip");
+        		it = (Iterator) appSession.getSessions("sip");
         		while(it.hasNext()) {
-        			SipSession session = (SipSession) it.next();
+        			session = (SipSession) it.next();
         			Call call = (Call) session.getAttribute("call");
         			if (call != null) call.end();
         			calls.removeCall(call);

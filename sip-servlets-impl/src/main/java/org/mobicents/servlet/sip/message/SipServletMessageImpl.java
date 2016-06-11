@@ -471,9 +471,9 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			if (first instanceof HeaderAddress) {
 				try {
 					if(this.isCommitted()) {
-						return new AddressImpl((HeaderAddress) first, ModifiableRule.NotModifiable, getSession());
+						return new AddressImpl((HeaderAddress) first, ModifiableRule.NotModifiable, null);
 					} else {
-						return new AddressImpl((HeaderAddress) first, getModifiableRule(hName), getSession());
+						return new AddressImpl((HeaderAddress) first, getModifiableRule(hName), null);
 					}
 				} catch (ParseException e) {
 					throw new ServletParseException("Bad address " + first);
@@ -483,7 +483,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 				try {
 					logger.debug("parametrable Value " + parametrable.getValue());					
 					if(this.isCommitted()) {
-						return new AddressImpl(SipFactoryImpl.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), ModifiableRule.NotModifiable, getSession());
+						return new AddressImpl(SipFactoryImpl.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), ModifiableRule.NotModifiable, null);
 					} else {
 						return new AddressImpl(SipFactoryImpl.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), getModifiableRule(hName), getSession());
 					}

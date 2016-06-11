@@ -76,7 +76,7 @@ public interface DNSResolver {
 	 * @param uri the uri for which the DNS lookups have to be done
 	 * @return a List of SipURI that have to be tried each one in turn.
 	 */
-	List<SipURI> locateURIs(SipURI uri, SipSession sipSession);        
+	List<SipURI> locateURIs(SipURI uri);        
         
         
 	
