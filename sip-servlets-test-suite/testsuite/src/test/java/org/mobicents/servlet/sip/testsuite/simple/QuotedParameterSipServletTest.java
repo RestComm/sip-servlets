@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import javax.servlet.sip.Address;
+import javax.servlet.sip.ServletParseException;
 import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
@@ -48,7 +50,7 @@ import javax.sip.header.UserAgentHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
-
+import javax.servlet.sip.SipServletRequest;
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.log4j.Logger;
 import org.junit.After;
@@ -177,7 +179,7 @@ public class QuotedParameterSipServletTest extends SipServletTestCase {
 	}
 	
 	
-    public void testQuotedAddressParam() throws Exception {
+    public void testQuotedFromHeaderParam() throws Exception {
     	receiverProtocolObjects =new ProtocolObjects(
 				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 					
@@ -194,7 +196,79 @@ public class QuotedParameterSipServletTest extends SipServletTestCase {
         Thread.sleep(TIMEOUT);
         assertTrue(receiver.getByeReceived());
         // qparam1 and qparam3 are being defined in sip.xml as the parameters which its value need to be quoted.
-        assertTrue(((MessageExt)receiver.getInviteRequest()).getFromHeader().toString().contains("param0=value0;qparam1=\"value1\";param2=value2;qparam3=\"value3\""));
+        assertTrue(((MessageExt)receiver.getInviteRequest()).getFromHeader().toString().contains("param0=value0;"));
+        assertTrue(((MessageExt)receiver.getInviteRequest()).getFromHeader().toString().contains(";qparam1=\"value1\";"));
+        assertTrue(((MessageExt)receiver.getInviteRequest()).getFromHeader().toString().contains(";param2=value2;"));
+        assertTrue(((MessageExt)receiver.getInviteRequest()).getFromHeader().toString().contains(";qparam3=\"value3\""));
+    }
+    
+    public void testQuotedToHeaderParam() throws Exception {
+    	receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider receiverProvider = receiver.createProvider();			
+		receiverProvider.addSipListener(receiver);
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();
+		Map<String, String> params = new HashMap<String, String>();
+		String userName = "sip:+34666666666@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080;pres-list=mylist";
+		params.put("username", userName);
+		params.put("testToHeader", "true");
+        deployApplication(params);
+        Thread.sleep(TIMEOUT);
+        assertTrue(receiver.getByeReceived());
+        // qparam1 and qparam3 are being defined in sip.xml as the parameters which its value need to be quoted.
+        assertTrue(((MessageExt)receiver.getInviteRequest()).getToHeader().toString().contains("param0=value0;"));
+        assertTrue(((MessageExt)receiver.getInviteRequest()).getToHeader().toString().contains(";qparam1=\"value1\";"));
+        assertTrue(((MessageExt)receiver.getInviteRequest()).getToHeader().toString().contains(";param2=value2;"));
+        assertTrue(((MessageExt)receiver.getInviteRequest()).getToHeader().toString().contains(";qparam3=\"value3\""));
+    }
+    
+    public void testQuotedContactHeaderParam() throws Exception {
+    	receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider receiverProvider = receiver.createProvider();			
+		receiverProvider.addSipListener(receiver);
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();
+		Map<String, String> params = new HashMap<String, String>();
+		String userName = "sip:+34666666666@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080;pres-list=mylist";
+		params.put("username", userName);
+		params.put("testContactHeader", "true");
+        deployApplication(params);
+        Thread.sleep(TIMEOUT);
+        assertTrue(receiver.getByeReceived());
+        // qparam1 and qparam3 are being defined in sip.xml as the parameters which its value need to be quoted.
+        assertTrue(((MessageExt)receiver.getInviteRequest()).getHeader("Contact").toString().contains("param0=value0;"));
+        assertTrue(((MessageExt)receiver.getInviteRequest()).getHeader("Contact").toString().contains(";qparam1=\"value1\";"));
+        assertTrue(((MessageExt)receiver.getInviteRequest()).getHeader("Contact").toString().contains(";param2=value2;"));
+        assertTrue(((MessageExt)receiver.getInviteRequest()).getHeader("Contact").toString().contains(";qparam3=\"value3\""));
+    }
+    
+    public void testQuotedViaHeaderParam() throws Exception {
+    	receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider receiverProvider = receiver.createProvider();			
+		receiverProvider.addSipListener(receiver);
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();
+		Map<String, String> params = new HashMap<String, String>();
+		String userName = "sip:+34666666666@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080;pres-list=mylist";
+		params.put("username", userName);
+		params.put("testViaHeader", "true");
+        deployApplication(params);
+        Thread.sleep(TIMEOUT);
+        assertTrue(receiver.getByeReceived());
+        // qparam1 and qparam3 are being defined in sip.xml as the parameters which its value need to be quoted.
+        assertTrue(((MessageExt)receiver.getInviteRequest()).getTopmostViaHeader().toString().contains("param0=value0;"));
+        assertTrue(((MessageExt)receiver.getInviteRequest()).getTopmostViaHeader().toString().contains(";qparam1=\"value1\";"));
+        assertTrue(((MessageExt)receiver.getInviteRequest()).getTopmostViaHeader().toString().contains(";param2=value2;"));
+        assertTrue(((MessageExt)receiver.getInviteRequest()).getTopmostViaHeader().toString().contains(";qparam3=\"value3\""));
     }
 
 	@Override

@@ -473,7 +473,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 					if(this.isCommitted()) {
 						return new AddressImpl((HeaderAddress) first, ModifiableRule.NotModifiable, null);
 					} else {
-						return new AddressImpl((HeaderAddress) first, getModifiableRule(hName), null);
+						return new AddressImpl((HeaderAddress) first, getModifiableRule(hName), sipSession);
 					}
 				} catch (ParseException e) {
 					throw new ServletParseException("Bad address " + first);

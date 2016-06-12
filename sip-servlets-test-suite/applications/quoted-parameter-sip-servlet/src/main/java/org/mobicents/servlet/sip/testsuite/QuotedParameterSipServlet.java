@@ -435,9 +435,13 @@ public class QuotedParameterSipServlet
 				if(prack != null) {
 					sipServletRequest.addHeader("Require", "100rel");
 				}
-				addr.setParameter("headerparam1", "headervalue1");
-				addr.setParameter("param5", "ffff");
-				addr.getURI().setParameter("uriparam", "urivalue");
+				if(ce.getServletContext().getInitParameter("testContactHeader") != null) {
+				    // https://code.google.com/p/sipservlets/issues/detail?id=245
+					addr.setParameter("param0", "value0");
+					addr.setParameter("qparam1", "value1");
+					addr.setParameter("param2", "value2");
+					addr.setParameter("qparam3", "value3");
+				}
 			}
 			String dontSetRURI = ce.getServletContext().getInitParameter("dontSetRURI");
 			if(dontSetRURI == null) {
@@ -536,6 +540,13 @@ public class QuotedParameterSipServlet
 				logger.error("couln't parse the Via Header ", e);
 			}
 			paramVia.setParameter("rport", "");
+			if(ce.getServletContext().getInitParameter("testViaHeader") != null) {
+			    // https://code.google.com/p/sipservlets/issues/detail?id=245
+				paramVia.setParameter("param0", "value0");
+				paramVia.setParameter("qparam1", "value1");
+				paramVia.setParameter("param2", "value2");
+				paramVia.setParameter("qparam3", "value3");
+			}
 			boolean gotException = false;
 			try {
 				paramVia.setParameter("branch", "");
@@ -565,6 +576,16 @@ public class QuotedParameterSipServlet
 				sipServletRequest.getFrom().setParameter("param2", "value2");
 				sipServletRequest.getFrom().setParameter("qparam3", "value3");
 			}
+			
+			if(ce.getServletContext().getInitParameter("testToHeader") != null) {
+			    // https://code.google.com/p/sipservlets/issues/detail?id=245
+				sipServletRequest.getTo().setParameter("param0", "value0");
+				sipServletRequest.getTo().setParameter("qparam1", "value1");
+				sipServletRequest.getTo().setParameter("param2", "value2");
+				sipServletRequest.getTo().setParameter("qparam3", "value3");
+			}
+			
+			
 			
 			try {			
 				sipServletRequest.send();
