@@ -88,6 +88,7 @@ import org.mobicents.servlet.sip.testsuite.session.SessionHandlerSipServletTest;
 import org.mobicents.servlet.sip.testsuite.session.SessionStateUACSipServletTest;
 import org.mobicents.servlet.sip.testsuite.session.SessionStateUASSipServletTest;
 import org.mobicents.servlet.sip.testsuite.session.SipAppSessionTerminationTest;
+import org.mobicents.servlet.sip.testsuite.simple.QuotedParameterSipServletTest;
 import org.mobicents.servlet.sip.testsuite.simple.ShootistSipServletTest;
 import org.mobicents.servlet.sip.testsuite.simple.ShootistTelURLSipServletTest;
 import org.mobicents.servlet.sip.testsuite.simple.ShootmeSipServletTest;
@@ -193,7 +194,7 @@ public class AllTests {
 		suite.addTestSuite(SipURITest.class);
 		suite.addTestSuite(AddressTest.class);
 		suite.addTestSuite(TelURLTest.class);
-
+		suite.addTestSuite(QuotedParameterSipServletTest.class);
 		// $JUnit-END$
 		return suite;
 	}
