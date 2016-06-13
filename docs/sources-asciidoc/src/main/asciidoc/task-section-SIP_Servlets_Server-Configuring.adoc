@@ -446,3 +446,11 @@ To use LOG4J in JAIN SIP Stack in JBoss, you need to define a logger in [path]_J
 ====
 
 For this category to be used in Restcomm SIP Servlets, you need to specify it in [path]_JBOSS_HOME/standalone/configuration/mss-sip-stack.properties_ or [path]_CATALINE_HOME/conf/mss-sip-stack.properties_, add the `gov.nist.javax.sip.LOG4J_LOGGER_NAME=gov.nist` property, and set the `gov.nist.javax.sip.TRACE_LEVEL=LOG4J` property.
+
+====
+**NOTE**  
+When using ``loadbalanceraddress`` algorithm for LB it is necessary to add the following at ``mss-sip-stack.properties`` file for the keepalive mechanism:
+
+----
+org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingServiceClassName=org.mobicents.ha.javax.sip.MultiNetworkLoadBalancerHeartBeatingServiceImpl
+----
