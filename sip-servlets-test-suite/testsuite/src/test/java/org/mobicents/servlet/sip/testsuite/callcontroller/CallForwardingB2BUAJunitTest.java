@@ -684,7 +684,7 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 		sipStackProperties.setProperty(SipStandardService.SERVER_LOG_STACK_PROP,
 				tomcatBasePath + "/" + "mss-jsip-" + getName() +"-messages.xml");
 		sipStackProperties.setProperty("javax.sip.STACK_NAME", "mss-" + getName());
-		sipStackProperties.setProperty(SipStandardService.AUTOMATIC_DIALOG_SUPPORT_STACK_PROP, "off");		
+		sipStackProperties.setProperty("javax.sip.AUTOMATIC_DIALOG_SUPPORT", "off");		
 		sipStackProperties.setProperty("gov.nist.javax.sip.DELIVER_UNSOLICITED_NOTIFY", "true");
 		sipStackProperties.setProperty("gov.nist.javax.sip.THREAD_POOL_SIZE", "64");
 		sipStackProperties.setProperty("gov.nist.javax.sip.REENTRANT_LISTENER", "true");
