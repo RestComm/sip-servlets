@@ -127,11 +127,11 @@ public class SessionStateUACSipServlet
 			sendMessage(sipFactory, "This request must timeout", "sip:timeout@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":4794");
 		}else {
 			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
-			SipURI fromURI = sipFactory.createSipURI("BigGuy", "here.com");			
-			SipURI toURI = sipFactory.createSipURI("LittleGuy", "there.com");
+			SipURI fromURI = sipFactory.createSipURI("BigGuy", "here.com", null);			
+			SipURI toURI = sipFactory.createSipURI("LittleGuy", "there.com", null);
 			SipServletRequest sipServletRequest = 
 				sipFactory.createRequest(sipApplicationSession, "INVITE", fromURI, toURI);
-			SipURI requestURI = sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+			SipURI requestURI = sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080", null);
 			sipServletRequest.setRequestURI(requestURI);
 			sipServletRequest.setContentLength(SEND_1XX_4XX.length());
 			try {
@@ -156,7 +156,7 @@ public class SessionStateUACSipServlet
 					"MESSAGE", 
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
-			SipURI sipUri = sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+			SipURI sipUri = sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080", null);
 			sipServletRequest.setRequestURI(sipUri);
 			sipServletRequest.setContentLength(messageContent.length());
 			sipServletRequest.setContent(messageContent, CONTENT_TYPE);
@@ -176,7 +176,7 @@ public class SessionStateUACSipServlet
 					"MESSAGE", 
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
-			SipURI sipUri = (SipURI) sipFactory.createURI(addr);
+			SipURI sipUri = (SipURI) sipFactory.createURI(addr, null);
 			sipServletRequest.setRequestURI(sipUri);
 			sipServletRequest.setContentLength(messageContent.length());
 			sipServletRequest.setContent(messageContent, CONTENT_TYPE);

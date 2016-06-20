@@ -471,21 +471,21 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			if (first instanceof HeaderAddress) {
 				try {
 					if(this.isCommitted()) {
-						return new AddressImpl((HeaderAddress) first, ModifiableRule.NotModifiable);
+						return new AddressImpl((HeaderAddress) first, ModifiableRule.NotModifiable, null);
 					} else {
-						return new AddressImpl((HeaderAddress) first, getModifiableRule(hName));
+						return new AddressImpl((HeaderAddress) first, getModifiableRule(hName), sipSession);
 					}
 				} catch (ParseException e) {
 					throw new ServletParseException("Bad address " + first);
 				}
 			} else {
-				Parameterable parametrable = createParameterable(first, first.getName(), message instanceof Request);
+				Parameterable parametrable = createParameterable(first, first.getName(), message instanceof Request, getSession());
 				try {
 					logger.debug("parametrable Value " + parametrable.getValue());					
 					if(this.isCommitted()) {
-						return new AddressImpl(SipFactoryImpl.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), ModifiableRule.NotModifiable);
+						return new AddressImpl(SipFactoryImpl.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), ModifiableRule.NotModifiable, null);
 					} else {
-						return new AddressImpl(SipFactoryImpl.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), getModifiableRule(hName));
+						return new AddressImpl(SipFactoryImpl.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), getModifiableRule(hName), getSession());
 					}
 				} catch (ParseException e) {
 					throw new ServletParseException("Impossible to parse the following header " + name + " as an address.", e);
@@ -521,15 +521,15 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 				HeaderAddress aph = (HeaderAddress) header;
 				try {
 					AddressImpl addressImpl = new AddressImpl(
-							aph, getModifiableRule(hName));
+							aph, getModifiableRule(hName), getSession());
 					retval.add(addressImpl);
 				} catch (ParseException ex) {
 					throw new ServletParseException("Bad header", ex);
 				}
 			}  else {
-				Parameterable parametrable = createParameterable(header, header.getName(), message instanceof Request);
+				Parameterable parametrable = createParameterable(header, header.getName(), message instanceof Request, getSession());
 				try {
-					AddressImpl addressImpl = new AddressImpl(SipFactoryImpl.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), getModifiableRule(hName));
+					AddressImpl addressImpl = new AddressImpl(SipFactoryImpl.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), getModifiableRule(hName), getSession());
 					retval.add(addressImpl);
 				} catch (ParseException e) {
 					throw new ServletParseException("Impossible to parse the following header " + name + " as an address.", e);
@@ -831,7 +831,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 //		AddressImpl address = new AddressImpl(from.getAddress(), AddressImpl.getParameters((Parameters)from), ModifiableRule.From);
 		// https://code.google.com/p/sipservlets/issues/detail?id=245
         try {
-            return new AddressImpl(from, ModifiableRule.From);
+            return new AddressImpl(from, ModifiableRule.From, getSession());
         } catch (ParseException e) {
             throw new IllegalArgumentException("Couldn't parse From Header " + from, e);
         }
@@ -929,7 +929,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			return null;
 		}
 		
-		return createParameterable(h, getFullHeaderName(name), message instanceof Request);
+		return createParameterable(h, getFullHeaderName(name), message instanceof Request, getSession());
 	}
 
 	/*
@@ -946,7 +946,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 
 		while (headers != null && headers.hasNext())
 			result.add(createParameterable(headers.next(),
-					getFullHeaderName(name), message instanceof Request));
+					getFullHeaderName(name), message instanceof Request, getSession()));
 
 		if(!isParameterable(name)) {
 			throw new ServletParseException(name + " header is not parameterable !");
@@ -1099,12 +1099,14 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		MobicentsSipSession session = getSipSession();
 		if (session == null && create) {
 			MobicentsSipApplicationSession sipApplicationSessionImpl = (MobicentsSipApplicationSession)getSipApplicationSession(create);
-			MobicentsSipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(sipApplicationSessionImpl.getKey().getId(), currentApplicationName, message, false);
-			session = sipApplicationSessionImpl.getSipContext().getSipManager().getSipSession(sessionKey, create,
-					sipFactoryImpl, sipApplicationSessionImpl);
-			session.setSessionCreatingTransactionRequest(this);
-			session.setOrphan(isOrphan());
-			sessionKey = session.getKey();
+			if (sipApplicationSessionImpl != null){
+				MobicentsSipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(sipApplicationSessionImpl.getKey().getId(), currentApplicationName, message, false);
+				session = sipApplicationSessionImpl.getSipContext().getSipManager().getSipSession(sessionKey, create,
+						sipFactoryImpl, sipApplicationSessionImpl);
+				session.setSessionCreatingTransactionRequest(this);
+				session.setOrphan(isOrphan());
+				sessionKey = session.getKey();
+			}
 		}
 		
 		if(session != null) {
@@ -1205,7 +1207,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		// return new AddressImpl(to.getAddress(), AddressImpl.getParameters((Parameters)to), ModifiableRule.To);
 		// https://code.google.com/p/sipservlets/issues/detail?id=245
 		try {
-            return new AddressImpl(to, ModifiableRule.From);
+            return new AddressImpl(to, ModifiableRule.From, getSession());
         } catch (ParseException e) {
             throw new IllegalArgumentException("Couldn't parse From Header " + to, e);
         }
@@ -1854,7 +1856,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		return count;
 	}
 
-	protected static Parameterable createParameterable(Header header, String hName, boolean isRequest)
+	protected static Parameterable createParameterable(Header header, String hName, boolean isRequest, SipSession sipSession)
 			throws ServletParseException {
 		String whole = header.toString();
 		if (logger.isDebugEnabled())
@@ -2041,7 +2043,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			logger.debug("modifiableRule for [" + hName + "] from ["
 					+ whole + "] is " + modifiableRule);
 		ParameterableHeaderImpl parameterable = new ParameterableHeaderImpl(
-				header, value, paramMap, modifiableRule);
+				header, value, paramMap, modifiableRule, sipSession);
 		return parameterable;
 	}
 

@@ -94,7 +94,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet {
 			
 			SipServletRequest forkedRequest = helper.createRequest(request, true,
 					headers);
-			SipURI sipUri = (SipURI) sipFactory.createURI(forwardingUri[1]);		
+			SipURI sipUri = (SipURI) sipFactory.createURI(forwardingUri[1], forkedRequest.getSession());		
 			forkedRequest.setRequestURI(sipUri);						
 			if(logger.isInfoEnabled()) {
 				logger.info("forkedRequest = " + forkedRequest);

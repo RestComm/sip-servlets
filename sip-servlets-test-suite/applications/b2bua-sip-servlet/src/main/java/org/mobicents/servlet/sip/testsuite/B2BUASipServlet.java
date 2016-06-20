@@ -58,7 +58,7 @@ public class B2BUASipServlet extends SipServlet {
 		
 		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
 				SIP_FACTORY);				
-		SipURI sipUri = (SipURI) sipFactory.createURI("sip:aa@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5059");	
+		SipURI sipUri = (SipURI) sipFactory.createURI("sip:aa@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5059", null);	
 		forkedRequest.setRequestURI(sipUri);
 		
 		if (logger.isDebugEnabled()) {
@@ -90,9 +90,9 @@ public class B2BUASipServlet extends SipServlet {
 		
 		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
 				SIP_FACTORY);				
-		SipURI sipUri = (SipURI) sipFactory.createURI("sip:aa@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5059");	
+		SipURI sipUri = (SipURI) sipFactory.createURI("sip:aa@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5059", null);	
 		if(request.getTo().toString().contains("cancel-no-response")) {
-			sipUri = (SipURI) sipFactory.createURI("sip:cancel-no-respo-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":9368");
+			sipUri = (SipURI) sipFactory.createURI("sip:cancel-no-respo-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":9368", null);
 		}
 		forkedRequest.setRequestURI(sipUri);
 		if(request.getTo().toString().contains("cancel-no-response")) {

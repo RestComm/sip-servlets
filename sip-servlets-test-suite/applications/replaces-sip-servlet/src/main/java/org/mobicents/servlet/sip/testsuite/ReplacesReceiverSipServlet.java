@@ -84,8 +84,8 @@ public class ReplacesReceiverSipServlet extends SipServlet {
 			String messageContent = "Replaces : " + callId + "; from-tag=" + fromTag + "; to-tag=" + toTag;
 			
 			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
-			SipURI fromURI = sipFactory.createSipURI("receiver", "sip-servlets.com");
-			SipURI requestURI = sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090");
+			SipURI fromURI = sipFactory.createSipURI("receiver", "sip-servlets.com", null);
+			SipURI requestURI = sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090", null);
 			SipServletRequest sipServletRequest = sipFactory.createRequest(sipApplicationSession, "MESSAGE", fromURI, request.getFrom().getURI());
 			sipServletRequest.setContentLength(messageContent.length());
 			sipServletRequest.setContent(messageContent, CONTENT_TYPE);

@@ -75,11 +75,11 @@ public class PublishSipServlet extends SipServlet implements SipServletListener,
 		if("PUBLISH".equals(resp.getMethod()) && !"Modify".equals(getServletContext().getAttribute("publishStateSent"))) {
 			SipFactory sipFactory = (SipFactory)getServletContext().getAttribute(SIP_FACTORY);
 			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
-			SipURI fromURI = sipFactory.createSipURI("presentity", "example.com");			
-			SipURI toURI = sipFactory.createSipURI("presentity", "example.com");
+			SipURI fromURI = sipFactory.createSipURI("presentity", "example.com", null);			
+			SipURI toURI = sipFactory.createSipURI("presentity", "example.com", null);
 			SipServletRequest sipServletRequest = 
 				sipFactory.createRequest(sipApplicationSession, "PUBLISH", fromURI, toURI);
-			SipURI requestURI = sipFactory.createSipURI("presentity", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+			SipURI requestURI = sipFactory.createSipURI("presentity", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080", null);
 			sipServletRequest.setRequestURI(requestURI);
 			sipServletRequest.setExpires(3600);
 			sipServletRequest.setHeader("Event", "presence");
@@ -185,11 +185,11 @@ public class PublishSipServlet extends SipServlet implements SipServletListener,
 	 */
 	public void timeout(ServletTimer timer) {
 		SipFactory sipFactory = (SipFactory) timer.getApplicationSession().getAttribute("sipFactory");		
-		SipURI fromURI = sipFactory.createSipURI("presentity", "example.com");			
-		SipURI toURI = sipFactory.createSipURI("presentity", "example.com");
+		SipURI fromURI = sipFactory.createSipURI("presentity", "example.com", null);			
+		SipURI toURI = sipFactory.createSipURI("presentity", "example.com", null);
 		SipServletRequest sipServletRequest = 
 			sipFactory.createRequest(timer.getApplicationSession(), "PUBLISH", fromURI, toURI);
-		SipURI requestURI = sipFactory.createSipURI("presentity", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+		SipURI requestURI = sipFactory.createSipURI("presentity", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080", null);
 		sipServletRequest.setRequestURI(requestURI);
 		sipServletRequest.setExpires(3600);
 		sipServletRequest.setHeader("Event", "presence");

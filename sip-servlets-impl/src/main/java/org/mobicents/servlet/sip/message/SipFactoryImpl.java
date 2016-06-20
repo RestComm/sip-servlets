@@ -67,6 +67,7 @@ import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.MessageFactory;
 import javax.sip.message.Request;
+import javax.servlet.sip.SipSession;
 
 import org.apache.log4j.Logger;
 import org.mobicents.ha.javax.sip.SipLoadBalancer;
@@ -176,14 +177,14 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 	 * 
 	 * @see javax.servlet.sip.SipFactory#createAddress(java.lang.String)
 	 */
-	public Address createAddress(String sipAddress)
+	public Address createAddress(String sipAddress, SipSession sipSession)
 			throws ServletParseException {
 		try {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Creating Address from [" + sipAddress + "]");
 			}
 
-			AddressImpl retval = new AddressImpl();
+			AddressImpl retval = new AddressImpl(sipSession);
 			retval.setValue(sipAddress);
 			return retval;
 		} catch (IllegalArgumentException e) {
@@ -196,14 +197,14 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 	 * 
 	 * @see javax.servlet.sip.SipFactory#createAddress(javax.servlet.sip.URI)
 	 */
-	public Address createAddress(URI uri) {
+	public Address createAddress(URI uri, SipSession sipSession) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Creating Address fromm URI[" + uri.toString()
 					+ "]");
 		}
 		URIImpl uriImpl = (URIImpl) uri;
 		return new AddressImpl(SipFactoryImpl.addressFactory
-				.createAddress(uriImpl.getURI()), null, ModifiableRule.Modifiable);
+				.createAddress(uriImpl.getURI()), null, ModifiableRule.Modifiable, sipSession);
 	}
 
 	/*
@@ -212,7 +213,7 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 	 * @see javax.servlet.sip.SipFactory#createAddress(javax.servlet.sip.URI,
 	 *      java.lang.String)
 	 */
-	public Address createAddress(URI uri, String displayName) {
+	public Address createAddress(URI uri, String displayName, SipSession sipSession) {
 		try {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Creating Address from URI[" + uri.toString()
@@ -222,7 +223,7 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 			javax.sip.address.Address address = SipFactoryImpl.addressFactory
 					.createAddress(((URIImpl) uri).getURI());
 			address.setDisplayName(displayName);
-			return new AddressImpl(address, null, ModifiableRule.Modifiable);
+			return new AddressImpl(address, null, ModifiableRule.Modifiable, sipSession);
 
 		} catch (ParseException e) {
 			throw new IllegalArgumentException(e);
@@ -314,8 +315,8 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 		validateCreation(method, sipAppSession);
 
 		//javadoc specifies that a copy of the uri should be done hence the clone
-		Address toA = this.createAddress(to.clone());
-		Address fromA = this.createAddress(from.clone());
+		Address toA = this.createAddress(to.clone(), null);
+		Address fromA = this.createAddress(from.clone(), null);
 
 		try {
 			return createSipServletRequest(sipAppSession, method, fromA, toA, handler, null, null);
@@ -346,8 +347,8 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 
 		validateCreation(method, sipAppSession);
 
-		Address toA = this.createAddress(to);
-		Address fromA = this.createAddress(from);
+		Address toA = this.createAddress(to, null);
+		Address fromA = this.createAddress(from, null);
 
 		return createSipServletRequest(sipAppSession, method, fromA, toA, handler, null, null);
 
@@ -507,7 +508,7 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 	 * @see javax.servlet.sip.SipFactory#createSipURI(java.lang.String,
 	 *      java.lang.String)
 	 */
-	public SipURI createSipURI(String user, String host) {		
+	public SipURI createSipURI(String user, String host, SipSession sipSession) {		
 		if (logger.isDebugEnabled()) {
 			logger.debug("Creating SipURI from USER[" + user + "] HOST[" + host
 					+ "]");
@@ -518,7 +519,7 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 		}
 		try {
 			return new SipURIImpl(SipFactoryImpl.addressFactory.createSipURI(
-					user, host), ModifiableRule.Modifiable);
+					user, host), ModifiableRule.Modifiable, sipSession);
 		} catch (ParseException e) {
 			logger.error("couldn't parse the SipURI from USER[" + user
 					+ "] HOST[" + host + "]", e);
@@ -526,7 +527,7 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 		}
 	}
 
-	public URI createURI(String uri) throws ServletParseException {
+	public URI createURI(String uri, SipSession sipSession) throws ServletParseException {
 //		if(!checkScheme(uri)) {
 //			// testCreateProxyBranches101 needs this to be IllegalArgumentExcpetion, but the test is wrong
 //			throw new ServletParseException("The uri " + uri + " is not valid");
@@ -536,12 +537,12 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 					.createURI(uri);
 			if (jainUri instanceof javax.sip.address.SipURI) {
 				return new SipURIImpl(
-						(javax.sip.address.SipURI) jainUri, ModifiableRule.Modifiable);
+						(javax.sip.address.SipURI) jainUri, ModifiableRule.Modifiable, sipSession);
 			} else if (jainUri instanceof javax.sip.address.TelURL) {
 				return new TelURLImpl(
-						(javax.sip.address.TelURL) jainUri);
+						(javax.sip.address.TelURL) jainUri, sipSession);
 			} else {
-				return new GenericURIImpl(jainUri);
+				return new GenericURIImpl(jainUri, sipSession);
 			}
 		} catch (ParseException ex) {
 			throw new ServletParseException("Bad param " + uri, ex);
@@ -743,8 +744,8 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 			MobicentsSipSession session = mobicentsSipApplicationSession.getSipContext().getSipManager().
 				getSipSession(key, true, this, mobicentsSipApplicationSession);
 			session.setHandler(handler);
-			session.setLocalParty(new AddressImpl(fromAddress, null, ModifiableRule.NotModifiable));
-			session.setRemoteParty(new AddressImpl(toAddress, null, ModifiableRule.NotModifiable));
+			session.setLocalParty(new AddressImpl(fromAddress, null, ModifiableRule.NotModifiable, null));
+			session.setRemoteParty(new AddressImpl(toAddress, null, ModifiableRule.NotModifiable, null));
 			
 			// cater to http://code.google.com/p/sipservlets/issues/detail?id=31 to be able to set the rport in applications
 			final SipApplicationDispatcher sipApplicationDispatcher = getSipApplicationDispatcher();
@@ -766,20 +767,20 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 	/**
 	 * {@inheritDoc}
 	 */
-	public Parameterable createParameterable(String value) throws ServletParseException {
+	public Parameterable createParameterable(String value, SipSession sipSession) throws ServletParseException {
 		try {			 
 			Header header = SipFactoryImpl.headerFactory.createHeader(ContactHeader.NAME, value);
-			return SipServletMessageImpl.createParameterable(header, SipServletMessageImpl.getFullHeaderName(header.getName()), true);
+			return SipServletMessageImpl.createParameterable(header, SipServletMessageImpl.getFullHeaderName(header.getName()), true, sipSession);
 		} catch (ParseException e) {
 			try {
 				Header header = SipFactoryImpl.headerFactory.createHeader(ContentTypeHeader.NAME, value);
-				return SipServletMessageImpl.createParameterable(header, SipServletMessageImpl.getFullHeaderName(header.getName()), true);
+				return SipServletMessageImpl.createParameterable(header, SipServletMessageImpl.getFullHeaderName(header.getName()), true, sipSession);
 			} catch (ParseException pe) {
 				// Contribution from Nishihara, Naoki from Japan for Issue http://code.google.com/p/mobicents/issues/detail?id=1856
 				// Cannot create a parameterable header for Session-Expires
 				try {
 					Header header = SipFactoryImpl.headerFactory.createHeader(ContentDispositionHeader.NAME, value);
-					return SipServletMessageImpl.createParameterable(header, SipServletMessageImpl.getFullHeaderName(header.getName()), true);
+					return SipServletMessageImpl.createParameterable(header, SipServletMessageImpl.getFullHeaderName(header.getName()), true, sipSession);
 				} catch (ParseException pe2) {
 					throw new ServletParseException("Impossible to parse the following parameterable "+ value , pe2);
 				}

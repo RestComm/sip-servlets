@@ -24,6 +24,7 @@ package org.mobicents.servlet.sip.address;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.servlet.sip.SipSession;
 import javax.servlet.sip.URI;
 import javax.sip.header.Parameters;
 
@@ -34,11 +35,13 @@ public abstract class URIImpl extends ParameterableImpl implements URI {
 
 	javax.sip.address.URI uri;
 
-	public URIImpl(javax.sip.address.URI uri) {
+	public URIImpl(javax.sip.address.URI uri, SipSession sipSession) {
+		super(sipSession);
 		this.uri = uri;
 	}
 
-	public URIImpl(javax.sip.address.TelURL telUrl) {
+	public URIImpl(javax.sip.address.TelURL telUrl, SipSession sipSession) {
+		super(sipSession);
 		this.uri = telUrl;
 		if(this.uri instanceof Parameters) {
 			super.setParameters(AddressImpl.getParameters((Parameters)this.uri));
@@ -47,7 +50,8 @@ public abstract class URIImpl extends ParameterableImpl implements URI {
 		}	
 	}
 
-	public URIImpl(javax.sip.address.SipURI sipUri) {
+	public URIImpl(javax.sip.address.SipURI sipUri, SipSession sipSession) {
+		super(sipSession);
 		this.uri = sipUri;
 		if(this.uri instanceof Parameters) {
 			super.setParameters(AddressImpl.getParameters((Parameters)this.uri));

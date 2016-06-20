@@ -304,7 +304,7 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 			
 			if(recordRouteURIString != null) {
 				try {
-					recordRouteURI = ((SipURI)proxy.getSipFactoryImpl().createURI(recordRouteURIString));
+					recordRouteURI = ((SipURI)proxy.getSipFactoryImpl().createURI(recordRouteURIString, originalRequest.getSession()));
 					recordRouteURIString = null;
 				} catch (ServletParseException e) {
 					logger.error("A problem occured while setting the target URI while proxying a request " + recordRouteURI, e);
@@ -438,7 +438,7 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 			}
 			if(recordRouteURIString != null) {
 				try {
-					recordRouteURI = ((SipURI)proxy.getSipFactoryImpl().createURI(recordRouteURIString));
+					recordRouteURI = ((SipURI)proxy.getSipFactoryImpl().createURI(recordRouteURIString, originalRequest.getSession()));
 				} catch (ServletParseException e) {
 					logger.error("A problem occured while setting the target URI while proxying a request " + recordRouteURIString, e);
 				}
@@ -454,7 +454,7 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
                 {
                     if(targetURI != null) {
                             try {
-                                    destination = proxy.getSipFactoryImpl().createURI(targetURI);
+                                    destination = proxy.getSipFactoryImpl().createURI(targetURI, originalRequest.getSession());
                             } catch (ServletParseException e) {
                                     logger.error("A problem occured while setting the target URI while proxying a request " + targetURI, e);
                             }
@@ -662,7 +662,7 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 					int start = contact.indexOf('<');
 					int end = contact.indexOf('>');
 					contact = contact.substring(start + 1, end);
-					URI uri = proxy.getSipFactoryImpl().createURI(contact);
+					URI uri = proxy.getSipFactoryImpl().createURI(contact, response.getSipSession());
 					ArrayList<SipURI> list = new ArrayList<SipURI>();
 					list.add((SipURI)uri);
 					List<ProxyBranch> pblist = proxy.createProxyBranches(list);
@@ -882,7 +882,7 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 		}
 		if(targetURIString != null) {
 			try {
-				targetURI = sipFactoryImpl.createURI(targetURIString);
+				targetURI = sipFactoryImpl.createURI(targetURIString, request.getSipSession());
 			} catch (ServletParseException e) {
 				logger.error("A problem occured while setting the target URI while proxying a request " + targetURIString, e);
 			}
@@ -892,7 +892,7 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 			recordRoute = recordRouteURI;
 		} else if (recordRouteURIString != null){
 			try {
-				recordRoute = ((SipURI)proxy.getSipFactoryImpl().createURI(recordRouteURIString));
+				recordRoute = ((SipURI)proxy.getSipFactoryImpl().createURI(recordRouteURIString, request.getSipSession()));
 			} catch (ServletParseException e) {
 				logger.error("A problem occured while setting the target URI while proxying a request " + recordRouteURI, e);
 			}
@@ -1114,7 +1114,7 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 			throw new IllegalStateException("Cannot set a record route on an already started proxy");
 		}
 		if(this.pathURI == null) {
-			this.pathURI = new SipURIImpl (JainSipUtils.createRecordRouteURI( proxy.getSipFactoryImpl().getSipNetworkInterfaceManager(), null), ModifiableRule.NotModifiable);
+			this.pathURI = new SipURIImpl (JainSipUtils.createRecordRouteURI( proxy.getSipFactoryImpl().getSipNetworkInterfaceManager(), null), ModifiableRule.NotModifiable, null);
 		}		
 		this.isAddToPath = isAddToPath;
 	}
@@ -1144,7 +1144,7 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 		if(networkInterface == null) throw new IllegalArgumentException("Network interface for " +
 				outboundInterface + " not found");	
 		
-		outboundInterface = proxy.getSipFactoryImpl().createSipURI(null, address);		
+		outboundInterface = proxy.getSipFactoryImpl().createSipURI(null, address, originalRequest.getSession());		
 	}
 
 	/**
@@ -1168,7 +1168,7 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 		if(networkInterface == null) throw new IllegalArgumentException("Network interface for " +
 				outboundInterface + " not found");	
 		
-		outboundInterface = proxy.getSipFactoryImpl().createSipURI(null, address);		
+		outboundInterface = proxy.getSipFactoryImpl().createSipURI(null, address, originalRequest.getSession());		
 	}
 	
 	/*

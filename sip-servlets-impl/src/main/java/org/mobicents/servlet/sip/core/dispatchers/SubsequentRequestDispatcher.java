@@ -731,7 +731,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 					}
 					request.setRequestURI(
 							((URIImpl)(StaticServiceHolder.sipStandardService.getSipApplicationDispatcher().getSipFactory().createURI(
-							finalBranch.getTargetURI()))).getURI());
+							finalBranch.getTargetURI(), sipServletMessage.getSession()))).getURI());
 				}								
 			}
 		}

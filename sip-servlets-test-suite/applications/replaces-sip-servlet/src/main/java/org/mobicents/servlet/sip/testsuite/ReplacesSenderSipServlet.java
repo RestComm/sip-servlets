@@ -62,7 +62,7 @@ public class ReplacesSenderSipServlet extends SipServlet {
 		SipFactory sipFactory = (SipFactory)getServletContext().getAttribute(SIP_FACTORY);
 		registeredUsers = new HashMap<String, List<URI>>();
 		List<URI> uriList  = new ArrayList<URI>();		
-		uriList.add(sipFactory.createURI("sip:replaces@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"));
+		uriList.add(sipFactory.createURI("sip:replaces@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090", null));
 		registeredUsers.put("sip:replaces@sip-servlets.com", uriList);
 		registeredUsers.put("sip:replaces@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070;transport=udp", uriList);
 	}
@@ -78,8 +78,8 @@ public class ReplacesSenderSipServlet extends SipServlet {
 		sipServletResponse.send();
 		
 		SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
-		SipURI fromURI = sipFactory.createSipURI("replacer", "sip-servlets.com");
-		SipURI requestURI = sipFactory.createSipURI("replacer", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090");
+		SipURI fromURI = sipFactory.createSipURI("replacer", "sip-servlets.com", null);
+		SipURI requestURI = sipFactory.createSipURI("replacer", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090", null);
 		SipServletRequest sipServletRequest = sipFactory.createRequest(sipApplicationSession, "INVITE", fromURI, request.getFrom().getURI());
 		sipServletRequest.addHeader("Replaces", ((String)request.getContent()).substring("Replaces : ".length()));
 		sipServletRequest.setRequestURI(requestURI);

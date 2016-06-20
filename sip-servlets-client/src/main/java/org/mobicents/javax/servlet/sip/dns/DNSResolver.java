@@ -25,6 +25,7 @@ package org.mobicents.javax.servlet.sip.dns;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 
@@ -60,7 +61,7 @@ public interface DNSResolver {
 	 * @param uri the uri used to find the corresponding SipURI
 	 * @return the SipURI found through ENUM methods or the uri itself if the uri is already a SipURI without a user=phone param
 	 */
-	SipURI getSipURI(URI uri);
+	SipURI getSipURI(URI uri, SipSession sipSession);
 	
 	/**
 	 * From the host in parameter, perform an A and AAAA Lookup and also use local host name to IP Address mapping (as DNSJava bypass the /etc/hosts)

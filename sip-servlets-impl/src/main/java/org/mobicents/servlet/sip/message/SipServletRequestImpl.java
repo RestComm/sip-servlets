@@ -486,7 +486,7 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 	public Address getPoppedRoute() {
 		if((this.poppedRoute == null && poppedRouteHeader != null) ||
 				(poppedRoute != null && poppedRouteHeader != null && !poppedRoute.getAddress().equals(poppedRouteHeader.getAddress()))) {
-			this.poppedRoute = new AddressImpl(poppedRouteHeader.getAddress(), null, getTransaction() == null ? ModifiableRule.Modifiable : ModifiableRule.NotModifiable);
+			this.poppedRoute = new AddressImpl(poppedRouteHeader.getAddress(), null, getTransaction() == null ? ModifiableRule.Modifiable : ModifiableRule.NotModifiable, getSession());
 		}
 		return poppedRoute;
 	}
@@ -566,13 +566,13 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 		Request request = (Request) super.message;
 		if (request.getRequestURI() instanceof javax.sip.address.SipURI)
 			return new SipURIImpl((javax.sip.address.SipURI) request
-					.getRequestURI(), ModifiableRule.Modifiable);
+					.getRequestURI(), ModifiableRule.Modifiable, getSession());
 		else if (request.getRequestURI() instanceof javax.sip.address.TelURL)
 			return new TelURLImpl((javax.sip.address.TelURL) request
-					.getRequestURI());
+					.getRequestURI(), getSession());
 		else 
 			// From horacimacias : Fix for Issue 2115 MSS unable to handle GenericURI URIs
-			return new GenericURIImpl(request.getRequestURI());
+			return new GenericURIImpl(request.getRequestURI(), getSession());
 	}
 
 	/**

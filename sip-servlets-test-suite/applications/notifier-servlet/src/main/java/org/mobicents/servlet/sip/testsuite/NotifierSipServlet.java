@@ -159,7 +159,7 @@ public class NotifierSipServlet extends SipServlet implements SipSessionListener
 						"MESSAGE", 
 						se.getSession().getLocalParty(), 
 						se.getSession().getRemoteParty());
-				SipURI sipUri=sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+				SipURI sipUri=sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080", null);
 				sipServletRequest.setRequestURI(sipUri);
 				sipServletRequest.setContentLength(SIP_SESSION_READY_TO_BE_INVALIDATED.length());
 				sipServletRequest.setContent(SIP_SESSION_READY_TO_BE_INVALIDATED, CONTENT_TYPE);
@@ -175,11 +175,11 @@ public class NotifierSipServlet extends SipServlet implements SipSessionListener
 			SipFactory sipFactory = (SipFactory)ce.getServletContext().getAttribute(SIP_FACTORY);
 			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
 			
-			URI fromURI = sipFactory.createSipURI("UnsollictedNotify", "here.com");
-			URI toURI =  sipFactory.createSipURI("LittleGuy", "there.com");
+			URI fromURI = sipFactory.createSipURI("UnsollictedNotify", "here.com", null);
+			URI toURI =  sipFactory.createSipURI("LittleGuy", "there.com", null);
 			SipServletRequest sipServletRequest = 
 				sipFactory.createRequest(sipApplicationSession, "NOTIFY", fromURI, toURI);
-			SipURI requestURI = sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+			SipURI requestURI = sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080", null);
 			sipServletRequest.addHeader("Event", "aastra-xml");
 			sipServletRequest.addHeader("Subscription-State", "pending");
 			try {	

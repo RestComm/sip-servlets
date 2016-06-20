@@ -25,6 +25,7 @@ package org.mobicents.servlet.sip.address;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.sip.Parameterable;
 import javax.sip.header.Header;
 import javax.sip.header.Parameters;
+import javax.servlet.sip.SipSession;
 
 import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 
@@ -58,8 +60,11 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 	
 	protected ModifiableRule isModifiable = ModifiableRule.Modifiable;
 	
-	protected ParameterableImpl() {
-		this.parameters = new ConcurrentHashMap<String, String>();	
+	protected SipSession sipSession;
+	
+	protected ParameterableImpl(SipSession sipSession) {
+		this.parameters = new ConcurrentHashMap<String, String>();
+		this.sipSession = sipSession;
 	}
 	
 	/**
@@ -67,8 +72,9 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 	 * @param value - initial value of parametrable value
 	 * @param parameters - parameter map - it can be null;
 	 */
-	public ParameterableImpl(Header header, Map<String, String> params, ModifiableRule isModifiable) {
+	public ParameterableImpl(Header header, Map<String, String> params, ModifiableRule isModifiable, SipSession sipSession) {
 		this.isModifiable = isModifiable;
+		this.sipSession = sipSession;
 		if(header instanceof Parameters) {
 			this.header = (Parameters) header;
 		}
@@ -151,15 +157,116 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 		if(name.equalsIgnoreCase("branch") && isModifiable == ModifiableRule.Via) {
 			throw new IllegalStateException("it is forbidden to set the branch parameter on the Via Header");
 		}
-		//Fix from abondar for Issue 494 and angelo.marletta for Issue 502      
+		//Fix from abondar for Issue 494 and angelo.marletta for Issue 502	  
 		this.parameters.put(name.toLowerCase(), value);
 		if(header != null) {
 			try {
-				header.setParameter(name, "".equals(value) ? null : value);
+				if (isQuotableParameter(name, value)){
+					header.setQuotedParameter(name, value);
+				}
+				else{
+					header.setParameter(name, "".equals(value) ? null : value);
+				}
 			} catch (ParseException e) {
 				throw new IllegalArgumentException("Problem setting parameter",e);
 			}
 		}
+	}
+	
+	private static final String QUOTABLE_PARAMETER_NAME ="org.restcomm.servlets.sip.QUOTABLE_PARAMETER_NAME";
+	/**
+	 * Verify that the parameter is in the known list of parameters that its value need to be quoted
+	 * 
+	 * @return 
+	 * true: if the Parameter name is present at servletContext and its value can be quoted, else return false
+	 * otherwise
+	 */
+	protected boolean isQuotableParameter(String name, String value){
+		if (sipSession != null && sipSession.getServletContext() != null){
+			// get list of parameter names which are splited by comma.
+			String quotableParamNames = sipSession.getServletContext().getInitParameter(QUOTABLE_PARAMETER_NAME);
+			if (quotableParamNames != null){
+				String[] paramNames = quotableParamNames.split(",");
+				for (int i = 0; i < paramNames.length; i++){
+					if (name.equalsIgnoreCase(paramNames[i])){
+						if(isQuotableString(value)){
+							return true;
+						}
+						break;
+					}
+				}
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Verify that the string is quotable string base on RFC 3261
+	 * 
+	 * @return 
+	 * true: if the Parameter value can be quoted base on condition which is stated in RFC 3261, else return false
+	 * otherwise
+	 */
+	private final static char CR = 0x0D;
+	private final static char LF = 0x0A;
+	private final static char TAB = 0x09;
+	private final static char VT = 0x0B;
+	private final static char FF = 0x0C;
+	private final static char SPACE = 0X20;
+	private final static char DQUOTE = '"';
+	private final static char BACKSLASH = '\\';
+	
+	protected boolean isQuotableString(String value){
+		if (value.length() == 0){
+			return true;
+		}
+		
+		char c = value.charAt(0);
+		for (int i = 0; i < value.length(); i++){
+			
+			if ((i - 1) >= 0){
+				c = value.charAt(i - 1);
+				if (c == BACKSLASH || c == CR || c == LF){
+					// if previous is backslash, CR or LF, the current char is already check, skip this index.
+					continue;
+				}
+			}
+			
+			c = value.charAt(i);
+			
+			if (c == BACKSLASH){
+				if ((i + 1)>= value.length()){
+					//Quotable String cannot be ended by an escape
+					return false;
+				}
+
+				char c1 = value.charAt(i + 1);
+				if(c1 == CR || c1 == LF){
+					// CR, LF are not allowed to be escaped
+					return false;
+				}
+			}
+			else if (c == CR || c == LF){
+				if ((i + 1) < value.length()){
+					char c1 = value.charAt(i + 1);
+					if (c1 == TAB||/***********************************/
+						c1 == LF ||
+						c1 == VT ||//  LINEAR WHITE SPACE
+						c1 == FF ||
+						c1 == CR ||
+						c1 == SPACE){/************************************/
+						return false;
+					}
+				}
+			}
+			else if (c == DQUOTE){
+				// Double quotes must be escaped if they appear in a quotable
+				// string
+				return false;
+			}
+		}
+		// the rest is quotable string
+		return true;
 	}
 
 	/*

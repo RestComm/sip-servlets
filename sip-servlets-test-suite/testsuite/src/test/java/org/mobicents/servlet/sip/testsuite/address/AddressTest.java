@@ -50,7 +50,7 @@ public class AddressTest extends junit.framework.TestCase {
 	}
 	
 	private Address address(String address) throws Exception {
-		return (Address) sipFactory.createAddress(address);
+		return (Address) sipFactory.createAddress(address, null);
 	}
 	
 	public void testEqual() throws Exception {

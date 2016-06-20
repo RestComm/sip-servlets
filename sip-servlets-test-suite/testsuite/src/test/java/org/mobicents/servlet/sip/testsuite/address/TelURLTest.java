@@ -49,7 +49,7 @@ public class TelURLTest extends junit.framework.TestCase {
 	}
 	
 	private TelURL telUrl(String uri) throws Exception {
-		return (TelURL) sipFactory.createURI(uri);
+		return (TelURL) sipFactory.createURI(uri, null);
 	}
 	
 	public void testEqual() throws Exception {

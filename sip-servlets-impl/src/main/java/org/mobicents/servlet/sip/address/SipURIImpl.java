@@ -28,6 +28,7 @@ import java.text.ParseException;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
 import javax.sip.InvalidArgumentException;
 import javax.sip.header.Parameters;
@@ -54,8 +55,8 @@ public class SipURIImpl extends URIImpl implements SipURI {
 	private final static Logger logger = Logger.getLogger(SipURIImpl.class.getCanonicalName()); 
 	private ModifiableRule isModifiable = ModifiableRule.Modifiable;
 	
-	public SipURIImpl(javax.sip.address.SipURI sipUri, ModifiableRule isModifiable) {		
-		super(sipUri);
+	public SipURIImpl(javax.sip.address.SipURI sipUri, ModifiableRule isModifiable, SipSession sipSession) {		
+		super(sipUri, sipSession);
 		this.isModifiable = isModifiable;
 	}
 
@@ -383,7 +384,7 @@ public class SipURIImpl extends URIImpl implements SipURI {
 	 */
 	@Override
 	public SipURI clone() {
-		return new SipURIImpl((javax.sip.address.SipURI) this.getSipURI().clone(), ModifiableRule.Modifiable);
+		return new SipURIImpl((javax.sip.address.SipURI) this.getSipURI().clone(), ModifiableRule.Modifiable, sipSession);
 	}
 
 	/*

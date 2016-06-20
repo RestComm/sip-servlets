@@ -159,7 +159,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			            String contact = request.getHeader("Contact");
 			            SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
 			    				SIP_FACTORY);
-			            aliceContact = (SipURI) sipFactory.createURI(contact.substring(1, contact.length() - 1));
+			            aliceContact = (SipURI) sipFactory.createURI(contact.substring(1, contact.length() - 1), null);
 			            aliceContact.setPort(request.getRemotePort());
 			            // Storing the incoming interface on which we received the message to be able to pick the correct interface
 			            // When sending requests to this SIP UA.
@@ -323,7 +323,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 				SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
 						SIP_FACTORY);
 				URI from = request.getTo().getURI();
-		        URI to= sipFactory.createURI("sip:receiver2@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5091");
+		        URI to= sipFactory.createURI("sip:receiver2@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5091", null);
 				SipServletRequest newRequest = sipFactory.createRequest(request.getApplicationSession(), "INVITE", from, to);
 		        if(request.getContent() != null) {
 		        	newRequest.setContent(request.getContent(), request.getContentType());
@@ -404,7 +404,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		SipServletRequest forkedRequest = helper.createRequest(request, true,
 				headers);
 		forkedRequest.getAddressHeader("From").setDisplayName("display name set correctly");
-		SipURI sipUri = (SipURI) sipFactory.createURI(forwardingUri[1]);
+		SipURI sipUri = (SipURI) sipFactory.createURI(forwardingUri[1], null);
 		forkedRequest.setRequestURI(sipUri);						
 		
 		logger.info("forkedRequest = " + forkedRequest);
@@ -426,7 +426,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 				SIP_FACTORY);
 		B2buaHelper b2buaHelper = origReq.getB2buaHelper();
         URI from = origReq.getTo().getURI();
-        URI to= sipFactory.createURI(forwardingUri[1]);
+        URI to= sipFactory.createURI(forwardingUri[1], null);
         SipApplicationSession appSession = origReq.getApplicationSession();
         SipServletRequest newRequest = null;
         if(((SipURI)origReq.getFrom().getURI()).getUser().contains("same-callID")) {
@@ -570,7 +570,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
         String[] forwardingUri = forwardingUris.get(prack.getFrom().getURI().toString());
         SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
 				SIP_FACTORY);
-        SipURI sipUri = (SipURI) sipFactory.createURI(forwardingUri[1]);
+        SipURI sipUri = (SipURI) sipFactory.createURI(forwardingUri[1], null);
 		prack.setRequestURI(sipUri);						
         prack.send();
         
@@ -899,7 +899,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 					"MESSAGE", 
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
-			SipURI sipUri=sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+			SipURI sipUri=sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080", null);
 			sipServletRequest.setRequestURI(sipUri);
 			sipServletRequest.setContentLength(content.length());
 			sipServletRequest.setContent(content, CONTENT_TYPE);

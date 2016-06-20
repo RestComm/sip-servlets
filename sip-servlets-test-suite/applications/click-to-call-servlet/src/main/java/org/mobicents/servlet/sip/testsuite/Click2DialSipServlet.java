@@ -276,7 +276,7 @@ public class Click2DialSipServlet extends SipServlet implements SipApplicationSe
 						"MESSAGE", 
 						"sip:sender@sip-servlets.com", 
 						"sip:receiver@sip-servlets.com");
-				SipURI sipUri=sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5057");
+				SipURI sipUri=sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5057", null);
 				sipServletRequest.setRequestURI(sipUri);
 				sipServletRequest.setContentLength(SIP_APP_SESSION_DESTROYED.length());
 				sipServletRequest.setContent(SIP_APP_SESSION_DESTROYED, CONTENT_TYPE);
@@ -310,7 +310,7 @@ public class Click2DialSipServlet extends SipServlet implements SipApplicationSe
 					"MESSAGE", 
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
-			SipURI sipUri=storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+			SipURI sipUri=storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080", null);
 			sipServletRequest.setRequestURI(sipUri);
 			sipServletRequest.setContentLength(content.length());
 			sipServletRequest.setContent(content, CONTENT_TYPE);

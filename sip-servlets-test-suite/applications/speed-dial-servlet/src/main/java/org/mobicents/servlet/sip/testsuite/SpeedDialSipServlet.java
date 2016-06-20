@@ -138,11 +138,11 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener,
 						StringTokenizer stringTokenizer = new StringTokenizer(mappedUri, ",");
 						while (stringTokenizer.hasMoreTokens()) {
 							String uri = stringTokenizer.nextToken();
-							uris.add(sipFactory.createURI(uri));
+							uris.add(sipFactory.createURI(uri, null));
 						}
 						proxy.proxyTo(uris);
 					} else {
-						proxy.proxyTo(sipFactory.createURI(mappedUri));
+						proxy.proxyTo(sipFactory.createURI(mappedUri, null));
 					}
 				} else {
 					SipServletResponse sipServletResponse = 
@@ -336,10 +336,10 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener,
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
 			sipServletRequest.addHeader("Ext", "Test 1, 2 ,3");
-			SipURI sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+			SipURI sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080", null);
 			if(transport != null) {
 				if(transport.equalsIgnoreCase(ListeningPoint.TCP)) {
-					sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5081");
+					sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5081", null);
 				}
 				sipUri.setTransportParam(transport);
 			}

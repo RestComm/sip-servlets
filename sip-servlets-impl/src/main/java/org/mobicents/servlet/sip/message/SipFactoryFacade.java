@@ -31,6 +31,7 @@ import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
+import javax.servlet.sip.SipSession;
 
 import org.apache.log4j.Logger;
 import org.mobicents.javax.servlet.sip.SipFactoryExt;
@@ -65,22 +66,22 @@ public class SipFactoryFacade implements SipFactoryExt, Serializable {
 	/* (non-Javadoc)
 	 * @see javax.servlet.sip.SipFactory#createAddress(java.lang.String)
 	 */
-	public Address createAddress(String sipAddress) throws ServletParseException {
-		return sipFactoryImpl.createAddress(sipAddress);
+	public Address createAddress(String sipAddress, SipSession sipSession) throws ServletParseException {
+		return sipFactoryImpl.createAddress(sipAddress, sipSession);
 	}
 
 	/* (non-Javadoc)
 	 * @see javax.servlet.sip.SipFactory#createAddress(javax.servlet.sip.URI)
 	 */
-	public Address createAddress(URI uri) {
-		return sipFactoryImpl.createAddress(uri);
+	public Address createAddress(URI uri, SipSession sipSession) {
+		return sipFactoryImpl.createAddress(uri, sipSession);
 	}
 
 	/* (non-Javadoc)
 	 * @see javax.servlet.sip.SipFactory#createAddress(javax.servlet.sip.URI, java.lang.String)
 	 */
-	public Address createAddress(URI uri, String displayName) {
-		return sipFactoryImpl.createAddress(uri, displayName);
+	public Address createAddress(URI uri, String displayName, SipSession sipSession) {
+		return sipFactoryImpl.createAddress(uri, displayName, sipSession);
 	}
 
 	/* (non-Javadoc)
@@ -129,8 +130,8 @@ public class SipFactoryFacade implements SipFactoryExt, Serializable {
 	/* (non-Javadoc)
 	 * @see javax.servlet.sip.SipFactory#createParameterable(java.lang.String)
 	 */
-	public Parameterable createParameterable(String s) throws ServletParseException {
-		return sipFactoryImpl.createParameterable(s);
+	public Parameterable createParameterable(String s, SipSession sipSession) throws ServletParseException {
+		return sipFactoryImpl.createParameterable(s, sipSession);
 	}
 
 	/* (non-Javadoc)
@@ -191,15 +192,15 @@ public class SipFactoryFacade implements SipFactoryExt, Serializable {
 	/* (non-Javadoc)
 	 * @see javax.servlet.sip.SipFactory#createSipURI(java.lang.String, java.lang.String)
 	 */
-	public SipURI createSipURI(String user, String host) {
-		return sipFactoryImpl.createSipURI(user, host);
+	public SipURI createSipURI(String user, String host, SipSession sipSession) {
+		return sipFactoryImpl.createSipURI(user, host, sipSession);
 	}
 
 	/* (non-Javadoc)
 	 * @see javax.servlet.sip.SipFactory#createURI(java.lang.String)
 	 */
-	public URI createURI(String uri) throws ServletParseException {
-		return sipFactoryImpl.createURI(uri);
+	public URI createURI(String uri, SipSession sipSession) throws ServletParseException {
+		return sipFactoryImpl.createURI(uri, sipSession);
 	}
 	
 	/**

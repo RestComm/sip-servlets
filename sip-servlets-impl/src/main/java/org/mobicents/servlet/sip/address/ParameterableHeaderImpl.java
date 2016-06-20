@@ -28,6 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sip.header.Header;
 import javax.sip.header.Parameters;
+import javax.servlet.sip.SipSession;
 
 import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 
@@ -41,19 +42,19 @@ public class ParameterableHeaderImpl extends ParameterableImpl {
 	private static final long serialVersionUID = 1L;
 	protected String value = null;
 	
-	public ParameterableHeaderImpl() {
-		super();
+	public ParameterableHeaderImpl(SipSession sipSession) {
+		super(sipSession);
 	}
 
-	public ParameterableHeaderImpl(Header header, String value, Map<String, String> params, ModifiableRule isModifiable) {
+	public ParameterableHeaderImpl(Header header, String value, Map<String, String> params, ModifiableRule isModifiable, SipSession sipSession) {
 		// General form of parametrable header
-		super(header, params, isModifiable);
+		super(header, params, isModifiable, sipSession);
 		this.value = value;
 	}
 
 	@Override
 	public Object clone() {
-		ParameterableHeaderImpl cloned = new ParameterableHeaderImpl();
+		ParameterableHeaderImpl cloned = new ParameterableHeaderImpl(sipSession);
 		cloned.parameters = cloneParameters(super.parameters);
 		cloned.value = this.value;
 		cloned.header = (Parameters)((Header)super.header).clone();

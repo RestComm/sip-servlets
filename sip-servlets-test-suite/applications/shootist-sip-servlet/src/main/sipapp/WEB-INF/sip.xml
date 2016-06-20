@@ -8,7 +8,6 @@
 	<!--main-servlet>
 		ShootistSipServlet
 	</main-servlet-->
-
 	<servlet>
 		<servlet-name>ShootistSipServlet</servlet-name>
 		<display-name>ShootistSipServlet</display-name>

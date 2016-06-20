@@ -63,6 +63,7 @@ public abstract class SipServletTestCase extends TestCase {
 		if(System.getProperty("org.mobicents.testsuite.testhostaddr") == null) {
 			System.setProperty("org.mobicents.testsuite.testhostaddr", "127.0.0.1");// [::1] for IPv6			
 		}
+		
 		if(sipIpAddress == null) {
 			sipIpAddress = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
 		}
