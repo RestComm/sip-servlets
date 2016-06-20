@@ -1258,6 +1258,15 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 			logger.debug(childrenMap.size() + " container to notify of " + event.getEventType());
 		}
 		if(event.getEventType() == SipContextEventType.SERVLET_INITIALIZED) {
+                        //fixes https://github.com/RestComm/sip-servlets/issues/165
+                        //now the SipService is totally ready/started, we prepare 
+                        //the context again just in case some att was not properly
+                        //initiated
+                        try {
+                            prepareServletContext();
+                        } catch (Exception e) {
+                            logger.warn("Couldnt prepare context", e);
+                        }                      
 			if(!timerService.isStarted()) {
 				timerService.start();
 			}
