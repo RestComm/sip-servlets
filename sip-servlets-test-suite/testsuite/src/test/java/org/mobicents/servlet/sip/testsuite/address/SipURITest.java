@@ -25,6 +25,7 @@ package org.mobicents.servlet.sip.testsuite.address;
 import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
+import junit.framework.Assert;
 
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
@@ -114,10 +115,14 @@ public class SipURITest extends junit.framework.TestCase {
 		String s = uri.toString();
 		assertEquals("sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080;Key=val", s);
 		// Non regression for https://github.com/Mobicents/sip-servlets/issues/46
-		uri.setParameter("orig", null);
-		System.out.println(uri);
+                try {
+                    uri.setParameter("orig", null);
+                    Assert.fail("URI must not accept null value");
+                } catch (Exception e) {
+                }
 		uri.setParameter("orig2", "");
-		System.out.println(uri);
+                s = uri.toString();
+		assertEquals("sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080;Key=val;orig2", s);
 	}
 	
 	public void testBrackets() throws Exception {
