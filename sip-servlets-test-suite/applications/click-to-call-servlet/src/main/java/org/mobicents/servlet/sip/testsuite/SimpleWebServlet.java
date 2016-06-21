@@ -141,11 +141,6 @@ public class SimpleWebServlet extends HttpServlet {
         	return;
         }
         SipServletRequest req = sipFactory.createRequest(appSession, "INVITE", from, to);   
-        if (notification != null) {
-            req.getApplicationSession().setAttribute("notification", notification);
-        }
-        req.getApplicationSession().setInvalidateWhenReady(true);
-        logger.info("sip application session created " +  req.getApplicationSession() + " notification " + notification);
         // Set some attribute
         req.getSession().setAttribute("SecondPartyAddress", sipFactory.createAddress(fromAddr));
         if(invalidateHttpSession != null) {
