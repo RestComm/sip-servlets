@@ -624,7 +624,7 @@ final class WrapperCreateRule extends Rule {
 
 }
 
-final class PatternRule extends ObjectCreateRule {
+final class PatternRule extends Rule {
 	
 	private static transient final Logger logger = Logger.getLogger(PatternRule.class);
 	
