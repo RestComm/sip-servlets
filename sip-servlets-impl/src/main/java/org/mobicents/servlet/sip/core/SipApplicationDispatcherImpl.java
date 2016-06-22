@@ -213,35 +213,16 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	
 	// stats
 	private boolean gatherStatistics = true;
-	private static AtomicLong requestsProcessed = new AtomicLong(0);
-	private static AtomicLong responsesProcessed = new AtomicLong(0);
-	static final Map<String, AtomicLong> requestsProcessedByMethod = new ConcurrentHashMap<String, AtomicLong>();
-	static {
-		for (String method : METHODS_SUPPORTED) {
-			requestsProcessedByMethod.put(method, new AtomicLong(0));
-		}
-	}
-	static final Map<String, AtomicLong> responsesProcessedByStatusCode = new ConcurrentHashMap<String, AtomicLong>();
-	static {
-		for (String classOfSc : RESPONSES_PER_CLASS_OF_SC) {
-			responsesProcessedByStatusCode.put(classOfSc, new AtomicLong(0));
-		}
-	}
+	private final AtomicLong requestsProcessed = new AtomicLong(0);
+	private final AtomicLong responsesProcessed = new AtomicLong(0);
+	final Map<String, AtomicLong> requestsProcessedByMethod = new ConcurrentHashMap<String, AtomicLong>();
+	final Map<String, AtomicLong> responsesProcessedByStatusCode = new ConcurrentHashMap<String, AtomicLong>();
 	// https://telestax.atlassian.net/browse/MSS-74
-	private static AtomicLong requestsSent = new AtomicLong(0);
-	private static AtomicLong responsesSent= new AtomicLong(0);
-	static final Map<String, AtomicLong> requestsSentByMethod = new ConcurrentHashMap<String, AtomicLong>();
-	static {
-		for (String method : METHODS_SUPPORTED) {
-			requestsSentByMethod.put(method, new AtomicLong(0));
-		}
-	}
-	static final Map<String, AtomicLong> responsesSentByStatusCode = new ConcurrentHashMap<String, AtomicLong>();
-	static {
-		for (String classOfSc : RESPONSES_PER_CLASS_OF_SC) {
-			responsesSentByStatusCode.put(classOfSc, new AtomicLong(0));
-		}
-	}
+	private final AtomicLong requestsSent = new AtomicLong(0);
+	private final AtomicLong responsesSent= new AtomicLong(0);
+	final Map<String, AtomicLong> requestsSentByMethod = new ConcurrentHashMap<String, AtomicLong>();
+	final Map<String, AtomicLong> responsesSentByStatusCode = new ConcurrentHashMap<String, AtomicLong>();
+        
 	// congestion control
 	private boolean memoryToHigh = false;	
 	private double maxMemory;
@@ -292,6 +273,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	 * 
 	 */
 	public SipApplicationDispatcherImpl() {
+                resetStatsCounters();
 		applicationDeployed = new ConcurrentHashMap<String, SipContext>();
 		mdToApplicationName = new ConcurrentHashMap<String, String>();
 		applicationNameToMd = new ConcurrentHashMap<String, String>();
@@ -301,6 +283,30 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		maxMemory = Runtime.getRuntime().maxMemory() / (double) 1024;
 		congestionControlPolicy = CongestionControlPolicy.ErrorResponse;
 	}
+        
+        @Override
+        public final void resetStatsCounters() {
+            requestsProcessed.set(0);
+            responsesProcessed.set(0);
+            requestsSent.set(0);
+            responsesSent.set(0);
+            for (String method : METHODS_SUPPORTED) {
+                    requestsProcessedByMethod.put(method, new AtomicLong(0));
+            }
+
+            for (String classOfSc : RESPONSES_PER_CLASS_OF_SC) {
+                    responsesProcessedByStatusCode.put(classOfSc, new AtomicLong(0));
+            }                
+
+            for (String classOfSc : RESPONSES_PER_CLASS_OF_SC) {
+                    responsesSentByStatusCode.put(classOfSc, new AtomicLong(0));
+            }
+
+            for (String method : METHODS_SUPPORTED) {
+                    requestsSentByMethod.put(method, new AtomicLong(0));
+            }    
+                               
+        }
 	
 	/**
 	 * {@inheritDoc} 
