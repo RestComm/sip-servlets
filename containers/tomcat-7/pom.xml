@@ -122,6 +122,13 @@
 			<artifactId>geronimo-spec-j2ee-jacc</artifactId>
 			<version>1.0-rc4</version>
 		</dependency>
+                <dependency>
+                    <groupId>javax.servlet.jsp</groupId>
+                    <artifactId>jsp-api</artifactId>
+                    <version>2.1</version>
+                    <type>jar</type>
+                    <scope>test</scope>
+                </dependency>                
 	</dependencies>
 	<build>
 		<plugins>

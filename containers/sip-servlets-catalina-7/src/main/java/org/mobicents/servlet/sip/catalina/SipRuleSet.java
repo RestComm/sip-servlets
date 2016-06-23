@@ -165,8 +165,8 @@ public class SipRuleSet extends RuleSetBase {
         digester.addRule(prefix + "sip-app/servlet",
                          new WrapperCreateRule());
         digester.addSetNext(prefix + "sip-app/servlet",
-                            "addChild");
-//                            ,"org.apache.catalina.Container");
+                            "addChild"
+                            ,"org.apache.catalina.Container");
         digester.addCallMethod(prefix + "sip-app/servlet/icon/smallIcon",
                 "setSmallIcon", 0);
         digester.addCallMethod(prefix + "sip-app/servlet/icon/largeIcon",
