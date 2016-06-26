@@ -224,6 +224,11 @@ public interface SipApplicationDispatcher extends SipListenerExt {
 	public Map<String, AtomicLong> getResponsesSentByStatusCode();	
 	long getRequestsSentByMethod(String method);
 	long getResponsesSentByStatusCode(String statusCode);
+        
+        /**
+         * reset all stats counter to initial value.
+         */
+        void resetStatsCounters();
 	
 	void setGatherStatistics(boolean gatherStatistics);	
 	boolean isGatherStatistics();

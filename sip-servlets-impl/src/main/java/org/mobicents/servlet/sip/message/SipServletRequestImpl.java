@@ -2389,7 +2389,7 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
             return ((SIPRequest)message).getPeerPacketSourceAddress().getHostAddress();
         } else if (message != null && 
                 message instanceof SIPRequest && 
-                ((SIPRequest)message).getRemoteAddress() != null ) {
+                ((SIPRequest)message).getPeerPacketSourceAddress() != null ) {
             //https://github.com/Mobicents/jain-sip/issues/42
             //take advantage of new message methods to extract addr from msg            
             return ((SIPRequest)message).getPeerPacketSourceAddress().getHostAddress();

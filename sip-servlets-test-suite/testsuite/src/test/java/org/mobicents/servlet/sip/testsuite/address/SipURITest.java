@@ -25,6 +25,7 @@ package org.mobicents.servlet.sip.testsuite.address;
 import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
+import org.junit.Assert;
 
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
@@ -113,12 +114,41 @@ public class SipURITest extends junit.framework.TestCase {
 		System.out.println(uri);
 		String s = uri.toString();
 		assertEquals("sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080;Key=val", s);
-		// Non regression for https://github.com/Mobicents/sip-servlets/issues/46
-		uri.setParameter("orig", null);
-		System.out.println(uri);
-		uri.setParameter("orig2", "");
-		System.out.println(uri);
 	}
+        
+        // Non regression for https://github.com/Mobicents/sip-servlets/issues/46
+	public void testNullValueParam() throws Exception {
+            try {
+		URI uri = sipFactory.createURI("sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+		uri.setParameter("orig", null);
+                Assert.fail("NPE expected");
+            } catch (Exception e) {
+                //we are expecting NPE
+            }
+	}
+        
+        // Non regression for https://github.com/Mobicents/sip-servlets/issues/46
+	public void testemptyValueParam() throws Exception {
+            String initialURI = "sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080";
+            URI uri = sipFactory.createURI(initialURI);
+            uri.setParameter("orig2", "");
+            String encodedURI = uri.toString();
+            Assert.assertEquals(initialURI + ";orig2", encodedURI);
+	}          
+        
+        /**
+         * 
+         * Non regression for https://github.com/RestComm/sip-servlets/issues/114
+         * @throws Exception 
+         */
+	public void testOneCharParam() throws Exception {
+		URI uri = sipFactory.createURI("sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+		System.out.println(uri);
+		uri.setParameter("Key", "v");
+		System.out.println(uri);
+		String s = uri.toString();
+		assertEquals("sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080;Key=v", s);
+	}        
 	
 	public void testBrackets() throws Exception {
 		try {
