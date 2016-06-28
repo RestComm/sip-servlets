@@ -22,6 +22,8 @@
 
 package org.mobicents.servlet.sip.address;
 
+import gov.nist.javax.sip.header.ParametersExt;
+
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.HashMap;
@@ -36,6 +38,8 @@ import javax.sip.header.Header;
 import javax.sip.header.Parameters;
 
 import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
+import org.mobicents.servlet.sip.core.SipContext;
+import org.mobicents.servlet.sip.core.session.SipApplicationSessionCreationThreadLocal;
 
 
 /**
@@ -154,8 +158,29 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 		//Fix from abondar for Issue 494 and angelo.marletta for Issue 502      
 		this.parameters.put(name.toLowerCase(), value);
 		if(header != null) {
+			boolean isQuotableParameter = false;
+			SipContext context = SipApplicationSessionCreationThreadLocal.lookupContext();
+			if (context != null){
+				Object object = context.getServletContext().getAttribute("org.restcomm.servlets.sip.QUOTABLE_PARAMETER");
+				if (object != null){
+					String quotableParameters = object.toString();
+					if (!quotableParameters.isEmpty()){
+						String[] parameters = quotableParameters.split(",");
+						for (int i = 0; i < parameters.length; i++){
+							if (parameters[i].trim().equalsIgnoreCase(name)){
+								isQuotableParameter = true;
+								break;
+							}
+						}
+					}
+				}
+			}
 			try {
-				header.setParameter(name, "".equals(value) ? null : value);
+				if (isQuotableParameter && header instanceof ParametersExt){
+					((ParametersExt) header).setQuotedParameter(name, value);
+				}else{
+					header.setParameter(name, "".equals(value) ? null : value);
+				}
 			} catch (ParseException e) {
 				throw new IllegalArgumentException("Problem setting parameter",e);
 			}

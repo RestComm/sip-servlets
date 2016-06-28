@@ -282,6 +282,10 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 				sipApplicationDispatcher.getSipService().findSipConnectors());
 		this.getServletContext().setAttribute("org.mobicents.servlet.sip.DNS_RESOLVER",
 				sipApplicationDispatcher.getDNSResolver());
+		String quotedParameter = this.getServletContext().getInitParameter("org.restcomm.servlets.sip.QUOTABLE_PARAMETER");
+		if (quotedParameter != null){
+			this.getServletContext().setAttribute("org.restcomm.servlets.sip.QUOTABLE_PARAMETER", quotedParameter);
+		}
 	}
 
 	/**
