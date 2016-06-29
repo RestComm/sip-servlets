@@ -23,17 +23,29 @@ package org.mobicents.as7.deployment;
 
 import static org.mobicents.as7.SipMessages.MESSAGES;
 
+import org.apache.catalina.core.StandardContext;
+import org.jboss.as.clustering.web.DistributedCacheManagerFactory;
+import org.jboss.as.clustering.web.DistributedCacheManagerFactoryService;
+import org.jboss.as.clustering.web.infinispan.sip.DistributedCacheConvergedSipManagerFactory;
+import org.jboss.as.clustering.web.sip.DistributedConvergedCacheManagerFactoryService;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.DeploymentUnitProcessor;
+import org.jboss.as.web.WebSubsystemServices;
+import org.jboss.as.web.deployment.JBossContextConfig;
 import org.jboss.as.web.deployment.WarMetaData;
+import org.jboss.as.web.ext.WebContextFactory;
 import org.jboss.dmr.ModelNode;
+import org.jboss.logging.Logger;
+import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.metadata.web.spec.ServletMetaData;
 import org.jboss.modules.Module;
 import org.jboss.msc.service.ServiceBuilder;
+import org.jboss.msc.service.ServiceBuilder.DependencyType;
+import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceRegistryException;
@@ -42,7 +54,9 @@ import org.jboss.vfs.VirtualFile;
 import org.mobicents.as7.SipDeploymentDefinition;
 import org.mobicents.as7.SipSubsystemServices;
 import org.mobicents.metadata.sip.spec.SipMetaData;
-
+import org.mobicents.servlet.sip.startup.jboss.SipJBossContextConfig;
+import org.jboss.msc.service.ServiceController.Mode;
+import org.jboss.msc.value.InjectedValue;
 
 /**
  * {@code DeploymentUnitProcessor} creating the actual deployment services.
@@ -54,6 +68,8 @@ import org.mobicents.metadata.sip.spec.SipMetaData;
  */
 public class SipWarDeploymentProcessor implements DeploymentUnitProcessor {
 
+	private static final Logger logger = Logger.getLogger(SipWarDeploymentProcessor.class);
+	
     public SipWarDeploymentProcessor() {
     }
 
@@ -67,7 +83,7 @@ public class SipWarDeploymentProcessor implements DeploymentUnitProcessor {
         if (metaData == null) {
             return;
         }
-        processDeployment(deploymentUnit, phaseContext.getServiceTarget());
+        processDeployment(deploymentUnit, phaseContext.getServiceTarget(), metaData);
     }
 
     @Override
@@ -76,8 +92,10 @@ public class SipWarDeploymentProcessor implements DeploymentUnitProcessor {
     }
 
     protected void processDeployment(final DeploymentUnit deploymentUnit,
-                                     final ServiceTarget serviceTarget) throws DeploymentUnitProcessingException {
-        final VirtualFile deploymentRoot = deploymentUnit.getAttachment(Attachments.DEPLOYMENT_ROOT).getRoot();
+                                     final ServiceTarget serviceTarget,
+                                     WarMetaData warMetaData) throws DeploymentUnitProcessingException {
+        
+    	final VirtualFile deploymentRoot = deploymentUnit.getAttachment(Attachments.DEPLOYMENT_ROOT).getRoot();
         final Module module = deploymentUnit.getAttachment(Attachments.MODULE);
         if (module == null) {
             throw new DeploymentUnitProcessingException(MESSAGES.failedToResolveModule(deploymentRoot));
@@ -86,26 +104,128 @@ public class SipWarDeploymentProcessor implements DeploymentUnitProcessor {
         if(sipMetaData != null) {
 	        final String appNameMgmt = sipMetaData.getApplicationName();
 	    	final ServiceName deploymentServiceName = SipSubsystemServices.deploymentServiceName(appNameMgmt);
+	    	
+	    	if (logger.isDebugEnabled()){
+	    		if (serviceTarget.getDependencies() != null){
+	    			logger.debug("processDeployment - serviceTarget.getDependencies()");
+	    			for (ServiceName sn: serviceTarget.getDependencies()){
+	    				logger.debug("processDeployment - dependency: " + sn.toString());
+	    			}
+	    		}
+        		logger.debug("processDeployment - deploymentServiceName.getSimpleName() = " + deploymentServiceName.getSimpleName());
+        		logger.debug("processDeployment - deploymentServiceName.getCanonicalName() = " + deploymentServiceName.getCanonicalName());
+        		logger.debug("processDeployment - deploymentServiceName.toString() = " + deploymentServiceName.toString());
+        		logger.debug("processDeployment - deploymentServiceName.getParent() = " + deploymentServiceName.getParent());
+        	}
+	    	
 	        try {
 	        	final SipDeploymentService sipDeploymentService = new SipDeploymentService(deploymentUnit);
 	        	ServiceBuilder<?> builder = serviceTarget
 	        			.addService(deploymentServiceName, sipDeploymentService);
 	
+	        	if (logger.isDebugEnabled()){
+	        		logger.debug("processDeployment - start distributable stuff");
+	        	}
+	        	
+	        	
 	//        	TODO: when distributable is implemented
-	//        	if (sipMetaData.getDistributable() != null) {
-	//        		DistributedCacheManagerFactoryService factoryService = new DistributedCacheManagerFactoryService();
-	//        		DistributedCacheManagerFactory factory = factoryService.getValue();
-	//        		if (factory != null) {
-	//        			ServiceName factoryServiceName = deploymentServiceName.append("session");
-	//        			builder.addDependency(DependencyType.OPTIONAL, factoryServiceName, DistributedCacheManagerFactory.class, config.getDistributedCacheManagerFactoryInjector());
-	//
-	//        			ServiceBuilder<DistributedCacheManagerFactory> factoryBuilder = serviceTarget.addService(factoryServiceName, factoryService);
-	//        			boolean enabled = factory.addDeploymentDependencies(deploymentServiceName, deploymentUnit.getServiceRegistry(), serviceTarget, factoryBuilder, metaData);
-	//        			factoryBuilder.setInitialMode(enabled ? ServiceController.Mode.ON_DEMAND : ServiceController.Mode.NEVER).install();
-	//        		}
-	//        	}
-	            // add dependency to sip deployment service
+	        	if (sipMetaData.getDistributable() != null) {
+	        		
+	        		
+	        		//--------------
+	            	final JBossWebMetaData metaData = warMetaData.getMergedJBossWebMetaData();
+	            	if (logger.isDebugEnabled()){
+	            		logger.error("processDeployment - is jbosswebmetadata distributable?: " + (metaData.getDistributable() != null));
+	            	}
+	            	//WebContextFactory contextFactory = deploymentUnit.getAttachment(WebContextFactory.ATTACHMENT);
+	            	//if (contextFactory == null) {
+	            	//	if (logger.isDebugEnabled()){
+	                //		logger.debug("processDeployment - contextFactory is null, using WebContextFactory.DEFAULT");
+	                //	}
+	                //    contextFactory = WebContextFactory.DEFAULT;
+	                //}
+	            	
+	            	// Create the context
+	            	//final SIPWebContext webContext = (SIPWebContext)contextFactory.createContext(deploymentUnit);
+	            	final SIPWebContext webContext = deploymentUnit.getAttachment(SIPWebContext.ATTACHMENT);
+	            	if (logger.isDebugEnabled()){
+	            		if (webContext == null){
+	            			logger.error("processDeployment - sip web context is null");
+	            		} else {
+	            			logger.debug("processDeployment - sip web context picked up successfully");
+	            		}
+	            	}
+	                //final JBossContextConfig config = new JBossContextConfig(deploymentUnit, this.service);
+	                final SipJBossContextConfig config = webContext.getSipJBossContextConfig();
+	                config.getDistributedCacheManagerFactoryInjector();
+	                //--------------
+	                
+	                if (logger.isDebugEnabled()){
+		        		logger.debug("processDeployment - distributable");
+		        	}
+	        		
+	        		//DistributedCacheManagerFactoryService factoryService = new DistributedCacheManagerFactoryService();
+	        		//DistributedCacheManagerFactory factory = factoryService.getValue();
+	        		
+	        		DistributedCacheManagerFactoryService factoryService = new DistributedConvergedCacheManagerFactoryService();
+	        		final DistributedCacheManagerFactory factory = factoryService.getValue();
+	        		
+	        		if (factory != null) {
+	        			if (logger.isDebugEnabled()){
+	    	        		logger.debug("processDeployment - factory not null");
+	    	        	}
+	        			
+	        			ServiceName factoryServiceName = deploymentServiceName.append("session");
+	        			if (logger.isDebugEnabled()){
+	    	        		logger.debug("processDeployment - factoryServiceName.getSimpleName() = " + factoryServiceName.getSimpleName());
+	    	        		logger.debug("processDeployment - factoryServiceName.getCanonicalName() = " + factoryServiceName.getCanonicalName());
+	    	        		logger.debug("processDeployment - factoryServiceName.toString() = " + factoryServiceName.toString());
+	    	        		logger.debug("processDeployment - factoryServiceName.getParent() = " + factoryServiceName.getParent());
+	    	        	}
+	        			
+	        			//----------
+	        			if (logger.isDebugEnabled()){
+	    	        		logger.debug("processDeployment - addInjection");
+	    	        	}
+	        			//builder.addInjection(config.getDistributedCacheManagerFactoryInjector(), (DistributedCacheConvergedSipManagerFactory)factory);
+	        			//----------
+	        			
+	        			if (logger.isDebugEnabled()){
+	    	        		logger.debug("processDeployment - addDependency");
+	    	        	}
+	        			builder.addDependency(DependencyType.REQUIRED, //DependencyType.OPTIONAL, 
+	        					factoryServiceName, 
+	        					DistributedCacheConvergedSipManagerFactory.class, 
+	        					//DistributedCacheManagerFactory.class, 
+	        					config.getDistributedCacheManagerFactoryInjector());
+	
+	        			ServiceBuilder<DistributedCacheManagerFactory> factoryBuilder = serviceTarget.addService(factoryServiceName, factoryService);
+	        			
+	        			
+	        			if (logger.isDebugEnabled()){
+	    	        		logger.debug("processDeployment - addInjection to factoryBuilder");
+	    	        	}
+	        			
+	        			boolean enabled = factory.addDeploymentDependencies(deploymentServiceName, deploymentUnit.getServiceRegistry(), serviceTarget, factoryBuilder, metaData);
+	        			if (logger.isDebugEnabled()){
+	    	        		logger.debug("processDeployment - install factoryBuilder... enabled = " + enabled);
+	    	        	}
+	        			factoryBuilder.setInitialMode(enabled ? ServiceController.Mode.ACTIVE : ServiceController.Mode.NEVER).install();
+	        			//factoryBuilder.setInitialMode(enabled ? ServiceController.Mode.ON_DEMAND : ServiceController.Mode.NEVER).install();
+	        		}
+	        	}
+	        // TODO - VEGE, eddig tart a distributable-s resz
+	        	
+	        	
+	        	
+	        	// add dependency to sip deployment service
+	        	if (logger.isDebugEnabled()){
+	        		logger.debug("processDeployment - add dependency to sip subsystem services (" + deploymentServiceName + ")");
+	        	}
 	            builder.addDependency(deploymentServiceName);
+	            if (logger.isDebugEnabled()){
+	        		logger.debug("processDeployment - install");
+	        	}
 	            builder.setInitialMode(Mode.ACTIVE).install();
 	        } catch (ServiceRegistryException e) {
 	        	throw new DeploymentUnitProcessingException(MESSAGES.failedToAddSipDeployment(), e);

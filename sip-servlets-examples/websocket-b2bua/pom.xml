@@ -28,6 +28,11 @@
 					<warSourceDirectory>
 						${basedir}/src/main/sipapp
 					</warSourceDirectory>
+					<archive>
+						<manifestEntries>
+							<Dependencies>org.jboss.netty</Dependencies>
+						</manifestEntries>
+					</archive>
 				</configuration>
 			</plugin>			
 		</plugins>

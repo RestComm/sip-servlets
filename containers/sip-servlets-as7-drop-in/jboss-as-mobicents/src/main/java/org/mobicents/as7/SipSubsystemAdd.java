@@ -46,6 +46,7 @@ import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
 import org.jboss.msc.value.InjectedValue;
+import org.mobicents.as7.clustering.sip.MockDistributedCacheManagerFactoryService;
 import org.mobicents.as7.deployment.AttachSipServerServiceProcessor;
 import org.mobicents.as7.deployment.SipAnnotationDeploymentProcessor;
 import org.mobicents.as7.deployment.SipComponentProcessor;
@@ -62,7 +63,7 @@ import org.mobicents.ext.javax.sip.dns.DefaultDNSServerLocator;
  * @author josemrecio@gmail.com
  */
 class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
-	private static final Logger logger = Logger.getLogger(SipServerService.class);
+	private static final Logger logger = Logger.getLogger(SipSubsystemAdd.class);
 	// FIXME: these priorities should be substituted by values from with org.jboss.as.server.deployment.Phase
 	//   aligned with those used by web subsystem
     static int PARSE_SIP_DEPLOYMENT_PRIORITY = 0x4000;
@@ -74,7 +75,7 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
 //    private static final boolean DEFAULT_NATIVE = true;
 
     private SipSubsystemAdd() {
-        //
+    	//
     }
 
 //    @Override
@@ -84,6 +85,10 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
     @Override
     protected void populateModel(ModelNode operation, ModelNode model) throws OperationFailedException {
+    	if(logger.isDebugEnabled()) {
+			logger.debug("populateModel");
+		}
+    	
         SipDefinition.INSTANCE_ID.validateAndSet(operation, model);
         SipDefinition.APPLICATION_ROUTER.validateAndSet(operation, model);
         SipDefinition.SIP_STACK_PROPS.validateAndSet(operation, model);
@@ -117,6 +122,9 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
     protected void performBoottime(OperationContext context, ModelNode operation, ModelNode model,
                                    ServiceVerificationHandler verificationHandler,
                                    List<ServiceController<?>> newControllers) throws OperationFailedException {
+    	if(logger.isDebugEnabled()) {
+			logger.debug("performBoottime");
+		}
         ModelNode fullModel = Resource.Tools.readModel(context.readResource(PathAddress.EMPTY_ADDRESS));
 
         final ModelNode instanceIdModel = SipDefinition.INSTANCE_ID.resolveModelAttribute(context, fullModel);
@@ -305,11 +313,18 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         //final DistributedCacheManagerFactory factory = new MockDistributedCacheManagerFactoryService().getValue();
         final DistributedCacheManagerFactory factory = new DistributedConvergedCacheManagerFactoryService().getValue();
         if (factory != null) {
+        	if(logger.isDebugEnabled()) {
+    			logger.debug("performBoottime - distributable cache manager factory not null");
+    		}
             final InjectedValue<SipServer> server = new InjectedValue<SipServer>();
-            newControllers.add(target.addService(DistributedConvergedCacheManagerFactoryService.JVM_ROUTE_REGISTRY_ENTRY_PROVIDER_SERVICE_NAME, new JvmRouteRegistryEntryProviderService(server))
-                    .addDependency(SipSubsystemServices.JBOSS_SIP, SipServer.class, server)
-                    .setInitialMode(Mode.ON_DEMAND)
-                    .install());
+            //newControllers.add(target.addService(MockDistributedCacheManagerFactoryService.JVM_ROUTE_REGISTRY_ENTRY_PROVIDER_SERVICE_NAME, new JvmRouteRegistryEntryProviderService(server))
+            newControllers.add(target.addService(
+            			DistributedConvergedCacheManagerFactoryService.JVM_ROUTE_REGISTRY_ENTRY_PROVIDER_SERVICE_NAME,
+            			new JvmRouteRegistryEntryProviderService(server)
+            		)
+            			.addDependency(SipSubsystemServices.JBOSS_SIP, SipServer.class, server)
+            			.setInitialMode(Mode.ON_DEMAND)
+            			.install());
             newControllers.addAll(factory.installServices(target));
         }
 

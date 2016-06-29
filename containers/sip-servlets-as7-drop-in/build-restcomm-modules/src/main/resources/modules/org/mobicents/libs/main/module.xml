@@ -28,6 +28,7 @@
     </resources>
 
     <dependencies>
+    	<module name="org.jboss.msc"/>
         <module name="org.apache.log4j"/>
         <module name="javax.api"/>
         <module name="javax.servlet.api"/>
@@ -41,6 +42,16 @@
         <module name="org.jboss.as.security"/>
         <module name="org.picketbox"/>
         <module name="javax.security.jacc.api"/>
+        <module name="org.jboss.as.clustering.web.spi" optional="true"/>
+        
+        <module name="org.infinispan"/>
+        <module name="org.jboss.as.clustering.web.infinispan"/>
+        <module name="org.jboss.as.clustering.infinispan"/>
+        <module name="org.jboss.as.clustering.common"/>
+        <module name="org.jboss.as.clustering.registry"/>
+        <module name="org.jboss.metadata"/>
+        <module name="org.jboss.as.clustering.impl"/>
+        <module name="org.jboss.as.clustering.api"/>
     </dependencies>
 
 </module>

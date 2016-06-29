@@ -35,8 +35,10 @@ import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.DeploymentUnitProcessor;
+import org.jboss.logging.Logger;
 import org.jboss.metadata.parser.util.MetaDataElementParser;
 import org.jboss.vfs.VirtualFile;
+import org.mobicents.metadata.sip.parser.SipCommonMetaDataParser;
 import org.mobicents.metadata.sip.parser.SipMetaDataParser;
 import org.mobicents.metadata.sip.spec.SipMetaData;
 
@@ -47,6 +49,8 @@ import org.mobicents.metadata.sip.spec.SipMetaData;
  */
 public class SipParsingDeploymentProcessor implements DeploymentUnitProcessor {
 
+	private static transient Logger logger = Logger.getLogger(SipParsingDeploymentProcessor.class);
+	
     protected static final String SIP_XML = "WEB-INF/sip.xml";
     private final boolean schemaValidation = true;
 
@@ -95,6 +99,9 @@ public class SipParsingDeploymentProcessor implements DeploymentUnitProcessor {
             MetaDataElementParser.DTDInfo dtdInfo = new MetaDataElementParser.DTDInfo();
             inputFactory.setXMLResolver(dtdInfo);
             final XMLStreamReader xmlReader = inputFactory.createXMLStreamReader(is);
+            if (logger.isDebugEnabled()){
+            	logger.debug("deploy - parse xml");
+            }
             SipMetaData sipMetaData = SipMetaDataParser.parse(xmlReader, dtdInfo);
             deploymentUnit.putAttachment(SipMetaData.ATTACHMENT_KEY, sipMetaData);
         } catch (XMLStreamException e) {

@@ -31,8 +31,22 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Loader;
 import org.apache.catalina.core.StandardWrapper;
 import org.apache.catalina.startup.ContextConfig;
+import org.jboss.as.clustering.ClassLoaderAwareClassResolver;
+import org.jboss.as.clustering.web.DistributedCacheManagerFactory;
+import org.jboss.as.clustering.web.OutgoingDistributableSessionData;
+import org.jboss.as.clustering.web.infinispan.sip.DistributedCacheConvergedSipManagerFactory;
+import org.jboss.as.clustering.web.sip.DistributedConvergedCacheManagerFactoryService;
+import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentUnit;
+import org.jboss.as.web.WebLogger;
+import org.jboss.as.web.deployment.JBossContextConfig;
+import org.jboss.as.web.deployment.WarMetaData;
+import org.jboss.as.web.session.DistributableSessionManager;
+import org.jboss.as.web.session.ExposedSessionBasedClusteredSession;
+import org.jboss.as.web.session.sip.DistributableSipSessionManager;
 import org.jboss.logging.Logger;
+import org.jboss.marshalling.ClassResolver;
+import org.jboss.marshalling.ModularClassResolver;
 import org.jboss.metadata.javaee.spec.DescriptionGroupMetaData;
 import org.jboss.metadata.javaee.spec.DescriptionImpl;
 import org.jboss.metadata.javaee.spec.DescriptionsImpl;
@@ -43,9 +57,14 @@ import org.jboss.metadata.javaee.spec.IconsImpl;
 import org.jboss.metadata.javaee.spec.ParamValueMetaData;
 import org.jboss.metadata.javaee.spec.SecurityRoleRefMetaData;
 import org.jboss.metadata.javaee.spec.SecurityRoleRefsMetaData;
+import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.metadata.web.spec.ListenerMetaData;
 import org.jboss.metadata.web.spec.ServletMetaData;
 import org.jboss.metadata.web.spec.TransportGuaranteeType;
+import org.jboss.modules.Module;
+import org.jboss.msc.inject.Injector;
+import org.jboss.msc.value.InjectedValue;
+import org.jboss.msc.value.Value;
 import org.mobicents.metadata.sip.jboss.JBossConvergedSipMetaData;
 import org.mobicents.metadata.sip.jboss.JBossSipServletsMetaData;
 import org.mobicents.metadata.sip.spec.AndMetaData;
@@ -77,7 +96,9 @@ import org.mobicents.servlet.sip.catalina.rules.ExistsRule;
 import org.mobicents.servlet.sip.catalina.rules.NotRule;
 import org.mobicents.servlet.sip.catalina.rules.OrRule;
 import org.mobicents.servlet.sip.catalina.rules.SubdomainRule;
+import org.mobicents.servlet.sip.core.SipContext;
 import org.mobicents.servlet.sip.core.descriptor.MatchingRule;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
 
 /**
@@ -89,9 +110,16 @@ import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
  */
 public class SipJBossContextConfig extends /*JBossContextConfig*/ ContextConfig {
 
+	private DeploymentUnit deploymentUnitContext = null;
+	private final InjectedValue<DistributedCacheConvergedSipManagerFactory> factory = new InjectedValue<DistributedCacheConvergedSipManagerFactory>();
+	
     public SipJBossContextConfig(DeploymentUnit deploymentUnitContext) {
         super();
-        //super(deploymentUnitContext);
+    	//super(deploymentUnitContext);
+        if (logger.isDebugEnabled()){
+        	logger.debug("created");
+        }
+    	this.deploymentUnitContext = deploymentUnitContext;
     }
 
     private static transient Logger logger = Logger.getLogger(SipJBossContextConfig.class);
@@ -99,44 +127,75 @@ public class SipJBossContextConfig extends /*JBossContextConfig*/ ContextConfig 
     /**
      * Process the context parameters defined in sip.xml. Let a user application override the sharedMetaData values.
      */
-    protected void processSipContextParameters(JBossConvergedSipMetaData metaData) {
+    /*protected void processSipContextParameters(JBossConvergedSipMetaData metaData) {
+    	if(logger.isDebugEnabled()){
+    		logger.debug("processSipContextParameters");
+    	}
         if (metaData.getSipContextParams() != null) {
             for (ParamValueMetaData param : metaData.getSipContextParams()) {
+            	if(logger.isDebugEnabled()){
+            		logger.debug("processSipContextParameters - paramName=" + param.getParamName() + ", paramValue=" + param.getParamValue());
+            	}
                 context.addParameter(param.getParamName(), param.getParamValue());
             }
         }
+    }*/
+
+    
+    //?????????
+//    // guess that this method matches with JBoss5 processContextParameters() method?
+    //@Override
+    //protected void processJBossWebMetaData(JBossWebMetaData metaData) {
+    /*public void processJBossWebMetaData(JBossWebMetaData metaData) {
+    	if(logger.isDebugEnabled()){
+    		logger.debug("processJBossWebMetaData");
+    	}
+    	if (metaData instanceof JBossConvergedSipMetaData && context instanceof SipStandardContext) {
+            processSipContextParameters((JBossConvergedSipMetaData) metaData);
+        }
+        super.processJBossWebMetaData(metaData);
     }
 
-//    // guess that this method matches with JBoss5 processContextParameters() method?
-//    @Override
-//    protected void processJBossWebMetaData(JBossWebMetaData metaData) {
-//        if (metaData instanceof JBossConvergedSipMetaData && context instanceof SipStandardContext) {
-//            processSipContextParameters((JBossConvergedSipMetaData) metaData);
-//        }
-//        super.processJBossWebMetaData(metaData);
-//    }
+    //@Override
+    //protected void processWebMetaData(JBossWebMetaData metaData) {
+    public void processWebMetaData(JBossWebMetaData metaData) {
+    	if(logger.isDebugEnabled()){
+    		logger.debug("processWebMetaData");
+    	}
+        if (metaData instanceof JBossConvergedSipMetaData && context instanceof SipContext) {
+            
+        	if(logger.isDebugEnabled()){
+        		logger.debug("processWebMetaData - metaData is JBossConvergedSipMetaData and context is sipContext");
+        	}
+        	
+        	//processSipMetaData((JBossConvergedSipMetaData) metaData);
+            
+        	// Issue 1522 http://code.google.com/p/mobicents/issues/detail?id=1522 :
+            // when converged distributable app deployed is missing distributable in one of the Deployment descriptor
+            // throw a better exception
+            if (metaData.getDistributable() != null && metaData.getReplicationConfig() == null) {
+            	if(logger.isDebugEnabled()){
+            		logger.debug("Throwing exception because the <distributable/> element should be present in both web.xml and sip.xml...");
+            	}
+                throw new SipDeploymentException(
+                        "the <distributable/> element should be present in both web.xml and sip.xml so that the application can be correctly clustered");
+            }
+        }
+        if(logger.isDebugEnabled()){
+    		logger.debug("call super.processWebMetaData");
+    	}
+        super.processWebMetaData(metaData);
 
-//    @Override
-//    protected void processWebMetaData(JBossWebMetaData metaData) {
-//        if (metaData instanceof JBossConvergedSipMetaData && context instanceof SipContext) {
-//            processSipMetaData((JBossConvergedSipMetaData) metaData);
-//            // Issue 1522 http://code.google.com/p/mobicents/issues/detail?id=1522 :
-//            // when converged distributable app deployed is missing distributable in one of the Deployment descriptor
-//            // throw a better exception
-//            if (metaData.getDistributable() != null && metaData.getReplicationConfig() == null) {
-//                throw new SipDeploymentException(
-//                        "the <distributable/> element should be present in both web.xml and sip.xml so that the application can be correctly clustered");
-//            }
-//        }
-//        super.processWebMetaData(metaData);
-//
-//    }
-
+    }*/
+//????????????
     /**
      * @param convergedMetaData
      * @throws Exception 
      */
     public void processSipMetaData(JBossConvergedSipMetaData convergedMetaData) throws Exception {
+    	if(logger.isDebugEnabled()){
+    		logger.debug("processSipMetaData - " + this);
+    	}
         CatalinaSipContext convergedContext = (CatalinaSipContext) context;
         convergedContext.setWrapperClass(SipServletImpl.class.getName());
         /*
@@ -168,10 +227,51 @@ public class SipJBossContextConfig extends /*JBossContextConfig*/ ContextConfig 
 
         // TODO: itt kell csinalni vmit? vagy csak az a lenyeg h ne dobjunk kivetelt, hiszen mostmar tamogatott a distributed mod?
         // Distributable
-        //if (convergedMetaData.getDistributable() != null) {
-            // TODO
-        //    throw new SipDeploymentException("Distributable not supported yet");
-        //}
+        if (convergedMetaData.getDistributable() != null) {
+        	if(logger.isDebugEnabled()){
+        		logger.debug("processSipMetaData - " + this + " - is distributable " + convergedMetaData.getApplicationName());
+        	}
+        	
+        	Module module = this.deploymentUnitContext.getAttachment(Attachments.MODULE);
+        	if(logger.isDebugEnabled()){
+        		logger.debug("processSipMetaData - " + this + " - is distributable2 " + convergedMetaData.getApplicationName());
+        	}
+        	if (module != null) {
+            	if(logger.isDebugEnabled()){
+            		logger.debug("processSipMetaData - " + this + " - is distributable and module not null " + convergedMetaData.getApplicationName());
+            	}
+            	try {
+                    ClassResolver resolver = ModularClassResolver.getInstance(module.getModuleLoader());
+                    if(logger.isDebugEnabled()){
+                		logger.debug("processSipMetaData - " + this + " - got classResolver " + convergedMetaData.getApplicationName());
+                	}
+
+                    context.setManager(
+                    		new DistributableSipSessionManager<OutgoingDistributableSessionData>(
+                    				this.factory.getValue(), 
+                    				convergedMetaData, 
+                    				new ClassLoaderAwareClassResolver(resolver, module.getClassLoader())
+                    			)
+                    		);
+                    if(logger.isDebugEnabled()){
+                		logger.debug("processSipMetaData - " + this + " - setManager returned " + convergedMetaData.getApplicationName());
+                	}
+                    context.setDistributable(true);
+                    if(logger.isDebugEnabled()){
+                		logger.debug("processSipMetaData - " + this + " - distributable is set to true " + convergedMetaData.getApplicationName());
+                	}
+                } catch (Exception e) {
+                	if(logger.isDebugEnabled()){
+                		logger.debug("processSipMetaData - " + this + " - exception thrown and caught while creating distributed converged session manager (" + convergedMetaData.getApplicationName() + "), exception: ", e);
+                		throw e;
+                	}
+                    WebLogger.WEB_LOGGER.clusteringNotSupported();
+                }
+            }
+            
+            // TODO - ez a kiveteldobas volt itt eredetileg
+            // throw new SipDeploymentException("Distributable not supported yet");
+        }
 
         // sip context params
         List<? extends ParamValueMetaData> sipContextParams = convergedMetaData.getSipContextParams();
@@ -353,7 +453,10 @@ public class SipJBossContextConfig extends /*JBossContextConfig*/ ContextConfig 
     }
 
     public static MatchingRule buildRule(ConditionMetaData condition) {
-
+    	if(logger.isDebugEnabled()){
+    		logger.debug("buildRule");
+    	}
+    	
         if (condition instanceof AndMetaData) {
             AndMetaData andMetaData = (AndMetaData) condition;
             AndRule and = new AndRule();
@@ -399,5 +502,26 @@ public class SipJBossContextConfig extends /*JBossContextConfig*/ ContextConfig 
             throw new IllegalArgumentException("Unknown rule: " + condition);
         }
     }
+    
+    @Override
+    protected void applicationWebConfig() {
+    	if (logger.isDebugEnabled()){
+    		logger.debug("applicationWebConfig - " + this + " - call applicationWebConfig");
+    	}
+        super.applicationWebConfig();
+    }
+    @Override
+    protected void defaultWebConfig() {
+    	if (logger.isDebugEnabled()){
+    		logger.debug("defaultWebConfig - " + this + " - call super.defaultWebConfig");
+    	}
+        super.defaultWebConfig();
+    }
 
+    public Injector<DistributedCacheConvergedSipManagerFactory> getDistributedCacheManagerFactoryInjector() {
+    	if (logger.isDebugEnabled()){
+    		logger.debug("getDistributedCacheManagerFactoryInjector - " + this);
+    	}
+        return this.factory;
+    }
 }

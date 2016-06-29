@@ -6,5 +6,5 @@ export CURRENT_CODE=$?
 echo "$1 $CURRENT_CODE" >> $2
 
 ./auto-kill-process-tree.sh `cat config1.pid` $config1
-cp $JBOSS_HOME/server/$config1/log/server.log ./$1-$config1-server.log
-cp $JBOSS_HOME/server/$config2/log/server.log ./$1-$config2-server.log
+cp $JBOSS_HOME/standalone/log/server.log ./$1-$config1-server.log
+cp $JBOSS_HOME/standalone/log2/server.log ./$1-$config2-server.log

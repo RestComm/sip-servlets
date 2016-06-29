@@ -1369,7 +1369,17 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 							"transaction is about to timeout. THIS " +
 							"MIGHT ALSO BE CONCURRENCY CONTROL RISK." +						 
 							" app Session is" + this);
+					if(logger.isDebugEnabled()) {
+						logger.debug("releasing semaphore, this=" + this + ", semaphore=" + semaphore);
+					}
 					semaphore.release();
+					if(logger.isDebugEnabled()) {
+						logger.debug("semaphore released, this=" + this + ", semaphore=" + semaphore);
+					}
+				}
+				
+				if(logger.isDebugEnabled()) {
+					logger.debug("proceed, this=" + this + ", semaphore=" + semaphore);
 				}
 			} catch (InterruptedException e) {
 				logger.error("Problem acquiring semaphore on app session " + this, e);
