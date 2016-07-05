@@ -946,8 +946,12 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	 * {@inheritDoc}
 	 */
 	public void update(IncomingDistributableSessionData sessionData) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("update - sessionData=" + sessionData);
+		}
+		
 		if (logger.isDebugEnabled()){
-			logger.debug("update - this.getHaId()=" + this.getHaId() + ", this.getId()=" + this.getId());
+			logger.debug("update - sessionData=" + sessionData + ", this.getHaId()=" + this.getHaId() + ", this.getId()=" + this.getId());
 		}
 		
 		assert sessionData != null : "sessionData is null";
@@ -959,6 +963,18 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		this.timestamp.set(ts);
 
 		this.metadata = (DistributableSipSessionMetadata)sessionData.getMetadata();
+		if(logger.isDebugEnabled()) {
+			logger.debug("update - this.metadata=" + this.metadata);
+			if (this.metadata != null){
+				logger.debug("update - this.metadata.getMetaData()" + this.metadata.getMetaData());
+				if (this.metadata.getMetaData() != null){
+					for (String tmpKey: this.metadata.getMetaData().keySet()){
+						logger.debug("update - this.metadata.getMetaData() entry:" + tmpKey + "=" + this.metadata.getMetaData().get(tmpKey));	
+					}
+				}
+			}
+		}
+		
 		// TODO -- get rid of these field and delegate to metadata
 		this.creationTime = metadata.getCreationTime();
 		this.maxInactiveInterval = metadata.getMaxInactiveInterval();					
@@ -1942,6 +1958,15 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		super.setHandler(name);
 		sessionMetadataDirty();
 		metadata.getMetaData().put(HANDLER, name);
+	}
+	
+	@Override
+	public String getHandler() {
+		if (logger.isDebugEnabled()){
+			logger.debug("getHandler - this.getHaId()=" + this.getHaId() + ", this.getId()=" + this.getId() + ", return=" + super.getHandler());
+		}
+		
+		return super.getHandler();
 	}
 	
 	@Override

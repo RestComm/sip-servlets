@@ -449,7 +449,7 @@ public class SipCacheListener //extends CacheListenerBase
             Map<Object, Object> map = event.getValue();
             if (!map.isEmpty()) {
             	if(logger.isDebugEnabled()) {
-        			logger.debug("modified - event map not empty");
+        			logger.debug("modified - event map not empty - event.getKey()=" + event.getKey());
         		}
                 Integer version = SipSessionMapEntry.VERSION.get(map);
                 Long timestamp = SipSessionMapEntry.TIMESTAMP.get(map);

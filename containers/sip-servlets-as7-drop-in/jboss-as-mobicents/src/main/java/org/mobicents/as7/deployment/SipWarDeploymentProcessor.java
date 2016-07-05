@@ -135,7 +135,7 @@ public class SipWarDeploymentProcessor implements DeploymentUnitProcessor {
 	        		//--------------
 	            	final JBossWebMetaData metaData = warMetaData.getMergedJBossWebMetaData();
 	            	if (logger.isDebugEnabled()){
-	            		logger.error("processDeployment - is jbosswebmetadata distributable?: " + (metaData.getDistributable() != null));
+	            		logger.debug("processDeployment - is jbosswebmetadata distributable?: " + (metaData.getDistributable() != null));
 	            	}
 	            	//WebContextFactory contextFactory = deploymentUnit.getAttachment(WebContextFactory.ATTACHMENT);
 	            	//if (contextFactory == null) {

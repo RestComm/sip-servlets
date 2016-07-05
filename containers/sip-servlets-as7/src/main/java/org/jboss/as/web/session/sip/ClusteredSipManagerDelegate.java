@@ -168,6 +168,14 @@ public class ClusteredSipManagerDelegate extends SipManagerDelegate {
 			session = new SessionBasedClusteredSipSession(key, sipFactoryImpl, mobicentsSipApplicationSession, useJK);
 		//}
 			
+		if(logger.isDebugEnabled()) {
+			logger.debug("getNewMobicentsSipSession - newly created session: session.getId()=" + session.getId()
+					+ ", session.getHaId()=" + session.getHaId()
+					+ ", session.getState()=" + session.getState()
+					+ ", session.getCallId()=" + session.getCallId()
+					+ ", session.getApplicationSession().getId()=" + session.getApplicationSession().getId());
+		}
+			
 		clusteredSipSessionManager.getDistributedCacheConvergedSipManager().sipSessionCreated(mobicentsSipApplicationSession.getKey().getId(), SessionManagerUtil.getSipSessionHaKey(key));
 		session.setNew(true);
 		MobicentsSipSession sipSessionImpl = sipSessions.putIfAbsent(key, session);

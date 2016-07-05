@@ -2046,7 +2046,7 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 			{
 				if (logger.isDebugEnabled())
 				{
-					logger.debug("Passivating session with id: " + realId);
+					logger.debug("processSessionPassivation - Passivating session with id: " + realId);
 				}
 
 				session.notifyWillPassivate(ClusteredSessionNotificationCause.PASSIVATION);
@@ -2061,11 +2061,11 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 				{
 					if (obj == null)
 					{
-						logger.debug("New session " + realId + " added to unloaded session map");
+						logger.debug("processSessionPassivation - New session with id: " + realId + " added to unloaded session map");
 					}
 					else
 					{
-						logger.debug("Updated timestamp for unloaded session " + realId);
+						logger.debug("processSessionPassivation - Updated timestamp for unloaded session with id: " + realId);
 					}
 				}
 				this.sessions.remove(realId);
@@ -2264,12 +2264,12 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 				calcActiveSessions();
 				if (logger.isDebugEnabled())
 				{
-					logger.debug("New session " + realId + " added to unloaded session map");
+					logger.debug("sessionChangedInDistributedCache - New session with id: " + realId + " added to unloaded session map");
 				}
 			}
 			else if (logger.isDebugEnabled())
 			{
-				logger.debug("Updated timestamp for unloaded session " + realId);
+				logger.debug("sessionChangedInDistributedCache - Updated timestamp for unloaded session with id: " + realId);
 			}
 		}
 
@@ -2773,7 +2773,11 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 	 */
 	protected ClusteredSipSession loadSipSession(final SipSessionKey key, final boolean create, final SipFactoryImpl sipFactoryImpl, final MobicentsSipApplicationSession sipApplicationSessionImpl) {
 		if (logger.isDebugEnabled()){
-			logger.debug("loadSipSession - key.getApplicationName()=" + key.getApplicationName() + ", key.getApplicationSessionId()=" + key.getApplicationSessionId() + ", key.getCallId()=" + key.getCallId() + ", create=" + create);
+			if (key != null){
+				logger.debug("loadSipSession - key.getApplicationName()=" + key.getApplicationName() + ", key.getApplicationSessionId()=" + key.getApplicationSessionId() + ", key.getCallId()=" + key.getCallId() + ", key.getFromTag()=" + key.getFromTag() + ", create=" + create);
+			} else {
+				logger.debug("loadSipSession - key is null");
+			}
 		}
 		
 		if (key == null) {
@@ -2783,12 +2787,19 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 		SipApplicationSessionKey applicationSessionKey = null;
 		if(sipApplicationSessionImpl != null) {
 			applicationSessionKey = (SipApplicationSessionKey) sipApplicationSessionImpl.getKey();
+			if (logger.isDebugEnabled()){
+				logger.debug("loadSipSession - sipApplicationSessionImpl not null - applicationSessionKey.getId()=" + applicationSessionKey.getId());
+			}
 		} else {
 			applicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(key.getApplicationName(), key.getApplicationSessionId(),
 					null); // TODO: ez a harmadik paraméter itt tényleg null kell h legyen? JBoss5-ben csak ket parametere volt ennek a metodusnak
+			if (logger.isDebugEnabled()){
+				logger.debug("loadSipSession - sipApplicationSessionImpl is null - applicationSessionKey.getId()=" + applicationSessionKey.getId());
+			}
+			
 		}
 		if(logger.isDebugEnabled()) {
-			logger.debug("load sip session " + key + ", create = " + create + " sip app session = "+ applicationSessionKey);
+			logger.debug("load sip session with id: " + key + ", create = " + create + ", sip app session id= "+ applicationSessionKey.getId());
 		}
 		MobicentsSipFactory sipFactory = sipFactoryImpl;
 		if(sipFactory == null) {
@@ -2816,6 +2827,9 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 				doTx = true;
 			}
 			if(session == null) {
+				if (logger.isDebugEnabled()){
+					logger.debug("loadSipSession - setting initialLoad to true");
+				}
 				initialLoad = true;
 			} else {
 				session.updateThisAccessedTime();
@@ -2854,6 +2868,9 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 						}
 					} 
 					if(session!= null) {
+						if (logger.isDebugEnabled()){
+							logger.debug("loadSipSession - session not null, calling session.update");
+						}
 						session.update(data);						
 					}
 				} else if(logger.isDebugEnabled()) {
@@ -2904,9 +2921,21 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 			}
 		}
 		if (session != null) {
+			if (logger.isDebugEnabled()){
+				logger.debug("loadSipSession - session not null");
+			}
+			
 			if (mustAdd) {
+				if (logger.isDebugEnabled()){
+					logger.debug("loadSipSession - session not null, mustAdd true");
+				}
+				
 				unloadedSipSessions_.remove(key);				
 				if (!passivated) {
+					if (logger.isDebugEnabled()){
+						logger.debug("loadSipSession - session not null, mustAdd true, passivated false");
+					}
+					
 					session.tellNew(ClusteredSessionNotificationCause.FAILOVER);
 				}
 			}
@@ -3472,10 +3501,22 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 				long ts = -1;
 				DistributableSessionMetadata md = null;
 				try {
+					if (logger.isDebugEnabled()){
+						logger.debug("initializeUnloadedSipApplicationSessions - get sip app session data from cache with id=" + sipApplicationSessionKey + ", and owner=" + owner);
+					}
+					
 					IncomingDistributableSessionData sessionData = getDistributedCacheConvergedSipManager()
 					.getSipApplicationSessionData(sipApplicationSessionKey, owner, false);
 					ts = sessionData.getTimestamp();
 					md = sessionData.getMetadata();
+					
+					if (logger.isDebugEnabled()){
+						if (md == null){
+							logger.debug("initializeUnloadedSipApplicationSessions - retrieved metadata is null");	
+						} else {
+							logger.debug("initializeUnloadedSipApplicationSessions - metadata.getId()=" + md.getId());
+						}
+					}
 				} catch (Exception e) {
 					// most likely a lock conflict if the session is being
 					// updated remotely;
@@ -3785,7 +3826,7 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 	public MobicentsSipApplicationSession getSipApplicationSession(
 			final MobicentsSipApplicationSessionKey key, final boolean create) {
 		if (logger.isDebugEnabled()){
-			logger.debug("removeSipApplicationSession - key.getApplicationName()=" + key.getApplicationName() + ", key.getId()=" + key.getId() + ", key.getAppGeneratedKey()=" + key.getAppGeneratedKey() + ", create=" + create);
+			logger.debug("getSipApplicationSession - key.getApplicationName()=" + key.getApplicationName() + ", key.getId()=" + key.getId() + ", key.getAppGeneratedKey()=" + key.getAppGeneratedKey() + ", create=" + create);
 		}
 		
 		return getSipApplicationSession(key, create, false);		
@@ -3856,13 +3897,23 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 		if (session != null) {			
 			// Add this session to the set of those potentially needing
 			// replication
+			if (logger.isDebugEnabled()){
+				logger.debug("getSipApplicationSession - retrieved session is not null");
+			}
 			ConvergedSessionReplicationContext.bindSipApplicationSession(session,
 					getSnapshotSipManager());
 			// If we previously called passivate() on the session due to
 			// replication, we need to make an offsetting activate() call
 			if (session.getNeedsPostReplicateActivation())
 			{
+				if (logger.isDebugEnabled()){
+					logger.debug("getSipApplicationSession - call activate on retrieved session");
+				}
 				session.notifyDidActivate(ClusteredSessionNotificationCause.REPLICATION);
+			}
+		} else {
+			if (logger.isDebugEnabled()){
+				logger.debug("getSipApplicationSession - retrieved session is null");
 			}
 		}
 
@@ -3958,6 +4009,10 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 		if (session != null) {			
 			// Add this session to the set of those potentially needing
 			// replication
+			if (logger.isDebugEnabled()){
+				logger.debug("getSipSession - session is not null - Add this session to the set of those potentially needing replication");
+			}
+			
 			ConvergedSessionReplicationContext.bindSipSession(session,
 					getSnapshotSipManager());
 
@@ -3965,6 +4020,9 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 			// replication, we need to make an offsetting activate() call
 			if (session.getNeedsPostReplicateActivation())
 			{
+				if (logger.isDebugEnabled()){
+					logger.debug("getSipSession - session is not null - calling notifyDidActivate");
+				}
 				session.notifyDidActivate(ClusteredSessionNotificationCause.REPLICATION);
 			}
 		}

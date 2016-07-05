@@ -142,6 +142,15 @@ public final class ConvergedSessionReplicationContext
     */
    public static void enterSipapp(SipServletRequestImpl request, SipServletResponseImpl response, boolean startCacheActivity)
    {
+	  if(logger.isDebugEnabled()) {
+		  logger.debug("enterSipApp - request=" + request + ", response=" + response + ", startCacheActivity=" + startCacheActivity);
+		  if (request != null){
+			  logger.debug("enterSipApp - request.getAppSessionId()" + request.getAppSessionId());
+		  }
+		  if (response != null){
+			  logger.debug("enterSipApp - response.getAppSessionId()=" + response.getAppSessionId());
+		  }
+	  }
       ConvergedSessionReplicationContext ctx = getCurrentSipContext();
       if (ctx == null)
       {
@@ -294,6 +303,7 @@ public final class ConvergedSessionReplicationContext
       ConvergedSessionReplicationContext ctx = getCurrentSipContext();  
       if(logger.isDebugEnabled()) {
 			logger.debug("binding sip session= " + session + " in mgr " + manager + " ctx = " + ctx);
+			logger.debug("binding sip session.getHaId()= " + session.getHaId());
 	  }
       if (ctx != null && ctx.sipappCount > 0)
       {

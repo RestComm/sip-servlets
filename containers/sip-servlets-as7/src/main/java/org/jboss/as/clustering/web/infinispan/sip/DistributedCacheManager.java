@@ -58,6 +58,7 @@ import org.jboss.as.clustering.web.OutgoingSessionGranularitySessionData;
 import org.jboss.as.clustering.web.SessionAttributeMarshaller;
 import org.jboss.as.clustering.web.SessionOwnershipSupport;
 import org.jboss.as.clustering.web.impl.IncomingDistributableSessionDataImpl;
+import org.jboss.as.clustering.web.impl.SessionAttributeMarshallerImpl;
 import org.jboss.logging.Logger;
 import org.jboss.metadata.web.jboss.ReplicationGranularity;
 import static org.jboss.as.clustering.web.infinispan.sip.InfinispanSipLogger.ROOT_LOGGER;
@@ -94,11 +95,9 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
     private final CacheInvoker txInvoker;
     private final SharedLocalYieldingClusterLockManager lockManager;
     
-    
     // delegate stuff
     public static final String SIP_SESSION_KEY_PREFIX = "SIP_SESSION/";
 	public static final String SIP_APP_SESSION_KEY_PREFIX = "SIP_APP_SESSION/";
-	
 	
 	protected String sipApplicationNameHashed; 
 	protected String sipApplicationName;
@@ -140,10 +139,7 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 		}
 	}
 	
-	
-	
-    
-    public DistributedCacheManager(LocalDistributableSessionManager manager,
+	public DistributedCacheManager(LocalDistributableSessionManager manager,
             Cache<String, Map<Object, Object>> cache, 
             Registry<String, Void> registry,
             SharedLocalYieldingClusterLockManager lockManager, 
@@ -412,26 +408,28 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
             @Override
             public Void invoke(Cache<String, Map<Object, Object>> cache) {
             	Map<Object, Object> map = cache.putIfAbsent(sipSessionKey, null);
-            	if (logger.isDebugEnabled()){
-        			logger.debug("storeSipSessionData after putIfAbsent - cache.getAdvancedCache().getStatus()=" + cache.getAdvancedCache().getStatus());
-        			logger.debug("storeSipSessionData after putIfAbsent - cache.getAdvancedCache().getStats()=" + cache.getAdvancedCache().getStats());
-        		}
             	try {
             		
 	                SipSessionMapEntry.VERSION.put(map, Integer.valueOf(sessionData.getVersion()));
 	                DistributableSipSessionMetadata dsm = (DistributableSipSessionMetadata)(sessionData.getMetadata());
 	                if (dsm != null && dsm.isNew() && sessionData.isSessionMetaDataDirty()){
 		                if (dsm.isNew()){
+		                	
+		                	// TODO: ezt az id-beallitast csak beletettem kezzel h ne legyen null, mert akkor elszallt, nem kene mar "jonnie" az id-nak vhonnan?
+		                	if (sessionData.getMetadata().getId() == null){
+		                		if (logger.isDebugEnabled()){
+		                			logger.debug("storeSipSessionData - sessionData.getMetadata().getId() is null - setting id manually to " + sipSessionId);
+		                		}
+		                		sessionData.getMetadata().setId(sipSessionId);
+		                	}
 		                	SipSessionMapEntry.METADATA.put(map, sessionData.getMetadata());
 		                }
 		                
 		                if (dsm.getMetaData() != null){
-		                	SipSessionMapEntry.SIP_SERVLETS_METADATA.put(map, DistributedCacheManager.this.marshaller.marshal(dsm.getMetaData()));
-		                	/*try {
-		                        DistributedCacheManager.this.infinispanCacheService.sipServletsMetaDataStorage.store(map, sipApplicationSessionData);
-		                    } catch (IOException e) {
-		                        throw MESSAGES.failedToStoreSessionAttributes(e, sessionId);
-		                    }*/
+		                	if (logger.isDebugEnabled()){
+		            			logger.debug("storeSipSessionData - storing SIP_METADATA_MAP: " + dsm.getMetaData());
+		            		}
+		                	SipSessionMapEntry.SIP_METADATA_MAP.put(map, DistributedCacheManager.this.marshaller.marshal(dsm.getMetaDataCopy()));
 		                }
 		                
 	                }   
@@ -509,14 +507,18 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
             		if (logger.isDebugEnabled()){
             			logger.debug("storeSipApplicationSessionData - SipSessionMapEntry.VERSION.put");
             		}
-	            	SipSessionMapEntry.VERSION.put(map, Integer.valueOf(sipAppSessionData.getVersion()));
+            		SipSessionMapEntry.VERSION.put(map, Integer.valueOf(sipAppSessionData.getVersion()));
 	                
-	                DistributableSipApplicationSessionMetadata dsm = (DistributableSipApplicationSessionMetadata)sipAppSessionData.getMetadata();
-	                if (dsm != null && dsm.isNew() && sipAppSessionData.isSessionMetaDataDirty()){
-		                if (dsm.isNew()){
-		                	
+            		DistributableSipApplicationSessionMetadata dsm = (DistributableSipApplicationSessionMetadata)sipAppSessionData.getMetadata();
+            		if (dsm != null && dsm.isNew() && sipAppSessionData.isSessionMetaDataDirty()){
+            			if (dsm.isNew()){
 		                	// TODO: ezt az id-beallitast csak beletettem kezzel h ne legyen null, mert akkor elszallt, nem kene mar "jonnie" az id-nak vhonnan?
-		                	sipAppSessionData.getMetadata().setId(sipAppSessionId);
+		                	if (sipAppSessionData.getMetadata().getId() == null){
+		                		if (logger.isDebugEnabled()){
+		                			logger.debug("storeSipApplicationSessionData - sipAppSessionData.getMetadata().getId() is null - setting id manually to " + sipAppSessionId);
+		                		}
+		                		sipAppSessionData.getMetadata().setId(sipAppSessionId);
+		                	}
 		                	if (logger.isDebugEnabled()){
 		            			logger.debug("storeSipApplicationSessionData - SipSessionMapEntry.METADATA.put");
 		            			logger.debug("storeSipApplicationSessionData - SipSessionMapEntry.METADATA.put: id=" + sipAppSessionData.getMetadata().getId());
@@ -530,41 +532,34 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 		                
 		                if(dsm.getMetaData() != null) {
 		                	if (logger.isDebugEnabled()){
-		            			logger.debug("storeSipApplicationSessionData - SipSessionMapEntry.SIP_SERVLETS_METADATA.put");
-		            			if (dsm.getMetaData() != null){
-		            				logger.debug("storeSipApplicationSessionData - sip servlets metadata keys:");
-		            				for (String metadataKey: dsm.getMetaData().keySet()){
-		            					logger.debug("storeSipApplicationSessionData - metadata key: " + metadataKey);	
-		            				}
-		            			} else {
-		            				logger.debug("getOutgoingSipApplicationSessionData - metadata.getMetaData() is null");
-		            			}
+		            			logger.debug("storeSipApplicationSessionData - sip metadata map entries:");
+	            				for (String metadataKey: dsm.getMetaData().keySet()){
+	            					logger.debug("storeSipApplicationSessionData - metadata key: " + metadataKey);	
+	            				}
 		            		}
-		                	SipSessionMapEntry.SIP_SERVLETS_METADATA.put(map, DistributedCacheManager.this.marshaller.marshal(dsm.getMetaData()));
-		                	
-		                	
-		                	// TODO ? store sip session data too?
+		                	SipSessionMapEntry.SIP_METADATA_MAP.put(map, DistributedCacheManager.this.marshaller.marshal(dsm.getMetaDataCopy()));
+		                	// TODO: store sip session data too?
 		                	
 		                }
 	                }
 	                
 	                if (sipAppSessionData.getTimestamp() != null){
 	                	if (logger.isDebugEnabled()){
-	            			logger.debug("storeSipApplicationSessionData - SipSessionMapEntry.TIMESTAMP.put");
-	            		}
+	                		logger.debug("storeSipApplicationSessionData - SipSessionMapEntry.TIMESTAMP.put");
+	                	}
 	                	SipSessionMapEntry.TIMESTAMP.put(map, sipAppSessionData.getTimestamp());
 	                }
-                
+	                
 	                if (logger.isDebugEnabled()){
-            			logger.debug("storeSipApplicationSessionData - DistributedCacheManager.this.attributeStorage.store");
-            		}
+	                	logger.debug("storeSipApplicationSessionData - return from operation");
+	                }
                     DistributedCacheManager.this.attributeStorage.store(map, sipApplicationSessionData);
                 } catch (IOException e) {
                     throw MESSAGES.failedToStoreSessionAttributes(e, sipAppSessionId);
                 }
                 if (logger.isDebugEnabled()){
-        			logger.debug("storeSipApplicationSessionData - return from operation");
-        		}
+                	logger.debug("storeSipApplicationSessionData - return from operation");
+                }
                 return null;
             }
         };
@@ -816,6 +811,7 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 			String sipSessionKey) {
 		if (logger.isDebugEnabled()){
 			logger.debug("sipSessionCreated - sipApplicationSessionKey=" + sipApplicationSessionKey + ", sipSessionKey=" + sipSessionKey);
+			logger.debug("sipSessionCreated - no-op by default");
 		}
 		// no-op by default
 	}
@@ -823,7 +819,8 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 	@Override
 	public void sipApplicationSessionCreated(String key) {
 		if (logger.isDebugEnabled()){
-			logger.debug("sipSessionCreated - key=" + key);
+			logger.debug("sipApplicationSessionCreated - key=" + key);
+			logger.debug("sipApplicationSessionCreated - no-op by default");
 		}
 		// no-op by default
 	}
@@ -1086,8 +1083,6 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
     	if (logger.isDebugEnabled()){
 			logger.debug("getSipApplicationSessionDataImpl - sipAppSessionId=" + sipAppSessionId + ", includeAttributes=" + includeAttributes);
 		}
-    	
-		final String sipAppSessionKey = getSipAppSessionCacheKey(sipAppSessionId);
 		
 		Operation<IncomingDistributableSessionData> operation = new Operation<IncomingDistributableSessionData>() {
             @Override
@@ -1097,7 +1092,10 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
             	}
                 
                 Map<Object, Object> map = cache.get(getSipAppSessionCacheKey(sipAppSessionId));
-
+                if (logger.isDebugEnabled()){
+        			logger.debug("getSipApplicationSessionDataImpl - cache entry key: getSipAppSessionCacheKey(sipAppSessionId)=" + getSipAppSessionCacheKey(sipAppSessionId));
+        		}
+                
                 // If requested sip app session or sip session is no longer in the cache; return null
             	if (map == null) return null;
             	
@@ -1122,20 +1120,15 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
         		
         		
             	try {
-	        		// --	
 	        		Integer version = SipSessionMapEntry.VERSION.get(map);
-	        		// Map<Object, Object> versionData = jBossCacheService.cacheWrapper_.getData(Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.VERSION_KEY), true);
 	        		
 	        		Long timestamp = SipSessionMapEntry.TIMESTAMP.get(map);
-	                org.jboss.as.clustering.web.DistributableSessionMetadata metadata = SipSessionMapEntry.METADATA.get(map);
 	                
-	                DistributableSipApplicationSessionMetadata sipMetaData = new DistributableSipApplicationSessionMetadata();
-	                sipMetaData.setId(metadata.getId());
-	                sipMetaData.setCreationTime(metadata.getCreationTime());
-	                sipMetaData.setMaxInactiveInterval(metadata.getMaxInactiveInterval());
-	                sipMetaData.setNew(metadata.isNew());
-	                sipMetaData.setValid(metadata.isValid());
-	                sipMetaData.setMetaData(loadSipServletsMetaData(map));
+	                org.jboss.as.clustering.web.sip.DistributableSipApplicationSessionMetadata sipMetaData = SipSessionMapEntry.METADATA.get(map);
+	                if (logger.isDebugEnabled()){
+	        			logger.debug("getSipApplicationSessionDataImpl - getting metadata map");
+	        		}
+	                sipMetaData.setMetaData(loadSipMetaDataMap(map));
 	                
 	                IncomingDistributableSessionDataImpl result = null;
                 
@@ -1175,12 +1168,27 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
             return null;
         }
     }
-		
-	public Map<String, Object> loadSipServletsMetaData(Map<Object, Object> map) throws IOException, ClassNotFoundException {
+	
+	public Map<String, Object> loadSipMetaDataMap(Map<Object, Object> map) throws IOException, ClassNotFoundException {
 		if (logger.isDebugEnabled()){
-			logger.debug("loadSipServletsMetaData");
+			logger.debug("loadSipMetaDataMap");
 		}
-        return (Map<String, Object>) this.marshaller.unmarshal(SipSessionMapEntry.SIP_SERVLETS_METADATA.get(map));
+		
+		Object tmpObject = SipSessionMapEntry.SIP_METADATA_MAP.get(map);
+		logger.debug("loadSipMetaDataMap - tmpObject=" + tmpObject);
+		Map<String, Object> result = (Map<String, Object>) this.marshaller.unmarshal(tmpObject);
+		
+		if (logger.isDebugEnabled()){
+			logger.debug("loadSipMetaDataMap - result=" + result);
+			if (result != null){
+				for (String tmpKey: result.keySet()){
+					logger.debug("loadSipMetaDataMap - result entries: " + tmpKey + "=" + result.get(tmpKey));
+				}
+			}
+		}
+		
+		return result;
+		//return (Map<String, Object>) this.marshaller.unmarshal(SipSessionMapEntry.SIP_SERVLETS_METADATA.get(map));
     }
 	
 	private IncomingDistributableSessionData getSipSessionDataImpl(final String sipAppSessionId, final String sipSessionId, final boolean includeAttributes) {
@@ -1196,6 +1204,9 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
             	}
 
             	Map<Object, Object> map = cache.get(getSipSessionCacheKey(sipAppSessionId, sipSessionId));
+            	if (logger.isDebugEnabled()){
+        			logger.debug("getSipSessionDataImpl - cache entry key: getSipSessionCacheKey(sipAppSessionId, sipSessionId)=" + getSipSessionCacheKey(sipAppSessionId, sipSessionId));
+        		}
 
                 // If requested sip app session or sip session is no longer in the cache; return null
             	if (map == null) return null;
@@ -1221,26 +1232,27 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
         		
         		
             	try {
-	        		// --	
 	        		Integer version = SipSessionMapEntry.VERSION.get(map);
-	        		// Map<Object, Object> versionData = jBossCacheService.cacheWrapper_.getData(Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.VERSION_KEY), true);
+	        		if (logger.isDebugEnabled()){
+	        			logger.debug("getSipSessionDataImpl - retrieved VERSION from cache: version=" + version);
+	        		}
 	        		
 	        		Long timestamp = SipSessionMapEntry.TIMESTAMP.get(map);
-	                org.jboss.as.clustering.web.DistributableSessionMetadata metadata = SipSessionMapEntry.METADATA.get(map);
+	        		if (logger.isDebugEnabled()){
+	        			logger.debug("getSipSessionDataImpl - retrieved TIMESTAMP from cache: timestamp=" + timestamp);
+	        		}
 	                
-	                DistributableSipSessionMetadata sipMetaData = new DistributableSipSessionMetadata();
-	                sipMetaData.setId(metadata.getId());
-	                sipMetaData.setCreationTime(metadata.getCreationTime());
-	                sipMetaData.setMaxInactiveInterval(metadata.getMaxInactiveInterval());
-	                sipMetaData.setNew(metadata.isNew());
-	                sipMetaData.setValid(metadata.isValid());
-	                sipMetaData.setMetaData(loadSipServletsMetaData(map));
+	        		org.jboss.as.clustering.web.sip.DistributableSipSessionMetadata sipMetaData = SipSessionMapEntry.METADATA.get(map);
+	                if (logger.isDebugEnabled()){
+	        			logger.debug("getSipSessionDataImpl - getting metadata map");
+	        		}
+	                sipMetaData.setMetaData(loadSipMetaDataMap(map));
 	                
 	                IncomingDistributableSessionDataImpl result = null;
 	                
                 	result = new IncomingDistributableSessionDataImpl(version, timestamp, sipMetaData);
                 	if (includeAttributes) {
-                        result.setSessionAttributes(attributeStorage.load(map));
+                		result.setSessionAttributes(attributeStorage.load(map));
                     }
                 	return result;
                 } catch (Exception e) {

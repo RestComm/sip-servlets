@@ -58,15 +58,13 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.LifecycleSupport;
 import org.apache.catalina.valves.ValveBase;
-import org.jboss.logging.Logger;
-import org.jboss.as.web.session.SessionManager;
-import org.jboss.as.web.session.ClusteredSession;
 import org.jboss.as.clustering.web.OutgoingDistributableSessionData;
-import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
+import org.jboss.as.web.session.ClusteredSession;
+import org.jboss.as.web.session.SessionManager;
+import org.jboss.logging.Logger;
 import org.mobicents.servlet.sip.catalina.session.ConvergedSessionFacade;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
-//TODO: ez az import minek volt itt? import org.mobicents.servlet.sip.startup.failover.SipStandardBalancerNodeService;
 
 /**
  * Web request valve to specifically handle Tomcat jvmRoute using mod_jk(2)

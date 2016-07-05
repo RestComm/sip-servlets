@@ -100,7 +100,7 @@ public class SessionBasedClusteredSipApplicationSession extends ClusteredSipAppl
 	@Override
 	protected OutgoingSessionGranularitySessionData getOutgoingSipApplicationSessionData() {
 		if (logger.isDebugEnabled()){
-			logger.debug("getOutgoingSipApplicationSessionData - isSessionAttributeMapDirty()=" + isSessionAttributeMapDirty());
+			logger.debug("getOutgoingSipApplicationSessionData - isSessionAttributeMapDirty()=" + isSessionAttributeMapDirty() + ", isSessionMetadataDirty()=" + isSessionMetadataDirty());
 		}
 		
 		Map<String, Object> attrs = isSessionAttributeMapDirty() ? getSessionAttributeMap() : null;
@@ -111,27 +111,26 @@ public class SessionBasedClusteredSipApplicationSession extends ClusteredSipAppl
 				.valueOf(getSessionTimestamp()) : null;
 		if (logger.isDebugEnabled()){
 			logger.debug("getOutgoingSipApplicationSessionData - create outgoingData with null realId: "
-					+ "key.getApplicationName()=" + key.getApplicationName()
-					+ ", key.getId()=" + key.getId()
-					+ ", key.getAppGeneratedKey()=" + key.getAppGeneratedKey()
+					+ "key.getApplicationName()=" + ((key == null) ? "key is null" : key.getApplicationName())
+					+ ", key.getId()=" + ((key == null) ? "key is null" : key.getId())
+					+ ", key.getAppGeneratedKey()=" + ((key == null) ? "key is null" : key.getAppGeneratedKey())
 					+ ", timestamp=" + timestamp
 					+ ", getVersion()=" + getVersion()
-					+ ", metadata.getId()=" + metadata.getId()
+					+ ", metadata.getId()=" + ((metadata == null) ? "metadata is null" : metadata.getId())
 					+ ", this.getId()=" + this.getId()
 					+ ", this.getHaId()=" + this.getHaId());
 			
-			if (metadata.getMetaData() != null){
+			if (metadata != null && metadata.getMetaData() != null){
 				logger.debug("getOutgoingSipApplicationSessionData - metadata keys:");
 				for (String metadataKey: metadata.getMetaData().keySet()){
 					logger.debug("getOutgoingSipApplicationSessionData - metadata key: " + metadataKey);	
 				}
 			} else {
-				logger.debug("getOutgoingSipApplicationSessionData - metadata.getMetaData() is null");
+				logger.debug("getOutgoingSipApplicationSessionData - either metadata or metadata.getMetaData() is null");
 			}
 		}
 		
-		OutgoingData outgoingData = new OutgoingData(null, getVersion(), timestamp, key.getId(), metadata,
-				attrs);
+		OutgoingData outgoingData = new OutgoingData(null, getVersion(), timestamp, key.getId(), metadata, attrs);
 		outgoingData.setSessionMetaDataDirty(isSessionMetadataDirty());
 		return outgoingData;
 	}
