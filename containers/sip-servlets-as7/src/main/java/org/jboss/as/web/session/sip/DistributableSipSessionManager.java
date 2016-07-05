@@ -49,7 +49,6 @@ import org.jboss.as.clustering.web.OutgoingSessionGranularitySessionData;
 import org.jboss.as.clustering.web.SessionOwnershipSupport;
 import org.jboss.as.clustering.web.sip.DistributedCacheConvergedSipManager;
 import org.jboss.as.clustering.web.sip.LocalDistributableConvergedSessionManager;
-import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.web.WebLogger;
 import org.jboss.as.web.session.AskSessionOutdatedSessionChecker;
 import org.jboss.as.web.session.ClusteredSession;
@@ -69,7 +68,6 @@ import org.jboss.as.web.session.notification.sip.IgnoreUndeployLegacyClusteredSi
 import org.jboss.logging.Logger;
 import org.jboss.marshalling.ClassResolver;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
-import org.jboss.modules.Module;
 import org.jboss.util.loading.ContextClassLoaderSwitcher;
 import org.mobicents.ha.javax.sip.ClusteredSipStack;
 import org.mobicents.ha.javax.sip.ReplicationStrategy;
@@ -88,6 +86,10 @@ import org.mobicents.servlet.sip.core.session.SipManagerDelegate;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
+import org.restcomm.cache.MobicentsCache;
+import org.restcomm.cluster.DefaultMobicentsCluster;
+import org.restcomm.cluster.MobicentsCluster;
+import org.restcomm.cluster.election.DefaultClusterElector;
 
 /**
  * Implementation of a converged clustered session manager for
@@ -193,8 +195,8 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 
 	/** Are we running embedded in JBoss? */
 	private boolean embedded_ = false;
-	// TODO: --> TIMER REPLICATION-höz tartozik valszeg private MobicentsCluster mobicentsCluster;
-	// TODO: --> TIMER REPLICATION-höz tartozik valszeg private MobicentsCache mobicentsCache;
+	MobicentsCluster mobicentsCluster;
+	MobicentsCache mobicentsCache;
 	private String applicationName;
 
 	private SnapshotManager snapshotManager;
@@ -1028,7 +1030,7 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 		}
 		//TODO: torolni - JBoss5-os ez a sor: String realId = getRealId(id);
 
-		String realId = this.parse(id).getKey().toString();	// TODO: miert kell ide a toString?? a JBoss-7 forrasban anelkul is megy
+		String realId = this.parse(id).getKey().toString();
 
 		// Find it from the local store first
 		// TODO: torolni - JBoss5-os ez a sor: ClusteredSession<? extends OutgoingDistributableSessionData> session = findLocalSession(realId);
@@ -4573,10 +4575,12 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 		this.outdatedSessionChecker = initOutdatedSessionChecker();
 		this.outdatedSipSessionChecker = initOutdatedSipSessionChecker();
 		this.outdatedSipApplicationSessionChecker = initOutdatedSipApplicationSessionChecker();
-		//TODO: timer-es cucchoz tartozik ez a sor mobicentsCache = new MobicentsCache(getDistributedCacheConvergedSipManager().getJBossCache(), null);
-		//TODO: timer-es cucchoz tartozik ez a sor mobicentsCluster = new DefaultMobicentsCluster(mobicentsCache, getDistributedCacheConvergedSipManager().getJBossCache().getConfiguration().getRuntimeConfig().getTransactionManager(), new DefaultClusterElector());
+		
+		mobicentsCache = new MobicentsCache(getDistributedCacheConvergedSipManager().getInfinispanCache());
+		mobicentsCluster = new DefaultMobicentsCluster(mobicentsCache, getDistributedCacheConvergedSipManager().getInfinispanCache().getAdvancedCache().getTransactionManager(), new DefaultClusterElector());
+		
 		if(logger.isDebugEnabled()) {
-			//TODO: timer-es cucchoz tartozik ez a sor logger.debug("Mobicents Sip Servlets Default Mobicents Cluster " + mobicentsCluster + " created");
+			logger.debug("Mobicents Sip Servlets Default Mobicents Cluster " + mobicentsCluster + " created");
 		}
 		initializeUnloadedSipApplicationSessions();
 		//		initializeUnloadedSipSessions();
@@ -4599,9 +4603,9 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 			logger.debug("stopExtensions");
 		}
 		
-		//TODO: timer-es cucchoz tartozik ez a sor mobicentsCache.stop();
-		//TODO: timer-es cucchoz tartozik ez a sor mobicentsCache = null;
-		//TODO: timer-es cucchoz tartozik ez a sor mobicentsCluster = null;
+		mobicentsCache.stopCache();
+		mobicentsCache = null;
+		mobicentsCluster = null;
 		removeAllSessions();
 
 		passivatedSipSessionCount_.set(0);
@@ -5455,10 +5459,10 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 		}
 	}
 
-	// TODO: timer-es cucc
-	//public MobicentsCluster getMobicentsCluster() {		
-	//	return mobicentsCluster;
-	//}
+	
+	public MobicentsCluster getMobicentsCluster() {		
+		return mobicentsCluster;
+	}
 
 	
 	

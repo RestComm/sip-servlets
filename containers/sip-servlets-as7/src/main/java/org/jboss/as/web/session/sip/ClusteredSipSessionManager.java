@@ -12,6 +12,7 @@ import org.mobicents.servlet.sip.catalina.CatalinaSipManager;
 import org.mobicents.servlet.sip.core.session.DistributableSipManager;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
+import org.restcomm.cluster.MobicentsCluster;
 
 /**
  * @author jean.deruelle@gmail.com
@@ -58,8 +59,8 @@ public interface ClusteredSipSessionManager<O extends OutgoingDistributableSessi
 
 	public DistributedCacheConvergedSipManager getDistributedCacheConvergedSipManager();
 
-	// TODO: valszeg timer repl-höz tartozik ez a metodus
-	//MobicentsCluster getMobicentsCluster();
+	
+	MobicentsCluster getMobicentsCluster();
 
 	void checkSipApplicationSessionPassivation(SipApplicationSessionKey key);
 	void checkSipSessionPassivation(SipSessionKey key);

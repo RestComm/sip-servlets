@@ -62,6 +62,12 @@ import org.apache.log4j.Logger;
 import org.apache.tomcat.InstanceManager;
 import org.jboss.as.clustering.web.BatchingManager;
 import org.jboss.as.clustering.web.OutgoingDistributableSessionData;
+import org.jboss.as.clustering.web.sip.DistributedCacheConvergedSipManager;
+import org.jboss.as.web.session.sip.ClusteredSipApplicationSession;
+import org.jboss.as.web.session.sip.ClusteredSipSession;
+import org.jboss.as.web.session.sip.ClusteredSipSessionManager;
+import org.jboss.as.web.session.sip.ConvergedSessionReplicationContext;
+import org.jboss.as.web.session.sip.SnapshotSipManager;
 import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.catalina.CatalinaSipContext;
@@ -95,6 +101,8 @@ import org.mobicents.servlet.sip.core.session.SipApplicationSessionCreationThrea
 import org.mobicents.servlet.sip.core.session.SipSessionsUtilImpl;
 import org.mobicents.servlet.sip.core.timers.DefaultProxyTimerService;
 import org.mobicents.servlet.sip.core.timers.DefaultSipApplicationSessionTimerService;
+import org.mobicents.servlet.sip.core.timers.FaultTolerantSasTimerService;
+import org.mobicents.servlet.sip.core.timers.FaultTolerantTimerServiceImpl;
 import org.mobicents.servlet.sip.core.timers.ProxyTimerService;
 import org.mobicents.servlet.sip.core.timers.ProxyTimerServiceImpl;
 import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerService;
@@ -105,13 +113,6 @@ import org.mobicents.servlet.sip.listener.SipConnectorListener;
 import org.mobicents.servlet.sip.message.SipFactoryFacade;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.ruby.SipRubyController;
-
-import org.jboss.as.clustering.web.sip.DistributedCacheConvergedSipManager;
-import org.jboss.as.web.session.sip.ClusteredSipSessionManager;
-import org.jboss.as.web.session.sip.ConvergedSessionReplicationContext;
-import org.jboss.as.web.session.sip.SnapshotSipManager;
-import org.jboss.as.web.session.sip.ClusteredSipSession;
-import org.jboss.as.web.session.sip.ClusteredSipApplicationSession;
 
 /**
  * Sip implementation of the <b>Context</b> interface extending the standard
@@ -260,9 +261,9 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 				if(logger.isInfoEnabled()) {
 					logger.info("Using the Fault Tolerant Timer Service to schedule fault tolerant timers in a distributed environment");
 				}
-				// TODO: ez a sor timer-es cucc: timerService = new FaultTolerantTimerServiceImpl((DistributableSipManager)getSipManager());
+				timerService = new FaultTolerantTimerServiceImpl((DistributableSipManager)getSipManager());
 			} else {
-				// TODO: ez a sor timer-es cucc: timerService = new TimerServiceImpl();
+				timerService = new TimerServiceImpl(sipApplicationDispatcher.getSipService(), applicationName);
 			}
 // FIXME - VEGE: distributable not supported
 			
@@ -286,7 +287,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 		if(sasTimerService == null || !sasTimerService.isStarted()) {
 			String sasTimerServiceType = sipApplicationDispatcher.getSipService().getSasTimerServiceImplementationType();
 			if(getDistributable() && hasDistributableManager) {
-				// TODO: ez a sor timer-es cucc: sasTimerService = new FaultTolerantSasTimerService((DistributableSipManager)getSipManager(), 4);
+				sasTimerService = new FaultTolerantSasTimerService((DistributableSipManager)getSipManager(), 4);
 			} else if (sasTimerServiceType != null && sasTimerServiceType.equalsIgnoreCase("Standard")) {
                 sasTimerService = new StandardSipApplicationSessionTimerService(applicationName);
             } else if (sasTimerServiceType != null && sasTimerServiceType.equalsIgnoreCase("Default")) {
