@@ -89,9 +89,9 @@ import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
-//TODO: timer-es cucc import org.mobicents.servlet.sip.core.timers.ClusteredSipApplicationSessionTimerService;
-//TODO: timer-es cucc import org.mobicents.servlet.sip.core.timers.FaultTolerantSasTimerTask;
-//TODO: timer-es cucc import org.mobicents.servlet.sip.core.timers.TimerServiceTask;
+import org.mobicents.servlet.sip.core.timers.ClusteredSipApplicationSessionTimerService;
+import org.mobicents.servlet.sip.core.timers.FaultTolerantSasTimerTask;
+import org.mobicents.servlet.sip.core.timers.TimerServiceTask;
 import org.mobicents.servlet.sip.core.SipContext;
 
 /**
@@ -1031,12 +1031,12 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 	public void passivate() {
 		notifyWillPassivate(ClusteredSessionNotificationCause.PASSIVATION);
 		if(expirationTimerTask != null) {
-			//TODO: timer-es cucc: ((FaultTolerantSasTimerTask)expirationTimerTask).passivate();
+			((FaultTolerantSasTimerTask)expirationTimerTask).passivate();
 			expirationTimerTask = null;
 		}
 		if(servletTimers != null) {
 			for (ServletTimer servletTimer : servletTimers.values()) {
-				//TODO: timer-es cucc: ((TimerServiceTask) servletTimer).passivate();
+				((TimerServiceTask) servletTimer).passivate();
 			}
 			servletTimers.clear();
 		}
@@ -1544,16 +1544,16 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 	}
 
 	public void rescheduleTimersLocally() {		
-		// TODO: timer-es cucc: ((ClusteredSipApplicationSessionTimerService)sipContext.getSipApplicationSessionTimerService()).rescheduleTimerLocally(this);
+		((ClusteredSipApplicationSessionTimerService)sipContext.getSipApplicationSessionTimerService()).rescheduleTimerLocally(this);
 		if(servletTimerIds != null) {
 			if(logger.isDebugEnabled()) {
 				logger.debug("SipApplicationSession " + key + " number of servletTimers to reschedule locally " + servletTimerIds.length);
 			}
 			for(String servletTimerId : servletTimerIds) {
-				// TODO: timer-es cucc: ServletTimer servletTimer = ((ClusteredSipServletTimerService)sipContext.getTimerService()).rescheduleTimerLocally(this, servletTimerId);
-				// TODO: timer-es cucc: if(servletTimer != null) {
-				// TODO: timer-es cucc: 	super.addServletTimer(servletTimer);
-				// TODO: timer-es cucc: }
+				ServletTimer servletTimer = ((ClusteredSipServletTimerService)sipContext.getTimerService()).rescheduleTimerLocally(this, servletTimerId);
+				if(servletTimer != null) {
+					super.addServletTimer(servletTimer);
+				}
 			}
 		}
 		servletTimerIds = null;

@@ -151,6 +151,28 @@
             <!-- <version>7.2.0.Final</version>-->
             <version>7.5.0.Final-redhat-21</version>
         </dependency>	
+		
+		<dependency>
+			<groupId>org.restcomm.cluster</groupId>
+			<artifactId>core</artifactId>
+			<version>3.0.0.3</version>
+			<scope>provided</scope>
+		</dependency>	
+		
+		<dependency>
+			<groupId>org.restcomm.cluster</groupId>
+			<artifactId>cache</artifactId>
+			<version>3.0.0.3</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.restcomm.cluster</groupId>
+			<artifactId>timers</artifactId>
+			<version>3.0.0.3</version>
+			<scope>provided</scope>
+		</dependency> 
+		
 	</dependencies>
 	<build>
 		<plugins>		
