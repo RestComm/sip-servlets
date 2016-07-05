@@ -258,6 +258,34 @@
 					<version>${restcomm.balancer.version}</version>
 					<scope>provided</scope>
 				</dependency>				
+				
+				<dependency>
+			<groupId>org.restcomm.cluster</groupId>
+			<artifactId>core</artifactId>
+			<version>3.0.0.3</version>
+			<scope>provided</scope>
+		</dependency>	
+		
+		<dependency>
+			<groupId>org.restcomm.cluster</groupId>
+			<artifactId>cache</artifactId>
+			<version>3.0.0.3</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.restcomm.cluster</groupId>
+			<artifactId>timers</artifactId>
+			<version>3.0.0.3</version>
+			<scope>provided</scope>
+		</dependency>
+		
+				<dependency>
+			<groupId>org.infinispan</groupId>
+			<artifactId>infinispan-tree</artifactId>
+			<version>5.2.10.Final</version>
+			<scope>provided</scope>
+		</dependency>
 
 			</dependencies>
 
