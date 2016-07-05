@@ -158,25 +158,8 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 		//Fix from abondar for Issue 494 and angelo.marletta for Issue 502      
 		this.parameters.put(name.toLowerCase(), value);
 		if(header != null) {
-			boolean isQuotableParameter = false;
-			SipContext context = SipApplicationSessionCreationThreadLocal.lookupContext();
-			if (context != null){
-				Object object = context.getServletContext().getAttribute("org.restcomm.servlets.sip.QUOTABLE_PARAMETER");
-				if (object != null){
-					String quotableParameters = object.toString();
-					if (!quotableParameters.isEmpty()){
-						String[] parameters = quotableParameters.split(",");
-						for (int i = 0; i < parameters.length; i++){
-							if (parameters[i].trim().equalsIgnoreCase(name)){
-								isQuotableParameter = true;
-								break;
-							}
-						}
-					}
-				}
-			}
 			try {
-				if (isQuotableParameter && header instanceof ParametersExt){
+				if (isQuotableParam(name) && (header instanceof ParametersExt)){
 					((ParametersExt) header).setQuotedParameter(name, value);
 				}else{
 					header.setParameter(name, "".equals(value) ? null : value);
@@ -186,7 +169,34 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 			}
 		}
 	}
-
+	
+	/*
+	 * Check if the param name is in the list that its value need to be quoted
+	 * 
+	 * @param name - a string specifying the parameter name
+	 * 
+	 */
+	private boolean isQuotableParam(String name){
+		boolean isQuotableParameter = false;
+		SipContext context = SipApplicationSessionCreationThreadLocal.lookupContext();
+		if (context != null){
+			Object object = context.getServletContext().getAttribute("org.restcomm.servlets.sip.QUOTABLE_PARAMETER");
+			if (object != null){
+				String quotableParameters = object.toString();
+				if (!quotableParameters.isEmpty()){
+					String[] parameters = quotableParameters.split(",");
+					for (int i = 0; i < parameters.length; i++){
+						if (parameters[i].trim().equalsIgnoreCase(name)){
+							isQuotableParameter = true;
+							break;
+						}
+					}
+				}
+			}
+		}
+		
+		return isQuotableParameter;
+	}
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.Parameterable#getParameters()
