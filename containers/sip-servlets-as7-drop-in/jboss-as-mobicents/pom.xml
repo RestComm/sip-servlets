@@ -40,7 +40,7 @@
 	<description>&gt;JBoss Application Server: Restcomm Sip Servlets Adaptation Layer</description>
 
     <properties>
-    	<!--  <jboss.version>7.5.0.Final-redhat-21</jboss.version>	-->
+    	<jboss.infinispan.modules.version>7.5.0.Final-redhat-21</jboss.infinispan.modules.version>
         <junit.version>4.1</junit.version>
     </properties>
 
@@ -220,30 +220,17 @@
         <dependency>
             <groupId>org.jboss.as</groupId>
             <artifactId>jboss-as-clustering-infinispan</artifactId>
-            <!-- <version>${jboss.version}</version> -->
-            <version>7.5.0.Final-redhat-21</version>
-            <!-- <version>7.2.0.Final</version> -->
+            <version>${jboss.infinispan.modules.version}</version>
             <scope>provided</scope>
         </dependency>
 
 		<dependency>
             <groupId>org.jboss.as</groupId>
             <artifactId>jboss-as-clustering-impl</artifactId>
-            <!-- <version>${jboss.version}</version> -->
-            <version>7.5.0.Final-redhat-21</version>
-            <!-- <version>7.2.0.Final</version> -->
+            <version>${jboss.infinispan.modules.version}</version>
             <scope>provided</scope>
         </dependency>
         
-        <!-- 
-		<dependency>
-			<groupId>org.infinispan</groupId>
-			<artifactId>infinispan-tree</artifactId>
-			<version>5.2.11.Final</version>
-			<scope>provided</scope>
-		</dependency>
-         -->
-         
         <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging-processor</artifactId>
@@ -258,16 +245,14 @@
             <groupId>org.jboss.as</groupId>
             <artifactId>jboss-as-clustering-web-infinispan</artifactId>
             <scope>provided</scope>
-            <!-- <version>7.2.0.Final</version>-->
-            <version>7.5.0.Final-redhat-21</version>
+            <version>${jboss.infinispan.modules.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.jboss.as</groupId>
             <artifactId>jboss-as-clustering-web-spi</artifactId>
             <scope>provided</scope>
-            <!-- <version>7.2.0.Final</version>-->
-            <version>7.5.0.Final-redhat-21</version>
+            <version>${jboss.infinispan.modules.version}</version>
         </dependency>
         
     </dependencies>
