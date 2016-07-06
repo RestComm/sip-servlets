@@ -25,8 +25,10 @@ import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.DeploymentUnitProcessor;
+import org.jboss.as.web.deployment.WarMetaData;
 import org.jboss.as.web.ext.WebContextFactory;
 import org.jboss.logging.Logger;
+import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.mobicents.metadata.sip.spec.SipAnnotationMetaData;
 import org.mobicents.metadata.sip.spec.SipMetaData;
 
@@ -58,6 +60,22 @@ public class SipContextFactoryDeploymentProcessor implements DeploymentUnitProce
             	if (logger.isDebugEnabled()) logger.debug(deploymentUnit.getName() + " has null sipMetaData and no SipApplication annotation, no Sip context factory installed");
 	            return;
             }
+        } else {
+        	if (logger.isDebugEnabled()) logger.debug(deploymentUnit.getName() + " sipMetaData not null");
+        	
+        	if (sipMetaData.getDistributable() != null){
+        		if (logger.isDebugEnabled()) logger.debug(deploymentUnit.getName() + " sipMetaData distributable");
+        		
+        		final WarMetaData warMetaData = deploymentUnit.getAttachment(WarMetaData.ATTACHMENT_KEY);
+                if (warMetaData != null) {
+                	if (logger.isDebugEnabled()) logger.debug(deploymentUnit.getName() + " warMetaData not null - setting to distributable");
+                	final JBossWebMetaData jbossWebMetaData = warMetaData.getMergedJBossWebMetaData();
+                	jbossWebMetaData.setDistributable(sipMetaData.getDistributable());
+                	deploymentUnit.putAttachment(WarMetaData.ATTACHMENT_KEY, warMetaData);
+                } else {
+                	if (logger.isDebugEnabled()) logger.debug(deploymentUnit.getName() + " warMetaData is null");
+                }
+        	}
         }
         if (logger.isDebugEnabled()) logger.debug(deploymentUnit.getName() + " sip context factory installed");
         // Just attach the context factory, the web subsystem will pick it up
