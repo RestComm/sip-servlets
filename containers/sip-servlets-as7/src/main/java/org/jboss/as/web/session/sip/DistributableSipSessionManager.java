@@ -47,6 +47,7 @@ import org.jboss.as.clustering.web.IncomingDistributableSessionData;
 import org.jboss.as.clustering.web.OutgoingDistributableSessionData;
 import org.jboss.as.clustering.web.OutgoingSessionGranularitySessionData;
 import org.jboss.as.clustering.web.SessionOwnershipSupport;
+import org.jboss.as.clustering.web.infinispan.sip.DistributedCacheManager;
 import org.jboss.as.clustering.web.sip.DistributedCacheConvergedSipManager;
 import org.jboss.as.clustering.web.sip.LocalDistributableConvergedSessionManager;
 import org.jboss.as.web.WebLogger;
@@ -3040,7 +3041,7 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 						//since the session has to be recreated we don't recreate the sas timer since it is fault tolerant and has been failed over as well
 						session = (ClusteredSipApplicationSession) 
 						((ClusteredSipManagerDelegate)sipManagerDelegate).getNewMobicentsSipApplicationSession(key, ((SipContext)getContainer()), true);
-						OwnedSessionUpdate osu = unloadedSipApplicationSessions_.get(key);
+						OwnedSessionUpdate osu = unloadedSipApplicationSessions_.get(key.getId());
 						passivated = (osu != null && osu.passivated);
 					}
 					if(session != null) {					
@@ -3094,7 +3095,7 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 		}
 		if (session != null) {
 			if (mustAdd) {
-				unloadedSipApplicationSessions_.remove(key);	
+				unloadedSipApplicationSessions_.remove(key.getId());	
 				if (!passivated) {
 					session.tellNew(ClusteredSessionNotificationCause.FAILOVER);
 				}
@@ -3497,18 +3498,18 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 			long passivationMin = getPassivationMinIdleTime() * 1000L;
 
 			for (Map.Entry<String, String> entry : sessions.entrySet()) {
-				String sipApplicationSessionKey = entry.getKey();
+				String sipApplicationSessionId = entry.getKey();
 				String owner = entry.getValue();
 
 				long ts = -1;
 				DistributableSessionMetadata md = null;
 				try {
 					if (logger.isDebugEnabled()){
-						logger.debug("initializeUnloadedSipApplicationSessions - get sip app session data from cache with id=" + sipApplicationSessionKey + ", and owner=" + owner);
+						logger.debug("initializeUnloadedSipApplicationSessions - get sip app session data from cache with id=" + sipApplicationSessionId + ", and owner=" + owner);
 					}
 					
 					IncomingDistributableSessionData sessionData = getDistributedCacheConvergedSipManager()
-					.getSipApplicationSessionData(sipApplicationSessionKey, owner, false);
+					.getSipApplicationSessionData(sipApplicationSessionId, owner, false);
 					ts = sessionData.getTimestamp();
 					md = sessionData.getMetadata();
 					
@@ -3524,7 +3525,7 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 					// updated remotely;
 					// ignore it and use default values for timstamp and
 					// maxInactive
-					logger.debug("Problem reading metadata for session " + sipApplicationSessionKey
+					logger.debug("Problem reading metadata for session " + sipApplicationSessionId
 							+ " -- " + e.toString());
 				}
 
@@ -3534,7 +3535,7 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 
 				OwnedSessionUpdate osu = new OwnedSessionUpdate(owner, lastMod,
 						maxLife, false);
-				unloadedSipApplicationSessions_.put(sipApplicationSessionKey, osu);
+				unloadedSipApplicationSessions_.put(sipApplicationSessionId, osu);
 				if (passivate) {
 					try {
 						long elapsed = System.currentTimeMillis() - lastMod;
@@ -3544,7 +3545,7 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 						if (passivationMax >= 0 && elapsed > passivationMax) {
 							if (logger.isDebugEnabled()) {
 								logger.debug("Elapsed time of " + elapsed
-										+ " for session " + sipApplicationSessionKey
+										+ " for session " + sipApplicationSessionId
 										+ " exceeds max of " + passivationMax
 										+ "; passivating");
 							}
@@ -3561,16 +3562,16 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 								&& elapsed >= passivationMin) {
 							if (logger.isDebugEnabled()) {
 								logger.debug("Elapsed time of " + elapsed
-										+ " for session " + sipApplicationSessionKey
+										+ " for session " + sipApplicationSessionId
 										+ " exceeds min of " + passivationMin
 										+ "; passivating");
 							}
-							processUnloadedSipApplicationSessionPassivation(sipApplicationSessionKey, osu);
+							processUnloadedSipApplicationSessionPassivation(sipApplicationSessionId, osu);
 						}
 					} catch (Exception e) {
 						// most likely a lock conflict if the session is being
 						// updated remotely; ignore it
-						logger.debug("Problem passivating session " + sipApplicationSessionKey
+						logger.debug("Problem passivating session " + sipApplicationSessionId
 								+ " -- " + e.toString());
 					}
 				}
@@ -4055,7 +4056,7 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 		if (session == null) {
 			// We weren't managing the session anyway. But remove it
 			// from the list of cached sessions we haven't loaded
-			if (unloadedSipApplicationSessions_.remove(key) != null) {
+			if (unloadedSipApplicationSessions_.remove(key.getId()) != null) {
 				if (logger.isDebugEnabled())
 					logger.debug("Removed entry for session " + key
 							+ " from unloaded session map");
@@ -4576,8 +4577,9 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 		this.outdatedSipSessionChecker = initOutdatedSipSessionChecker();
 		this.outdatedSipApplicationSessionChecker = initOutdatedSipApplicationSessionChecker();
 		
-		mobicentsCache = new MobicentsCache(getDistributedCacheConvergedSipManager().getInfinispanCache());
-		mobicentsCluster = new DefaultMobicentsCluster(mobicentsCache, getDistributedCacheConvergedSipManager().getInfinispanCache().getAdvancedCache().getTransactionManager(), new DefaultClusterElector());
+		// ###TIMER
+		//mobicentsCache = new MobicentsCache(getDistributedCacheConvergedSipManager().getInfinispanCache());
+		//mobicentsCluster = new DefaultMobicentsCluster(mobicentsCache, getDistributedCacheConvergedSipManager().getInfinispanCache().getAdvancedCache().getTransactionManager(), new DefaultClusterElector());
 		
 		if(logger.isDebugEnabled()) {
 			logger.debug("Mobicents Sip Servlets Default Mobicents Cluster " + mobicentsCluster + " created");
@@ -4602,10 +4604,10 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 		if (logger.isDebugEnabled()){
 			logger.debug("stopExtensions");
 		}
-		
-		mobicentsCache.stopCache();
+		// ###TIMER
+		/*mobicentsCache.stopCache();
 		mobicentsCache = null;
-		mobicentsCluster = null;
+		mobicentsCluster = null;*/
 		removeAllSessions();
 
 		passivatedSipSessionCount_.set(0);

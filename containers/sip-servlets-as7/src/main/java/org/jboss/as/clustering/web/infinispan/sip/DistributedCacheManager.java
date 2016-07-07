@@ -106,19 +106,19 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 	
 	LocalDistributableSessionManager manager;
 	
-	static String getSipSessionCacheKey(String sipAppSessionKey, String sipSessionId){
+	public static String getSipSessionCacheKey(String sipAppSessionKey, String sipSessionId){
 		return SIP_SESSION_KEY_PREFIX + sipAppSessionKey + "/" + sipSessionId;
 	}
-	static String getSipAppSessionCacheKey(String sipAppSessionId){
+	public static String getSipAppSessionCacheKey(String sipAppSessionId){
 		return SIP_APP_SESSION_KEY_PREFIX + sipAppSessionId;
 	}
-	static boolean isKeySipSessionId(String cacheKey){
+	public static boolean isKeySipSessionId(String cacheKey){
 		return cacheKey.startsWith(SIP_SESSION_KEY_PREFIX);
 	}
-	static boolean isKeySipAppSessionId(String cacheKey){
+	public static boolean isKeySipAppSessionId(String cacheKey){
 		return cacheKey.startsWith(SIP_APP_SESSION_KEY_PREFIX);
 	}
-	static String getSipSessionIdFromCacheKey(String cacheKey){
+	public static String getSipSessionIdFromCacheKey(String cacheKey){
 		if (isKeySipSessionId(cacheKey)){
 			return cacheKey.substring(SIP_SESSION_KEY_PREFIX.length());
 		} else if (isKeySipAppSessionId(cacheKey)){
@@ -128,7 +128,7 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 			return null;
 		}
 	}
-	static String getSipAppSessionIdFromCacheKey(String cacheKey){
+	public static String getSipAppSessionIdFromCacheKey(String cacheKey){
 		if (isKeySipAppSessionId(cacheKey)){
 			return cacheKey.substring(SIP_APP_SESSION_KEY_PREFIX.length());
 		} else if (isKeySipSessionId(cacheKey)){
@@ -766,7 +766,7 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
             	Set<String> sessionIds = new HashSet<String>();
             	for (String key: cache.keySet()){
             		if (key.startsWith(SIP_SESSION_KEY_PREFIX)){
-            			sessionIds.add(key);
+            			sessionIds.add(getSipSessionIdFromCacheKey(key));
             		}
             	}
             	return sessionIds;
@@ -794,7 +794,7 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
             	Set<String> sessionIds = new HashSet<String>();
             	for (String key: cache.keySet()){
             		if (key.startsWith(SIP_APP_SESSION_KEY_PREFIX)){
-            			sessionIds.add(key);
+            			sessionIds.add(getSipAppSessionIdFromCacheKey(key));
             		}
             	}
             	return sessionIds;
