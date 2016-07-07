@@ -3549,7 +3549,7 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 										+ " exceeds max of " + passivationMax
 										+ "; passivating");
 							}
-							processUnloadedSipApplicationSessionPassivation(sipApplicationSessionKey, osu);
+							processUnloadedSipApplicationSessionPassivation(sipApplicationSessionId, osu);
 						}
 						// If the session didn't exceed the
 						// passivationMaxIdleTime_, see
