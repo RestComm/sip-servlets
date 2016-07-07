@@ -5,13 +5,13 @@ export config=$2
 if [ $# -ne 0 ]; then
 	case $1 in	
 	    proxy)
-	    		# TODO: adapt to eap-6.4
 	    		echo "Distributed example used is proxy"
 	    		mvn clean install -f $EXAMPLES_HOME/location-service-distributable/pom.xml
-				rm -rf $JBOSS_HOME/server/$config/deploy/location-service-distributable-*.war
-				cp $EXAMPLES_HOME/location-service-distributable/target/location-service-distributable-*.war $JBOSS_HOME/server/$config/deploy
-				cp $EXAMPLES_HOME/location-service-distributable/distributable-location-service-dar.properties $JBOSS_HOME/server/$config/conf/dars/mobicents-dar.properties
-	            ;;
+				#rm -rf $JBOSS_HOME/server/$config/deploy/location-service-distributable-*.war
+				rm -rf $JBOSS_HOME/standalone/deployments/location-service-distributable-*.war
+				cp $EXAMPLES_HOME/location-service-distributable/target/location-service-distributable-*.war $JBOSS_HOME/standalone/deployments
+				cp $EXAMPLES_HOME/location-service-distributable/distributable-location-service-dar.properties $JBOSS_HOME/standalone/configuration/dars/mobicents-dar.properties
+				;;
 	    proxy-early)
 	    		# TODO: adapt to eap-6.4
 	    		echo "Distributed example used is proxy early failover"
@@ -22,13 +22,13 @@ if [ $# -ne 0 ]; then
 				cp setup/jboss-5/mss-sip-stack-jboss-early-failover.properties $JBOSS_HOME/server/$config/conf/mss-sip-stack.properties				
 	            ;;
 	    b2bua)
-	            # TODO: adapt to eap-6.4
 	            echo "Distributed example used is b2bua"
 	    		mvn clean install -f $EXAMPLES_HOME/call-forwarding-distributable/pom.xml
-				rm -rf $JBOSS_HOME/server/$config/deploy/call-forwarding-distributable-*.war
-				cp $EXAMPLES_HOME/call-forwarding-distributable/target/call-forwarding-distributable-*.war $JBOSS_HOME/server/$config/deploy
-				cp $EXAMPLES_HOME/call-forwarding-distributable/distributable-call-forwarding-dar.properties $JBOSS_HOME/server/$config/conf/dars/mobicents-dar.properties
-	            ;;
+				#rm -rf $JBOSS_HOME/server/$config/deploy/call-forwarding-distributable-*.war
+				rm -rf $JBOSS_HOME/standalone/deployments/call-forwarding-distributable-*.war
+				cp $EXAMPLES_HOME/call-forwarding-distributable/target/call-forwarding-distributable-*.war $JBOSS_HOME/standalone/deployments
+				cp $EXAMPLES_HOME/call-forwarding-distributable/distributable-call-forwarding-dar.properties $JBOSS_HOME/standalone/configuration/dars/mobicents-dar.properties
+				;;
 	    b2bua-early)
 	            # TODO: adapt to eap-6.4
 	            echo "Distributed example used is b2bua early failover"
@@ -64,12 +64,12 @@ if [ $# -ne 0 ]; then
 				echo "" > $JBOSS_HOME/server/all/conf/dars/mobicents-dar.properties
 				;;	    
 	    uas)
-	            # TODO: adapt to eap-6.4
 	            echo "Distributed example used is uas"
 	    		mvn clean install -f $EXAMPLES_HOME/simple-sip-servlet-distributable/pom.xml
-				rm -rf $JBOSS_HOME/server/$config/deploy/simple-sip-servlet-distributable-*.war
-				cp $EXAMPLES_HOME/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-*.war $JBOSS_HOME/server/$config/deploy
-				cp $EXAMPLES_HOME/simple-sip-servlet-distributable/distributable-simple-dar.properties $JBOSS_HOME/server/$config/conf/dars/mobicents-dar.properties
+				#rm -rf $JBOSS_HOME/server/$config/deploy/simple-sip-servlet-distributable-*.war
+				rm -rf $JBOSS_HOME/standalone/deployments/custom-call-forwarding-distributable-*.war
+				cp $EXAMPLES_HOME/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-*.war $JBOSS_HOME/standalone/deployments
+				cp $EXAMPLES_HOME/simple-sip-servlet-distributable/distributable-simple-dar.properties $JBOSS_HOME/standalone/configuration/dars/mobicents-dar.properties
 	            ;;
 	    uas-passivation)
 	            # TODO: adapt to eap-6.4
