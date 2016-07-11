@@ -1,22 +1,22 @@
 
 [[_bsssc_binary_sip_servlets_server_configuring]]
-=  Sip Connectors 
+=  Sip Connectors
 
 Restcomm SIP Servlets comes with default settings that are designed to get your system up and running without the need to know about all the detailed configurations.
 That said, there are situations in which you might like to fine-tune your setttings to adapt it to your needs.
 That is what the following section will help you achieve.
-You will get a better understand of SIP connectors and how to make them work for you. 
+You will get a better understand of SIP connectors and how to make them work for you.
 
 [[_bsssc_binary_sip_servlets_server_adding_sip_connectors]]
 == Configuring SIP Connectors and Bindings
 
 There are two important configuration files that you might need to modifying depending on your system needs.
 The standalone-sip.xml file in Restcomm SIP Servlets for JBoss AS7 and the server.xml file in Restcomm SIP Servlets for Tomcat.
-The extracts below will give you a snapshot of default configurations. 
+The extracts below will give you a snapshot of default configurations.
 
 .For JBoss
 Changing the ports and other configuration for the SIP connector can be done in the standalone-sip.xml file.
-Below is an extract : 
+Below is an extract :
 
 .Adding a SIP Connector to $JBOSS_HOME/standalone/configuration/standalone-sip.xml
 ====
@@ -48,12 +48,15 @@ Below is an extract :
 
 If you need to add a connector for the same protocol, a new socket-binding should be created.
 A naming convention should be followed for the name attribute of the new socket-binding.
-The convention is <name>-sip-<protocol>. By example,  
+The convention is <name>-sip-<protocol>. By example,
+
+====
 [source,xml]
 ----
 
 	<socket-binding name="second-sip-udp" port="5080"/>
 ----
+====
 
 
 .SIP <connector> Attributes
@@ -106,25 +109,25 @@ static-server-port::
   This parameter is useful in cluster configurations where requests should be bound to a load-balancer address rather than a specific node address.
 
 http-follow-sip::
-  Makes the application server aware of how the SIP Load Balancers assign request affinity, and stores this information in the application session. 
+  Makes the application server aware of how the SIP Load Balancers assign request affinity, and stores this information in the application session.
 
 .For Tomcat
 Changing the ports and other configuration for the SIP connector can be done in the server.xml file.
-Below is an extract. 
+Below is an extract.
 
 .Adding a SIP Connector to $CATALINA_HOME/conf/server.xml
 ====
 [source,xml]
 ----
 
-  <Connector port="5080" 
+  <Connector port="5080"
 ipAddress="127.0.0.1"
  protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
  signalingTransport="udp"
  useStun="false"
  stunServerAddress="stun01.sipphone.com"
  stunServerPort="3478"
- staticServerAddress="122.122.122.122" 
+ staticServerAddress="122.122.122.122"
  staticServerPort="44"
  useStaticAddress="true"
  httpFollowsSip="false"/>
@@ -185,7 +188,7 @@ staticServerPort::
   This parameter is useful in cluster configurations where requests should be bound to a load-balancer address rather than a specific node address.
 
 httpFollowsSip::
-  Makes the application server aware of how the SIP Load Balancers assign request affinity, and stores this information in the application session. 
+  Makes the application server aware of how the SIP Load Balancers assign request affinity, and stores this information in the application session.
 
 NOTE: A comprehensive list of implementing classes for the SIP Stack is available from the http://ci.jboss.org/jenkins/job/jain-sip/lastSuccessfulBuild/artifact/javadoc/javax/sip/SipStack.html[Class SipStackImpl page on nist.gov].
 
@@ -199,14 +202,14 @@ An application router is required for a container to function, but it is a separ
 The application router is responsible for application selection and must not implement application logic.
 For example, the application router cannot modify a request or send a response.
 
-For more information about the application router, refer to the following sections of the http://jcp.org/en/jsr/detail?id=289[JSR 289 specification]: Application Router Packaging and Deployment, Application Selection Process, and Appendix C. 
+For more information about the application router, refer to the following sections of the http://jcp.org/en/jsr/detail?id=289[JSR 289 specification]: Application Router Packaging and Deployment, Application Selection Process, and Appendix C.
 
 .
 [NOTE]
 ====
-See the example chapters for more information about the Application Router Configuration for SIP Restcomm SIP Servlets for JBoss AS7 
+See the example chapters for more information about the Application Router Configuration for SIP Restcomm SIP Servlets for JBoss AS7
 
-<<_sfss_services_for_sip_servlets>>  
+<<_sfss_services_for_sip_servlets>>
 ====
 
 In order to configure the application router for Tomcat, you should edit the `Service` element in the container's [path]_server.xml_ configuration file
@@ -219,10 +222,10 @@ In order to configure the application router for Tomcat, you should edit the `Se
   <Service name="Sip-Servlets"
  className="org.mobicents.servlet.sip.startup.SipStandardService"
  sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
- usePrettyEncoding="false" 
- additionalParameterableHeaders="Header1,Header2" 
- bypassResponseExecutor="false" 
- bypassRequestExecutor="false" 
+ usePrettyEncoding="false"
+ additionalParameterableHeaders="Header1,Header2"
+ bypassResponseExecutor="false"
+ bypassRequestExecutor="false"
  baseTimerInterval="500"
  t2Interval="4000"
  t4Interval="5000"
@@ -329,128 +332,128 @@ canceledTimerTasksPurgePeriod (Tomcat) - canceled-timer-tasks-purge-period (JBos
   The purge may prevent excessive memory usage for apps that cancel most of the timers it sets.
 
 [[_bsssc_binary_sip_servlets_server_configuring_logging]]
-== SIP Servlets Server Logging
+  == SIP Servlets Server Logging
 
-Logging is an important part of working with Restcomm SIP Servlets.
-There are a few files that you need to be familiar with in order to successfully troubleshoot and adapt Restcomm SIP Servlets server monitoring and logging to your environment. 
+  Logging is an important part of working with Restcomm SIP Servlets.
+  There are a few files that you need to be familiar with in order to successfully troubleshoot and adapt Restcomm SIP Servlets server monitoring and logging to your environment.
 
-.Logging Files for Restcomm SIP Servlets for JBoss AS7
-$JBOSS/standalone/configuration/logging.properties 
+  .Logging Files for Restcomm SIP Servlets for JBoss AS7
+  $JBOSS/standalone/configuration/logging.properties
 
-$JBOSS/standalone/configuration/mss-sip-stack.properties 
+  $JBOSS/standalone/configuration/mss-sip-stack.properties
 
-$JBOSS/standalone/configuration/standalone-sip.xml 
+  $JBOSS/standalone/configuration/standalone-sip.xml
 
-.Setting the log file name in $JBOSS/standalone/configuration/standalone-sip.xml
-====
-[source,xml]
-----
-
-
-
- </formatter>
-<file relative-to="jboss.server.log.dir" path="server.log"/>
-<suffix value=".yyyy-MM-dd"/>
-<append value="true"/>
-----
-====
-
-The configuration above produces SIP logs that can be found in the  $JBOSS_HOME/standalone/log directory.
-Below is an extract of the log files.
- 
-
-----
-
-                       server.log.2012-08-14  server.log.2012-08-24
-server.log             server.log.2012-08-16  server.log.2012-08-25
-server.log.2012-08-07  server.log.2012-08-21  server.log.2012-08-26
-server.log.2012-08-13  server.log.2012-08-22
-----
-
-.Logging Files for Restcomm SIP Servlets for Tomcat 
-If you are working with Tomcat, the log configuration files are located in the $CATALINA_HOME/conf/ directory.
-The log4j configuration file is located in $CATALINA_HOME/lib/ directory 
-
-$CATALINA_HOME/conf/logging.properties 
-
-$CATALINA_HOME/conf/mss-sip-stack.properties 
-
-$CATALINA_HOME/conf/server.xml 
-
-$CATALINA_HOME/lib/log4j.xml 
-
-.Truncated Sample Configuration from Server.xml  
-.Setting the log file name $CATALINA_HOME/conf/server.xml
-====
-[source,xml]
-----
+  .Setting the log file name in $JBOSS/standalone/configuration/standalone-sip.xml
+  ====
+  [source,xml]
+  ----
 
 
 
+   </formatter>
+  <file relative-to="jboss.server.log.dir" path="server.log"/>
+  <suffix value=".yyyy-MM-dd"/>
+  <append value="true"/>
+  ----
+  ====
 
-<Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"  
-               prefix="localhost_access_log." suffix=".txt"
-               pattern="%h %l %u %t &quot;%r&quot; %s %b" resolveHosts="false"/>
-----
-====
-
-.Truncated Sample Configuration from log4j.xml  
-.Configuring the log file name $CATALINA_HOME/lib/log4j.xml
-====
-[source,xml]
-----
+  The configuration above produces SIP logs that can be found in the  $JBOSS_HOME/standalone/log directory.
+  Below is an extract of the log files.
 
 
-<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
-  <appender name="rolling-file" class="org.apache.log4j.RollingFileAppender"> 
-    <param name="file" value="${catalina.home}/logs/sip-server.log"/>
-    <param name="MaxFileSize" value="1000KB"/>
-----
-====
+  ----
 
-The result of the extracted configuration above that is taken from the log4j.xml file  and can be found in the $CATALINA_HOME/logs directory.
- 
-JAIN-SIP Stack Logging
+                         server.log.2012-08-14  server.log.2012-08-24
+  server.log             server.log.2012-08-16  server.log.2012-08-25
+  server.log.2012-08-07  server.log.2012-08-21  server.log.2012-08-26
+  server.log.2012-08-13  server.log.2012-08-22
+  ----
 
-There are two separate levels of logging:
+  .Logging Files for Restcomm SIP Servlets for Tomcat
+  If you are working with Tomcat, the log configuration files are located in the $CATALINA_HOME/conf/ directory.
+  The log4j configuration file is located in $CATALINA_HOME/lib/ directory
 
-* Logging at the container level, which can be configured using the [path]_log4j.xml_ or [path]_standalone-sip.xml_ configuration file seen above
-* Logging of the JAIN SIP stack, which is configured through the container logging and the SIP stack properties themselves
+  $CATALINA_HOME/conf/logging.properties
 
-You can setup the logging so that the JAIN SIP Stack will log into the container logs.
+  $CATALINA_HOME/conf/mss-sip-stack.properties
 
-To use LOG4J in JAIN SIP Stack in Tomcat, you need to define a category in [path]_CATALINE_HOME/lib/jboss-log4j.xml_ and set it to `DEBUG`.
+  $CATALINA_HOME/conf/server.xml
 
-.Configuring the JAIN SIP Stack to log into the Tomcat Container's logs
-====
-[source,xml]
-----
+  $CATALINA_HOME/lib/log4j.xml
 
-                        <category name="gov.nist">
-                        <priority value="DEBUG"/>
-                        </category>
-----
-====
+  .Truncated Sample Configuration from Server.xml
+  .Setting the log file name $CATALINA_HOME/conf/server.xml
+  ====
+  [source,xml]
+  ----
 
-To use LOG4J in JAIN SIP Stack in JBoss, you need to define a logger in [path]_JBOSS_HOME/standalone/configuration/standalone-sip.xml_ and set it to `DEBUG`.
 
-.Configuring the JAIN SIP Stack to log into the JBoss Container's logs
-====
-[source,xml]
-----
 
-                        <logger category="gov.nist">
-                		<level name="DEBUG"/>
-            		</logger>
-----
-====
 
-For this category to be used in Restcomm SIP Servlets, you need to specify it in [path]_JBOSS_HOME/standalone/configuration/mss-sip-stack.properties_ or [path]_CATALINE_HOME/conf/mss-sip-stack.properties_, add the `gov.nist.javax.sip.LOG4J_LOGGER_NAME=gov.nist` property, and set the `gov.nist.javax.sip.TRACE_LEVEL=LOG4J` property.
+  <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
+                 prefix="localhost_access_log." suffix=".txt"
+                 pattern="%h %l %u %t &quot;%r&quot; %s %b" resolveHosts="false"/>
+  ----
+  ====
 
-====
-**NOTE**  
-When using ``loadbalanceraddress`` algorithm for LB it is necessary to add the following at ``mss-sip-stack.properties`` file for the keepalive mechanism:
+  .Truncated Sample Configuration from log4j.xml
+  .Configuring the log file name $CATALINA_HOME/lib/log4j.xml
+  ====
+  [source,xml]
+  ----
 
-----
-org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingServiceClassName=org.mobicents.ha.javax.sip.MultiNetworkLoadBalancerHeartBeatingServiceImpl
-----
+
+  <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+    <appender name="rolling-file" class="org.apache.log4j.RollingFileAppender">
+      <param name="file" value="${catalina.home}/logs/sip-server.log"/>
+      <param name="MaxFileSize" value="1000KB"/>
+  ----
+  ====
+
+  The result of the extracted configuration above that is taken from the log4j.xml file  and can be found in the $CATALINA_HOME/logs directory.
+
+  JAIN-SIP Stack Logging
+
+  There are two separate levels of logging:
+
+  * Logging at the container level, which can be configured using the [path]_log4j.xml_ or [path]_standalone-sip.xml_ configuration file seen above
+  * Logging of the JAIN SIP stack, which is configured through the container logging and the SIP stack properties themselves
+
+  You can setup the logging so that the JAIN SIP Stack will log into the container logs.
+
+  To use LOG4J in JAIN SIP Stack in Tomcat, you need to define a category in [path]_CATALINE_HOME/lib/jboss-log4j.xml_ and set it to `DEBUG`.
+
+  .Configuring the JAIN SIP Stack to log into the Tomcat Container's logs
+  ====
+  [source,xml]
+  ----
+
+                          <category name="gov.nist">
+                          <priority value="DEBUG"/>
+                          </category>
+  ----
+  ====
+
+  To use LOG4J in JAIN SIP Stack in JBoss, you need to define a logger in [path]_JBOSS_HOME/standalone/configuration/standalone-sip.xml_ and set it to `DEBUG`.
+
+  .Configuring the JAIN SIP Stack to log into the JBoss Container's logs
+  ====
+  [source,xml]
+  ----
+
+                          <logger category="gov.nist">
+                  		<level name="DEBUG"/>
+              		</logger>
+  ----
+  ====
+
+  For this category to be used in Restcomm SIP Servlets, you need to specify it in [path]_JBOSS_HOME/standalone/configuration/mss-sip-stack.properties_ or [path]_CATALINE_HOME/conf/mss-sip-stack.properties_, add the `gov.nist.javax.sip.LOG4J_LOGGER_NAME=gov.nist` property, and set the `gov.nist.javax.sip.TRACE_LEVEL=LOG4J` property.
+
+  ====
+  **NOTE**
+  When using ``loadbalanceraddress`` algorithm for LB it is necessary to add the following at ``mss-sip-stack.properties`` file for the keepalive mechanism:
+
+  ----
+  org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingServiceClassName=org.mobicents.ha.javax.sip.MultiNetworkLoadBalancerHeartBeatingServiceImpl
+  ----
