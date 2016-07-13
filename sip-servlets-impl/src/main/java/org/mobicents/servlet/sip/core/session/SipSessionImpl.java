@@ -362,6 +362,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * @see javax.servlet.sip.SipSession#createRequest(java.lang.String)
 	 */
 	public SipServletRequest createRequest(final String method) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("createRequest - method="+ method);
+		}
 		if(method.equalsIgnoreCase(Request.ACK) || method.equalsIgnoreCase(Request.PRACK)
 				|| method.equalsIgnoreCase(Request.CANCEL)) {
 			throw new IllegalArgumentException(
@@ -482,7 +485,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 				logger.error("Cannot create the " + method + " request from the dialog " + sessionCreatingDialog,e);
 				throw new IllegalArgumentException("Cannot create the " + method + " request from the dialog " + sessionCreatingDialog + " for sip session " + key,e);
 			} 	
-		} else {	
+		} else {
 			boolean treatAsInitialRequest = false;
 			// http://code.google.com/p/sipservlets/issues/detail?id=19 
 			// Retried Request are not considered as initial
@@ -495,6 +498,10 @@ public class SipSessionImpl implements MobicentsSipSession {
 			}
 			//case where other requests are sent with the same session like REGISTER or for challenge requests
 			if(sessionCreatingTransactionRequest != null) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("createRequest - sessionCreatingTransactionRequest is not null - id:" + this.getId());
+				}
+				
 				if(!isSessionCreatingTransactionServer) {
 					if(logger.isDebugEnabled()) {
 						logger.debug("orignal tx for creating susbequent request " + method + " on session " + key +" was a Client Tx");
@@ -921,7 +928,10 @@ public class SipSessionImpl implements MobicentsSipSession {
 		invalidate(false);
 	}
 	
-	public void invalidate(boolean bypassCheck) {						
+	public void invalidate(boolean bypassCheck) {
+		if(logger.isInfoEnabled()) {
+			logger.info("invalidate - bypassCheck=" + bypassCheck);					
+		}
 		boolean wasValid = isValidInternal.compareAndSet(true, false);
 		if(!wasValid) {
 			if(!bypassCheck) {
@@ -1114,6 +1124,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 				}
 			}
 			sessionCreatingTransactionRequest.cleanUp();
+			if(logger.isDebugEnabled()) {
+				logger.debug("invalidate - setting the sessionCreatingTransactionRequest to null, id:" + this.getId());
+			}
 			sessionCreatingTransactionRequest = null;
 		}
 		if(proxy != null && !proxy.getAckReceived()) {
@@ -1406,13 +1419,29 @@ public class SipSessionImpl implements MobicentsSipSession {
 	}
 
 	public MobicentsSipApplicationSession getSipApplicationSession() {
+		if(logger.isDebugEnabled()) {
+			logger.debug("getSipApplicationSession");
+		}
+		
 		if(sipApplicationSession == null) {
-			final String applicationName = key.getApplicationName(); 
+			final String applicationName = key.getApplicationName();
+			if(logger.isDebugEnabled()) {
+				logger.debug("getSipApplicationSession - sipApplicationSession is null, applicationName=" + applicationName);
+			}
+			
 			final SipContext sipContext = sipFactory.getSipApplicationDispatcher().findSipApplication(applicationName);
 			if(sipContext != null) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("getSipApplicationSession - sipContext is not null");
+				}
 				sipApplicationSession = sipContext.getSipManager().getSipApplicationSession(sipApplicationSessionKey, false);
 			}
-		} 
+		}
+		
+		if(logger.isDebugEnabled()) {
+			logger.debug("getSipApplicationSession - return=" + sipApplicationSession);
+		}
+		
 		return sipApplicationSession;
 	}
 
@@ -1432,13 +1461,34 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * @param sessionCreatingTransaction the sessionCreatingTransaction to set
 	 */
 	public void setSessionCreatingTransactionRequest(MobicentsSipServletMessage message) {		
+		if(logger.isDebugEnabled()) {
+			logger.debug("setSessionCreatingTransactionRequest - message="+ message + ", id:" + this.getId());
+		}
 		if(message != null) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("setSessionCreatingTransactionRequest - message.getTransaction()=" + message.getTransaction());
+				if (message.getTransaction() != null){
+					logger.debug("setSessionCreatingTransactionRequest - message.getTransaction().getApplicationData()=" + message.getTransaction().getApplicationData());
+				}
+			}
 			if(message instanceof SipServletRequestImpl) {		
+				if(logger.isDebugEnabled()) {
+					logger.debug("setSessionCreatingTransactionRequest - message is instanceof SipServletRequestImpl, id:" + this.getId());
+				}
 				this.sessionCreatingTransactionRequest = (SipServletRequestImpl) message;
 				this.isSessionCreatingTransactionServer = message.getTransaction() instanceof ServerTransaction;
 			} else if(message.getTransaction() != null && message.getTransaction().getApplicationData() != null) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("setSessionCreatingTransactionRequest - message is not SipServletRequestImpl");
+				}
 				SipServletMessageImpl sipServletMessageImpl = ((TransactionApplicationData)message.getTransaction().getApplicationData()).getSipServletMessage();
-				if(sipServletMessageImpl != null && sipServletMessageImpl instanceof SipServletRequestImpl) {		
+				if(logger.isDebugEnabled()) {
+					logger.debug("setSessionCreatingTransactionRequest - sipServletMessageImpl=" + sipServletMessageImpl);
+				}
+				if(sipServletMessageImpl != null && sipServletMessageImpl instanceof SipServletRequestImpl) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("setSessionCreatingTransactionRequest - sipServletMessageImpl is instanceof SipServletRequestImpl, id:" + this.getId());
+					}
 					this.sessionCreatingTransactionRequest = (SipServletRequestImpl) sipServletMessageImpl;
 					this.isSessionCreatingTransactionServer = message.getTransaction() instanceof ServerTransaction;
 				}
@@ -1446,6 +1496,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 		}
 		if(sessionCreatingTransactionRequest != null) {
 			if(originalMethod == null) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("setSessionCreatingTransactionRequest - setting originalMethod="+ sessionCreatingTransactionRequest.getMethod());
+				}
 				originalMethod = sessionCreatingTransactionRequest.getMethod();
 			}		
 			addOngoingTransaction(sessionCreatingTransactionRequest.getTransaction());
@@ -1458,6 +1511,10 @@ public class SipSessionImpl implements MobicentsSipSession {
 					parentSession.setSessionCreatingTransactionRequest(message);
 				}
 			}
+		}
+		
+		if(logger.isDebugEnabled()) {
+			logger.debug("setSessionCreatingTransactionRequest - sessionCreatingTransactionRequest="+ sessionCreatingTransactionRequest + ", id:" + this.getId());
 		}
 	}
 	
@@ -1578,9 +1635,15 @@ public class SipSessionImpl implements MobicentsSipSession {
 				// https://telestax.atlassian.net/browse/MSS-153 improve performance by cleaning the request for dialog based requests
 				// or proxy case or dialog creating methods
 				if(sessionCreatingDialog != null || proxy != null || JainSipUtils.DIALOG_CREATING_METHODS.contains(sessionCreatingTransactionRequestMethod)) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("removeOngoingTransaction - sessionCreatingTransactionRequest=" + sessionCreatingTransactionRequest);
+					}
 					if(logger.isDebugEnabled() && sessionCreatingTransactionRequest != null) {
 						logger.debug("nullifying  sessionCreatingTransactionRequest" + sessionCreatingTransactionRequest 
 								+ " from Session " + key);
+					}
+					if(logger.isDebugEnabled()) {
+						logger.debug("invalidate - setting the sessionCreatingTransactionRequest to null, id:" + this.getId());
 					}
 					sessionCreatingTransactionRequest = null;
 				}
@@ -1838,9 +1901,15 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
     public void updateStateOnSubsequentRequest(
 			MobicentsSipServletRequest request, boolean receive) {
-
+    	if(logger.isDebugEnabled()) {
+			logger.debug("updateStateOnSubsequentRequest - request=" + request + ", receive=" + receive);
+		}
+    	
 		//state updated to TERMINATED for CANCEL only if no final response had been received on the inviteTransaction
 		if(((Request.CANCEL.equalsIgnoreCase(request.getMethod())))) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("updateStateOnSubsequentRequest - CANCEL, request.getMethod()=" + request.getMethod());
+			}
 			if(!(request.getTransaction() instanceof ServerTransactionExt)) {
 				return;
 			}
@@ -1850,8 +1919,14 @@ public class SipSessionImpl implements MobicentsSipSession {
 			SipServletRequestImpl inviteRequest = (SipServletRequestImpl)inviteAppData.getSipServletMessage();
 			// Issue 1484 : http://code.google.com/p/mobicents/issues/detail?id=1484
 			// we terminate the session only for initial requests
+			if(logger.isDebugEnabled()) {
+				logger.debug("updateStateOnSubsequentRequest - CANCEL - inviteRequest=" + inviteRequest);
+			}
 			if((inviteRequest != null && inviteRequest.isInitial() && inviteRequest.getLastFinalResponse() == null) || 
 						(proxy != null && proxy.getBestResponse() == null))  {
+				if(logger.isDebugEnabled()) {
+					logger.debug("updateStateOnSubsequentRequest - CANCEL - setting state to terminated");
+				}
 				this.setState(State.TERMINATED);
 				if(logger.isDebugEnabled()) {
 					logger.debug("the following sip session " + getKey() + " has its state updated to " + state);
@@ -1860,6 +1935,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 		}
 		
 		if(Request.ACK.equalsIgnoreCase(request.getMethod())) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("updateStateOnSubsequentRequest - ACK, sessionCreatingTransactionRequest=" + sessionCreatingTransactionRequest);
+			}
 			if(sessionCreatingTransactionRequest != null) {
 				sessionCreatingTransactionRequest.cleanUpLastResponses();
 			}

@@ -1372,13 +1372,16 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 		}
 		if(event.getEventType() == SipContextEventType.SERVLET_INITIALIZED) {
 			if(!timerService.isStarted()) {
-				timerService.start();
+				// ###TIMER
+				//timerService.start();
 			}
 			if(!proxyTimerService.isStarted()) {
-				proxyTimerService.start();
+				// ###TIMER
+				//proxyTimerService.start();
 			}
 			if(!sasTimerService.isStarted()) {
-				sasTimerService.start();
+				// ###TIMER
+				//sasTimerService.start();
 			}
 		}
 		

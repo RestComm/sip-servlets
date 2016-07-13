@@ -54,15 +54,25 @@ public abstract class DispatchTask implements Runnable {
 	}
 
 	public void dispatchAndHandleExceptions () {
+		if (logger.isDebugEnabled()){
+			logger.debug("dispatchAndHandleExceptions");
+		}
 		try {
 			dispatch();
 		} catch (Throwable t) {
 			logger.error("Unexpected exception while processing message " + sipServletMessage, t);
 			
 			if(sipServletMessage instanceof SipServletRequestImpl) {
+				if (logger.isDebugEnabled()){
+					logger.debug("dispatchAndHandleExceptions - sipServletMessage is instanceof SipServletRequestImpl");
+				}
+				
 				SipServletRequestImpl sipServletRequest = (SipServletRequestImpl) sipServletMessage;
 				if(!Request.ACK.equalsIgnoreCase(sipServletRequest.getMethod()) &&
 						!Request.PRACK.equalsIgnoreCase(sipServletRequest.getMethod())) {
+					if (logger.isDebugEnabled()){
+						logger.debug("dispatchAndHandleExceptions - calling sendErrorResponse");
+					}
 					MessageDispatcher.sendErrorResponse(sipServletRequest.getSipSession().getSipApplicationSession().getSipContext().getSipApplicationDispatcher(), Response.SERVER_INTERNAL_ERROR, sipServletRequest, sipProvider);					
 				}
 			}

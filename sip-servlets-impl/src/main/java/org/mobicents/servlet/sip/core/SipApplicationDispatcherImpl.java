@@ -761,6 +761,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		final SipProvider sipProvider = (SipProvider)requestEvent.getSource();
 		ServerTransaction requestTransaction =  requestEvent.getServerTransaction();
 		final Dialog dialog = requestEvent.getDialog();
+		if(logger.isDebugEnabled()) {
+			logger.debug("processRequest - dialog=" + dialog);
+			if (dialog != null){
+				logger.debug("processRequest - dialog.getDialogId()=" + dialog.getDialogId());
+			}
+		}
 		final Request request = requestEvent.getRequest();
 		// self routing makes the application data cloned, so we make sure to nullify it
 		((MessageExt)request).setApplicationData(null);
@@ -824,12 +830,19 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 						dialog,
 						JainSipUtils.DIALOG_CREATING_METHODS.contains(requestMethod));			
 			updateRequestsStatistics(request, true);
+			if(logger.isDebugEnabled()) {
+				logger.debug("processRequest - routing state=" + sipServletRequest.getRoutingState());
+			}
+			
 			// Check if the request is meant for me. If so, strip the topmost
 			// Route header.
 			
 			//Popping the router header if it's for the container as
 			//specified in JSR 289 - Section 15.8
 			if(!isRouteExternal(routeHeader)) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("processRequest - not external - =routeHeader" + routeHeader);
+				}
 				request.removeFirst(RouteHeader.NAME);
 				sipServletRequest.setPoppedRoute(routeHeader);
 				final Parameters poppedAddress = (Parameters)routeHeader.getAddress().getURI();
@@ -842,8 +855,17 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 					sipServletRequest.setRoutingState(RoutingState.SUBSEQUENT);
 				}
 				if(transaction != null) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("processRequest - transaction not null, transaction.getDialog()=" + transaction.getDialog());
+						if (transaction.getDialog() != null){
+							logger.debug("processRequest - transaction dialog not null, transaction.getDialog().getDialogId()=" + transaction.getDialog().getDialogId());
+						}
+					}
 					TransactionApplicationData transactionApplicationData = (TransactionApplicationData)transaction.getApplicationData();
-					if(transactionApplicationData != null && transactionApplicationData.getInitialPoppedRoute() == null) {				
+					if(transactionApplicationData != null && transactionApplicationData.getInitialPoppedRoute() == null) {
+						if (transaction.getDialog() != null){
+							logger.debug("processRequest - setInitialPoppedRoute, routeHeader.getAddress()=" + routeHeader.getAddress());
+						}
 						transactionApplicationData.setInitialPoppedRoute(new AddressImpl(routeHeader.getAddress(), null, ModifiableRule.NotModifiable));
 					}
 				}
@@ -858,6 +880,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 				if(controlCongestion(request, sipServletRequest, dialog, routeHeader, sipProvider)) {
 					return;
 				}
+				
+				if(logger.isDebugEnabled()) {
+					logger.debug("processRequest - dispatching request with sipServletRequest.getAppSessionId()=" + sipServletRequest.getAppSessionId());
+				}
+				
 				messageDispatcherFactory.getRequestDispatcher(sipServletRequest, this).
 					dispatchMessage(sipProvider, sipServletRequest);
 			} catch (DispatcherException e) {
@@ -1170,6 +1197,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	 * @param sipSessionImpl
 	 */
 	private void tryToInvalidateSession(MobicentsSipSessionKey sipSessionKey, boolean invalidateProxySession) {
+		if (logger.isDebugEnabled()){
+			logger.debug("tryToInvalidateSession - sipSessionKey.getCallId()=" + sipSessionKey.getCallId() + ", sipSessionKey.getFromTag()=" + sipSessionKey.getFromTag() + ", sipSessionKey.getToTag()=" + sipSessionKey.getToTag() + ", sipSessionKey.getApplicationName()=" + sipSessionKey.getApplicationName());
+		}
 		//the key can be null if the application already invalidated the session
 		if(sipSessionKey != null) {
 			SipContext sipContext = findSipApplication(sipSessionKey.getApplicationName());
@@ -1662,7 +1692,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		return applicationServerId;
 	}
 	@Override
-	public String getApplicationServerIdHash() {		
+	public String getApplicationServerIdHash() {
+		if(logger.isDebugEnabled()) {
+			logger.info("getApplicationServerIdHash - return=" + applicationServerIdHash);
+		}
 		return applicationServerIdHash;
 	}
 	
@@ -1723,6 +1756,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	 * false otherwise
 	 */
 	public final boolean isExternal(String host, int port, String transport) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("isExternal - host=" + host + ", port=" + port + ", transport=" + transport);
+		}
 		boolean isExternal = true;
 		MobicentsExtendedListeningPoint listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(host, port, transport);		
 		if((hostNames.contains(host) || hostNames.contains(host+":" + port) || listeningPoint != null)) {

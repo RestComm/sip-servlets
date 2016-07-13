@@ -199,7 +199,10 @@ public abstract class SipManagerDelegate {
 	 * @param create if set to true, if no session has been found one will be created
 	 * @return the sip application session matching the key
 	 */
-	public MobicentsSipApplicationSession getSipApplicationSession(final SipApplicationSessionKey key, final boolean create) {		
+	public MobicentsSipApplicationSession getSipApplicationSession(final SipApplicationSessionKey key, final boolean create) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("getSipApplicationSession with key=" + key);
+		}
 		MobicentsSipApplicationSession sipApplicationSessionImpl = null;
 		//first we check if the app session can be found by its app generated key
 		final String appGeneratedKey = key.getAppGeneratedKey();
@@ -211,7 +214,11 @@ public abstract class SipManagerDelegate {
 		}
 		if(sipApplicationSessionImpl == null) {
 			if(logger.isDebugEnabled()) {
-				logger.debug("trying to find sip application session with key " + key);
+				logger.debug("getSipApplicationSession - trying to find sip application session with key " + key);
+				logger.debug("getSipApplicationSession - sip application session keyset: ");
+				for (SipApplicationSessionKey tmp: sipApplicationSessions.keySet()){
+					logger.debug("getSipApplicationSession - element=" + tmp);
+				}
 			}
 			sipApplicationSessionImpl = sipApplicationSessions.get(key);
 		}
@@ -222,6 +229,9 @@ public abstract class SipManagerDelegate {
 	}	
 
 	protected MobicentsSipApplicationSession createSipApplicationSession(final SipApplicationSessionKey key) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("createSipApplicationSession - with key : " + key);
+		}
 		//http://dmy999.com/article/34/correct-use-of-concurrenthashmap
 		MobicentsSipApplicationSession sipApplicationSessionImpl = null;
 		final MobicentsSipApplicationSession newSipApplicationSessionImpl = 
@@ -229,7 +239,10 @@ public abstract class SipManagerDelegate {
 		final String appGeneratedKey = key.getAppGeneratedKey(); 
 		// Fix for Issue http://code.google.com/p/mobicents/issues/detail?id=2521
 		// in case od appGeneratedKey use the sipApplicationSessionsByAppGeneratedKey to ensure uniqueness
-		if(appGeneratedKey != null) {    		
+		if(appGeneratedKey != null) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("createSipApplicationSession - appGeneratedKey is not null");
+			}
 			// gurantees uniqueness on the appgeneratedkey
         	sipApplicationSessionImpl = sipApplicationSessionsByAppGeneratedKey.putIfAbsent(appGeneratedKey, newSipApplicationSessionImpl);
         	if (sipApplicationSessionImpl == null) {
@@ -237,19 +250,22 @@ public abstract class SipManagerDelegate {
     			scheduleExpirationTimer(newSipApplicationSessionImpl);
     			// put succeeded, use new value
     			if(logger.isDebugEnabled()) {
-    				logger.debug("Adding a sip application session with the key : " + key);
+    				logger.debug("createSipApplicationSession - Adding a sip application session with the key : " + key);
     			}
                 sipApplicationSessionImpl = newSipApplicationSessionImpl;                
             }
-        } else {        	
+        } else {
+        	if(logger.isDebugEnabled()) {
+				logger.debug("createSipApplicationSession - appGeneratedKey is null");
+			}
     		sipApplicationSessionImpl = sipApplicationSessions.putIfAbsent(key, newSipApplicationSessionImpl);
     		if (sipApplicationSessionImpl == null) {
     			scheduleExpirationTimer(newSipApplicationSessionImpl);
     			// put succeeded, use new value
     			if(logger.isDebugEnabled()) {
-    				logger.debug("Adding a sip application session with the key : " + key);
+    				logger.debug("createSipApplicationSession - Adding a sip application session with the key : " + key);
     			}
-                sipApplicationSessionImpl = newSipApplicationSessionImpl;
+    			sipApplicationSessionImpl = newSipApplicationSessionImpl;
                 
             }
         }
@@ -262,10 +278,11 @@ public abstract class SipManagerDelegate {
 		// as for clustering it might not be needed to reschedule them on recreation
 		final SipContext sipContext = sipApplicationSession.getSipContext();
 		if(sipContext != null) {
-			if(sipContext.getSipApplicationSessionTimeout() > 0) {		
-				SipApplicationSessionTimerTask expirationTimerTask = sipContext.getSipApplicationSessionTimerService().createSipApplicationSessionTimerTask(sipApplicationSession);				
-				expirationTimerTask = sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, sipApplicationSession.getSipApplicationSessionTimeout(), TimeUnit.MILLISECONDS);
-				sipApplicationSession.setExpirationTimerTask(expirationTimerTask);
+			if(sipContext.getSipApplicationSessionTimeout() > 0) {
+				// ###TIMER
+				//SipApplicationSessionTimerTask expirationTimerTask = sipContext.getSipApplicationSessionTimerService().createSipApplicationSessionTimerTask(sipApplicationSession);				
+				//expirationTimerTask = sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, sipApplicationSession.getSipApplicationSessionTimeout(), TimeUnit.MILLISECONDS);
+				//sipApplicationSession.setExpirationTimerTask(expirationTimerTask);
 			} 
 			
 			sipApplicationSession.notifySipApplicationSessionListeners(SipApplicationSessionEventType.CREATION);
@@ -284,16 +301,42 @@ public abstract class SipManagerDelegate {
 	 * @throws IllegalArgumentException if create is set to true and sip Factory is null
 	 */
 	public MobicentsSipSession getSipSession(final SipSessionKey key, final boolean create, final SipFactoryImpl sipFactoryImpl, final MobicentsSipApplicationSession sipApplicationSessionImpl) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("getSipSession - key=" + key + ", create=" + create + ", sipApplicationSessionImpl=" + sipApplicationSessionImpl);
+			if (sipApplicationSessionImpl != null){
+				logger.debug("getSipSession - sipApplicationSessionImpl.getId()=" + sipApplicationSessionImpl.getId());
+				 
+			}
+		}
 		if(create && sipFactoryImpl == null) {
 			throw new IllegalArgumentException("the sip factory should not be null");
 		}
 		//http://dmy999.com/article/34/correct-use-of-concurrenthashmap
 		MobicentsSipSession sipSessionImpl = sipSessions.get(key);
+		if(logger.isDebugEnabled()) {
+			logger.debug("getSipSession - existing sip session keys:");
+			if (sipSessions != null){
+				for (SipSessionKey tmp: sipSessions.keySet()){
+					logger.debug("getSipSession - key.getApplicationSessionId()=" + tmp.getApplicationSessionId()
+							+ ", key.getApplicationName()=" + key.getApplicationName()
+							+ ", key.getCallId()=" + key.getCallId()
+							+ ", key.getFromTag()=" + key.getFromTag()
+							+ ", key.getToTag()=" + key.getToTag());
+				}
+			}
+			logger.debug("getSipSession - existing sipSessionImpl=" + sipSessionImpl);
+		}
 		if(sipSessionImpl == null && create) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("getSipSession - creating new sip session");
+			}
 			sipSessionImpl =  createSipSession(key, create, sipFactoryImpl, sipApplicationSessionImpl);
 		}
 		// check if this session key has a to tag.
 		if(sipSessionImpl != null) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("getSipSession - calling setToTag");
+			}
 			return setToTag(key, sipSessionImpl);
 		}
 		return sipSessionImpl;

@@ -192,8 +192,16 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 			MobicentsSipSession sipSession, Transaction transaction, Dialog dialog,
 			boolean createDialog) {
 		super(request, sipFactoryImpl, transaction, sipSession, dialog);
+		
 		this.createDialog = createDialog;
 		routingState = checkRoutingState(this, dialog);
+		if(logger.isDebugEnabled()) {
+			logger.debug("SipServletRequestImpl constructor - routingState=" + routingState);
+            logger.debug("SipServletRequestImpl constructor - dialog=" + dialog);
+            if (request != null){
+            	logger.debug("SipServletRequestImpl constructor - request.getMethod()=" + request.getMethod());
+            }
+        }
 		if(RoutingState.INITIAL.equals(routingState)) {
 			isInitial = true;
 		}
@@ -575,6 +583,9 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 	 * {@inheritDoc}
 	 */
 	public boolean isInitial() {
+		if(logger.isDebugEnabled()) {
+            logger.debug("isInitial - isInitial=" + isInitial + ", isOrphan=" + isOrphan() + ", return=" + (isInitial && !isOrphan()));
+        }
 		return isInitial && !isOrphan(); 
 	}
 	
@@ -720,6 +731,10 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 	 */
 	public void setRoutingDirective(SipApplicationRoutingDirective directive,
 			SipServletRequest origRequest) throws IllegalStateException {
+		if(logger.isDebugEnabled()) {
+            logger.debug("setRoutingDirective - directive=" + directive + ", origRequest=" + origRequest);
+        }
+		
 		checkReadOnly();
 		SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
 		final MobicentsSipSession session = getSipSession();
@@ -1883,6 +1898,9 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 	 * @param routingState the routingState to set
 	 */
 	public void setRoutingState(RoutingState routingState) throws IllegalStateException {
+		if(logger.isDebugEnabled()) {
+            logger.debug("setRoutingState - routingState=" + routingState);
+        }
 		//JSR 289 Section 11.2.3 && 10.2.6
 		if(routingState.equals(RoutingState.CANCELLED) && 
 				(this.routingState.equals(RoutingState.FINAL_RESPONSE_SENT) || 
@@ -1899,6 +1917,9 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 		// http://code.google.com/p/sipservlets/issues/detail?id=19 
 		// Retried Request are not considered as initial
 		if(routingState.equals(RoutingState.INITIAL)) {
+			if(logger.isDebugEnabled()) {
+	            logger.debug("setRoutingState - isInitial=" + isInitial);
+	        }
 			isInitial = true;
 		}
 		if(logger.isDebugEnabled()) {
@@ -2187,11 +2208,17 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 		//to see if the request matches an existing transaction. 
 		//If it does, stop. The request is not an initial request.
 		if(dialog != null && DialogState.CONFIRMED.equals(dialog.getState())) {
+			if (logger.isDebugEnabled()){
+				logger.debug("checkRoutingState - dialog not null and dialog state is CONFIRMED");
+			}
 			return RoutingState.SUBSEQUENT;
 		}		
 		// 3. Examine Request Method. If it is CANCEL, BYE, PRACK or ACK, stop. 
 		//The request is not an initial request for which application selection occurs.
 		if(NON_INITIAL_SIP_REQUEST_METHODS.contains(sipServletRequest.getMethod())) {
+			if (logger.isDebugEnabled()){
+				logger.debug("checkRoutingState - sipServletRequest.getMethod() is element of NON_INITIAL_SIP_REQUEST_METHODS, sipServletRequest.getMethod()=" + sipServletRequest.getMethod());
+			}
 			return RoutingState.SUBSEQUENT;
 		}
 		// 4. Existing Dialog Detection - If the request has a tag in the To header field, 
@@ -2210,6 +2237,9 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 		// as a subsequent request and it is inappropriate to route it as an initial request. 
 		// Therefore, the only viable approach is to reject the request.
 		if(dialog != null && !DialogState.EARLY.equals(dialog.getState())) {
+			if (logger.isDebugEnabled()){
+				logger.debug("checkRoutingState - dialog not null and dialog state is not EARLY");
+			}
 			return RoutingState.SUBSEQUENT;
 		}
 		
@@ -2507,6 +2537,10 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 	 */
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {
+		if(logger.isDebugEnabled()) {
+            logger.debug("readExternal");
+        }
+		
 		super.readExternal(in);
 		String messageString = in.readUTF();
 		try {
@@ -2532,6 +2566,9 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 			routingRegion = (SipApplicationRoutingRegion) in.readObject();
 		}
 		isInitial = in.readBoolean();
+		if(logger.isDebugEnabled()) {
+            logger.debug("readExternal - isInitial=" + isInitial);
+        }
 		isFinalResponseGenerated = in.readBoolean();
 		is1xxResponseGenerated = in.readBoolean();		
 	}
@@ -2566,6 +2603,9 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 			out.writeBoolean(false);
 		}
 		out.writeBoolean(isInitial);
+		if(logger.isDebugEnabled()) {
+            logger.debug("writeExternal - isInitial=" + isInitial);
+        }
 		out.writeBoolean(isFinalResponseGenerated);
 		out.writeBoolean(is1xxResponseGenerated);	
 	}

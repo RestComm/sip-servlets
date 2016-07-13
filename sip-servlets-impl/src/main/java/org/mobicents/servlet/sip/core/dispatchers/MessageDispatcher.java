@@ -121,8 +121,14 @@ public abstract class MessageDispatcher {
 //	}
 	
 	public static void sendErrorResponse(SipApplicationDispatcher sipApplicationDispatcher, int errorCode, SipServletRequestImpl sipServletRequest, SipProvider sipProvider) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("sendErrorResponse - errorCode=" + errorCode + ", sipServletRequest=" + sipServletRequest);
+		}
 		MessageDispatcher.sendErrorResponse(sipApplicationDispatcher, errorCode, (ServerTransaction) sipServletRequest.getTransaction(), (Request) sipServletRequest.getMessage(), sipProvider);
 		if(sipServletRequest.getSipSession() != null) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("sendErrorResponse - sip session is not null");
+			}
 			sipServletRequest.getSipSession().updateStateOnResponse((SipServletResponseImpl)sipServletRequest.createResponse(SipServletResponseImpl.SC_SERVER_INTERNAL_ERROR), false);
 		}
 	}
@@ -137,6 +143,9 @@ public abstract class MessageDispatcher {
 	public static void sendErrorResponse(SipApplicationDispatcher sipApplicationDispatcher, int errorCode,
 			ServerTransaction transaction, Request request,
 			SipProvider sipProvider) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("sendErrorResponse - errorCode=" + errorCode + ", request=" + request);
+		}
 		try{
 			Response response=SipFactoryImpl.messageFactory.createResponse
 	        	(errorCode,request);			
@@ -153,6 +162,10 @@ public abstract class MessageDispatcher {
 	}
 	
 	protected static SipApplicationSessionKey makeAppSessionKey(SipContext sipContext, SipServletRequestImpl sipServletRequestImpl, String applicationName) throws DispatcherException {
+		if(logger.isDebugEnabled()) {
+			logger.debug("makeAppSessionKey - applicationName=" + applicationName);
+		}
+		
 		String appGeneratedKey = null;
 		Method appKeyMethod = null;			
 		
@@ -230,6 +243,10 @@ public abstract class MessageDispatcher {
 				applicationName, 
 				null,
 				appGeneratedKey);
+		
+		if(logger.isDebugEnabled()) {
+			logger.debug("makeAppSessionKey - returning sipApplicationSessionKey=" + sipApplicationSessionKey);
+		}
 		return sipApplicationSessionKey;
 	}
 	

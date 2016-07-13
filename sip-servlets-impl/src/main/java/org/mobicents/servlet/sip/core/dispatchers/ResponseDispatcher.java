@@ -95,6 +95,9 @@ public class ResponseDispatcher extends MessageDispatcher {
 	 * {@inheritDoc}
 	 */
 	public void dispatchMessage(final SipProvider sipProvider, SipServletMessageImpl sipServletMessage) throws DispatcherException {		
+		if(logger.isDebugEnabled()) {
+			logger.debug("dispatchMessage  - sipServletMessage.getAppSessionId()=" + sipServletMessage.getAppSessionId() + ", sipServletMessage.getCallId()=" + sipServletMessage.getCallId());
+		}
 		final SipFactoryImpl sipFactoryImpl = (SipFactoryImpl) sipApplicationDispatcher.getSipFactory();
 		final SipServletResponseImpl sipServletResponse = (SipServletResponseImpl) sipServletMessage;
 		final Response response = sipServletResponse.getResponse();
