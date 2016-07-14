@@ -134,6 +134,9 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 	// application session is 3 minutes
 	private static int DEFAULT_LIFETIME = 3;
 	
+	// default quotable params that their values need to be quoted.
+	private static String DEFAULT_QUOTABLE_PARAMS = "vendor, model, version, nextnonce, nonce, code, Identity, oc-algo, cid, text";
+	
 	protected String applicationName;
 	protected String smallIcon;
 	protected String largeIcon;
@@ -288,14 +291,14 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 	
 	/**
 	 * 
-	 * @return a list of known params that thier values need to be quoted.
+	 * @return a list of known params that their values need to be quoted.
 	 */
 	private List<String> getQuotableParams(){
 		List<String> retValue = new ArrayList<String>();
-		// default generic params value need to be quoted
-		String quotableParameters = "vendor, model, version, nextnonce, nonce, code, Identity, oc-algo, cid, text";
-		quotableParameters += ",";
-		quotableParameters = quotableParameters + this.getServletContext().getInitParameter("org.restcomm.servlets.sip.QUOTABLE_PARAMETER");
+		String quotableParameters = this.getServletContext().getInitParameter("org.restcomm.servlets.sip.QUOTABLE_PARAMETER");
+		if (quotableParameters == null){
+			quotableParameters = DEFAULT_QUOTABLE_PARAMS;
+		}
 		String[] parameters = quotableParameters.split(",");
 		for (int i = 0; i < parameters.length; i++){
 			String param = parameters[i].trim();
