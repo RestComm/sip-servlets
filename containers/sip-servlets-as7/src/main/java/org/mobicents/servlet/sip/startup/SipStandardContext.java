@@ -288,12 +288,30 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 				sipApplicationDispatcher.getSipService().findSipConnectors());
 		this.getServletContext().setAttribute("org.mobicents.servlet.sip.DNS_RESOLVER",
 				sipApplicationDispatcher.getDNSResolver());
-		String quotedParameter = this.getServletContext().getInitParameter("org.restcomm.servlets.sip.QUOTABLE_PARAMETER");
-		if (quotedParameter != null){
-			this.getServletContext().setAttribute("org.restcomm.servlets.sip.QUOTABLE_PARAMETER", quotedParameter);
-		}
+		this.getServletContext().setAttribute("org.restcomm.servlets.sip.QUOTABLE_PARAMETER", 
+				getQuotableParams());
 	}
-
+	
+	/**
+	 * 
+	 * @return a list of known params that thier values need to be quoted.
+	 */
+	private List<String> getQuotableParams(){
+		List<String> retValue = new ArrayList<String>();
+		// default generic params value need to be quoted
+		String quotableParameters = "vendor, model, version, nextnonce, nonce, code, Identity, oc-algo, cid, text";
+		quotableParameters += ",";
+		quotableParameters = quotableParameters + this.getServletContext().getInitParameter("org.restcomm.servlets.sip.QUOTABLE_PARAMETER");
+		String[] parameters = quotableParameters.split(",");
+		for (int i = 0; i < parameters.length; i++){
+			String param = parameters[i].trim();
+			if (param != null && !param.isEmpty() && !retValue.contains(param)){
+				retValue.add(param);
+			}
+		}
+		return retValue;
+	}
+	
 	/**
 	 * @throws Exception
 	 */

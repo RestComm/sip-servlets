@@ -28,6 +28,7 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -180,17 +181,11 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 		boolean isQuotableParameter = false;
 		SipContext context = SipApplicationSessionCreationThreadLocal.lookupContext();
 		if (context != null){
-			Object object = context.getServletContext().getAttribute("org.restcomm.servlets.sip.QUOTABLE_PARAMETER");
-			if (object != null){
-				String quotableParameters = object.toString();
-				if (!quotableParameters.isEmpty()){
-					String[] parameters = quotableParameters.split(",");
-					for (int i = 0; i < parameters.length; i++){
-						if (parameters[i].trim().equalsIgnoreCase(name)){
-							isQuotableParameter = true;
-							break;
-						}
-					}
+			List<String> params = (List<String>)context.getServletContext().getAttribute("org.restcomm.servlets.sip.QUOTABLE_PARAMETER");
+			for (String param : params){
+				if (param.equalsIgnoreCase(name)){
+					isQuotableParameter = true;
+					break;
 				}
 			}
 		}
