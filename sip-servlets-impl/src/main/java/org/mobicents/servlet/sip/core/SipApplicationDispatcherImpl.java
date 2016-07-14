@@ -1,6 +1,6 @@
 /*
  * TeleStax, Open Source Cloud Communications
- * Copyright 2011-2014, Telestax Inc and individual contributors
+ * Copyright 2011-2016, Telestax Inc and individual contributors
  * by the @authors tag.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -2458,6 +2458,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		return RFC_SUPPORTED;
 	}
 
+	@Override
 	public void loadBalancerAdded(SipLoadBalancer sipLoadBalancer) {
 		sipLoadBalancers.add(sipLoadBalancer);
 		if(sipFactoryImpl.getLoadBalancerToUse() == null) {
@@ -2465,6 +2466,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		}
 	}
 
+	@Override
 	public void loadBalancerRemoved(SipLoadBalancer sipLoadBalancer) {
 		sipLoadBalancers.remove(sipLoadBalancer);
 		if(sipFactoryImpl.getLoadBalancerToUse() != null && 
@@ -2476,6 +2478,28 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			}
 		}
 	}	
+	
+	// https://github.com/RestComm/sip-servlets/issues/172
+	@Override
+	public void pingingloadBalancer(SipLoadBalancer balancerDescription) {
+		SipConnector[] sipConnectors = sipService.findSipConnectors();
+		for (SipConnector sipConnector : sipConnectors) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("Comparing Balancer Address " + balancerDescription.getAddress().getHostAddress() + 
+						" to sipconnector balancer address " + sipConnector.getLoadBalancerAddress());
+			}
+			if(balancerDescription.getAddress().getHostAddress().equals(sipConnector.getLoadBalancerAddress()) 
+					&& sipConnector.getLoadBalancerCustomInformation() != null
+					&& !sipConnector.getLoadBalancerCustomInformation().isEmpty()) {
+				balancerDescription.setCustomInfo(sipConnector.getLoadBalancerCustomInformation());
+			}
+		}
+	}
+
+	@Override
+	public void pingedloadBalancer(SipLoadBalancer balancerDescription) {
+		// Nothing to do here
+	}
 	
 	/**
 	 * @param info

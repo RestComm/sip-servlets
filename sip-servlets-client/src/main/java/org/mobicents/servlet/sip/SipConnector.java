@@ -1,28 +1,26 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * TeleStax, Open Source Cloud Communications
+ * Copyright 2011-2016, Telestax Inc and individual contributors
+ * by the @authors tag.
  *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
+ * This program is free software: you can redistribute it and/or modify
+ * under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
  *
- * This software is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
 package org.mobicents.servlet.sip;
 
 import java.io.Serializable;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.management.MBeanServer;
@@ -32,7 +30,7 @@ import javax.management.ObjectName;
 import org.apache.log4j.Logger;
 
 /**
- * Represents a Mobicents Sip Servlets SIP connector and its various attributes
+ * Represents a Restcomm Sip Servlets SIP connector and its various attributes
  * 
  * @author jean.deruelle@gmail.com
  * 
@@ -87,6 +85,12 @@ public class SipConnector implements Serializable {
 	private String loadBalancerAddress;
 	private int loadBalancerRmiPort;
 	private int loadBalancerSipPort;
+	// https://github.com/RestComm/sip-servlets/issues/172
+	private Properties loadBalancerCustomInformation;
+	
+	public SipConnector() {
+		loadBalancerCustomInformation = new Properties();
+	}
 	
 	/**
 	 * @return the Transport
@@ -431,5 +435,20 @@ public class SipConnector implements Serializable {
 	 */
 	public void setLoadBalancerSipPort(int loadBalancerSipPort) {
 		this.loadBalancerSipPort = loadBalancerSipPort;
+	}
+
+	/**
+	 * @return the loadBalancerCustomInformation
+	 */
+	public Properties getLoadBalancerCustomInformation() {
+		return loadBalancerCustomInformation;
+	}
+
+	/**
+	 * @param loadBalancerCustomInformation the loadBalancerCustomInformation to set
+	 */
+	public void setLoadBalancerCustomInformation(
+			Properties loadBalancerCustomInformation) {
+		this.loadBalancerCustomInformation = loadBalancerCustomInformation;
 	}
 }
