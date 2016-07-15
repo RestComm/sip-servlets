@@ -439,6 +439,12 @@ public class ShootistSipServlet
 				addr.setParameter("headerparam1", "headervalue1");
 				addr.setParameter("param5", "ffff");
 				addr.getURI().setParameter("uriparam", "urivalue");
+				if (ce.getServletContext().getInitParameter("testContactHeader") != null){
+					addr.setParameter("param0", "value0");
+					addr.setParameter("qparam1", "value1");
+					addr.setParameter("param2", "value2");
+					addr.setParameter("qparam3", "value3");
+				}
 			}
 			String dontSetRURI = ce.getServletContext().getInitParameter("dontSetRURI");
 			if(dontSetRURI == null) {
@@ -537,6 +543,12 @@ public class ShootistSipServlet
 				logger.error("couln't parse the Via Header ", e);
 			}
 			paramVia.setParameter("rport", "");
+			if (ce.getServletContext().getInitParameter("testViaHeader") != null){
+				paramVia.setParameter("param0", "value0");
+				paramVia.setParameter("qparam1", "value1");
+				paramVia.setParameter("param2", "value2");
+				paramVia.setParameter("qparam3", "value3");
+			}
 			boolean gotException = false;
 			try {
 				paramVia.setParameter("branch", "");
@@ -547,6 +559,18 @@ public class ShootistSipServlet
 				logger.info("got the expected exception on Via Header branch setting");
 			} else {
 				throw new IllegalStateException("didn't get the expected exception on branch modification of the Via Header"); 
+			}
+			if (ce.getServletContext().getInitParameter("testFromHeader") != null){
+				sipServletRequest.getFrom().setParameter("param0", "value0");
+				sipServletRequest.getFrom().setParameter("qparam1", "value1");
+				sipServletRequest.getFrom().setParameter("param2", "value2");
+				sipServletRequest.getFrom().setParameter("qparam3", "value3");
+			}
+			if (ce.getServletContext().getInitParameter("testToHeader") != null){
+				sipServletRequest.getTo().setParameter("param0", "value0");
+				sipServletRequest.getTo().setParameter("qparam1", "value1");
+				sipServletRequest.getTo().setParameter("param2", "value2");
+				sipServletRequest.getTo().setParameter("qparam3", "value3");
 			}
 			if(testRemoteAddrAndPort != null) {
 				sipServletRequest.getRemoteAddr();
@@ -646,7 +670,7 @@ public class ShootistSipServlet
 						}
 					} 								
 				}
-			}	
+			}
 		} finally {
 			release();
 		}

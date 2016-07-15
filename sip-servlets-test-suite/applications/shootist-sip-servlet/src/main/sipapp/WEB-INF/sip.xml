@@ -8,7 +8,10 @@
 	<!--main-servlet>
 		ShootistSipServlet
 	</main-servlet-->
-
+	<context-param>
+			<param-name>org.restcomm.servlets.sip.QUOTABLE_PARAMETER</param-name>
+			<param-value>qparam1,qparam3</param-value>
+	</context-param>
 	<servlet>
 		<servlet-name>ShootistSipServlet</servlet-name>
 		<display-name>ShootistSipServlet</display-name>

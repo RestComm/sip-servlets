@@ -22,10 +22,13 @@
 
 package org.mobicents.servlet.sip.address;
 
+import gov.nist.javax.sip.header.ParametersExt;
+
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -36,6 +39,8 @@ import javax.sip.header.Header;
 import javax.sip.header.Parameters;
 
 import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
+import org.mobicents.servlet.sip.core.SipContext;
+import org.mobicents.servlet.sip.core.session.SipApplicationSessionCreationThreadLocal;
 
 
 /**
@@ -155,13 +160,38 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 		this.parameters.put(name.toLowerCase(), value);
 		if(header != null) {
 			try {
-				header.setParameter(name, "".equals(value) ? null : value);
+				if (isQuotableParam(name) && (header instanceof ParametersExt)){
+					((ParametersExt) header).setQuotedParameter(name, value);
+				}else{
+					header.setParameter(name, "".equals(value) ? null : value);
+				}
 			} catch (ParseException e) {
 				throw new IllegalArgumentException("Problem setting parameter",e);
 			}
 		}
 	}
-
+	
+	/*
+	 * Check if the param name is in the list that its value need to be quoted
+	 * 
+	 * @param name - a string specifying the parameter name
+	 * 
+	 */
+	private boolean isQuotableParam(String name){
+		boolean isQuotableParameter = false;
+		SipContext context = SipApplicationSessionCreationThreadLocal.lookupContext();
+		if (context != null){
+			List<String> params = (List<String>)context.getServletContext().getAttribute("org.restcomm.servlets.sip.QUOTABLE_PARAMETER");
+			for (String param : params){
+				if (param.equalsIgnoreCase(name)){
+					isQuotableParameter = true;
+					break;
+				}
+			}
+		}
+		
+		return isQuotableParameter;
+	}
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.Parameterable#getParameters()
