@@ -1028,7 +1028,7 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 			final ProtocolHandler protocolHandler = connector.getProtocolHandler();
 			if(protocolHandler instanceof SipProtocolHandler) {
 				final SipProtocolHandler sipProtocolHandler = (SipProtocolHandler) protocolHandler;
-				if(sipProtocolHandler.getIpAddress().equals(ipAddress) && sipProtocolHandler.getPort() == port && sipProtocolHandler.getSignalingTransport().equals(transport)) {
+				if(sipProtocolHandler.getIpAddress().equals(ipAddress) && sipProtocolHandler.getPort() == port && sipProtocolHandler.getSignalingTransport().equalsIgnoreCase(transport)) {
 //					connector.destroy();
 					connectorToRemove = connector;
 					break;

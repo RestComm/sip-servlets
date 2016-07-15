@@ -735,7 +735,7 @@ public class SipStandardService implements SipService {
         SipConnector connectorToRemove = null;
         for (SipProtocolHandler protocolHandler : connectors) {
             if (protocolHandler.getIpAddress().equals(ipAddress) && protocolHandler.getPort() == port
-                    && protocolHandler.getSignalingTransport().equals(transport)) {
+                    && protocolHandler.getSignalingTransport().equalsIgnoreCase(transport)) {
                 connectorToRemove = protocolHandler.getSipConnector();
                 return protocolHandler;
             }
