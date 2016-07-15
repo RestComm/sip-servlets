@@ -129,7 +129,8 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 	private static int DEFAULT_LIFETIME = 3;
 	
 	// default quotable params that their values need to be quoted.
-	private static String DEFAULT_QUOTABLE_PARAMS = "vendor, model, version, nextnonce, nonce, code, Identity, oc-algo, cid, text";
+	private static final String DEFAULT_QUOTABLE_PARAMS = "vendor, model, version, cnonce, nextnonce,"
+			+ "nonce, code, oc-algo, cid, text, domain, opaque, qop, realm, response, rspauth, uri, username";
 	
 	protected String applicationName;
 	protected String smallIcon;
