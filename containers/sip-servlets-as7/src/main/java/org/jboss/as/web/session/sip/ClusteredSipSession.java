@@ -104,6 +104,7 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSessionKey;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
+import org.mobicents.servlet.sip.core.SipContext;
 import org.mobicents.servlet.sip.core.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
@@ -1154,24 +1155,129 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 			}
 		}
 		if(logger.isDebugEnabled()) {
-			logger.debug("dialog to inject " + sessionCreatingDialogId);
-			if(sessionCreatingDialogId != null) {
-				logger.debug("dialog id of the dialog to inject " + sessionCreatingDialogId);
-			}
+			logger.debug("dialog id to inject " + sessionCreatingDialogId + ", this.getId()=" + this.getId());
 		}
 		if(sessionCreatingDialogId != null && sessionCreatingDialogId.length() > 0) {
 			//Container context = getManager().getContainer();
 			Container context = this.manager.getContainer();
+			
+			//--- 
+			//SipContext context2 = ((SipContext)this.manager.getContainer());
+			Container sipContext = (Container)((DistributableSipSessionManager)this.manager).getSipContextContainer();
+			if (logger.isDebugEnabled()){
+				logger.debug("updateSipSession - sipContext=" + sipContext);
+				if (sipContext != null){
+					/*logger.debug("updateSipSession - sipContext.getDescription()=" + sipContext.getDescription());
+					logger.debug("updateSipSession - sipContext.getPath()=" + sipContext.getPath());
+					logger.debug("updateSipSession - sipContext.getEngineName()=" + sipContext.getEngineName());
+					*/
+					if(sipContext instanceof Engine) {
+						if (logger.isDebugEnabled()){
+							logger.debug("updateSipSession - sipContext is instanceof Engine");
+						}
+						
+						Service service = ((Engine)sipContext).getService();
+						if (logger.isDebugEnabled()){
+							logger.debug("updateSipSession - sipContext..service=" + service);
+							if (service != null){
+								logger.debug("updateSipSession - service.getName()=" + service.getName());
+								logger.debug("updateSipSession - service.getInfo()=" + service.getInfo());
+								logger.debug("updateSipSession - service.getClass()=" + service.getClass());
+								logger.debug("updateSipSession - service.getServer()=" + service.getServer());
+								logger.debug("updateSipSession - service.getContainer()=" + service.getContainer());
+							}
+						}
+					}
+					
+					if(sipContext.getParent().getParent() instanceof Engine) {
+						if (logger.isDebugEnabled()){
+							logger.debug("updateSipSession - sipContext.getParent().getParent() is instanceof Engine");
+						}
+						
+						Service service = ((Engine)sipContext.getParent().getParent()).getService();
+						if (logger.isDebugEnabled()){
+							logger.debug("updateSipSession - sipContext..service=" + service);
+							if (service != null){
+								logger.debug("updateSipSession - service.getName()=" + service.getName());
+								logger.debug("updateSipSession - service.getInfo()=" + service.getInfo());
+								logger.debug("updateSipSession - service.getClass()=" + service.getClass());
+								logger.debug("updateSipSession - service.getServer()=" + service.getServer());
+								logger.debug("updateSipSession - service.getContainer()=" + service.getContainer());
+							}
+						}
+					}
+					
+				}
+			}
+			//context2.getServletContext().getSer
+			
+			
+			
+			
+			if(context instanceof Engine) {
+				if (logger.isDebugEnabled()){
+					logger.debug("updateSipSession - context is instanceof Engine");
+				}
+				
+				Service service = ((Engine)context).getService();
+				if (logger.isDebugEnabled()){
+					logger.debug("updateSipSession - context..service=" + service);
+					if (service != null){
+						logger.debug("updateSipSession - service.getName()=" + service.getName());
+						logger.debug("updateSipSession - service.getInfo()=" + service.getInfo());
+						logger.debug("updateSipSession - service.getClass()=" + service.getClass());
+						logger.debug("updateSipSession - service.getServer()=" + service.getServer());
+						logger.debug("updateSipSession - service.getContainer()=" + service.getContainer());
+					}
+				}
+			}
+			
+			if(context.getParent() instanceof Engine) {
+				if (logger.isDebugEnabled()){
+					logger.debug("updateSipSession - context.getParent() is instanceof Engine");
+				}
+				
+				Service service = ((Engine)context.getParent()).getService();
+				if (logger.isDebugEnabled()){
+					logger.debug("updateSipSession - context.getParent()..service=" + service);
+					if (service != null){
+						logger.debug("updateSipSession - service.getName()=" + service.getName());
+						logger.debug("updateSipSession - service.getInfo()=" + service.getInfo());
+						logger.debug("updateSipSession - service.getClass()=" + service.getClass());
+						logger.debug("updateSipSession - service.getServer()=" + service.getServer());
+						logger.debug("updateSipSession - service.getContainer()=" + service.getContainer());
+					}
+				}
+			}
+			
+			
 			Container container = context.getParent().getParent();
 			if(container instanceof Engine) {
+				if (logger.isDebugEnabled()){
+					logger.debug("updateSipSession - container is instanceof Engine");
+				}
+				
 				Service service = ((Engine)container).getService();
+				if (logger.isDebugEnabled()){
+					logger.debug("updateSipSession - service=" + service);
+					if (service != null){
+						logger.debug("updateSipSession - service.getName()=" + service.getName());
+						logger.debug("updateSipSession - service.getInfo()=" + service.getInfo());
+						logger.debug("updateSipSession - service.getClass()=" + service.getClass());
+						logger.debug("updateSipSession - service.getServer()=" + service.getServer());
+						logger.debug("updateSipSession - service.getContainer()=" + service.getContainer());
+					}
+				}
 				if(service instanceof SipService) {
 					SipService sipService = (SipService) service;
-					SipStack sipStack = sipService.getSipStack();					
+					SipStack sipStack = sipService.getSipStack();
+					if (logger.isDebugEnabled()){
+						logger.debug("updateSipSession - service is instanceof SipService - sipStack=" + sipStack);
+					}
 					if(sipStack != null) {
 						sessionCreatingDialog = ((ClusteredSipStack)sipStack).getDialog(sessionCreatingDialogId); 
 						if(logger.isDebugEnabled()) {
-							logger.debug("dialog injected " + sessionCreatingDialog);
+							logger.debug("dialog injected " + sessionCreatingDialog + ", this.getId()=" + this.getId());
 						}
 					}
 				}

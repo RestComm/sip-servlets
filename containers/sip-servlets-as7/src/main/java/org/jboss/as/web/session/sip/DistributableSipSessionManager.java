@@ -3623,7 +3623,7 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 	@Override
 	public void setContainer(Container container) {
 		if (logger.isDebugEnabled()){
-			logger.debug("setContainer");
+			logger.debug("setContainer - container=" + container);
 		}
 		
 		if(container != null && container instanceof SipContext && ((SipContext)container).getSipFactoryFacade() == null) {
@@ -3634,6 +3634,9 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 		}
 		super.setContainer(container);		
 		if(container instanceof SipContext) {	
+			if (logger.isDebugEnabled()){
+				logger.debug("setContainer - container is instanceof SipContext");
+			}
 			sipManagerDelegate.setContainer((SipContext) container);
 		}
 		DistributedCacheConvergedSipManager<? extends OutgoingDistributableSessionData> distributedCacheConvergedSipManager = getDistributedCacheConvergedSipManager();
@@ -4153,8 +4156,16 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 					Container context = getContainer();
 					Container container = context.getParent().getParent();
 					if(container instanceof Engine) {
+						if (logger.isDebugEnabled()) {
+							logger.debug("container is instanceof Engine");
+						}
+						
 						Service service = ((Engine)container).getService();
 						if(service instanceof SipService) {
+							if (logger.isDebugEnabled()) {
+								logger.debug("service is instanceof SipService");
+							}
+							
 							Connector[] connectors = service.findConnectors();
 							for (Connector connector : connectors) {
 								SipStack sipStack = (SipStack)

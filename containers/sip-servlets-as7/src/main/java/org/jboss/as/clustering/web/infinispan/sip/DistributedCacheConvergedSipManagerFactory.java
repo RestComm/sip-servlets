@@ -56,7 +56,7 @@ public class DistributedCacheConvergedSipManagerFactory extends DistributedCache
 	
 	private static final Logger logger = Logger.getLogger(DistributedCacheConvergedSipManagerFactory.class);
 	
-	public static final String DEFAULT_CACHE_CONTAINER = "singleton";
+	//public static final String DEFAULT_CACHE_CONTAINER = "sip";
 	private static final ServiceName JVM_ROUTE_REGISTRY_SERVICE_NAME = DistributedConvergedCacheManagerFactoryService.JVM_ROUTE_REGISTRY_ENTRY_PROVIDER_SERVICE_NAME.getParent();
 
 	private SessionAttributeStorageFactory storageFactory = new SessionAttributeStorageFactoryImpl();//todo? atallni ConvergedSessionAttributeMarshallerFactory-ra?

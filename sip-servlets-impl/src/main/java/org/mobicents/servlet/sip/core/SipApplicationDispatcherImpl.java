@@ -1,6 +1,6 @@
 /*
  * TeleStax, Open Source Cloud Communications
- * Copyright 2011-2014, Telestax Inc and individual contributors
+ * Copyright 2011-2016, Telestax Inc and individual contributors
  * by the @authors tag.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -213,35 +213,16 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	
 	// stats
 	private boolean gatherStatistics = true;
-	private static AtomicLong requestsProcessed = new AtomicLong(0);
-	private static AtomicLong responsesProcessed = new AtomicLong(0);
-	static final Map<String, AtomicLong> requestsProcessedByMethod = new ConcurrentHashMap<String, AtomicLong>();
-	static {
-		for (String method : METHODS_SUPPORTED) {
-			requestsProcessedByMethod.put(method, new AtomicLong(0));
-		}
-	}
-	static final Map<String, AtomicLong> responsesProcessedByStatusCode = new ConcurrentHashMap<String, AtomicLong>();
-	static {
-		for (String classOfSc : RESPONSES_PER_CLASS_OF_SC) {
-			responsesProcessedByStatusCode.put(classOfSc, new AtomicLong(0));
-		}
-	}
+	private final AtomicLong requestsProcessed = new AtomicLong(0);
+	private final AtomicLong responsesProcessed = new AtomicLong(0);
+	final Map<String, AtomicLong> requestsProcessedByMethod = new ConcurrentHashMap<String, AtomicLong>();
+	final Map<String, AtomicLong> responsesProcessedByStatusCode = new ConcurrentHashMap<String, AtomicLong>();
 	// https://telestax.atlassian.net/browse/MSS-74
-	private static AtomicLong requestsSent = new AtomicLong(0);
-	private static AtomicLong responsesSent= new AtomicLong(0);
-	static final Map<String, AtomicLong> requestsSentByMethod = new ConcurrentHashMap<String, AtomicLong>();
-	static {
-		for (String method : METHODS_SUPPORTED) {
-			requestsSentByMethod.put(method, new AtomicLong(0));
-		}
-	}
-	static final Map<String, AtomicLong> responsesSentByStatusCode = new ConcurrentHashMap<String, AtomicLong>();
-	static {
-		for (String classOfSc : RESPONSES_PER_CLASS_OF_SC) {
-			responsesSentByStatusCode.put(classOfSc, new AtomicLong(0));
-		}
-	}
+	private final AtomicLong requestsSent = new AtomicLong(0);
+	private final AtomicLong responsesSent= new AtomicLong(0);
+	final Map<String, AtomicLong> requestsSentByMethod = new ConcurrentHashMap<String, AtomicLong>();
+	final Map<String, AtomicLong> responsesSentByStatusCode = new ConcurrentHashMap<String, AtomicLong>();
+        
 	// congestion control
 	private boolean memoryToHigh = false;	
 	private double maxMemory;
@@ -292,6 +273,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	 * 
 	 */
 	public SipApplicationDispatcherImpl() {
+                resetStatsCounters();
 		applicationDeployed = new ConcurrentHashMap<String, SipContext>();
 		mdToApplicationName = new ConcurrentHashMap<String, String>();
 		applicationNameToMd = new ConcurrentHashMap<String, String>();
@@ -301,6 +283,30 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		maxMemory = Runtime.getRuntime().maxMemory() / (double) 1024;
 		congestionControlPolicy = CongestionControlPolicy.ErrorResponse;
 	}
+        
+        @Override
+        public final void resetStatsCounters() {
+            requestsProcessed.set(0);
+            responsesProcessed.set(0);
+            requestsSent.set(0);
+            responsesSent.set(0);
+            for (String method : METHODS_SUPPORTED) {
+                    requestsProcessedByMethod.put(method, new AtomicLong(0));
+            }
+
+            for (String classOfSc : RESPONSES_PER_CLASS_OF_SC) {
+                    responsesProcessedByStatusCode.put(classOfSc, new AtomicLong(0));
+            }                
+
+            for (String classOfSc : RESPONSES_PER_CLASS_OF_SC) {
+                    responsesSentByStatusCode.put(classOfSc, new AtomicLong(0));
+            }
+
+            for (String method : METHODS_SUPPORTED) {
+                    requestsSentByMethod.put(method, new AtomicLong(0));
+            }    
+                               
+        }
 	
 	/**
 	 * {@inheritDoc} 
@@ -1763,8 +1769,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		MobicentsExtendedListeningPoint listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(host, port, transport);		
 		if((hostNames.contains(host) || hostNames.contains(host+":" + port) || listeningPoint != null)) {
 			if(logger.isDebugEnabled()) {
-				logger.debug("hostNames.contains(host)=" + 
+				logger.debug("hostNames.contains(" + host + ")=" + 
 						hostNames.contains(host) +
+						"hostNames.contains(" + host + ":" + port + ")=" + 
+								hostNames.contains(host+":" + port) +
 						" | listeningPoint found = " +
 						listeningPoint);
 			}
@@ -2486,6 +2494,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		return RFC_SUPPORTED;
 	}
 
+	@Override
 	public void loadBalancerAdded(SipLoadBalancer sipLoadBalancer) {
 		sipLoadBalancers.add(sipLoadBalancer);
 		if(sipFactoryImpl.getLoadBalancerToUse() == null) {
@@ -2493,6 +2502,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		}
 	}
 
+	@Override
 	public void loadBalancerRemoved(SipLoadBalancer sipLoadBalancer) {
 		sipLoadBalancers.remove(sipLoadBalancer);
 		if(sipFactoryImpl.getLoadBalancerToUse() != null && 
@@ -2504,6 +2514,28 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			}
 		}
 	}	
+	
+	// https://github.com/RestComm/sip-servlets/issues/172
+	@Override
+	public void pingingloadBalancer(SipLoadBalancer balancerDescription) {
+		SipConnector[] sipConnectors = sipService.findSipConnectors();
+		for (SipConnector sipConnector : sipConnectors) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("Comparing Balancer Address " + balancerDescription.getAddress().getHostAddress() + 
+						" to sipconnector balancer address " + sipConnector.getLoadBalancerAddress());
+			}
+			if(balancerDescription.getAddress().getHostAddress().equals(sipConnector.getLoadBalancerAddress()) 
+					&& sipConnector.getLoadBalancerCustomInformation() != null
+					&& !sipConnector.getLoadBalancerCustomInformation().isEmpty()) {
+				balancerDescription.setCustomInfo(sipConnector.getLoadBalancerCustomInformation());
+			}
+		}
+	}
+
+	@Override
+	public void pingedloadBalancer(SipLoadBalancer balancerDescription) {
+		// Nothing to do here
+	}
 	
 	/**
 	 * @param info

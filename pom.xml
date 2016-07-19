@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<artifactId>mobicents-parent</artifactId>
-		<groupId>org.mobicents</groupId>
-		<version>2.27.23</version>
+		<groupId>org.restcomm</groupId>
+		<artifactId>restcomm-parent</artifactId>
+		<version>3.0.46</version>
 	</parent>
 	<groupId>org.mobicents.servlet.sip</groupId>
 	<artifactId>sip-servlets-bootstrap</artifactId>
@@ -89,10 +89,14 @@
 
 	<properties>
 		<restcomm.tools.mavenplugin.eclipse.version>1.0.0.FINAL</restcomm.tools.mavenplugin.eclipse.version>
-		<jain-sip-ri.version>1.2.281</jain-sip-ri.version>
+		<jain-sip-ri.version>1.2.295</jain-sip-ri.version>
 		<restcomm.cluster.version>1.15.26</restcomm.cluster.version>
+		<!--
 		<restcomm.balancer.version>2.0.23</restcomm.balancer.version>
 		<restcomm.jain.sip.ha.version>1.5.32</restcomm.jain.sip.ha.version>
+		-->
+		<restcomm.balancer.version>2.0.41</restcomm.balancer.version>
+		<restcomm.jain.sip.ha.version>1.5.34</restcomm.jain.sip.ha.version>
 		<restcomm.jain.sip.ext.version>1.3.23</restcomm.jain.sip.ext.version>
 		<restcomm.commons.version>1.0.134</restcomm.commons.version>
 		<tomcat-7.version>7.0.64</tomcat-7.version>

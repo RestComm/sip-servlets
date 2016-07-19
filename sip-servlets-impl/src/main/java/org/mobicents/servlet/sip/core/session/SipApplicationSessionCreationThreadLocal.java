@@ -22,8 +22,10 @@
 
 package org.mobicents.servlet.sip.core.session;
 
+import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import org.mobicents.servlet.sip.core.SipContext;
 
 /**
  * Information related to the application sessions created in the context of a thread when it is passed to the application
@@ -37,4 +39,22 @@ public class SipApplicationSessionCreationThreadLocal {
 	public Set<MobicentsSipApplicationSession> getSipApplicationSessions() {
 		return sipApplicationSessions;
 	}
+        
+        private static ThreadLocal<SipApplicationSessionCreationThreadLocal> sessionsTH = new ThreadLocal();
+        
+        public static ThreadLocal<SipApplicationSessionCreationThreadLocal> getTHRef() {
+            return sessionsTH;
+        }
+        
+        public static SipContext lookupContext() {
+            SipContext ctx = null;
+            SipApplicationSessionCreationThreadLocal get = sessionsTH.get();
+            if (get != null) {
+                Iterator<MobicentsSipApplicationSession> iterator = get.getSipApplicationSessions().iterator();
+                if (iterator.hasNext()) {
+                    ctx = iterator.next().getSipContext();
+                }
+            }
+            return ctx;
+        }
 }

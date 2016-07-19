@@ -143,11 +143,27 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 	private ProxyTerminationInfo terminationInfo; // Object to store termination information	
 
 	// empty constructor used only for Externalizable interface
-	public ProxyImpl() {}
+	public ProxyImpl() {
+		if (logger.isDebugEnabled()){
+			logger.debug("ProxyImpl no-argument constructor");
+		}
+	}
 	
 	public ProxyImpl(SipServletRequestImpl request, SipFactoryImpl sipFactoryImpl)
 	{
+		if (logger.isDebugEnabled()){
+			logger.debug("ProxyImpl constructor");
+		}
 		this.proxyTimerService = ((MobicentsSipApplicationSession)request.getSipApplicationSession(false)).getSipContext().getProxyTimerService();
+		if (logger.isDebugEnabled()){
+			logger.debug("ProxyImpl constructor - this.proxyTimerService=" + this.proxyTimerService);
+			if (((MobicentsSipApplicationSession)request.getSipApplicationSession(false)) != null){
+				logger.debug("ProxyImpl constructor - sipContext=" + ((MobicentsSipApplicationSession)request.getSipApplicationSession(false)).getSipContext());
+				logger.debug("ProxyImpl constructor - sipContext.getApplicationName()=" + ((MobicentsSipApplicationSession)request.getSipApplicationSession(false)).getSipContext().getApplicationName());
+				logger.debug("ProxyImpl constructor - getApplicationName()=" + ((MobicentsSipApplicationSession)request.getSipApplicationSession(false)).getApplicationName());
+				logger.debug("ProxyImpl constructor - SipApplicationSession.getId()=" + ((MobicentsSipApplicationSession)request.getSipApplicationSession(false)).getId());
+			}
+		}
 		this.originalRequest = request;
 		this.sipFactoryImpl = sipFactoryImpl;
 		this.proxyBranches = new LinkedHashMap<URI, ProxyBranchImpl> ();		
@@ -320,6 +336,10 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 			if(!JainSipUtils.checkScheme(target.toString())) {
 				throw new IllegalArgumentException("Scheme " + target.getScheme() + " is not supported");
 			}
+			if(logger.isDebugEnabled()) {
+				logger.debug("createProxyBranches with proxyTimerService=" + proxyTimerService);
+			}
+			
 			ProxyBranchImpl branch = new ProxyBranchImpl(target, this);
 			branch.setRecordRoute(recordRoutingEnabled);
 			branch.setRecurse(recurse);
@@ -1100,6 +1120,10 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {
+		if(logger.isDebugEnabled()) {
+			logger.debug("readExternal");
+		}
+		
 		if(ReplicationStrategy.EarlyDialog == StaticServiceHolder.sipStandardService.getReplicationStrategy()) {
 			// Issue 2587 : read only if not null.
 			if(in.readBoolean()) {
@@ -1119,12 +1143,18 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 //		tryingSent = in.readBoolean();
 		finalBranchForSubsequentRequests = (ProxyBranchImpl) in.readObject();
 		if(finalBranchForSubsequentRequests != null) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("readExternal - finalBranchForSubsequentRequests is not null - calling setProxy");
+			}
 			finalBranchForSubsequentRequests.setProxy(this);
 		}
 		previousNode = in.readUTF();
 		callerFromTag = in.readUTF();
 		storeTerminationInfo = in.readBoolean();
 		if (storeTerminationInfo) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("readExternal - storeTerminationInfo is not null - calling setProxy");
+			}
 			terminationInfo = (ProxyTerminationInfo) in.readObject();
 			terminationInfo.setProxy(this);
 		}
@@ -1261,4 +1291,9 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 	public boolean isAppSpecifiedRecordRoutingEnabled() {
 		return appSpecifiedRecordRoutingEnabled;
 	}
+
+	public void setProxyTimerService(ProxyTimerService proxyTimerService) {
+		this.proxyTimerService = proxyTimerService;
+	}
+		
 }

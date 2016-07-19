@@ -207,10 +207,14 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 		}
 		isFinalResponseGenerated = false;
 	}
-
+        
 	@Override
 	public ModifiableRule getModifiableRule(String headerName) {
-
+                ModifiableRule overriden = retrieveModifiableOverriden();
+                if ( overriden != null ) {
+                    return overriden;
+                }
+                
 		String hName = getFullHeaderName(headerName);
 
 		/*
@@ -523,6 +527,9 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 	 * {@inheritDoc}
 	 */
 	public Proxy getProxy(boolean create) throws TooManyHopsException {
+		if (logger.isDebugEnabled()){
+			logger.debug("getProxy - create=" + create);
+		}
 		checkReadOnly();
 		final MobicentsSipSession session = getSipSession();
 		if (session.getB2buaHelper() != null ) throw new IllegalStateException("Cannot proxy request");
@@ -955,6 +962,9 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 	 */
 	@Override
 	public void send() throws IOException {
+		if(logger.isDebugEnabled()) {
+			logger.debug("send - method=" + this.getMethod());
+		}
 		checkReadOnly();
 		// Cope with com.bea.sipservlet.tck.agents.api.javax_servlet_sip.SipServletMessageTest.testSend101 
 		// make sure a message received cannot be sent out
@@ -1021,6 +1031,9 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 				}
 			}
 		}
+		if(logger.isDebugEnabled()) {
+			logger.debug("send - calling send(hop) - hop=" + hop);
+		}
 		send(hop);
 	}
 	
@@ -1058,6 +1071,10 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 	}
 	
 	public void send(Hop hop) throws IOException {
+		if(logger.isDebugEnabled()) {
+			logger.debug("send - hop=" + hop + ", method=" + this.getMethod());
+		}
+		
 		final Request request = (Request) super.message;
 		final String requestMethod = getMethod();
 		final MobicentsSipSession session = getSipSession();
@@ -1131,6 +1148,9 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 					throw new IllegalArgumentException("couldn't parse the outbound interface " + outboundInterface, e);
 				}
 				matchingListeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(outboundInterfaceURI, false);
+				if(logger.isDebugEnabled()) {
+					logger.debug("Matching listening point " + matchingListeningPoint);
+				}
 			}
 			if(matchingListeningPoint == null) {
 				if(logger.isDebugEnabled()) {
@@ -1138,6 +1158,9 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 				}
 				matchingListeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(
 						transport, false);
+				if(logger.isDebugEnabled()) {
+					logger.debug("Matching listening point " + matchingListeningPoint);
+				}
 			}
 			
 			final SipProvider sipProvider = matchingListeningPoint.getSipProvider();
@@ -1185,11 +1208,12 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 				if(isInitial() || dialog == null) {		
 				    //Issue: https://code.google.com/p/sipservlets/issues/detail?id=284
 				    //Issue: https://telestax.atlassian.net/browse/MSS-121
+					if(logger.isDebugEnabled()) {
+						logger.debug("bypassLoadBalancer: " + session.getBypassLoadBalancer() + ", sipFactoryImpl UseLoadBalancer: " + sipFactoryImpl.isUseLoadBalancer()
+								+ ", matchingListeningPoint: " + matchingListeningPoint);
+					}
 					if(!session.getBypassLoadBalancer() && sipFactoryImpl.isUseLoadBalancer()) {
 						if(matchingListeningPoint != null && matchingListeningPoint.isUseLoadBalancer()) {
-							if(logger.isDebugEnabled()) {
-								logger.debug("Using listeningPoint " + matchingListeningPoint + " for load balancer " + sipFactoryImpl.getLoadBalancerToUse());
-							}
 							sipFactoryImpl.addLoadBalancerRouteHeader(request, matchingListeningPoint);
 							addDNSRoute = false;
 							if(logger.isDebugEnabled()) {
@@ -1239,8 +1263,16 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 				JainSipUtils.setTransactionTimers((TransactionExt) ctx, sipFactoryImpl.getSipApplicationDispatcher());
 				Dialog dialog = null;
 				if(session.getProxy() != null) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("send - session.getProxy is not null");
+					}
+					
 					// take care of the RRH
 					if(isInitial()) {
+						if(logger.isDebugEnabled()) {
+							logger.debug("send - isInitial true");
+						}
+						
 						if(session.getProxy().getRecordRoute()) {
 							ListIterator li = request.getHeaders(RecordRouteHeader.NAME);
 							while(li.hasNext()) {
@@ -1275,6 +1307,9 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 					}
 				} else {
 					// no dialogs in proxy
+					if(logger.isDebugEnabled()) {
+						logger.debug("send - session.getProxy is null");
+					}
 					dialog = ctx.getDialog();
 				}
 				
@@ -1293,6 +1328,9 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 				// Make the dialog point here so that when the dialog event
 				// comes in we can find the session quickly.
 				if (dialog != null) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("send - calling dialog.setApplicationData");
+					}
 					dialog.setApplicationData(this.transactionApplicationData);
 				}
 				
@@ -1328,6 +1366,11 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 			if(linkedRequest != null && 
 					!SipApplicationRoutingDirective.NEW.equals(routingDirective)) {
 				if(!RoutingState.PROXIED.equals(linkedRequest.getRoutingState())) {
+					
+					if(logger.isDebugEnabled()) {
+						logger.debug("send - setRoutingState to RELAYED");
+					}
+					
 					linkedRequest.setRoutingState(RoutingState.RELAYED);
 				}
 			}		
@@ -1357,17 +1400,23 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 						|| (dialog.getState() == DialogState.EARLY && !Request.PRACK.equals(requestMethod) && !Request.UPDATE.equals(requestMethod)) 
 						|| Request.CANCEL.equals(requestMethod)) {
 					if(logger.isDebugEnabled()) {
-						logger.debug("Sending the request " + request);
+						logger.debug("Sending the request " + request + ", transaction=" + super.getTransaction());
+						logger.debug("Sending the request " + request + ", transaction.getState()=" + super.getTransaction().getState());
+						logger.debug("Sending the request " + request + ", transaction.getDialog()=" + super.getTransaction().getDialog());
+						logger.debug("Sending the request " + request + ", transaction.getRequest()=" + super.getTransaction().getRequest());
 					}
 					((ClientTransaction) super.getTransaction()).sendRequest();
 				} else {
 					// This is a subsequent (an in-dialog) request. 
 					// we don't redirect it to the container for now
 					if(logger.isDebugEnabled()) {
-						logger.debug("Sending the in dialog request " + request);
+						logger.debug("Sending the in dialog request " + request + ", dialog=" + dialog + ", transaction=" + getTransaction());
 					}
 					dialog.sendRequest((ClientTransaction) getTransaction());
-				}	
+				}
+				if(logger.isDebugEnabled()) {
+					logger.debug("send - message is sent - calling updateRequestsStatistics");
+				}
 				sipFactoryImpl.getSipApplicationDispatcher().updateRequestsStatistics(request, false);
 				isMessageSent = true;
 				
@@ -1377,7 +1426,11 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 			} finally {
 				Thread.currentThread().setContextClassLoader(oldClassLoader);
 			}
-		} catch (Exception ex) {			
+		} catch (Exception ex) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("send - exception while trying to send the request", ex);
+			}
+			
 			// The second condition for SipExcpetion is to cover com.bea.sipservlet.tck.agents.spec.ProxyBranchTest.testCreatingBranchParallel() where they send a request twice, the second
 			// time it does a "Request already sent" jsip exception but the tx is going on and must not be destroyed
 			boolean skipTxTermination = false;
@@ -1393,6 +1446,9 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 					// https://code.google.com/p/sipservlets/issues/detail?id=250 retry directly on TCP
                     boolean nextHopVisited = visitNextHop();
                     if(nextHopVisited) {
+                    	if(logger.isDebugEnabled()) {
+            				logger.debug("send - returning after exception");
+            			}
                     	return;
                     }
 				}
@@ -1582,6 +1638,9 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 	 */
 	private void updateLinkedRequestAppDataMapping(final ClientTransaction ctx,
 			Dialog dialog) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("updateLinkedRequestAppDataMapping");
+		}
 		final Transaction linkedTransaction = linkedRequest.getTransaction();
 		final Dialog linkedDialog = linkedRequest.getDialog();
 		//keeping the client transaction in the server transaction's application data
@@ -2408,7 +2467,7 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
             return ((SIPRequest)message).getPeerPacketSourceAddress().getHostAddress();
         } else if (message != null && 
                 message instanceof SIPRequest && 
-                ((SIPRequest)message).getRemoteAddress() != null ) {
+                ((SIPRequest)message).getPeerPacketSourceAddress() != null ) {
             //https://github.com/Mobicents/jain-sip/issues/42
             //take advantage of new message methods to extract addr from msg            
             return ((SIPRequest)message).getPeerPacketSourceAddress().getHostAddress();
@@ -2520,7 +2579,7 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 		subscriberURI = null;
 //		lastFinalResponse = null;
 //		lastInformationalResponse = null;		
-		linkedRequest = null;		
+		linkedRequest = null;
 	}
 	
 	public void cleanUpLastResponses() {

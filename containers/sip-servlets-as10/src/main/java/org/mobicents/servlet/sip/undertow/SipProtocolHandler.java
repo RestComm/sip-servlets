@@ -44,6 +44,9 @@ import net.java.stun4j.client.NetworkConfigurationDiscoveryProcess;
 import net.java.stun4j.client.StunDiscoveryReport;
 
 import org.apache.log4j.Logger;
+import org.mobicents.ha.javax.sip.ClusteredSipStack;
+import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingService;
+import org.mobicents.ha.javax.sip.SipLoadBalancer;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
@@ -126,6 +129,15 @@ public class SipProtocolHandler implements MBeanRegistration {
                     logger.debug("Removing the following Listening Point " + extendedListeningPoint);
                 }
                 sipStack.deleteListeningPoint(extendedListeningPoint.getListeningPoint());
+                // https://github.com/RestComm/sip-servlets/issues/111
+				if(sipConnector.isUseLoadBalancer() && sipStack instanceof ClusteredSipStack && 
+						((ClusteredSipStack)sipStack).getLoadBalancerHeartBeatingService() != null) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("SipConnector " + extendedListeningPoint.getListeningPoint() + " remove to use Load Balancer for outbound traffic");
+					}
+					LoadBalancerHeartBeatingService loadBalancerHeartBeatingService = ((ClusteredSipStack)sipStack).getLoadBalancerHeartBeatingService();
+					loadBalancerHeartBeatingService.removeSipConnector(extendedListeningPoint.getListeningPoint(), extendedListeningPoint.getLoadBalancer());
+				}
                 extendedListeningPoint = null;
             }
         }
@@ -255,6 +267,7 @@ public class SipProtocolHandler implements MBeanRegistration {
             } else {
                 createSipProvider = true;
             }
+ 			
             if (createSipProvider) {
                 sipProvider = sipStack.createSipProvider(listeningPoint);
             } else {
@@ -266,6 +279,37 @@ public class SipProtocolHandler implements MBeanRegistration {
             extendedListeningPoint.setUseStaticAddress(false);
             extendedListeningPoint.setGlobalIpAddress(globalIpAddress);
             extendedListeningPoint.setGlobalPort(globalPort);
+            extendedListeningPoint.setUseLoadBalancer(sipConnector.isUseLoadBalancer());
+            
+            // https://github.com/RestComm/sip-servlets/issues/111
+            LoadBalancerHeartBeatingService loadBalancerHeartBeatingService = null;
+ 			if(sipConnector.isUseLoadBalancer() && sipStack instanceof ClusteredSipStack && 
+ 					((ClusteredSipStack)sipStack).getLoadBalancerHeartBeatingService() != null) {
+ 				if(logger.isDebugEnabled()) {
+ 					logger.debug("SipConnector " + listeningPoint + " set to use Load Balancer for outbound traffic");
+ 				}
+ 				loadBalancerHeartBeatingService = ((ClusteredSipStack)sipStack).getLoadBalancerHeartBeatingService();
+ 				// https://github.com/RestComm/sip-servlets/issues/137
+ 				if(sipConnector.getLoadBalancerAddress() != null && loadBalancerHeartBeatingService != null) {
+ 	            	InetAddress loadBalancerAddress = null;
+ 	        		try {
+ 	        			loadBalancerAddress = InetAddress.getByName(sipConnector.getLoadBalancerAddress());
+ 	        		} catch (UnknownHostException e) {
+ 	        			throw new IllegalArgumentException(
+ 	        					"Something wrong with load balancer host creation.", e);
+ 	        		}		
+ 	            	SipLoadBalancer loadBalancer = new SipLoadBalancer(
+ 	            			loadBalancerHeartBeatingService, 
+ 	            			loadBalancerAddress, 
+ 	            			sipConnector.getLoadBalancerSipPort(), 
+ 	            			-1, 
+ 	            			sipConnector.getLoadBalancerRmiPort());
+ 	            	extendedListeningPoint.setLoadBalancer(loadBalancer);
+ 	            	loadBalancerHeartBeatingService.addSipConnector(listeningPoint, loadBalancer);
+ 	            } else {
+ 	            	loadBalancerHeartBeatingService.addSipConnector(listeningPoint);
+ 	            }
+ 			}
 
             // make the extended listening Point available to the service implementation
             setAttribute(ExtendedListeningPoint.class.getSimpleName(), extendedListeningPoint);

@@ -19,7 +19,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.servlet.sip.testsuite.click2call;
 
 import java.io.InputStream;
@@ -27,6 +26,7 @@ import java.net.URL;
 import java.util.Properties;
 
 import javax.sip.message.Response;
+import org.apache.catalina.Wrapper;
 
 import org.apache.log4j.Logger;
 import org.cafesip.sipunit.SipCall;
@@ -39,206 +39,222 @@ import org.mobicents.servlet.sip.startup.SipStandardContext;
 
 public class Click2CallBasicTest extends SipServletTestCase {
 
-	private String CLICK2DIAL_URL;
-	private String RESOURCE_LEAK_URL;
-	private String EXPIRATION_TIME_PARAMS;
-	private String CLICK2DIAL_PARAMS;
-	private static transient Logger logger = Logger.getLogger(Click2CallBasicTest.class);
+    private String CLICK2DIAL_URL;
+    private String RESOURCE_LEAK_URL;
+    private String EXPIRATION_TIME_PARAMS;
+    private String CLICK2DIAL_PARAMS;
+    private static transient Logger logger = Logger.getLogger(Click2CallBasicTest.class);
 
-	private SipStack[] sipStackReceivers;
+    private SipStack[] sipStackReceivers;
 
-	private SipPhone[] sipPhoneReceivers;
+    private SipPhone[] sipPhoneReceivers;
 
-	private static final int timeout = 10000;
+    private static final int timeout = 10000;
 
-	private static final int receiversCount = 2;
+    private static final int receiversCount = 2;
 
-	// Don't restart the server for this set of tests.
-	private static boolean firstTime = true;
+    // Don't restart the server for this set of tests.
+    private static boolean firstTime = true;
 
-	SipStandardContext context = null;
-	SipStandardManager manager = null; 
-		
-	public Click2CallBasicTest(String name) {
-		super(name);
-	}
+    SipStandardContext context = null;
+    SipStandardManager manager = null;
 
-	@Override
-	public void setUp() throws Exception {
-		if (firstTime) {
-			super.setUp();
-			CLICK2DIAL_URL = "http://" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":8080/click2call/call";
-			RESOURCE_LEAK_URL = "http://" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":8080/click2call/index.html";
-			EXPIRATION_TIME_PARAMS = "?expirationTime";
-			CLICK2DIAL_PARAMS = "?from=sip:from@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5056&to=sip:to@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5057";
-		}
-		firstTime = true;
-	}
+    public Click2CallBasicTest(String name) {
+        super(name);
+    }
 
-	@Override
-	public void tearDown() throws Exception {
-		if(sipPhoneReceivers != null) {
-			for (SipPhone sp : sipPhoneReceivers) {
-				if(sp != null) {
-					sp.dispose();
-				}
-			}
-		}
-		if(sipStackReceivers != null) {
-			for (SipStack ss : sipStackReceivers) {
-				if(ss != null) {
-					ss.dispose();
-				}
-			}
-		}
-		super.tearDown();
-		context = null;
-		manager = null;
-	}
+    @Override
+    public void setUp() throws Exception {
+        if (firstTime) {
+            super.setUp();
+            CLICK2DIAL_URL = "http://" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":8080/click2call/call";
+            RESOURCE_LEAK_URL = "http://" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":8080/click2call/index.html";
+            EXPIRATION_TIME_PARAMS = "?expirationTime";
+            CLICK2DIAL_PARAMS = "?from=sip:from@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5056&to=sip:to@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5057";
+        }
+        firstTime = true;
+    }
 
-	@Override
-	public void deployApplication() {
-		context = new SipStandardContext();
-		context.setDocBase(projectHome +  "/sip-servlets-test-suite/applications/click-to-call-servlet/src/main/sipapp");
-		context.setName("click2call-context");
-		context.setPath("/click2call");		
-		context.addLifecycleListener(new SipContextConfig());
-		manager = new SipStandardManager();
-		context.setManager(manager);
-		assertTrue(tomcat.deployContext(context));		
-	}
+    @Override
+    public void tearDown() throws Exception {
+        if (sipPhoneReceivers != null) {
+            for (SipPhone sp : sipPhoneReceivers) {
+                if (sp != null) {
+                    sp.dispose();
+                }
+            }
+        }
+        if (sipStackReceivers != null) {
+            for (SipStack ss : sipStackReceivers) {
+                if (ss != null) {
+                    ss.dispose();
+                }
+            }
+        }
+        super.tearDown();
+        context = null;
+        manager = null;
+    }
 
-	@Override
-	protected String getDarConfigurationFile() {
-		return "file:///"
-				+ projectHome
-				+ "/sip-servlets-test-suite/testsuite/src/test/resources/"
-				+ "org/mobicents/servlet/sip/testsuite/click2call/click-to-call-dar.properties";
-	}
+    @Override
+    public void deployApplication() {
 
-	public SipStack makeStack(String transport, int port) throws Exception {
-		Properties properties = new Properties();
-		String peerHostPort1 = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070";
-		properties.setProperty("javax.sip.OUTBOUND_PROXY", peerHostPort1 + "/"
-				+ "udp");
-		properties.setProperty("javax.sip.STACK_NAME", "UAC_" + transport + "_"
-				+ port);
-		properties.setProperty("sipunit.BINDADDR", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
-		properties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
-				"logs/simplesipservlettest_debug_port" + port + ".txt");
-		properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
-				"logs/simplesipservlettest_log_port" + port + ".xml");
-		properties.setProperty("gov.nist.javax.sip.TRACE_LEVEL",
-				"32");
-		return new SipStack(transport, port, properties);
-	}
+        context = new SipStandardContext();
+        context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/click-to-call-servlet/src/main/sipapp");
+        context.setName("click2call-context");
+        context.setPath("/click2call");
+        context.addLifecycleListener(new SipContextConfig());
+        manager = new SipStandardManager();
+        context.setManager(manager);
+        
+// Define DefaultServlet to server static content!!!
+        Wrapper defaultServlet = context.createWrapper();
+        defaultServlet.setName("default");
+        defaultServlet.setServletClass("org.apache.catalina.servlets.DefaultServlet");
+        defaultServlet.addInitParameter("debug", "0");
+        defaultServlet.addInitParameter("listings", "false");
+        defaultServlet.setLoadOnStartup(1);
+        context.addChild(defaultServlet);
+        context.addServletMapping("/", "default");        
+        
+        assertTrue(tomcat.deployContext(context));
+    }
 
-	public void setupPhones() throws Exception {
-		sipStackReceivers = new SipStack[receiversCount];
-		sipPhoneReceivers = new SipPhone[receiversCount];
+    @Override
+    protected String getDarConfigurationFile() {
+        return "file:///"
+                + projectHome
+                + "/sip-servlets-test-suite/testsuite/src/test/resources/"
+                + "org/mobicents/servlet/sip/testsuite/click2call/click-to-call-dar.properties";
+    }
 
-		sipStackReceivers[0] = makeStack(SipStack.PROTOCOL_UDP, 5057);
-		sipPhoneReceivers[0] = sipStackReceivers[0].createSipPhone("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "",
-				SipStack.PROTOCOL_UDP, 5070, "sip:to@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
+    public SipStack makeStack(String transport, int port) throws Exception {
+        Properties properties = new Properties();
+        String peerHostPort1 = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070";
+        properties.setProperty("javax.sip.OUTBOUND_PROXY", peerHostPort1 + "/"
+                + "udp");
+        properties.setProperty("javax.sip.STACK_NAME", "UAC_" + transport + "_"
+                + port);
+        properties.setProperty("sipunit.BINDADDR", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
+        properties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
+                "logs/simplesipservlettest_debug_port" + port + ".txt");
+        properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
+                "logs/simplesipservlettest_log_port" + port + ".xml");
+        properties.setProperty("gov.nist.javax.sip.TRACE_LEVEL",
+                "32");
+        return new SipStack(transport, port, properties);
+    }
 
-		sipStackReceivers[1] = makeStack(SipStack.PROTOCOL_UDP, 5056);
-		sipPhoneReceivers[1] = sipStackReceivers[1].createSipPhone("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "",
-				SipStack.PROTOCOL_UDP, 5070, "sip:from@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
-	}
+    public void setupPhones() throws Exception {
+        sipStackReceivers = new SipStack[receiversCount];
+        sipPhoneReceivers = new SipPhone[receiversCount];
 
-	public void init() throws Exception {
-		setupPhones();
-	}
+        sipStackReceivers[0] = makeStack(SipStack.PROTOCOL_UDP, 5057);
+        sipPhoneReceivers[0] = sipStackReceivers[0].createSipPhone("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "",
+                SipStack.PROTOCOL_UDP, 5070, "sip:to@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
 
-	public void testClickToCallNoConvergedSession()
-			throws Exception {
-		init();
-		SipCall[] receiverCalls = new SipCall[receiversCount];
+        sipStackReceivers[1] = makeStack(SipStack.PROTOCOL_UDP, 5056);
+        sipPhoneReceivers[1] = sipStackReceivers[1].createSipPhone("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "",
+                SipStack.PROTOCOL_UDP, 5070, "sip:from@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
+    }
 
-		receiverCalls[0] = sipPhoneReceivers[0].createSipCall();
-		receiverCalls[1] = sipPhoneReceivers[1].createSipCall();
+    public void init() throws Exception {
+        setupPhones();
+    }
 
-		receiverCalls[0].listenForIncomingCall();
-		receiverCalls[1].listenForIncomingCall();
+    public void testClickToCallNoConvergedSession()
+            throws Exception {
+        init();
+        SipCall[] receiverCalls = new SipCall[receiversCount];
 
-		logger.info("Trying to reach url : " + CLICK2DIAL_URL
-				+ CLICK2DIAL_PARAMS);
+        receiverCalls[0] = sipPhoneReceivers[0].createSipCall();
+        receiverCalls[1] = sipPhoneReceivers[1].createSipCall();
 
-		URL url = new URL(CLICK2DIAL_URL + CLICK2DIAL_PARAMS);
-		InputStream in = url.openConnection().getInputStream();
+        receiverCalls[0].listenForIncomingCall();
+        receiverCalls[1].listenForIncomingCall();
 
-		byte[] buffer = new byte[10000];
-		int len = in.read(buffer);
-		String httpResponse = "";
-		for (int q = 0; q < len; q++)
-			httpResponse += (char) buffer[q];
-		logger.info("Received the follwing HTTP response: " + httpResponse);
+        logger.info("Trying to reach url : " + CLICK2DIAL_URL
+                + CLICK2DIAL_PARAMS);
 
-		receiverCalls[0].waitForIncomingCall(timeout);
+        URL url = new URL(CLICK2DIAL_URL + CLICK2DIAL_PARAMS);
+        InputStream in = url.openConnection().getInputStream();
 
-		assertTrue(receiverCalls[0].sendIncomingCallResponse(Response.RINGING,
-				"Ringing", 0));
-		assertTrue(receiverCalls[0].sendIncomingCallResponse(Response.OK, "OK",
-				0));
+        byte[] buffer = new byte[10000];
+        int len = in.read(buffer);
+        String httpResponse = "";
+        for (int q = 0; q < len; q++) {
+            httpResponse += (char) buffer[q];
+        }
+        logger.info("Received the follwing HTTP response: " + httpResponse);
 
-		receiverCalls[1].waitForIncomingCall(timeout);
+        receiverCalls[0].waitForIncomingCall(timeout);
 
-		assertTrue(receiverCalls[1].sendIncomingCallResponse(Response.RINGING,
-				"Ringing", 0));
-		assertTrue(receiverCalls[1].sendIncomingCallResponse(Response.OK, "OK",
-				0));
+        assertTrue(receiverCalls[0].sendIncomingCallResponse(Response.RINGING,
+                "Ringing", 0));
+        assertTrue(receiverCalls[0].sendIncomingCallResponse(Response.OK, "OK",
+                0));
 
-		assertTrue(receiverCalls[1].waitForAck(timeout));
-		assertTrue(receiverCalls[0].waitForAck(timeout));
+        receiverCalls[1].waitForIncomingCall(timeout);
 
-		assertTrue(receiverCalls[0].disconnect());
-		assertTrue(receiverCalls[1].waitForDisconnect(timeout));
-		assertTrue(receiverCalls[1].respondToDisconnect());
-	}
+        assertTrue(receiverCalls[1].sendIncomingCallResponse(Response.RINGING,
+                "Ringing", 0));
+        assertTrue(receiverCalls[1].sendIncomingCallResponse(Response.OK, "OK",
+                0));
 
-	/**
-	 * http://code.google.com/p/mobicents/issues/detail?id=882 
-	 * HTTP requests to a SIP application always create an HTTP session, even for static resources
-	 */
-	public void testClickToCallHttpSessionLeak()
-		throws Exception {
-		
-		final int sessionsNumber = manager.getActiveSessions();
-		
-		logger.info("Trying to reach url : " + RESOURCE_LEAK_URL);
-		
-		URL url = new URL(RESOURCE_LEAK_URL);
-		InputStream in = url.openConnection().getInputStream();
-		
-		byte[] buffer = new byte[10000];
-		int len = in.read(buffer);
-		String httpResponse = "";
-		for (int q = 0; q < len; q++)
-			httpResponse += (char) buffer[q];
-		logger.info("Received the follwing HTTP response: " + httpResponse);
-		
-		assertEquals(sessionsNumber, manager.getActiveSessions());
-	}
-	
-	/**
-	 * http://code.google.com/p/mobicents/issues/detail?id=1853 
-	 * SipApplicationSession.getExpirationTime() returns 0 in converged app
-	 */
-	public void testClickToCallExpirationTime()
-		throws Exception {				
-		
-		logger.info("Trying to reach url : " + CLICK2DIAL_URL + EXPIRATION_TIME_PARAMS);
-		
-		URL url = new URL(CLICK2DIAL_URL + EXPIRATION_TIME_PARAMS);
-		InputStream in = url.openConnection().getInputStream();
-		
-		byte[] buffer = new byte[10000];
-		int len = in.read(buffer);
-		String httpResponse = "";
-		for (int q = 0; q < len; q++)
-			httpResponse += (char) buffer[q];
-		logger.info("Received the follwing HTTP response: " + httpResponse);
-		
-		assertFalse("0".equals(httpResponse.trim()));
-	}
+        assertTrue(receiverCalls[1].waitForAck(timeout));
+        assertTrue(receiverCalls[0].waitForAck(timeout));
+
+        assertTrue(receiverCalls[0].disconnect());
+        assertTrue(receiverCalls[1].waitForDisconnect(timeout));
+        assertTrue(receiverCalls[1].respondToDisconnect());
+    }
+
+    /**
+     * http://code.google.com/p/mobicents/issues/detail?id=882 HTTP requests to
+     * a SIP application always create an HTTP session, even for static
+     * resources
+     */
+    public void testClickToCallHttpSessionLeak()
+            throws Exception {
+
+        final int sessionsNumber = manager.getActiveSessions();
+
+        logger.info("Trying to reach url : " + RESOURCE_LEAK_URL);
+
+        URL url = new URL(RESOURCE_LEAK_URL);
+        InputStream in = url.openConnection().getInputStream();
+
+        byte[] buffer = new byte[10000];
+        int len = in.read(buffer);
+        String httpResponse = "";
+        for (int q = 0; q < len; q++) {
+            httpResponse += (char) buffer[q];
+        }
+        logger.info("Received the follwing HTTP response: " + httpResponse);
+
+        assertEquals(sessionsNumber, manager.getActiveSessions());
+    }
+
+    /**
+     * http://code.google.com/p/mobicents/issues/detail?id=1853
+     * SipApplicationSession.getExpirationTime() returns 0 in converged app
+     */
+    public void testClickToCallExpirationTime()
+            throws Exception {
+
+        logger.info("Trying to reach url : " + CLICK2DIAL_URL + EXPIRATION_TIME_PARAMS);
+
+        URL url = new URL(CLICK2DIAL_URL + EXPIRATION_TIME_PARAMS);
+        InputStream in = url.openConnection().getInputStream();
+
+        byte[] buffer = new byte[10000];
+        int len = in.read(buffer);
+        String httpResponse = "";
+        for (int q = 0; q < len; q++) {
+            httpResponse += (char) buffer[q];
+        }
+        logger.info("Received the follwing HTTP response: " + httpResponse);
+
+        assertFalse("0".equals(httpResponse.trim()));
+    }
 }

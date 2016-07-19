@@ -10,6 +10,7 @@ do
   echo "Killing script $2 child process $child because parent pid = $pid"
   kill $child # clean kill with shutdown instruction
   sleep .4 # give some time for the clean shutdown to reach out
+  echo "Hard Killing script $2 child process $child because parent pid = $pid"
   kill -9 $child # kill it immediately without wasting more time
   export killed="yes"
 done

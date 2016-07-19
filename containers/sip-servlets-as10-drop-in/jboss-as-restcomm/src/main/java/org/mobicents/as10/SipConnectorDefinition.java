@@ -81,6 +81,41 @@ public class SipConnectorDefinition extends SimpleResourceDefinition {
                     .setDefaultValue(new ModelNode(true))
                     .build();
 
+    protected static final SimpleAttributeDefinition USE_LOAD_BALANCER =
+            new SimpleAttributeDefinitionBuilder(Constants.USE_LOAD_BALANCER, ModelType.BOOLEAN)
+                    .setXmlName(Constants.USE_LOAD_BALANCER)
+                    .setAllowNull(true)
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    .setDefaultValue(new ModelNode(false))
+                    .build();
+    
+    protected static final SimpleAttributeDefinition LOAD_BALANCER_ADDRESS =
+            new SimpleAttributeDefinitionBuilder(Constants.LOAD_BALANCER_ADDRESS, ModelType.STRING)
+                    .setXmlName(Constants.LOAD_BALANCER_ADDRESS)
+                    .setAllowNull(true)
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    .setValidator(new InetAddressValidator(true, false))
+                    .setRequires(Constants.USE_LOAD_BALANCER)
+                    .build();
+
+    protected static final SimpleAttributeDefinition LOAD_BALANCER_RMI_PORT =
+            new SimpleAttributeDefinitionBuilder(Constants.LOAD_BALANCER_RMI_PORT, ModelType.INT)
+                    .setXmlName(Constants.LOAD_BALANCER_RMI_PORT)
+                    .setAllowNull(true)
+                    .setValidator(new IntRangeValidator(1, true))
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    .setRequires(Constants.USE_LOAD_BALANCER)
+                    .build();
+
+    protected static final SimpleAttributeDefinition LOAD_BALANCER_SIP_PORT =
+            new SimpleAttributeDefinitionBuilder(Constants.LOAD_BALANCER_SIP_PORT, ModelType.INT)
+                    .setXmlName(Constants.LOAD_BALANCER_SIP_PORT)
+                    .setAllowNull(true)
+                    .setValidator(new IntRangeValidator(1, true))
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    .setRequires(Constants.USE_LOAD_BALANCER)
+                    .build();
+    
     protected static final SimpleAttributeDefinition USE_STATIC_ADDRESS =
             new SimpleAttributeDefinitionBuilder(Constants.USE_STATIC_ADDRESS, ModelType.BOOLEAN)
                     .setXmlName(Constants.USE_STATIC_ADDRESS)
@@ -148,6 +183,10 @@ public class SipConnectorDefinition extends SimpleResourceDefinition {
         SCHEME,
         SOCKET_BINDING,
         ENABLED,
+        USE_LOAD_BALANCER,
+        LOAD_BALANCER_ADDRESS,
+        LOAD_BALANCER_RMI_PORT,
+        LOAD_BALANCER_SIP_PORT,
         USE_STATIC_ADDRESS,
         STATIC_SERVER_ADDRESS,
         STATIC_SERVER_PORT,

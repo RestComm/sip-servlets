@@ -10,7 +10,7 @@ rm -rf $JBOSS_HOME/server/port-1
 rm -rf $JBOSS_HOME/server/port-2
 rm -rf $JBOSS_HOME/server/port-3
 
-mvn clean install -f ../../../pom.xml -P jboss-5 -Dnode=all
+#mvn clean install -f ../../../pom.xml -P jboss-5 -Dnode=all
 
 cp setup/jboss-5/mss-sip-stack-jboss.properties $JBOSS_HOME/server/all/conf/mss-sip-stack.properties
 cp setup/jboss-5/performance/log4j.xml $JBOSS_HOME/server/all/conf/jboss-log4j.xml

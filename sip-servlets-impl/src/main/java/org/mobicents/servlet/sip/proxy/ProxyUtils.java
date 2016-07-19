@@ -416,6 +416,9 @@ public class ProxyUtils {
 	
 	public static SipServletResponseImpl createProxiedResponse(MobicentsSipServletResponse sipServetResponse, MobicentsProxyBranch proxyBranch)
 	{
+		if(logger.isDebugEnabled()) {
+			logger.debug("createProxiedResponse - proxyBranch=" + proxyBranch);
+		}
 		final Response response = (Response)sipServetResponse.getMessage();
 		final Response clonedResponse = (Response)  response.clone();
 		((MessageExt)clonedResponse).setApplicationData(null);

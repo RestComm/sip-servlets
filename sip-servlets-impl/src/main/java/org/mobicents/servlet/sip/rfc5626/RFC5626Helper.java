@@ -81,7 +81,13 @@ public class RFC5626Helper {
 	}
 	
 	public static void checkRequest(ProxyBranchImpl proxyBranch, Request request, SipServletRequestImpl originalRequest) throws IncorrectFlowIdentifierException {
+		if (logger.isDebugEnabled()){
+			logger.debug("checkRequest - proxyBranch=" + proxyBranch + ", request=" + request);
+		}
 		if(!((ProxyImpl)proxyBranch.getProxy()).getSipOutboundSupport()) {
+			if (logger.isDebugEnabled()){
+				logger.debug("checkRequest - returning immediately");
+			}
 			return;
 		}
 //		final Request request = (Request) sipServletRequestImpl.getMessage();
@@ -89,6 +95,10 @@ public class RFC5626Helper {
 		final ProxyImpl proxy = (ProxyImpl) proxyBranch.getProxy();		
 		
 		if(proxyBranch.isAddToPath() && request.getMethod().equalsIgnoreCase(Request.REGISTER)) {
+			if (logger.isDebugEnabled()){
+				logger.debug("checkRequest - RFC 5626 Section 5.1. Processing Register Requests");
+			}
+			
 			//RFC 5626 Section 5.1. Processing Register Requests			
 			if(contactHeader != null && contactHeader.getParameter(MessageDispatcher.SIP_OUTBOUND_PARAM_REG_ID) != null) {
 				int nbVias = 0;
@@ -114,6 +124,9 @@ public class RFC5626Helper {
 				}
 			}
 		}else {
+			if (logger.isDebugEnabled()){
+				logger.debug("checkRequest - RFC 5626 Section 5.3. Forwarding Non-REGISTER Requests");
+			}
 			//RFC 5626 Section 5.3. Forwarding Non-REGISTER Requests
 			RouteHeader poppedRouteHeader = originalRequest.getPoppedRouteHeader();
 			boolean poppedRouteHasObParam = false;

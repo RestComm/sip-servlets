@@ -110,6 +110,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/mobicents-jain-sip-ext"/>
 	<classpathentry kind="var" path="M2_REPO/net/java/stun4j/stun4j/1.0.MOBICENTS/stun4j-1.0.MOBICENTS.jar"/>
 	<classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/mobicents-jain-sip-ha-core"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/restcomm-jain-sip-ha-core"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
