@@ -277,10 +277,19 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 			
 			String proxyTimerServiceType = sipApplicationDispatcher.getSipService().getProxyTimerServiceImplementationType();
 			if(proxyTimerServiceType != null && proxyTimerServiceType.equalsIgnoreCase("Standard")) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("prepareServletContext - proxyTimerService is standard (new ProxyTimerServiceImpl) - " + getName());
+				}
                 proxyTimerService = new ProxyTimerServiceImpl(applicationName);
             } else if(proxyTimerServiceType != null && proxyTimerServiceType.equalsIgnoreCase("Default")) {
+            	if(logger.isDebugEnabled()) {
+					logger.debug("prepareServletContext - proxyTimerService is default (new DefaultProxyTimerService) - " + getName());
+				}
                 proxyTimerService = new DefaultProxyTimerService(applicationName);
             } else {
+            	if(logger.isDebugEnabled()) {
+					logger.debug("prepareServletContext - proxyTimerService else (new ProxyTimerServiceImpl) - " + getName());
+				}
                 proxyTimerService = new ProxyTimerServiceImpl(applicationName);
             }
 		}
@@ -1376,8 +1385,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 				//timerService.start();
 			}
 			if(!proxyTimerService.isStarted()) {
-				// ###TIMER
-				//proxyTimerService.start();
+				proxyTimerService.start();
 			}
 			if(!sasTimerService.isStarted()) {
 				// ###TIMER

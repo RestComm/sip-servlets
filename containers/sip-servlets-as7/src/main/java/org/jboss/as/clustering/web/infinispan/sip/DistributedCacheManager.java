@@ -72,6 +72,9 @@ import org.jboss.as.clustering.web.sip.LocalDistributableConvergedSessionManager
 import org.jboss.as.clustering.web.sip.OutgoingDistributableSipApplicationSessionData;
 import org.jboss.as.clustering.web.sip.OutgoingDistributableSipSessionData;
 import org.jboss.as.clustering.web.SessionAttributeMarshaller;
+import org.jboss.as.web.session.sip.DistributableSipSessionManager;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.proxy.ProxyImpl;
 
 /**
  * Distributed cache manager implementation using Infinispan.
@@ -1185,6 +1188,30 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 					logger.debug("loadSipMetaDataMap - result entries: " + tmpKey + "=" + result.get(tmpKey));
 				}
 			}
+		}
+		
+		// Injecting the proxy timer service of the current sip context into the proxy loaded from the cache 
+		for (String tmpKey: result.keySet()){
+			Object entry = result.get(tmpKey);
+			
+			if (entry instanceof ProxyImpl){
+				
+				if (logger.isDebugEnabled()){
+					logger.debug("loadSipMetaDataMap - found ProxyImpl");
+					logger.debug("loadSipMetaDataMap - found ProxyImpl - DistributableSipSessionManager=" + ((DistributableSipSessionManager)manager));
+					if (((DistributableSipSessionManager)manager) != null){
+						logger.debug("loadSipMetaDataMap - found ProxyImpl - getSipContextContainer=" + ((DistributableSipSessionManager)manager).getSipContextContainer());
+						if (((DistributableSipSessionManager)manager).getSipContextContainer() != null){
+							logger.debug("loadSipMetaDataMap - found ProxyImpl - getProxyTimerService=" + ((DistributableSipSessionManager)manager).getSipContextContainer().getProxyTimerService());
+						}
+					}
+					
+				}
+				((ProxyImpl)entry).setProxyTimerService(
+						((DistributableSipSessionManager)manager).getSipContextContainer().getProxyTimerService()
+				);
+			}
+			
 		}
 		
 		return result;
