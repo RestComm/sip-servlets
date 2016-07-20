@@ -624,12 +624,14 @@ final class WrapperCreateRule extends Rule {
 
 }
 
-final class PatternRule extends ObjectCreateRule {
+
+//fixes https://github.com/RestComm/sip-servlets/issues/92
+final class PatternRule extends NodeCreateRule {
 	
 	private static transient final Logger logger = Logger.getLogger(PatternRule.class);
 	
 	public PatternRule() throws Exception {
-		super(PatternRule.class.getName());
+		//super(PatternRule.class.getName());
 	}
 	
 	@Override

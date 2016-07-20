@@ -17,9 +17,9 @@
 	<classpathentry kind="var" path="M2_REPO/dnsjava/dnsjava/2.1.7/dnsjava-2.1.7.jar"/>
 	<classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/net/java/stun4j/stun4j/1.0.MOBICENTS/stun4j-1.0.MOBICENTS.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/ha/javax/sip/mobicents-jain-sip-ha-core/1.5.5/mobicents-jain-sip-ha-core-1.5.5.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/spec/javax/servlet/jboss-servlet-api_3.0_spec/1.0.0.Final/jboss-servlet-api_3.0_spec-1.0.0.Final.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/mobicents-jain-sip-ext"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jain-sip"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/restcomm-jain-sip-ha-core"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

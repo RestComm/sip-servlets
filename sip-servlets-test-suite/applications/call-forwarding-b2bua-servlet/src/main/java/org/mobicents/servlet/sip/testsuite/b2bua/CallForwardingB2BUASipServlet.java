@@ -853,8 +853,8 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 
 	public void sessionReadyToInvalidate(SipApplicationSessionEvent ev) {
 		// Issue http://code.google.com/p/mobicents/issues/detail?id=2246
-		String fromName = ev.getApplicationSession().getAttribute("double-callback-test").toString();
-		if(fromName.contains("true")) {
+		Boolean fromName = (Boolean) ev.getApplicationSession().getAttribute("double-callback-test");
+		if(fromName != null && fromName) {
 			boolean doubleCallback = ev.getApplicationSession().getAttribute("double") != null;
 			if(doubleCallback) {
 				try {
@@ -883,7 +883,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			}
 		} else {
 //			incomingSession.getB
-//			sendMessage(ev.getApplicationSession(), (SipFactory) getServletContext().getAttribute(SIP_FACTORY), "sipApplicationSessionReadyToBeInvalidated");
+			sendMessage(ev.getApplicationSession(), (SipFactory) getServletContext().getAttribute(SIP_FACTORY), "sipApplicationSessionReadyToBeInvalidated");
 		}
 	}
 	
