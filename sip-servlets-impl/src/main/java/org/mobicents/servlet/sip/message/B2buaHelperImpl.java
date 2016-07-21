@@ -259,10 +259,20 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 				if(sipFactoryImpl.isUseLoadBalancer()) {
 					MobicentsExtendedListeningPoint listeningPoint = JainSipUtils.findListeningPoint(sipFactoryImpl.getSipNetworkInterfaceManager(), newRequest, session.getOutboundInterface());
 					if(listeningPoint != null && listeningPoint.isUseLoadBalancer()) {
-						if(logger.isDebugEnabled()) {
-							logger.debug("Using listeningPoint " + listeningPoint + " for load balancer " + sipFactoryImpl.getLoadBalancerToUse());
+						// https://github.com/RestComm/sip-servlets/issues/137
+						SipLoadBalancer loadBalancerToUse = null; 
+						if(listeningPoint.getLoadBalancer() == null) {
+							loadBalancerToUse = sipFactoryImpl.getLoadBalancerToUse();
+							if(logger.isDebugEnabled()) {
+								logger.debug("Using listeningPoint " + listeningPoint + " for global load balancer " + sipFactoryImpl.getLoadBalancerToUse());
+							}
+						} else {
+							loadBalancerToUse = listeningPoint.getLoadBalancer();
+							if(logger.isDebugEnabled()) {
+								logger.debug("Using listeningPoint " + listeningPoint + " for connector specific load balancer " + listeningPoint.getLoadBalancer());
+							}
 						}
-						final SipLoadBalancer loadBalancerToUse = sipFactoryImpl.getLoadBalancerToUse();
+						
 						javax.sip.address.SipURI sipURI = sipFactoryImpl.getAddressFactory().createSipURI(fromName, loadBalancerToUse.getAddress().getHostAddress());
 						sipURI.setHost(loadBalancerToUse.getAddress().getHostAddress());
 						sipURI.setPort(loadBalancerToUse.getSipPort());			
@@ -320,6 +330,10 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 	 */
 	public SipServletRequest createRequest(SipSession session,
 			SipServletRequest origRequest, Map<String, List<String>> headerMap) {
+		
+		if(logger.isDebugEnabled()) {
+			logger.debug("createRequest - session=" + session + ", origRequest=" + origRequest);
+		}
 		
 		if(origRequest == null) {
 			throw new NullPointerException("original request cannot be null");

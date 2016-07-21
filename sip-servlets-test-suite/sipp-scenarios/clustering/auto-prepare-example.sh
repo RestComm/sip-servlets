@@ -67,7 +67,7 @@ if [ $# -ne 0 ]; then
 	            echo "Distributed example used is uas"
 	    		mvn clean install -f $EXAMPLES_HOME/simple-sip-servlet-distributable/pom.xml
 				#rm -rf $JBOSS_HOME/server/$config/deploy/simple-sip-servlet-distributable-*.war
-				rm -rf $JBOSS_HOME/standalone/deployments/custom-call-forwarding-distributable-*.war
+				rm -rf $JBOSS_HOME/standalone/deployments/simple-sip-servlet-distributable-*.war
 				cp $EXAMPLES_HOME/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-*.war $JBOSS_HOME/standalone/deployments
 				cp $EXAMPLES_HOME/simple-sip-servlet-distributable/distributable-simple-dar.properties $JBOSS_HOME/standalone/configuration/dars/mobicents-dar.properties
 	            ;;
@@ -98,15 +98,16 @@ if [ $# -ne 0 ]; then
 				cp $EXAMPLES_HOME/shootist-sip-servlet-distributable/distributable-shootist-dar.properties $JBOSS_HOME/server/$config/conf/dars/mobicents-dar.properties
 	            ;;
         proxy-b2bua-ar)
-	            # TODO: adapt to eap-6.4
 	            echo "Distributed example used is proxy-b2bua-ar"
 	    		mvn clean install -f $EXAMPLES_HOME/custom-call-forwarding-distributable/pom.xml
-				rm -rf $JBOSS_HOME/server/$config/deploy/custom-call-forwarding-distributable-*.war
-				cp $EXAMPLES_HOME/custom-call-forwarding-distributable/target/custom-call-forwarding-distributable-*.war $JBOSS_HOME/server/$config/deploy
+				#rm -rf $JBOSS_HOME/server/$config/deploy/custom-call-forwarding-distributable-*.war
+				rm -rf $JBOSS_HOME/standalone/deployments/custom-call-forwarding-distributable-*.war
+				cp $EXAMPLES_HOME/custom-call-forwarding-distributable/target/custom-call-forwarding-distributable-*.war $JBOSS_HOME/standalone/deployments
                 mvn clean install -f $EXAMPLES_HOME/location-service-distributable/pom.xml
-				rm -rf $JBOSS_HOME/server/$config/deploy/location-service-distributable-*.war
-				cp $EXAMPLES_HOME/location-service-distributable/target/location-service-distributable-*.war $JBOSS_HOME/server/$config/deploy
-				cp ar/proxy-b2bua-ar-dar.properties $JBOSS_HOME/server/$config/conf/dars/mobicents-dar.properties
-				cp setup/jboss-5/mss-sip-stack-jboss.properties $JBOSS_HOME/server/$config/conf/mss-sip-stack.properties
+				#rm -rf $JBOSS_HOME/server/$config/deploy/location-service-distributable-*.war
+				rm -rf $JBOSS_HOME/standalone/deployments/location-service-distributable-*.war
+				cp $EXAMPLES_HOME/location-service-distributable/target/location-service-distributable-*.war $JBOSS_HOME/standalone/deployments
+				cp ar/proxy-b2bua-ar-dar.properties $JBOSS_HOME/standalone/configuration/dars/mobicents-dar.properties
+				cp setup/jboss-5/mss-sip-stack-jboss.properties $JBOSS_HOME/standalone/configuration/mss-sip-stack.properties
     esac
 fi

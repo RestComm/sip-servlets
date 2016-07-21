@@ -72,6 +72,9 @@ import org.jboss.as.clustering.web.sip.LocalDistributableConvergedSessionManager
 import org.jboss.as.clustering.web.sip.OutgoingDistributableSipApplicationSessionData;
 import org.jboss.as.clustering.web.sip.OutgoingDistributableSipSessionData;
 import org.jboss.as.clustering.web.SessionAttributeMarshaller;
+import org.jboss.as.web.session.sip.DistributableSipSessionManager;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.proxy.ProxyImpl;
 
 /**
  * Distributed cache manager implementation using Infinispan.
@@ -109,19 +112,19 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 	
 	LocalDistributableSessionManager manager;
 	
-	static String getSipSessionCacheKey(String sipAppSessionKey, String sipSessionId){
+	public static String getSipSessionCacheKey(String sipAppSessionKey, String sipSessionId){
 		return SIP_SESSION_KEY_PREFIX + sipAppSessionKey + "/" + sipSessionId;
 	}
-	static String getSipAppSessionCacheKey(String sipAppSessionId){
+	public static String getSipAppSessionCacheKey(String sipAppSessionId){
 		return SIP_APP_SESSION_KEY_PREFIX + sipAppSessionId;
 	}
-	static boolean isKeySipSessionId(String cacheKey){
+	public static boolean isKeySipSessionId(String cacheKey){
 		return cacheKey.startsWith(SIP_SESSION_KEY_PREFIX);
 	}
-	static boolean isKeySipAppSessionId(String cacheKey){
+	public static boolean isKeySipAppSessionId(String cacheKey){
 		return cacheKey.startsWith(SIP_APP_SESSION_KEY_PREFIX);
 	}
-	static String getSipSessionIdFromCacheKey(String cacheKey){
+	public static String getSipSessionIdFromCacheKey(String cacheKey){
 		if (isKeySipSessionId(cacheKey)){
 			return cacheKey.substring(SIP_SESSION_KEY_PREFIX.length());
 		} else if (isKeySipAppSessionId(cacheKey)){
@@ -131,7 +134,7 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 			return null;
 		}
 	}
-	static String getSipAppSessionIdFromCacheKey(String cacheKey){
+	public static String getSipAppSessionIdFromCacheKey(String cacheKey){
 		if (isKeySipAppSessionId(cacheKey)){
 			return cacheKey.substring(SIP_APP_SESSION_KEY_PREFIX.length());
 		} else if (isKeySipSessionId(cacheKey)){
@@ -771,7 +774,7 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
             	Set<String> sessionIds = new HashSet<String>();
             	for (String key: cache.keySet()){
             		if (key.startsWith(SIP_SESSION_KEY_PREFIX)){
-            			sessionIds.add(key);
+            			sessionIds.add(getSipSessionIdFromCacheKey(key));
             		}
             	}
             	return sessionIds;
@@ -799,7 +802,7 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
             	Set<String> sessionIds = new HashSet<String>();
             	for (String key: cache.keySet()){
             		if (key.startsWith(SIP_APP_SESSION_KEY_PREFIX)){
-            			sessionIds.add(key);
+            			sessionIds.add(getSipAppSessionIdFromCacheKey(key));
             		}
             	}
             	return sessionIds;
@@ -1195,6 +1198,30 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 					logger.debug("loadSipMetaDataMap - result entries: " + tmpKey + "=" + result.get(tmpKey));
 				}
 			}
+		}
+		
+		// Injecting the proxy timer service of the current sip context into the proxy loaded from the cache 
+		for (String tmpKey: result.keySet()){
+			Object entry = result.get(tmpKey);
+			
+			if (entry instanceof ProxyImpl){
+				
+				if (logger.isDebugEnabled()){
+					logger.debug("loadSipMetaDataMap - found ProxyImpl");
+					logger.debug("loadSipMetaDataMap - found ProxyImpl - DistributableSipSessionManager=" + ((DistributableSipSessionManager)manager));
+					if (((DistributableSipSessionManager)manager) != null){
+						logger.debug("loadSipMetaDataMap - found ProxyImpl - getSipContextContainer=" + ((DistributableSipSessionManager)manager).getSipContextContainer());
+						if (((DistributableSipSessionManager)manager).getSipContextContainer() != null){
+							logger.debug("loadSipMetaDataMap - found ProxyImpl - getProxyTimerService=" + ((DistributableSipSessionManager)manager).getSipContextContainer().getProxyTimerService());
+						}
+					}
+					
+				}
+				((ProxyImpl)entry).setProxyTimerService(
+						((DistributableSipSessionManager)manager).getSipContextContainer().getProxyTimerService()
+				);
+			}
+			
 		}
 		
 		return result;

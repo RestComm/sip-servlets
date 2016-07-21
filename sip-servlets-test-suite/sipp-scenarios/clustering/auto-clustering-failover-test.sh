@@ -3,7 +3,6 @@ export EXAMPLES_HOME=../../../sip-servlets-examples
 export config1="all"
 export config2="port-1"
 export KILL_PARAMS="-9"
-
 export FULLSTARTSLEEP=200
 export HALFSTARTSLEEP=200
 export CALLS=5
@@ -590,7 +589,7 @@ sleep $HALFSTARTSLEEP
 
 # SIPp should be running by the time JBoss finishes the startup, hence we use half start time here.
 
-sleep 50
+sleep 5
 ./auto-run-test.sh uac-register result.txt $CALLS
 
 #Kill the app servers

@@ -249,6 +249,9 @@ public class MobicentsSipApplicationSessionFacade implements
 
 	public void readExternal(ObjectInput arg0) throws IOException,
 			ClassNotFoundException {
+		if (logger.isDebugEnabled()){
+    		logger.debug("readExternal");
+    	}
 		String sipApplicationSessionId = arg0.readUTF();
 		SipApplicationSessionKey key = null;
 		try {

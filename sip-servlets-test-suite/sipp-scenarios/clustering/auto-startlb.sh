@@ -1,2 +1,5 @@
 #!/bin/sh
-java -server -Xms1536m -Xmx1536m -XX:PermSize=128M -XX:MaxPermSize=256M -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -Djava.util.logging.config.file=lb-logging.properties -jar /home/vralev/test/mss-1.3-SNAPSHOT-jboss-4.2.3.GA/sip-balancer/sip-balancer-jar-with-dependencies.jar -mobicents-balancer-config=/home/vralev/test/mss-1.3-SNAPSHOT-jboss-4.2.3.GA/sip-balancer/lb-configuration.properties 
+
+java -DlogConfigFile=/home/posger/alerant/projects/sip/git/forks/sip-servlets/build/release/target/restcomm-sip-servlets-as7/restcomm-sip-servlets--jboss-eap-6.4/sip-balancer/lb-log4j.xml -Djava.util.logging.config.file=lb-logging.properties.normal -server -Xms1536m -Xmx1536m -XX:PermSize=128M -XX:MaxPermSize=256M -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -jar /home/posger/alerant/projects/sip/git/forks/sip-servlets/build/release/target/restcomm-sip-servlets-as7/restcomm-sip-servlets--jboss-eap-6.4/sip-balancer/sip-balancer-jar-2.1.0-SNAPSHOT-jar-with-dependencies.jar -mobicents-balancer-config=/home/posger/alerant/projects/sip/git/forks/sip-servlets/build/release/target/restcomm-sip-servlets-as7/restcomm-sip-servlets--jboss-eap-6.4/sip-balancer/lb-configuration.properties
+
+

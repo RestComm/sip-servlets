@@ -89,6 +89,9 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 	}
 
 	public SipServletRequest createRequest(String arg0) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("createRequest - arg0=" + arg0);
+		}
 		return getSipSession().createRequest(arg0);
 	}
 

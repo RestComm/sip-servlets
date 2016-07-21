@@ -59,7 +59,10 @@ public class SessionManagerUtil {
 	 * @return the computed key 
 	 * @throws NullPointerException if application name is null
 	 */
-	public static SipSessionKey getSipSessionKey(final String applicationSessionId, final String applicationName, final Message message, boolean inverted) {		
+	public static SipSessionKey getSipSessionKey(final String applicationSessionId, final String applicationName, final Message message, boolean inverted) {
+		if (logger.isDebugEnabled()){
+			logger.debug("getSipSessionKey - applicationSessionId=" + applicationSessionId + ", applicationName=" + applicationName + ", message=" + message + ", inverted=" + inverted);
+		}
 		if(applicationName == null) {
 			throw new NullPointerException("the application name cannot be null for sip session key creation");
 		}
@@ -109,6 +112,9 @@ public class SessionManagerUtil {
 	 * @throws NullPointerException if one of the two parameters is null
 	 */
 	public static SipApplicationSessionKey getSipApplicationSessionKey(final String applicationName, final String id, final String appGeneratedKey) {
+		if (logger.isDebugEnabled()){
+			logger.debug("getSipApplicationSessionKey - applicationName=" + applicationName + ", id=" + id + ", appGeneratedKey=" + appGeneratedKey);
+		}
 		if(applicationName == null) {
 			throw new NullPointerException("the application name cannot be null for sip application session key creation");
 		}
@@ -159,6 +165,9 @@ public class SessionManagerUtil {
 	 */
 	public static SipSessionKey parseSipSessionKey(
 			String sipSessionKey) throws ParseException {
+		if(logger.isDebugEnabled()) {
+			logger.debug("parseSipSessionKey - sipSessionKey=" + sipSessionKey);
+		}
 		
 		int indexOfLeftParenthesis = sipSessionKey.indexOf("(");
 		// see http://code.google.com/p/sipservlets/issues/detail?id=207
@@ -198,10 +207,10 @@ public class SessionManagerUtil {
 	 */
 	public static SipSessionKey parseHaSipSessionKey(
 			String sipSessionKey, String sipAppSessionId, String sipApplicationName) throws ParseException {
-		
 		if(logger.isDebugEnabled()) {
-			logger.debug("sipSession ha key to parse " + sipSessionKey );
+			logger.debug("parseHaSipSessionKey - sipSessionKey=" + sipSessionKey + ", sipAppSessionId=" + sipAppSessionId + ", sipApplicationName=" + sipApplicationName);
 		}
+		
 		StringTokenizer stringTokenizer = new StringTokenizer(sipSessionKey, SESSION_KEY_SEPARATOR);
 		String fromTag = stringTokenizer.nextToken();
 		String callId = stringTokenizer.nextToken();

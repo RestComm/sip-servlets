@@ -140,8 +140,7 @@ public class SimpleWebServlet extends HttpServlet {
         	response.sendError(HttpServletResponse.SC_EXPECTATION_FAILED);
         	return;
         }
-        SipServletRequest req = sipFactory.createRequest(appSession, "INVITE", from, to);
-        
+        SipServletRequest req = sipFactory.createRequest(appSession, "INVITE", from, to);   
         // Set some attribute
         req.getSession().setAttribute("SecondPartyAddress", sipFactory.createAddress(fromAddr));
         if(invalidateHttpSession != null) {

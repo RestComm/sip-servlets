@@ -109,6 +109,9 @@ public class ProxyTimerServiceImpl extends Timer implements ProxyTimerService {
      * @see org.mobicents.servlet.sip.core.timers.ProxyTimerService#stop()
      */
     public void stop() {
+    	if(logger.isDebugEnabled()) {
+            logger.debug("stop");
+        }
         started.set(false);
         super.cancel();
         if(logger.isDebugEnabled()) {
@@ -120,6 +123,9 @@ public class ProxyTimerServiceImpl extends Timer implements ProxyTimerService {
      * @see org.mobicents.servlet.sip.core.timers.ProxyTimerService#start()
      */
     public void start() {
+    	if(logger.isDebugEnabled()) {
+            logger.debug("start");
+        }
         started.set(true);
         if(logger.isDebugEnabled()) {
             logger.debug("Started proxy timer service "+ this);

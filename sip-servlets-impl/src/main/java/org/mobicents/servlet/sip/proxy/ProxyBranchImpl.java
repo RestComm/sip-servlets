@@ -142,10 +142,19 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 	}
 	
 	// empty constructor used only for Externalizable interface
-	public ProxyBranchImpl() {}
+	public ProxyBranchImpl() {
+		
+		if(logger.isDebugEnabled()) {
+			logger.debug("ProxyBranchImpl no-argument constructor");
+		}
+		
+	}
 	
 	public ProxyBranchImpl(URI uri, ProxyImpl proxy)
 	{
+		if(logger.isDebugEnabled()) {
+			logger.debug("ProxyBranchImpl constructor - proxy=" + proxy);
+		}
 		this.targetURI = uri.toString();
 		this.proxy = proxy;
 		isAddToPath = proxy.getAddToPath();
@@ -395,6 +404,9 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 	 * @see javax.servlet.sip.ProxyBranch#setProxyBranchTimeout(int)
 	 */
 	public void setProxyBranchTimeout(int seconds) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("setProxyBranchTimeout");
+		}
 		if(seconds<=0) 
 			throw new IllegalArgumentException("Negative or zero timeout not allowed");
 		
@@ -412,6 +424,10 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 	 * specified destination. Subsequent requests are proxied through proxySubsequentRequest
 	 */
 	public void start()	{
+		if(logger.isDebugEnabled()) {
+			logger.debug("start");
+		}
+		
 		if(started) {
 			throw new IllegalStateException("Proxy branch alredy started!");
 		}
@@ -426,6 +442,9 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 		}
 		
 		// Initialize these here for efficiency.
+		if(logger.isDebugEnabled()) {
+			logger.debug("start - calling updateTimer");
+		}
 		updateTimer(false, originalRequest.getSipApplicationSession(false));		
 		
 		SipURI recordRoute = null;
@@ -448,13 +467,21 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 		addTransaction(originalRequest);
 		
 		URI destination = null;
-		if(targetURI != null) {
-			try {
-				destination = proxy.getSipFactoryImpl().createURI(targetURI);
-			} catch (ServletParseException e) {
-				logger.error("A problem occured while setting the target URI while proxying a request " + targetURI, e);
-			}
-		}				
+                //app may have modified the branch request, so give it priority
+                //fixes https://github.com/RestComm/sip-servlets/issues/131
+                if (outgoingRequest.getRequestURI().equals(this.getProxy().getOriginalRequest().getRequestURI()))
+                {
+                    if(targetURI != null) {
+                            try {
+                                    destination = proxy.getSipFactoryImpl().createURI(targetURI);
+                            } catch (ServletParseException e) {
+                                    logger.error("A problem occured while setting the target URI while proxying a request " + targetURI, e);
+                            }
+                    }                    
+                } else {
+                    //the app has mofified the requestURI after branch creation..
+                     destination = outgoingRequest.getRequestURI();
+                }
 		Request cloned = ProxyUtils.createProxiedRequest(
 				outgoingRequest,
 				this,
@@ -494,7 +521,14 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 				null,
 				null, null, false);
 		
+		if(logger.isDebugEnabled()) {
+			logger.debug("forwardRequest - clonedRequest=" + clonedRequest);
+		}
+		
 		if(subsequent) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("forwardRequest - setRoutingState to SUBSEQUENT");
+			}
 			clonedRequest.setRoutingState(RoutingState.SUBSEQUENT);
 		}
 		
@@ -502,13 +536,24 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 		
 		// Initialize the sip session for the new request if initial
 		final MobicentsSipSession originalSipSession = originalRequest.getSipSession();
+		if(logger.isDebugEnabled()) {
+			logger.debug("forwardRequest - originalSipSession=" + originalSipSession);
+			logger.debug("forwardRequest - originalRequest.getCurrentApplicationName()=" + originalRequest.getCurrentApplicationName());
+		}
+		
 		clonedRequest.setCurrentApplicationName(originalRequest.getCurrentApplicationName());
 		if(clonedRequest.getCurrentApplicationName() == null && subsequent) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("forwardRequest - originalSipSession.getSipApplicationSession().getApplicationName()=" + originalSipSession.getSipApplicationSession().getApplicationName());
+			}
 			clonedRequest.setCurrentApplicationName(originalSipSession.getSipApplicationSession().getApplicationName());
 		}
 		clonedRequest.setSipSession(originalSipSession);
 		final MobicentsSipSession newSession = (MobicentsSipSession) clonedRequest.getSipSession();
 		try {
+			if(logger.isDebugEnabled()) {
+				logger.debug("forwardRequest - calling setHandler - originalSipSession.getHandler()=" + originalSipSession.getHandler());
+			}
 			newSession.setHandler(originalSipSession.getHandler());
 		} catch (ServletException e) {
 			logger.error("could not set the session handler while forwarding the request", e);
@@ -523,8 +568,14 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 		newSession.setProxy(proxy);		
 				
 		try {
+			if(logger.isDebugEnabled()) {
+				logger.debug("forwardRequest - calling checkRequest");
+			}
 			RFC5626Helper.checkRequest(this, request, originalRequest);
 		} catch (IncorrectFlowIdentifierException e1) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("forwardRequest - checkRequest threw an exception", e1);
+			}
 			logger.warn(e1.getMessage());
 			this.cancel();
 			try {
@@ -536,11 +587,20 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 		}
 		//JSR 289 Section 15.1.6
 		if(!subsequent) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("forwardRequest - not subsequent");
+			}
 			// Subsequent requests can't have a routing directive?
 			clonedRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, originalRequest);
 		}
+		if(logger.isDebugEnabled()) {
+			logger.debug("forwardRequest - setting the proxy branch");
+		}
 		clonedRequest.getTransactionApplicationData().setProxyBranch(this);			
 		try {
+			if(logger.isDebugEnabled()) {
+				logger.debug("forwardRequest - sending the cloned request=" + clonedRequest);
+			}
 			clonedRequest.send();			
 		} catch (IOException e) {
 			throw new IllegalStateException(e);
@@ -786,7 +846,10 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 //		}
 
 		// https://telestax.atlassian.net/browse/MSS-153 perf optimization : we update the timer only on non ACK
-		if(!clonedRequest.getMethod().equalsIgnoreCase(Request.ACK) ) { 
+		if(!clonedRequest.getMethod().equalsIgnoreCase(Request.ACK) ) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("proxySubsequentRequest - calling updateTimer - request " + request);
+			}
 			updateTimer(false, request.getSipApplicationSession(false)); 
 		}
  
@@ -794,6 +857,10 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 			// Reset the proxy supervised state to default Chapter 6.2.1 - page down list bullet number 6
 			proxy.setSupervised(true);
 			if(clonedRequest.getMethod().equalsIgnoreCase(Request.ACK) ) { //|| clonedRequest.getMethod().equalsIgnoreCase(Request.PRACK)) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("proxySubsequentRequest - clonedRequest is ACK - request " + request);
+				}
+				
 				// we mark them as accessed so that HA replication can occur
 				final MobicentsSipSession sipSession = request.getSipSession();
 				final MobicentsSipApplicationSession sipApplicationSession = sipSession.getSipApplicationSession();
@@ -829,6 +896,9 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 				sipFactoryImpl.getSipApplicationDispatcher().updateRequestsStatistics(clonedRequest, false);
 			}
 			else {				
+				if(logger.isDebugEnabled()) {
+					logger.debug("proxySubsequentRequest - calling forwardRequest - request " + request);
+				}
 				forwardRequest(clonedRequest, true);
 			}
 			
@@ -1016,6 +1086,13 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 	 *
 	 */
 	public void updateTimer(boolean cancel1xxTimer, MobicentsSipApplicationSession mobicentsSipApplicationSession) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("updateTimer - cancel1xxTimer=" + cancel1xxTimer + ", mobicentsSipApplicationSession=" + mobicentsSipApplicationSession);
+			if (mobicentsSipApplicationSession != null){
+				logger.debug("updateTimer - cancel1xxTimer=" + cancel1xxTimer + ", mobicentsSipApplicationSession.getApplicationName()=" + mobicentsSipApplicationSession.getApplicationName());
+				logger.debug("updateTimer - cancel1xxTimer=" + cancel1xxTimer + ", mobicentsSipApplicationSession.getSipContext()=" + mobicentsSipApplicationSession.getSipContext());
+			}
+		}
 		if(cancel1xxTimer) {
 			cancel1xxTimer();
 		}
@@ -1027,6 +1104,10 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 						final ProxyBranchTimerTask timerCTask = new ProxyBranchTimerTask(this, ResponseType.FINAL, mobicentsSipApplicationSession);
 						if(logger.isDebugEnabled()) {
 							logger.debug("Proxy Branch Timeout set to " + proxyBranchTimeout);
+							logger.debug("updateTimer - proxy=" + proxy);
+							if (proxy != null){
+								logger.debug("updateTimer - proxy.getProxyTimerService()=" + proxy.getProxyTimerService());
+							}
 						}
 						proxy.getProxyTimerService().schedule(timerCTask, proxyBranchTimeout * 1000L);
 						proxyTimeoutTask = timerCTask;
@@ -1236,6 +1317,9 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 	 * @param proxy the proxy to set
 	 */
 	public void setProxy(ProxyImpl proxy) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("setProxy - proxy=" + proxy);
+		}
 		this.proxy = proxy;
 	}
 

@@ -2,7 +2,7 @@
 <deployment xmlns="urn:jboss:bean-deployer:2.0">
 
    <bean name="WebServer"
-         class="org.jboss.web.tomcat.service.deployers.TomcatConvergedService">
+         class="org.jboss.web.tomcat.service.deployers.sip.TomcatConvergedService">
          
       <annotation>@org.jboss.aop.microcontainer.aspects.jmx.JMX(name="jboss.web:service=WebServer", exposedInterface=org.jboss.web.tomcat.service.deployers.TomcatServiceMBean.class,registerDirectly=true)</annotation>
 

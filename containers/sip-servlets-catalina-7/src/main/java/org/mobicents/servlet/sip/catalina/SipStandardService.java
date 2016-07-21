@@ -97,8 +97,7 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 	public static final String DEFAULT_SIP_PATH_NAME = "gov.nist";
 	public static final String PASS_INVITE_NON_2XX_ACK_TO_LISTENER = "gov.nist.javax.sip.PASS_INVITE_NON_2XX_ACK_TO_LISTENER";
 	public static final String TCP_POST_PARSING_THREAD_POOL_SIZE = "gov.nist.javax.sip.TCP_POST_PARSING_THREAD_POOL_SIZE";
-	public static final String AUTOMATIC_DIALOG_SUPPORT_STACK_PROP = "javax.sip.AUTOMATIC_DIALOG_SUPPORT";
-	
+	public static final String AUTOMATIC_DIALOG_SUPPORT_STACK_PROP = "javax.sip.AUTOMATIC_DIALOG_SUPPORT";	
 	public static final String LOOSE_DIALOG_VALIDATION = "gov.nist.javax.sip.LOOSE_DIALOG_VALIDATION";
 	public static final String SERVER_LOG_STACK_PROP = "gov.nist.javax.sip.SERVER_LOG";
 	public static final String DEBUG_LOG_STACK_PROP = "gov.nist.javax.sip.DEBUG_LOG";	
@@ -445,7 +444,11 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 						catalinaBase + "/" + serverLog);
 				}
 				// The whole MSS is built upon those assumptions, so those properties are not overrideable
-				sipStackProperties.setProperty(AUTOMATIC_DIALOG_SUPPORT_STACK_PROP, "off");
+                                if (sipStackProperties.getProperty(AUTOMATIC_DIALOG_SUPPORT_STACK_PROP) == null) {
+                                    //https://github.com/RestComm/sip-servlets/issues/143
+                                    //set off if user didnt provided any value.
+                                    sipStackProperties.setProperty(AUTOMATIC_DIALOG_SUPPORT_STACK_PROP, "off");
+                                }                                
 				sipStackProperties.setProperty(LOOSE_DIALOG_VALIDATION, "true");
 				sipStackProperties.setProperty(PASS_INVITE_NON_2XX_ACK_TO_LISTENER, "true");
 				isPropsLoaded = true;
@@ -464,7 +467,7 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 				sipStackProperties.setProperty(SERVER_LOG_STACK_PROP,
 						catalinaBase + "/" + "mss-jsip-" + getName() +"-messages.xml");
 				sipStackProperties.setProperty("javax.sip.STACK_NAME", "mss-" + getName());
-				sipStackProperties.setProperty(AUTOMATIC_DIALOG_SUPPORT_STACK_PROP, "off");		
+				sipStackProperties.setProperty(AUTOMATIC_DIALOG_SUPPORT_STACK_PROP, "off");	                                
 				sipStackProperties.setProperty("gov.nist.javax.sip.DELIVER_UNSOLICITED_NOTIFY", "true");
 				sipStackProperties.setProperty("gov.nist.javax.sip.THREAD_POOL_SIZE", "64");
 				sipStackProperties.setProperty("gov.nist.javax.sip.REENTRANT_LISTENER", "true");
@@ -1030,7 +1033,7 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 			final ProtocolHandler protocolHandler = connector.getProtocolHandler();
 			if(protocolHandler instanceof SipProtocolHandler) {
 				final SipProtocolHandler sipProtocolHandler = (SipProtocolHandler) protocolHandler;
-				if(sipProtocolHandler.getIpAddress().equals(ipAddress) && sipProtocolHandler.getPort() == port && sipProtocolHandler.getSignalingTransport().equals(transport)) {
+				if(sipProtocolHandler.getIpAddress().equals(ipAddress) && sipProtocolHandler.getPort() == port && sipProtocolHandler.getSignalingTransport().equalsIgnoreCase(transport)) {
 //					connector.destroy();
 					connectorToRemove = connector;
 					break;

@@ -29,6 +29,7 @@ import javax.sip.address.SipURI;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.ViaHeader;
 
+import org.mobicents.ha.javax.sip.SipLoadBalancer;
 import org.mobicents.servlet.sip.SipConnector;
 
 /**
@@ -146,4 +147,13 @@ public interface MobicentsExtendedListeningPoint {
 	 */
 	void setUseLoadBalancer(boolean useLoadBalancer);
 
+	/**
+	 * @return the loadBalancer
+	 */
+	SipLoadBalancer getLoadBalancer();
+
+	/**
+	 * @param loadBalancer the loadBalancer to set
+	 */
+	void setLoadBalancer(SipLoadBalancer loadBalancer);
 }

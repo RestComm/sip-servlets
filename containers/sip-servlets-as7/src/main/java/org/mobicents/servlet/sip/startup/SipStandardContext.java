@@ -139,6 +139,10 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 	// application session is 3 minutes
 	private static int DEFAULT_LIFETIME = 3;
 	
+	// default quotable params that their values need to be quoted.
+	private static final String DEFAULT_QUOTABLE_PARAMS = "vendor, model, version, cnonce, nextnonce,"
+			+ "nonce, code, oc-algo, cid, text, domain, opaque, qop, realm, response, rspauth, uri, username";
+	
 	protected String applicationName;
 	protected String smallIcon;
 	protected String largeIcon;
@@ -280,10 +284,19 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 			
 			String proxyTimerServiceType = sipApplicationDispatcher.getSipService().getProxyTimerServiceImplementationType();
 			if(proxyTimerServiceType != null && proxyTimerServiceType.equalsIgnoreCase("Standard")) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("prepareServletContext - proxyTimerService is standard (new ProxyTimerServiceImpl) - " + getName());
+				}
                 proxyTimerService = new ProxyTimerServiceImpl(applicationName);
             } else if(proxyTimerServiceType != null && proxyTimerServiceType.equalsIgnoreCase("Default")) {
+            	if(logger.isDebugEnabled()) {
+					logger.debug("prepareServletContext - proxyTimerService is default (new DefaultProxyTimerService) - " + getName());
+				}
                 proxyTimerService = new DefaultProxyTimerService(applicationName);
             } else {
+            	if(logger.isDebugEnabled()) {
+					logger.debug("prepareServletContext - proxyTimerService else (new ProxyTimerServiceImpl) - " + getName());
+				}
                 proxyTimerService = new ProxyTimerServiceImpl(applicationName);
             }
 		}
@@ -314,8 +327,30 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 				sipApplicationDispatcher.getSipService().findSipConnectors());
 		this.getServletContext().setAttribute("org.mobicents.servlet.sip.DNS_RESOLVER",
 				sipApplicationDispatcher.getDNSResolver());
+		this.getServletContext().setAttribute("org.restcomm.servlets.sip.QUOTABLE_PARAMETER", 
+				getQuotableParams());
 	}
-
+	
+	/**
+	 * 
+	 * @return a list of known params that their values need to be quoted.
+	 */
+	private List<String> getQuotableParams(){
+		List<String> retValue = new ArrayList<String>();
+		String quotableParameters = this.getServletContext().getInitParameter("org.restcomm.servlets.sip.QUOTABLE_PARAMETER");
+		if (quotableParameters == null){
+			quotableParameters = DEFAULT_QUOTABLE_PARAMS;
+		}
+		String[] parameters = quotableParameters.split(",");
+		for (int i = 0; i < parameters.length; i++){
+			String param = parameters[i].trim();
+			if (param != null && !param.isEmpty() && !retValue.contains(param)){
+				retValue.add(param);
+			}
+		}
+		return retValue;
+	}
+	
 	/**
 	 * @throws Exception
 	 */
@@ -1125,10 +1160,10 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 						isManagedThread.set(Boolean.TRUE);
 					}
 					if(sipApplicationSession != null) {									
-						SipApplicationSessionCreationThreadLocal sipApplicationSessionCreationThreadLocal = sipApplicationSessionsAccessedThreadLocal.get();
+						SipApplicationSessionCreationThreadLocal sipApplicationSessionCreationThreadLocal = SipApplicationSessionCreationThreadLocal.getTHRef().get();
 						if(sipApplicationSessionCreationThreadLocal == null) {
 							sipApplicationSessionCreationThreadLocal = new SipApplicationSessionCreationThreadLocal();
-							sipApplicationSessionsAccessedThreadLocal.set(sipApplicationSessionCreationThreadLocal);
+							SipApplicationSessionCreationThreadLocal.getTHRef().set(sipApplicationSessionCreationThreadLocal);
 						}
 						boolean notPresent = sipApplicationSessionCreationThreadLocal.getSipApplicationSessions().add(sipApplicationSession);
 						if(notPresent && isContainerManaged) {
@@ -1180,17 +1215,17 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 				break;
 			case SipApplicationSession:
 				boolean wasSessionReleased = false;
-				SipApplicationSessionCreationThreadLocal sipApplicationSessionCreationThreadLocal = sipApplicationSessionsAccessedThreadLocal.get();
+				SipApplicationSessionCreationThreadLocal sipApplicationSessionCreationThreadLocal = SipApplicationSessionCreationThreadLocal.getTHRef().get();
 				if(sipApplicationSessionCreationThreadLocal != null) {					
-					for(MobicentsSipApplicationSession sipApplicationSessionAccessed : sipApplicationSessionsAccessedThreadLocal.get().getSipApplicationSessions()) {
+					for(MobicentsSipApplicationSession sipApplicationSessionAccessed : SipApplicationSessionCreationThreadLocal.getTHRef().get().getSipApplicationSessions()) {
 						sipApplicationSessionAccessed.release();
 						if(sipApplicationSessionAccessed.equals(sipApplicationSession)) {
 							wasSessionReleased = true;
 						}
 					}		
-					sipApplicationSessionsAccessedThreadLocal.get().getSipApplicationSessions().clear();
-					sipApplicationSessionsAccessedThreadLocal.set(null);
-					sipApplicationSessionsAccessedThreadLocal.remove();
+					SipApplicationSessionCreationThreadLocal.getTHRef().get().getSipApplicationSessions().clear();
+					SipApplicationSessionCreationThreadLocal.getTHRef().set(null);
+					SipApplicationSessionCreationThreadLocal.getTHRef().remove();
 				}
 				isManagedThread.set(null);
 				isManagedThread.remove();
@@ -1375,7 +1410,16 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 			logger.debug(childrenMap.size() + " container to notify of " + event.getEventType());
 		}
 		if(event.getEventType() == SipContextEventType.SERVLET_INITIALIZED) {
-			if(!timerService.isStarted()) {
+                        //fixes https://github.com/RestComm/sip-servlets/issues/165
+                        //now the SipService is totally ready/started, we prepare 
+                        //the context again just in case some att was not properly
+                        //initiated
+                        try {
+                            prepareServletContext();
+                        } catch (Exception e) {
+                            logger.warn("Couldnt prepare context", e);
+                        }                    
+			if(!timerService.isStarted()) {				
 				timerService.start();
 			}
 			if(!proxyTimerService.isStarted()) {
@@ -1660,3 +1704,4 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 		}
 	}
 }
+

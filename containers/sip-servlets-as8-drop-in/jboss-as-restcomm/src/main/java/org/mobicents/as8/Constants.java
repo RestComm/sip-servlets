@@ -82,6 +82,9 @@ public interface Constants {
     String KEY_ALIAS = "key-alias";
     String KEYSTORE_TYPE = "keystore-type";
     String LISTINGS = "listings";
+    String LOAD_BALANCER_ADDRESS = "load-balancer-address";
+    String LOAD_BALANCER_RMI_PORT = "load-balancer-rmi-port";
+    String LOAD_BALANCER_SIP_PORT = "load-balancer-sip-port";
     String MAPPED_FILE = "mapped-file";
     String MAX_CONNECTIONS = "max-connections";
     String MAX_DEPTH = "max-depth";

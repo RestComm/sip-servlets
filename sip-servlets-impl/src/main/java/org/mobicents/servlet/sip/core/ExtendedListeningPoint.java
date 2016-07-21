@@ -39,6 +39,7 @@ import javax.sip.header.ContactHeader;
 import javax.sip.header.ViaHeader;
 
 import org.apache.log4j.Logger;
+import org.mobicents.ha.javax.sip.SipLoadBalancer;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
@@ -62,6 +63,7 @@ public class ExtendedListeningPoint implements MobicentsExtendedListeningPoint {
 	private boolean isAnyLocalAddress;
 	private boolean useStaticAddress;
 	private boolean useLoadBalancer;
+	private SipLoadBalancer loadBalancer;
 	
 //	String host = null;
 	int port = -1;
@@ -383,5 +385,19 @@ public class ExtendedListeningPoint implements MobicentsExtendedListeningPoint {
 	@Override
 	public void setUseLoadBalancer(boolean useLoadBalancer) {
 		this.useLoadBalancer = useLoadBalancer;
+	}
+
+	/**
+	 * @return the loadBalancer
+	 */
+	public SipLoadBalancer getLoadBalancer() {
+		return loadBalancer;
+	}
+
+	/**
+	 * @param loadBalancer the loadBalancer to set
+	 */
+	public void setLoadBalancer(SipLoadBalancer loadBalancer) {
+		this.loadBalancer = loadBalancer;
 	}
 }

@@ -98,12 +98,13 @@ import org.jboss.metadata.web.jboss.ReplicationTrigger;
 import org.mobicents.ha.javax.sip.ClusteredSipStack;
 import org.mobicents.ha.javax.sip.HASipDialog;
 import org.mobicents.ha.javax.sip.ReplicationStrategy;
-import org.mobicents.servlet.sip.core.SipManager;
 import org.mobicents.servlet.sip.core.SipService;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSessionKey;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
+import org.mobicents.servlet.sip.core.SipContext;
+import org.mobicents.servlet.sip.core.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.B2buaHelperImpl;
@@ -1173,14 +1174,12 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 			}
 		}
 		if(logger.isDebugEnabled()) {
-			logger.debug("dialog to inject " + sessionCreatingDialogId);
-			if(sessionCreatingDialogId != null) {
-				logger.debug("dialog id of the dialog to inject " + sessionCreatingDialogId);
-			}
+			logger.debug("dialog id to inject " + sessionCreatingDialogId + ", this.getId()=" + this.getId());
 		}
 		if(sessionCreatingDialogId != null && sessionCreatingDialogId.length() > 0) {
 			//Container context = getManager().getContainer();
 			Container context = this.manager.getContainer();
+
 			if(logger.isDebugEnabled()){
 				logger.debug(context.getClass().getName());
 			}
@@ -1195,14 +1194,18 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 					logger.debug("Service: " + service);
 					logger.debug("Service: " + service.getClass().getName());
 					new Exception().printStackTrace();
+
 				}
 				if(service instanceof SipService) {
 					SipService sipService = (SipService) service;
-					SipStack sipStack = sipService.getSipStack();					
+					SipStack sipStack = sipService.getSipStack();
+					if (logger.isDebugEnabled()){
+						logger.debug("updateSipSession - service is instanceof SipService - sipStack=" + sipStack);
+					}
 					if(sipStack != null) {
 						sessionCreatingDialog = ((ClusteredSipStack)sipStack).getDialog(sessionCreatingDialogId); 
 						if(logger.isDebugEnabled()) {
-							logger.debug("dialog injected " + sessionCreatingDialog);
+							logger.debug("dialog injected " + sessionCreatingDialog + ", this.getId()=" + this.getId());
 						}
 					}
 				}else{

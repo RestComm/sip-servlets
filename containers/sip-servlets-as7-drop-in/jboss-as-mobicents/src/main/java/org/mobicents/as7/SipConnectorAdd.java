@@ -22,6 +22,9 @@
 package org.mobicents.as7;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
+import static org.mobicents.as7.Constants.LOAD_BALANCER_ADDRESS;
+import static org.mobicents.as7.Constants.LOAD_BALANCER_RMI_PORT;
+import static org.mobicents.as7.Constants.LOAD_BALANCER_SIP_PORT;
 import static org.mobicents.as7.Constants.STATIC_SERVER_ADDRESS;
 import static org.mobicents.as7.Constants.STATIC_SERVER_PORT;
 import static org.mobicents.as7.Constants.STUN_SERVER_ADDRESS;
@@ -81,6 +84,9 @@ class SipConnectorAdd extends AbstractAddStepHandler {
         final String scheme = SipConnectorDefinition.SCHEME.resolveModelAttribute(context, fullModel).asString();
 
         final boolean useLoadBalancer = SipConnectorDefinition.USE_LOAD_BALANCER.resolveModelAttribute(context, fullModel).asBoolean();
+        final String loadBalancerAddress = operation.hasDefined(LOAD_BALANCER_ADDRESS) ? SipConnectorDefinition.LOAD_BALANCER_ADDRESS.resolveModelAttribute(context, fullModel).asString() : null;
+        final int loadBalancerRmiPort = operation.hasDefined(LOAD_BALANCER_RMI_PORT) ? SipConnectorDefinition.LOAD_BALANCER_RMI_PORT.resolveModelAttribute(context, fullModel).asInt() : -1;
+        final int loadBalancerSipPort = operation.hasDefined(LOAD_BALANCER_SIP_PORT) ? SipConnectorDefinition.LOAD_BALANCER_SIP_PORT.resolveModelAttribute(context, fullModel).asInt() : -1;
         
         final boolean useStaticAddress = SipConnectorDefinition.USE_STATIC_ADDRESS.resolveModelAttribute(context, fullModel).asBoolean();        
         final String staticServerAddress = operation.hasDefined(STATIC_SERVER_ADDRESS) ? SipConnectorDefinition.STATIC_SERVER_ADDRESS.resolveModelAttribute(context, fullModel).asString() : null;
@@ -92,7 +98,7 @@ class SipConnectorAdd extends AbstractAddStepHandler {
         
         final String hostNames = operation.hasDefined(HOSTNAMES) ? SipConnectorDefinition.HOSTNAMES.resolveModelAttribute(context, fullModel).asString() : null;
 
-        final SipConnectorService service = new SipConnectorService(protocol, scheme, useLoadBalancer, useStaticAddress, staticServerAddress, staticServerPort, useStun, stunServerAddress, stunServerPort, hostNames);
+        final SipConnectorService service = new SipConnectorService(protocol, scheme, useLoadBalancer, loadBalancerAddress, loadBalancerRmiPort, loadBalancerSipPort, useStaticAddress, staticServerAddress, staticServerPort, useStun, stunServerAddress, stunServerPort, hostNames);
         final ServiceBuilder<Connector> serviceBuilder = context.getServiceTarget().addService(SipSubsystemServices.JBOSS_SIP_CONNECTOR.append(name), service)
                 .addDependency(SipSubsystemServices.JBOSS_SIP, SipServer.class, service.getServer())
                 .addDependency(SocketBinding.JBOSS_BINDING_NAME.append(bindingRef), SocketBinding.class, service.getBinding());

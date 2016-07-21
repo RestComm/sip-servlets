@@ -747,6 +747,12 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 	 * {@inheritDoc}
 	 */
 	public void update(IncomingDistributableSessionData sessionData) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("update - sessionData=" + sessionData);
+			if (sessionData != null){
+				logger.debug("update - sessionData.getMetadata()=" + sessionData.getMetadata());
+			}
+		}
 		assert sessionData != null : "sessionData is null";
 
 		this.version.set(sessionData.getVersion());
@@ -755,6 +761,18 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		this.thisAccessedTime = ts;
 
 		DistributableSipApplicationSessionMetadata md = (DistributableSipApplicationSessionMetadata)sessionData.getMetadata();
+		if(logger.isDebugEnabled()) {
+			logger.debug("update - metadata=" + md);
+			if (md != null){
+				logger.debug("update - md.getMetaData()" + md.getMetaData());
+				if (md.getMetaData() != null){
+					for (String tmpKey: md.getMetaData().keySet()){
+						logger.debug("update - md.getMetaData() entry:" + tmpKey + "=" + md.getMetaData().get(tmpKey));	
+					}
+				}
+			}
+		}
+		
 		// Fix for Issue 1974 When app call setExpires, it is not propagated to the failover node
 		Long sasTimeout = (Long) md.getMetaData().get(SIP_APPLICATION_SESSION_TIMEOUT);
 		if(sasTimeout != null) {
@@ -1580,7 +1598,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 			if(logger.isDebugEnabled()) {
 				logger.debug("SipApplicationSession " + key + " number of servletTimers to reschedule locally " + servletTimerIds.length);
 			}
-			for(String servletTimerId : servletTimerIds) {
+			for(String servletTimerId : servletTimerIds) {				
 				ServletTimer servletTimer = ((ClusteredSipServletTimerService)sipContext.getTimerService()).rescheduleTimerLocally(this, servletTimerId);
 				if(servletTimer != null) {
 					super.addServletTimer(servletTimer);

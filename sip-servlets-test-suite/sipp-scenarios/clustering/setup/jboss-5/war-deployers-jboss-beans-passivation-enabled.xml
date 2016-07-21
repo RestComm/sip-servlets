@@ -23,13 +23,13 @@ $Id: war-deployers-jboss-beans.xml 85945 2009-03-16 19:45:12Z dimitris@jboss.org
       <property name="relativeOrder">1999</property>
    </bean>
    <!-- sip.xml parsing deployer -->
-   <bean name="SipAppParsingDeployer" class="org.jboss.deployment.SipAppParsingDeployer">
+   <bean name="SipAppParsingDeployer" class="org.jboss.deployment.sip.SipAppParsingDeployer">
       <property name="relativeOrder">2000</property>
    </bean>
    <!--bean name="JBossWebAppParsingDeployer" class="org.jboss.deployment.JBossWebAppParsingDeployer">
       <property name="relativeOrder">2001</property>
    </bean-->
-   <bean name="JBossConvergedSipAppParsingDeployer" class="org.jboss.deployment.JBossConvergedSipAppParsingDeployer">
+   <bean name="JBossConvergedSipAppParsingDeployer" class="org.jboss.deployment.sip.JBossConvergedSipAppParsingDeployer">
       <property name="relativeOrder">2001</property>
    </bean>   
 
@@ -48,7 +48,7 @@ $Id: war-deployers-jboss-beans.xml 85945 2009-03-16 19:45:12Z dimitris@jboss.org
         and conf/standardjboss.xml as the source for defaults. 
    -->
    <bean name="WebAppClusteringDefaultsDeployer" 
-         class="org.jboss.web.tomcat.service.deployers.ConvergedSipClusteringDefaultsDeployer">
+         class="org.jboss.web.tomcat.service.deployers.sip.ConvergedSipClusteringDefaultsDeployer">
       
       <!-- Default session cache config used by distributable webapps -->
       <property name="cacheName">standard-session-cache</property>
@@ -231,7 +231,7 @@ $Id: war-deployers-jboss-beans.xml 85945 2009-03-16 19:45:12Z dimitris@jboss.org
           Class of the session manager (used if context is marked as 'distributable' and being a sip application. Currently allowed values:
           - org.jboss.web.tomcat.service.session.JBossCacheSipManager
       -->
-      <property name="sipManagerClass">org.jboss.web.tomcat.service.session.JBossCacheSipManager</property>
+      <property name="sipManagerClass">org.jboss.web.tomcat.service.session.sip.JBossCacheSipManager</property>
 
       <!-- The name of the request property under with the authenticated JAAS
       Subject is stored on successful authentication. If null or empty then

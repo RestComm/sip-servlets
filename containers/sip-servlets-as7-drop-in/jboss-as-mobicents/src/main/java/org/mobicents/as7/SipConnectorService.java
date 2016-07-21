@@ -50,6 +50,10 @@ class SipConnectorService implements Service<Connector> {
     private String scheme = "sip";
     // https://github.com/RestComm/sip-servlets/issues/111
     private Boolean useLoadBalancer = false;
+    // https://github.com/RestComm/sip-servlets/issues/137
+    private String loadBalancerAddress;
+	private int loadBalancerRmiPort;
+	private int loadBalancerSipPort;
     private Boolean useStaticAddress = false;
     private String staticServerAddress = null;
     private int staticServerPort = -1;
@@ -73,12 +77,15 @@ class SipConnectorService implements Service<Connector> {
     private final InjectedValue<SocketBinding> binding = new InjectedValue<SocketBinding>();
     private final InjectedValue<SipServer> server = new InjectedValue<SipServer>();
 
-    public SipConnectorService(String protocol, String scheme, boolean useLoadBalancer, boolean useStaticAddress, String staticServerAddress, int staticServerPort, boolean useStun, String stunServerAddress, int stunServerPort, String hostNames) {
+    public SipConnectorService(String protocol, String scheme, boolean useLoadBalancer, String loadBalancerAddress, int loadBalancerRmiPort, int loadBalancerSipPort, boolean useStaticAddress, String staticServerAddress, int staticServerPort, boolean useStun, String stunServerAddress, int stunServerPort, String hostNames) {
         if (protocol != null)
             this.protocol = protocol;
         if (scheme != null)
             this.scheme = scheme;
         this.useLoadBalancer = useLoadBalancer;
+        this.loadBalancerAddress = loadBalancerAddress;
+        this.loadBalancerRmiPort = loadBalancerRmiPort;
+        this.loadBalancerSipPort = loadBalancerSipPort;
         this.useStaticAddress = useStaticAddress;
         if (staticServerAddress != null)
             this.staticServerAddress = staticServerAddress;
@@ -112,6 +119,9 @@ class SipConnectorService implements Service<Connector> {
             // https://github.com/Mobicents/sip-servlets/issues/44 support multiple connectors
             sipConnector.setTransport(binding.getName().substring(binding.getName().lastIndexOf("sip-")+("sip-".length())));
             sipConnector.setUseLoadBalancer(useLoadBalancer);
+            sipConnector.setLoadBalancerAddress(loadBalancerAddress);
+            sipConnector.setLoadBalancerRmiPort(loadBalancerRmiPort);
+            sipConnector.setLoadBalancerSipPort(loadBalancerSipPort);
             sipConnector.setUseStaticAddress(useStaticAddress);
             sipConnector.setStaticServerAddress(staticServerAddress);
             sipConnector.setStaticServerPort(staticServerPort);

@@ -90,6 +90,6 @@ public class SipApplicationSessionKeyParsingTest extends TestCase {
 	}
 	
 	public void testEquals() {
-		EqualsVerifier.forClass(SipApplicationSessionKey.class).verify();
+		EqualsVerifier.forClass(SipApplicationSessionKey.class).withOnlyTheseFields("applicationName", "uuid").verify();
 	}
 }

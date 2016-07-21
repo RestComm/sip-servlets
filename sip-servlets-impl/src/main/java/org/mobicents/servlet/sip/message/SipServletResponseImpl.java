@@ -139,6 +139,11 @@ public abstract class SipServletResponseImpl extends SipServletMessageImpl imple
 	
 	@Override
 	public ModifiableRule getModifiableRule(String headerName) {
+                ModifiableRule overriden = retrieveModifiableOverriden();
+                if ( overriden != null ) {
+                    return overriden;
+                }
+                
 		String hName = getFullHeaderName(headerName);
 
 		/*
@@ -809,10 +814,10 @@ public abstract class SipServletResponseImpl extends SipServletMessageImpl imple
 	}
 	
 	@Override
-	public void cleanUp() {		
+	public void cleanUp() {	
 //		super.cleanUp();
 		originalRequest = null;
-		proxyBranch = null;				
+		proxyBranch = null;
 	}
 	
 	/*

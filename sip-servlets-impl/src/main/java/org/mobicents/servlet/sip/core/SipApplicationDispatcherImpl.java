@@ -1,6 +1,6 @@
 /*
  * TeleStax, Open Source Cloud Communications
- * Copyright 2011-2014, Telestax Inc and individual contributors
+ * Copyright 2011-2016, Telestax Inc and individual contributors
  * by the @authors tag.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -213,35 +213,16 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	
 	// stats
 	private boolean gatherStatistics = true;
-	private static AtomicLong requestsProcessed = new AtomicLong(0);
-	private static AtomicLong responsesProcessed = new AtomicLong(0);
-	static final Map<String, AtomicLong> requestsProcessedByMethod = new ConcurrentHashMap<String, AtomicLong>();
-	static {
-		for (String method : METHODS_SUPPORTED) {
-			requestsProcessedByMethod.put(method, new AtomicLong(0));
-		}
-	}
-	static final Map<String, AtomicLong> responsesProcessedByStatusCode = new ConcurrentHashMap<String, AtomicLong>();
-	static {
-		for (String classOfSc : RESPONSES_PER_CLASS_OF_SC) {
-			responsesProcessedByStatusCode.put(classOfSc, new AtomicLong(0));
-		}
-	}
+	private final AtomicLong requestsProcessed = new AtomicLong(0);
+	private final AtomicLong responsesProcessed = new AtomicLong(0);
+	final Map<String, AtomicLong> requestsProcessedByMethod = new ConcurrentHashMap<String, AtomicLong>();
+	final Map<String, AtomicLong> responsesProcessedByStatusCode = new ConcurrentHashMap<String, AtomicLong>();
 	// https://telestax.atlassian.net/browse/MSS-74
-	private static AtomicLong requestsSent = new AtomicLong(0);
-	private static AtomicLong responsesSent= new AtomicLong(0);
-	static final Map<String, AtomicLong> requestsSentByMethod = new ConcurrentHashMap<String, AtomicLong>();
-	static {
-		for (String method : METHODS_SUPPORTED) {
-			requestsSentByMethod.put(method, new AtomicLong(0));
-		}
-	}
-	static final Map<String, AtomicLong> responsesSentByStatusCode = new ConcurrentHashMap<String, AtomicLong>();
-	static {
-		for (String classOfSc : RESPONSES_PER_CLASS_OF_SC) {
-			responsesSentByStatusCode.put(classOfSc, new AtomicLong(0));
-		}
-	}
+	private final AtomicLong requestsSent = new AtomicLong(0);
+	private final AtomicLong responsesSent= new AtomicLong(0);
+	final Map<String, AtomicLong> requestsSentByMethod = new ConcurrentHashMap<String, AtomicLong>();
+	final Map<String, AtomicLong> responsesSentByStatusCode = new ConcurrentHashMap<String, AtomicLong>();
+        
 	// congestion control
 	private boolean memoryToHigh = false;	
 	private double maxMemory;
@@ -292,6 +273,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	 * 
 	 */
 	public SipApplicationDispatcherImpl() {
+                resetStatsCounters();
 		applicationDeployed = new ConcurrentHashMap<String, SipContext>();
 		mdToApplicationName = new ConcurrentHashMap<String, String>();
 		applicationNameToMd = new ConcurrentHashMap<String, String>();
@@ -301,6 +283,30 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		maxMemory = Runtime.getRuntime().maxMemory() / (double) 1024;
 		congestionControlPolicy = CongestionControlPolicy.ErrorResponse;
 	}
+        
+        @Override
+        public final void resetStatsCounters() {
+            requestsProcessed.set(0);
+            responsesProcessed.set(0);
+            requestsSent.set(0);
+            responsesSent.set(0);
+            for (String method : METHODS_SUPPORTED) {
+                    requestsProcessedByMethod.put(method, new AtomicLong(0));
+            }
+
+            for (String classOfSc : RESPONSES_PER_CLASS_OF_SC) {
+                    responsesProcessedByStatusCode.put(classOfSc, new AtomicLong(0));
+            }                
+
+            for (String classOfSc : RESPONSES_PER_CLASS_OF_SC) {
+                    responsesSentByStatusCode.put(classOfSc, new AtomicLong(0));
+            }
+
+            for (String method : METHODS_SUPPORTED) {
+                    requestsSentByMethod.put(method, new AtomicLong(0));
+            }    
+                               
+        }
 	
 	/**
 	 * {@inheritDoc} 
@@ -761,6 +767,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		final SipProvider sipProvider = (SipProvider)requestEvent.getSource();
 		ServerTransaction requestTransaction =  requestEvent.getServerTransaction();
 		final Dialog dialog = requestEvent.getDialog();
+		if(logger.isDebugEnabled()) {
+			logger.debug("processRequest - dialog=" + dialog);
+			if (dialog != null){
+				logger.debug("processRequest - dialog.getDialogId()=" + dialog.getDialogId());
+			}
+		}
 		final Request request = requestEvent.getRequest();
 		// self routing makes the application data cloned, so we make sure to nullify it
 		((MessageExt)request).setApplicationData(null);
@@ -824,12 +836,19 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 						dialog,
 						JainSipUtils.DIALOG_CREATING_METHODS.contains(requestMethod));			
 			updateRequestsStatistics(request, true);
+			if(logger.isDebugEnabled()) {
+				logger.debug("processRequest - routing state=" + sipServletRequest.getRoutingState());
+			}
+			
 			// Check if the request is meant for me. If so, strip the topmost
 			// Route header.
 			
 			//Popping the router header if it's for the container as
 			//specified in JSR 289 - Section 15.8
 			if(!isRouteExternal(routeHeader)) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("processRequest - not external - =routeHeader" + routeHeader);
+				}
 				request.removeFirst(RouteHeader.NAME);
 				sipServletRequest.setPoppedRoute(routeHeader);
 				final Parameters poppedAddress = (Parameters)routeHeader.getAddress().getURI();
@@ -842,8 +861,17 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 					sipServletRequest.setRoutingState(RoutingState.SUBSEQUENT);
 				}
 				if(transaction != null) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("processRequest - transaction not null, transaction.getDialog()=" + transaction.getDialog());
+						if (transaction.getDialog() != null){
+							logger.debug("processRequest - transaction dialog not null, transaction.getDialog().getDialogId()=" + transaction.getDialog().getDialogId());
+						}
+					}
 					TransactionApplicationData transactionApplicationData = (TransactionApplicationData)transaction.getApplicationData();
-					if(transactionApplicationData != null && transactionApplicationData.getInitialPoppedRoute() == null) {				
+					if(transactionApplicationData != null && transactionApplicationData.getInitialPoppedRoute() == null) {
+						if (transaction.getDialog() != null){
+							logger.debug("processRequest - setInitialPoppedRoute, routeHeader.getAddress()=" + routeHeader.getAddress());
+						}
 						transactionApplicationData.setInitialPoppedRoute(new AddressImpl(routeHeader.getAddress(), null, ModifiableRule.NotModifiable));
 					}
 				}
@@ -858,6 +886,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 				if(controlCongestion(request, sipServletRequest, dialog, routeHeader, sipProvider)) {
 					return;
 				}
+				
+				if(logger.isDebugEnabled()) {
+					logger.debug("processRequest - dispatching request with sipServletRequest.getAppSessionId()=" + sipServletRequest.getAppSessionId());
+				}
+				
 				messageDispatcherFactory.getRequestDispatcher(sipServletRequest, this).
 					dispatchMessage(sipProvider, sipServletRequest);
 			} catch (DispatcherException e) {
@@ -1170,6 +1203,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	 * @param sipSessionImpl
 	 */
 	private void tryToInvalidateSession(MobicentsSipSessionKey sipSessionKey, boolean invalidateProxySession) {
+		if (logger.isDebugEnabled()){
+			logger.debug("tryToInvalidateSession - sipSessionKey.getCallId()=" + sipSessionKey.getCallId() + ", sipSessionKey.getFromTag()=" + sipSessionKey.getFromTag() + ", sipSessionKey.getToTag()=" + sipSessionKey.getToTag() + ", sipSessionKey.getApplicationName()=" + sipSessionKey.getApplicationName());
+		}
 		//the key can be null if the application already invalidated the session
 		if(sipSessionKey != null) {
 			SipContext sipContext = findSipApplication(sipSessionKey.getApplicationName());
@@ -1662,7 +1698,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		return applicationServerId;
 	}
 	@Override
-	public String getApplicationServerIdHash() {		
+	public String getApplicationServerIdHash() {
+		if(logger.isDebugEnabled()) {
+			logger.info("getApplicationServerIdHash - return=" + applicationServerIdHash);
+		}
 		return applicationServerIdHash;
 	}
 	
@@ -1723,12 +1762,17 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	 * false otherwise
 	 */
 	public final boolean isExternal(String host, int port, String transport) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("isExternal - host=" + host + ", port=" + port + ", transport=" + transport);
+		}
 		boolean isExternal = true;
 		MobicentsExtendedListeningPoint listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(host, port, transport);		
 		if((hostNames.contains(host) || hostNames.contains(host+":" + port) || listeningPoint != null)) {
 			if(logger.isDebugEnabled()) {
-				logger.debug("hostNames.contains(host)=" + 
+				logger.debug("hostNames.contains(" + host + ")=" + 
 						hostNames.contains(host) +
+						"hostNames.contains(" + host + ":" + port + ")=" + 
+								hostNames.contains(host+":" + port) +
 						" | listeningPoint found = " +
 						listeningPoint);
 			}
@@ -2450,6 +2494,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		return RFC_SUPPORTED;
 	}
 
+	@Override
 	public void loadBalancerAdded(SipLoadBalancer sipLoadBalancer) {
 		sipLoadBalancers.add(sipLoadBalancer);
 		if(sipFactoryImpl.getLoadBalancerToUse() == null) {
@@ -2457,6 +2502,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		}
 	}
 
+	@Override
 	public void loadBalancerRemoved(SipLoadBalancer sipLoadBalancer) {
 		sipLoadBalancers.remove(sipLoadBalancer);
 		if(sipFactoryImpl.getLoadBalancerToUse() != null && 
@@ -2468,6 +2514,28 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			}
 		}
 	}	
+	
+	// https://github.com/RestComm/sip-servlets/issues/172
+	@Override
+	public void pingingloadBalancer(SipLoadBalancer balancerDescription) {
+		SipConnector[] sipConnectors = sipService.findSipConnectors();
+		for (SipConnector sipConnector : sipConnectors) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("Comparing Balancer Address " + balancerDescription.getAddress().getHostAddress() + 
+						" to sipconnector balancer address " + sipConnector.getLoadBalancerAddress());
+			}
+			if(balancerDescription.getAddress().getHostAddress().equals(sipConnector.getLoadBalancerAddress()) 
+					&& sipConnector.getLoadBalancerCustomInformation() != null
+					&& !sipConnector.getLoadBalancerCustomInformation().isEmpty()) {
+				balancerDescription.setCustomInfo(sipConnector.getLoadBalancerCustomInformation());
+			}
+		}
+	}
+
+	@Override
+	public void pingedloadBalancer(SipLoadBalancer balancerDescription) {
+		// Nothing to do here
+	}
 	
 	/**
 	 * @param info
