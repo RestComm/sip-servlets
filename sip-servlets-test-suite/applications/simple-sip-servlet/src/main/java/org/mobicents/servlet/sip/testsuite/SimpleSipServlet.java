@@ -101,7 +101,7 @@ public class SimpleSipServlet
 	private static final String TEST_SERIALIZATION = "serialization";
 	private static final String TEST_FROM_TO_HEADER_MODIFICATION = "fromToHeaderModification";
 	private static final String TEST_LOCALLY_GENERATED_REMOTE_ADDRESS = "locallyGeneratedRemoteAddress";
-	
+	private static final String TEST_ADD_HEADER_HANDLER = "testAddHeaderHandler";
 	@Resource
 	SipFactory sipFactory;
 	@Resource
@@ -463,7 +463,12 @@ public class SimpleSipServlet
 			sipServletResponse.getSession().setAttribute("okResponse", sipServletResponse);
 			
 			return;
-		}		
+		}	
+		if(TEST_ADD_HEADER_HANDLER.equalsIgnoreCase(((SipURI)request.getFrom().getURI()).getUser())){
+			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_USE_PROXY);
+			sipServletResponse.addHeader("Contact", "sip:1234@127.0.0.1:5060;transport=tcp");
+			sipServletResponse.send();
+		}
 		if(!TEST_CANCEL_USERNAME.equalsIgnoreCase(((SipURI)request.getFrom().getURI()).getUser())) {
 			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
 			if(fromString.contains(TEST_SERIALIZATION)) {		
