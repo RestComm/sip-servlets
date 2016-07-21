@@ -469,6 +469,8 @@ public interface DistributedCacheConvergedSipManager<T extends OutgoingDistribut
 			String sipSessionKey);
 
 	Cache getInfinispanCache();
+	
+	Cache getClusteredCache();
 
 	void setApplicationName(String applicationName);
 

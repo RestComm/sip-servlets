@@ -67,32 +67,33 @@ import javax.servlet.sip.SipApplicationSessionBindingEvent;
 import javax.servlet.sip.SipApplicationSessionBindingListener;
 import javax.servlet.sip.SipApplicationSessionEvent;
 import javax.servlet.sip.SipApplicationSessionListener;
-import javax.servlet.sip.SipSessionAttributeListener;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.log4j.Logger;
-import org.jboss.metadata.web.jboss.ReplicationTrigger;
-import org.jboss.as.web.session.ClusteredSession;
 import org.jboss.as.clustering.web.DistributableSessionMetadata;
 import org.jboss.as.clustering.web.DistributedCacheManager;
 import org.jboss.as.clustering.web.IncomingDistributableSessionData;
 import org.jboss.as.clustering.web.OutgoingDistributableSessionData;
+import org.jboss.as.clustering.web.sip.DistributableSipApplicationSessionMetadata;
+import org.jboss.as.clustering.web.sip.DistributedCacheConvergedSipManager;
+import org.jboss.as.web.session.ClusteredSession;
 import org.jboss.as.web.session.notification.ClusteredSessionManagementStatus;
 import org.jboss.as.web.session.notification.ClusteredSessionNotificationCause;
 import org.jboss.as.web.session.notification.sip.ClusteredSipApplicationSessionNotificationPolicy;
-import org.jboss.as.clustering.web.sip.DistributableSipApplicationSessionMetadata;
-import org.jboss.as.clustering.web.sip.DistributedCacheConvergedSipManager;
+import org.jboss.metadata.web.jboss.ReplicationTrigger;
+import org.mobicents.servlet.sip.core.SipContext;
+import org.mobicents.servlet.sip.core.SipManager;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
-import org.mobicents.servlet.sip.core.session.SipListenersHolder;
-import org.mobicents.servlet.sip.core.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.core.timers.ClusteredSipApplicationSessionTimerService;
 import org.mobicents.servlet.sip.core.timers.FaultTolerantSasTimerTask;
 import org.mobicents.servlet.sip.core.timers.TimerServiceTask;
-import org.mobicents.servlet.sip.core.SipContext;
+import org.mobicents.servlet.sip.notification.SessionActivationNotificationCause;
+import org.mobicents.servlet.sip.notification.SipApplicationSessionActivationEvent;
+import org.mobicents.servlet.sip.notification.SipSessionActivationEvent;
 
 /**
  * Abstract base class for sip session clustering based on SipApplicationSessionImpl. Different session
@@ -1069,14 +1070,29 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 					if (notificationPolicy
 							.isSipApplicationSessionActivationListenerInvocationAllowed(
 									this.clusterStatus, cause, keys[i])) {
-						if (event == null)
-							event = new SipApplicationSessionEvent(this);
+						if (event == null){
+							if(cause == ClusteredSessionNotificationCause.REPLICATION){
+								event = new SipApplicationSessionActivationEvent(this, SessionActivationNotificationCause.REPLICATION);
+							}else if(cause == ClusteredSessionNotificationCause.PASSIVATION){
+								event = new SipApplicationSessionActivationEvent(this, SessionActivationNotificationCause.PASSIVATION);
+							}else if(cause == ClusteredSessionNotificationCause.FAILOVER){
+								event = new SipApplicationSessionActivationEvent(this, SessionActivationNotificationCause.FAILOVER);
+							}else if(cause == ClusteredSessionNotificationCause.FAILAWAY){
+								event = new SipApplicationSessionActivationEvent(this, SessionActivationNotificationCause.FAILAWAY);
+							}else if(cause == ClusteredSessionNotificationCause.ACTIVATION){
+								event = new SipApplicationSessionActivationEvent(this, SessionActivationNotificationCause.ACTIVATION);
+							}else{
+								throw new IllegalStateException("can not translate clustered session notification cause to session activation notification cause");
+							}
+						}
+						
 
 						try {
 							((SipApplicationSessionActivationListener) attribute)
 									.sessionWillPassivate(event);
 						} catch (Throwable t) {
 							manager.getContainer().getLogger().error(MESSAGES.errorSessionActivationEvent(t));
+							new Exception(t).printStackTrace();
 						}
 					}
 				}
@@ -1123,13 +1139,28 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 					if (notificationPolicy
 							.isSipApplicationSessionActivationListenerInvocationAllowed(
 									this.clusterStatus, cause, keys[i])) {
-						if (event == null)
-							event = new SipApplicationSessionEvent(this);
+						if (event == null){
+							if(cause == ClusteredSessionNotificationCause.REPLICATION){
+								event = new SipApplicationSessionActivationEvent(this, SessionActivationNotificationCause.REPLICATION);
+							}else if(cause == ClusteredSessionNotificationCause.PASSIVATION){
+								event = new SipApplicationSessionActivationEvent(this, SessionActivationNotificationCause.PASSIVATION);
+							}else if(cause == ClusteredSessionNotificationCause.FAILOVER){
+								event = new SipApplicationSessionActivationEvent(this, SessionActivationNotificationCause.FAILOVER);
+							}else if(cause == ClusteredSessionNotificationCause.FAILAWAY){
+								event = new SipApplicationSessionActivationEvent(this, SessionActivationNotificationCause.FAILAWAY);
+							}else if(cause == ClusteredSessionNotificationCause.ACTIVATION){
+								event = new SipApplicationSessionActivationEvent(this, SessionActivationNotificationCause.ACTIVATION);
+							}else{
+								throw new IllegalStateException("can not translate clustered session notification cause to session activation notification cause");
+							}
+						}
+						
 						try {
 							((SipApplicationSessionActivationListener) attribute)
 									.sessionDidActivate(event);
 						} catch (Throwable t) {
 							manager.getContainer().getLogger().error(MESSAGES.errorSessionActivationEvent(t));
+							new Exception(t).printStackTrace();
 						}
 					}
 				}

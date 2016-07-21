@@ -24,11 +24,17 @@ import java.util.concurrent.locks.Lock;
 
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.http.HttpSession;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipSession.State;
 import javax.sip.SipStack;
+import javax.transaction.InvalidTransactionException;
+import javax.transaction.SystemException;
+import javax.transaction.Transaction;
+import javax.transaction.TransactionManager;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -39,6 +45,7 @@ import org.apache.catalina.Service;
 import org.apache.catalina.Session;
 import org.apache.catalina.Valve;
 import org.apache.catalina.connector.Connector;
+import org.infinispan.Cache;
 import org.jboss.as.clustering.web.BatchingManager;
 import org.jboss.as.clustering.web.ClusteringNotSupportedException;
 import org.jboss.as.clustering.web.DistributableSessionMetadata;
@@ -3622,7 +3629,12 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 	@Override
 	public void setContainer(Container container) {
 		if (logger.isDebugEnabled()){
-			logger.debug("setContainer");
+			logger.debug("setContainer - " + container);
+			logger.debug("setContainer - " + container.getClass().getName());
+			logger.debug("setContainer parent - " + container.getParent().getClass().getName());
+			logger.debug("setContainer parent parent - " + container.getParent().getParent().getClass().getName());
+			logger.debug("setContainer parent parent serice - " + ((Engine)container.getParent().getParent()).getService().getClass().getName());
+			new Exception().printStackTrace();
 		}
 		
 		if(container != null && container instanceof SipContext && ((SipContext)container).getSipFactoryFacade() == null) {
@@ -3633,6 +3645,9 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 		}
 		super.setContainer(container);		
 		if(container instanceof SipContext) {	
+			if(logger.isDebugEnabled()){
+				logger.debug("container is SipContext so set it to sipManagerDelegate");
+			}
 			sipManagerDelegate.setContainer((SipContext) container);
 		}
 		DistributedCacheConvergedSipManager<? extends OutgoingDistributableSessionData> distributedCacheConvergedSipManager = getDistributedCacheConvergedSipManager();
@@ -4574,14 +4589,29 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 
 		this.outdatedSessionChecker = initOutdatedSessionChecker();
 		this.outdatedSipSessionChecker = initOutdatedSipSessionChecker();
+		
 		this.outdatedSipApplicationSessionChecker = initOutdatedSipApplicationSessionChecker();
 		
-		mobicentsCache = new MobicentsCache(getDistributedCacheConvergedSipManager().getInfinispanCache());
-		mobicentsCluster = new DefaultMobicentsCluster(mobicentsCache, getDistributedCacheConvergedSipManager().getInfinispanCache().getAdvancedCache().getTransactionManager(), new DefaultClusterElector());
+		
+				
+		mobicentsCache = new MobicentsCache(getDistributedCacheConvergedSipManager().getClusteredCache());
+		mobicentsCluster = new DefaultMobicentsCluster(mobicentsCache, getDistributedCacheConvergedSipManager().getClusteredCache().getAdvancedCache().getTransactionManager(), new DefaultClusterElector());
+				
 		
 		if(logger.isDebugEnabled()) {
 			logger.debug("Mobicents Sip Servlets Default Mobicents Cluster " + mobicentsCluster + " created");
 		}
+		
+		if(!mobicentsCluster.isStarted()){
+			mobicentsCluster.startCluster();
+			
+			if(logger.isDebugEnabled()) {
+				logger.debug("Mobicents Sip Servlets Default Mobicents Cluster " + mobicentsCluster + " started");
+			}
+			
+		}
+		
+		
 		initializeUnloadedSipApplicationSessions();
 		//		initializeUnloadedSipSessions();
 		initClusteredSipSessionNotificationPolicy();
@@ -4603,9 +4633,12 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 			logger.debug("stopExtensions");
 		}
 		
-		mobicentsCache.stopCache();
-		mobicentsCache = null;
-		mobicentsCluster = null;
+		if(mobicentsCache != null){
+			mobicentsCache.stopCache();
+			mobicentsCache = null;
+			mobicentsCluster = null;
+		}
+		
 		removeAllSessions();
 
 		passivatedSipSessionCount_.set(0);

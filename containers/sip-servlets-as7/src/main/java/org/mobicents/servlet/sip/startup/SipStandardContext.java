@@ -227,7 +227,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 		// is correctly initialized too
 		super.init();
 		
-		prepareServletContext();
+		//prepareServletContext();
 		
 		if(logger.isDebugEnabled()) {
 			logger.debug("sip context Initialized");
@@ -237,6 +237,9 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 	protected void prepareServletContext() throws LifecycleException {
 		if(logger.isDebugEnabled()) {
 			logger.debug("prepareServletContext " + getName());
+			logger.debug("prepareServletContext - getDistributable: " + getDistributable() + ", hasDistributableManager: " +  hasDistributableManager
+					+ " init:" + initialized);
+			
 		}
 		if(sipApplicationDispatcher == null) {
 			setApplicationDispatcher();
@@ -255,6 +258,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 			
 			if(logger.isDebugEnabled()) {
 				logger.debug("prepareServletContext - timerService is null" + getName());
+				logger.debug("prepareServletContext - getDistributable: " + getDistributable() + ", hasDistributableManager: " +  hasDistributableManager);
 			}
 			
 			if(getDistributable() && hasDistributableManager) {
@@ -268,7 +272,6 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 // FIXME - VEGE: distributable not supported
 			
 			
-			timerService = new TimerServiceImpl(sipApplicationDispatcher.getSipService(), applicationName);
 		}
 		if(proxyTimerService == null) {
 			if(logger.isDebugEnabled()) {
@@ -316,8 +319,9 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 	/**
 	 * @throws Exception
 	 */
-	protected void setApplicationDispatcher() throws LifecycleException {
+	protected void setApplicationDispatcher() throws LifecycleException {		
 		Container container = getParent().getParent();
+		
 		if(container instanceof Engine) {
 			Service service = ((Engine)container).getService();
 			if(service instanceof SipService) {

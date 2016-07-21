@@ -91,6 +91,9 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
     //DistributedCacheConvergedSipManagerDelegate<OutgoingSessionGranularitySessionData> delegate;
 	final SessionAttributeStorage<V> attributeStorage;
     private final Cache<String, Map<Object, Object>> cache;
+    
+    private final Cache clusterCache;
+    
     private final ForceSynchronousCacheInvoker invoker;
     private final CacheInvoker txInvoker;
     private final SharedLocalYieldingClusterLockManager lockManager;
@@ -148,7 +151,8 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
             CacheInvoker invoker, 
             CacheInvoker txInvoker, 
             KeyAffinityServiceFactory affinityFactory,
-            SessionAttributeMarshaller marshaller) {
+            SessionAttributeMarshaller marshaller,
+            Cache clusterCache) {
     	super(manager, 
     			cache, 
     			registry, 
@@ -169,6 +173,7 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
     	//		marshaller);
     	this.manager = manager;
 		this.marshaller = marshaller;
+		this.clusterCache = clusterCache;
     }
     
     public Cache<String, Map<Object, Object>> getCache() {
@@ -978,6 +983,11 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 	@Override
 	public Cache getInfinispanCache() {
 		return this.cache;
+	}
+	
+	@Override
+	public Cache getClusteredCache() {
+		return this.clusterCache;
 	}
 
 	@Override

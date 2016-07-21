@@ -30,6 +30,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamClass;
 import java.io.Serializable;
+import java.net.URL;
+import java.util.Enumeration;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSessionKey;
@@ -206,7 +208,13 @@ public class TimerServiceTaskData extends TimerTaskData implements Serializable 
 		@Override
 		protected Class<?> resolveClass(ObjectStreamClass desc)
 				throws IOException, ClassNotFoundException {
-			return Thread.currentThread().getContextClassLoader().loadClass(desc.getName());			
+			return Thread.currentThread().getContextClassLoader().loadClass(desc.getName());
+			
+			
+
+			
+			
+			//return this.getClass().getClassLoader().loadClass(desc.getName());
 		}
 	}
 	

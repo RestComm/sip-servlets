@@ -42,6 +42,7 @@ import org.jboss.as.clustering.web.sip.DistributedConvergedCacheManagerFactorySe
 import org.jboss.logging.Logger;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.metadata.web.jboss.ReplicationConfig;
+import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceBuilder.DependencyType;
 import org.jboss.msc.service.ServiceController;
@@ -56,7 +57,7 @@ public class DistributedCacheConvergedSipManagerFactory extends DistributedCache
 	
 	private static final Logger logger = Logger.getLogger(DistributedCacheConvergedSipManagerFactory.class);
 	
-	// TODO: ha mas cache kellene: public static final String DEFAULT_CACHE_CONTAINER = "sip";
+	//public static final String DEFAULT_CACHE_CONTAINER = "singleton";
 	private static final ServiceName JVM_ROUTE_REGISTRY_SERVICE_NAME = DistributedConvergedCacheManagerFactoryService.JVM_ROUTE_REGISTRY_ENTRY_PROVIDER_SERVICE_NAME.getParent();
 
 	private SessionAttributeStorageFactory storageFactory = new SessionAttributeStorageFactoryImpl();//todo? atallni ConvergedSessionAttributeMarshallerFactory-ra?
@@ -64,6 +65,8 @@ public class DistributedCacheConvergedSipManagerFactory extends DistributedCache
     private CacheInvoker txInvoker = new TransactionCacheInvoker();
 	private SessionAttributeMarshallerFactory marshallerFactory = new SessionAttributeMarshallerFactoryImpl();
 	private final InjectedValue<KeyAffinityServiceFactory> affinityFactory = new InjectedValue<KeyAffinityServiceFactory>();
+	
+	private final InjectedValue<Cache> clusterCache = new InjectedValue<Cache>();
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -76,6 +79,8 @@ public class DistributedCacheConvergedSipManagerFactory extends DistributedCache
         Registry<String, Void> jvmRouteRegistry = ((InjectedValue<Registry>)getRegistryInjector()).getValue();
         @SuppressWarnings("unchecked")
         AdvancedCache<String, Map<Object, Object>> cache = ((InjectedValue<Cache>)getCacheInjector()).getValue().getAdvancedCache();
+        Cache clusterCache = this.clusterCache.getValue();
+        	
 
         if (!cache.getCacheConfiguration().invocationBatching().enabled()) {
             ServiceName cacheServiceName = this.getCacheServiceName(manager.getReplicationConfig());
@@ -87,7 +92,8 @@ public class DistributedCacheConvergedSipManagerFactory extends DistributedCache
         SessionAttributeStorage<T> storage = this.storageFactory.createStorage(manager.getReplicationConfig().getReplicationGranularity(), marshaller);
 
         //return new DistributedCacheManager<T>(manager, new AtomicMapCache<String, Object, Object>(cache), jvmRouteRegistry, ((InjectedValue<SharedLocalYieldingClusterLockManager>)getLockManagerInjector()).getOptionalValue(), storage, batchingManager, this.invoker, this.txInvoker, this.affinityFactory.getValue());
-        return new DistributedCacheManager<T>(manager, new AtomicMapCache<String, Object, Object>(cache), jvmRouteRegistry, ((InjectedValue<SharedLocalYieldingClusterLockManager>)getLockManagerInjector()).getOptionalValue(), storage, batchingManager, this.invoker, this.txInvoker, this.affinityFactory.getValue(), marshaller);
+        //return new DistributedCacheManager<T>(manager, new AtomicMapCache<String, Object, Object>(cache), jvmRouteRegistry, ((InjectedValue<SharedLocalYieldingClusterLockManager>)getLockManagerInjector()).getOptionalValue(), storage, batchingManager, this.invoker, this.txInvoker, this.affinityFactory.getValue(), marshaller);
+        return new DistributedCacheManager<T>(manager,  new AtomicMapCache<String, Object, Object>(cache), jvmRouteRegistry, ((InjectedValue<SharedLocalYieldingClusterLockManager>)getLockManagerInjector()).getOptionalValue(), storage, batchingManager, this.invoker, this.txInvoker, this.affinityFactory.getValue(), marshaller, clusterCache);
     }
 	
 	private ServiceName getCacheServiceName(ReplicationConfig config) {
@@ -169,6 +175,12 @@ public class DistributedCacheConvergedSipManagerFactory extends DistributedCache
         if(logger.isDebugEnabled()) {
 			logger.debug("addDeploymentDependencies - cacheName = " + cacheName);
 		}
+        
+        String clusteredCacheName = cacheName + ".clustered";
+        if(logger.isDebugEnabled()) {
+			logger.debug("addDeploymentDependencies - clusteredCacheName = " + clusteredCacheName);
+		}
+        
         ServiceName cacheConfigurationServiceName = AbstractCacheConfigurationService.getServiceName(containerName, cacheName);
         if(logger.isDebugEnabled()) {
 			logger.debug("addDeploymentDependencies - cacheConfigurationServiceName = " + cacheConfigurationServiceName.getSimpleName());
@@ -178,14 +190,36 @@ public class DistributedCacheConvergedSipManagerFactory extends DistributedCache
 			logger.debug("addDeploymentDependencies - cacheServiceName = " + cacheServiceName.getSimpleName());
 		}
         
+        //new
+        ServiceName clusteredCacheConfigurationServiceName = AbstractCacheConfigurationService.getServiceName(containerName, clusteredCacheName);
+        if(logger.isDebugEnabled()) {
+			logger.debug("addDeploymentDependencies - clusteredCacheConfigurationServiceName = " + clusteredCacheConfigurationServiceName.getSimpleName());
+		}
+        ServiceName clusteredCacheServiceName = CacheService.getServiceName(containerName, clusteredCacheName);
+        if(logger.isDebugEnabled()) {
+			logger.debug("addDeploymentDependencies - clusteredCacheServiceName = " + clusteredCacheServiceName.getSimpleName());
+		}
+        
+        
         final InjectedValue<EmbeddedCacheManager> container = new InjectedValue<EmbeddedCacheManager>();
         final InjectedValue<Configuration> config = new InjectedValue<Configuration>();
+        
         target.addService(cacheConfigurationServiceName, new WebSessionCacheConfigurationService(cacheName, container, config, metaData))
                 .addDependency(containerServiceName, EmbeddedCacheManager.class, container)
                 .addDependency(templateCacheConfigurationServiceName, Configuration.class, config)
                 .setInitialMode(ServiceController.Mode.ON_DEMAND)
                 .install()
         ;
+        
+        final InjectedValue<EmbeddedCacheManager> clusteredContainer = new InjectedValue<EmbeddedCacheManager>();
+        final InjectedValue<Configuration> clusteredConfig = new InjectedValue<Configuration>();
+        
+        target.addService(clusteredCacheConfigurationServiceName, new WebSessionCacheConfigurationService(clusteredCacheName, container, clusteredConfig, metaData))
+        	.addDependency(containerServiceName, EmbeddedCacheManager.class, clusteredContainer)
+        	.addDependency(templateCacheConfigurationServiceName, Configuration.class, clusteredConfig)
+        	.setInitialMode(ServiceController.Mode.ON_DEMAND)
+            .install();
+        
         final InjectedValue<EmbeddedCacheManager> cacheContainer = new InjectedValue<EmbeddedCacheManager>();
         CacheService.Dependencies dependencies = new CacheService.Dependencies() {
             @Override
@@ -198,13 +232,50 @@ public class DistributedCacheConvergedSipManagerFactory extends DistributedCache
                 return null;
             }
         };
-        AsynchronousService.addService(target, cacheServiceName, new CacheService<Object, Object>(cacheName, dependencies))
+        
+        final InjectedValue<EmbeddedCacheManager> clusteredCacheContainer = new InjectedValue<EmbeddedCacheManager>();
+        CacheService.Dependencies clusteredDependencies = new CacheService.Dependencies() {
+            @Override
+            public EmbeddedCacheManager getCacheContainer() {
+                return clusteredCacheContainer.getValue();
+            }
+
+            @Override
+            public XAResourceRecoveryRegistry getRecoveryRegistry() {
+                return null;
+            }
+        };
+        
+        /*AsynchronousService.addService(target, cacheServiceName, new CacheService<Object, Object>(cacheName, dependencies), false, false)
                 .addDependency(cacheConfigurationServiceName)
                 .addDependency(containerServiceName, EmbeddedCacheManager.class, cacheContainer)
                 .setInitialMode(ServiceController.Mode.ON_DEMAND)
                 .install()
-        ;
+        ;*/
+        
+        target.addService(cacheServiceName, new CacheService<Object, Object>(cacheName, dependencies))
+                .addDependency(cacheConfigurationServiceName)
+                .addDependency(containerServiceName, EmbeddedCacheManager.class, cacheContainer)
+                .setInitialMode(ServiceController.Mode.ON_DEMAND)
+                .install();
+        
+
+        
+        
+        /*AsynchronousService.addService(target, clusteredCacheServiceName, new CacheService<Object, Object>(clusteredCacheName, clusteredDependencies), false, false)
+        	.addDependency(clusteredCacheConfigurationServiceName)
+        	.addDependency(containerServiceName, EmbeddedCacheManager.class, clusteredCacheContainer)
+        	.setInitialMode(ServiceController.Mode.ON_DEMAND)
+        	.install();*/
+        
+        target.addService(clusteredCacheServiceName, new CacheService<Object, Object>(clusteredCacheName, clusteredDependencies))
+    		.addDependency(clusteredCacheConfigurationServiceName)
+    		.addDependency(containerServiceName, EmbeddedCacheManager.class, clusteredCacheContainer)
+    		.setInitialMode(ServiceController.Mode.ON_DEMAND)
+    		.install();
+        
         builder.addDependency(cacheServiceName, Cache.class, ((InjectedValue<Cache>)getCacheInjector()));
+        builder.addDependency(clusteredCacheServiceName, Cache.class, this.clusterCache);
         builder.addDependency(JVM_ROUTE_REGISTRY_SERVICE_NAME, Registry.class, ((InjectedValue<Registry>)getRegistryInjector()));
         builder.addDependency(DependencyType.OPTIONAL, SharedLocalYieldingClusterLockManagerService.getServiceName(containerName), SharedLocalYieldingClusterLockManager.class, ((InjectedValue<SharedLocalYieldingClusterLockManager>)getLockManagerInjector()));
         builder.addDependency(KeyAffinityServiceFactoryService.getServiceName(containerName), KeyAffinityServiceFactory.class, this.affinityFactory);

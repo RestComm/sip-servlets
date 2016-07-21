@@ -40,12 +40,11 @@ package org.jboss.as.web.session.sip;
 
 import static org.jboss.as.web.WebMessages.MESSAGES;
 
-import gov.nist.javax.sip.message.RequestExt;
-
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -54,8 +53,8 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -73,7 +72,6 @@ import javax.servlet.sip.SipSessionBindingEvent;
 import javax.servlet.sip.SipSessionBindingListener;
 import javax.servlet.sip.SipSessionEvent;
 import javax.servlet.sip.SipSessionListener;
-import javax.servlet.sip.URI;
 import javax.sip.Dialog;
 import javax.sip.ServerTransaction;
 import javax.sip.SipStack;
@@ -86,25 +84,26 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.Service;
 import org.apache.catalina.util.Enumerator;
 import org.apache.log4j.Logger;
-import org.jboss.metadata.web.jboss.ReplicationTrigger;
-import org.jboss.as.web.session.ClusteredSession;
 import org.jboss.as.clustering.web.DistributedCacheManager;
 import org.jboss.as.clustering.web.IncomingDistributableSessionData;
 import org.jboss.as.clustering.web.OutgoingDistributableSessionData;
 import org.jboss.as.clustering.web.SessionOwnershipSupport;
+import org.jboss.as.clustering.web.sip.DistributableSipSessionMetadata;
+import org.jboss.as.clustering.web.sip.DistributedCacheConvergedSipManager;
+import org.jboss.as.web.session.ClusteredSession;
 import org.jboss.as.web.session.notification.ClusteredSessionManagementStatus;
 import org.jboss.as.web.session.notification.ClusteredSessionNotificationCause;
 import org.jboss.as.web.session.notification.sip.ClusteredSipSessionNotificationPolicy;
-import org.jboss.as.clustering.web.sip.DistributableSipSessionMetadata;
-import org.jboss.as.clustering.web.sip.DistributedCacheConvergedSipManager;
+import org.jboss.metadata.web.jboss.ReplicationTrigger;
 import org.mobicents.ha.javax.sip.ClusteredSipStack;
 import org.mobicents.ha.javax.sip.HASipDialog;
 import org.mobicents.ha.javax.sip.ReplicationStrategy;
+import org.mobicents.servlet.sip.core.SipManager;
+import org.mobicents.servlet.sip.core.SipService;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSessionKey;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
-import org.mobicents.servlet.sip.core.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.B2buaHelperImpl;
@@ -113,8 +112,12 @@ import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
-import org.mobicents.servlet.sip.core.SipService;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
+
+import org.mobicents.servlet.sip.notification.SipSessionActivationEvent;
+import org.mobicents.servlet.sip.notification.SessionActivationNotificationCause;
+
+import gov.nist.javax.sip.message.RequestExt;
 
 /**
  * Abstract base class for sip session clustering based on SipSessionImpl. Different session
@@ -370,6 +373,16 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		if(mobicentsSipApplicationSession.getSipContext() != null) {
 			setManager((ClusteredSipSessionManager<O>)mobicentsSipApplicationSession.getSipContext().getSipManager()); //TODO: kell ide a <O> ?
 			this.invalidationPolicy = this.manager.getReplicationTrigger();
+			if(logger.isDebugEnabled()){
+				logger.debug("----------------------------------");
+				logger.debug(this.manager.getContainer());
+				logger.debug(Arrays.deepToString(this.manager.getContainer().findChildren()));
+				logger.debug(this.manager.getContainer().getParent());
+				logger.debug(Arrays.deepToString(this.manager.getContainer().getParent().findChildren()));
+				logger.debug(this.manager.getContainer().getParent().getParent());
+				logger.debug(Arrays.deepToString(this.manager.getContainer().getParent().getParent().findChildren()));
+				logger.debug(((Engine)this.manager.getContainer().getParent().getParent()).getService());
+			}
 		}		
 		this.isNew = true;
 		this.useJK = useJK;
@@ -407,6 +420,12 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	public void setManager(SipManager manager) {
 		if ((manager instanceof ClusteredSipSessionManager) == false)
 			throw MESSAGES.invalidManager();
+		
+		if(logger.isDebugEnabled()){
+			logger.debug("setManager with : "  + manager);
+			new Exception().printStackTrace();
+		}
+		
 		@SuppressWarnings("unchecked")
 		ClusteredSipSessionManager<O> unchecked = (ClusteredSipSessionManager<O>) manager;
 		this.manager = unchecked;
@@ -1162,9 +1181,21 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		if(sessionCreatingDialogId != null && sessionCreatingDialogId.length() > 0) {
 			//Container context = getManager().getContainer();
 			Container context = this.manager.getContainer();
+			if(logger.isDebugEnabled()){
+				logger.debug(context.getClass().getName());
+			}
 			Container container = context.getParent().getParent();
 			if(container instanceof Engine) {
+				if(logger.isDebugEnabled()){
+					logger.debug("Engine: " + container);
+					logger.debug("Engine: " + container.getClass().getName());
+				}
 				Service service = ((Engine)container).getService();
+				if(logger.isDebugEnabled()){
+					logger.debug("Service: " + service);
+					logger.debug("Service: " + service.getClass().getName());
+					new Exception().printStackTrace();
+				}
 				if(service instanceof SipService) {
 					SipService sipService = (SipService) service;
 					SipStack sipStack = sipService.getSipStack();					
@@ -1174,6 +1205,24 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 							logger.debug("dialog injected " + sessionCreatingDialog);
 						}
 					}
+				}else{
+					if(logger.isDebugEnabled()) {
+						logger.debug("Jean mondta " + sessionCreatingDialog);
+						
+					}
+					SipService sipService = StaticServiceHolder.sipStandardService;
+					SipStack sipStack = sipService.getSipStack();					
+					if(sipStack != null) {
+						sessionCreatingDialog = ((ClusteredSipStack)sipStack).getDialog(sessionCreatingDialogId); 
+						if(logger.isDebugEnabled()) {
+							logger.debug("dialog injected " + sessionCreatingDialog);
+						}
+					}else{
+						if(logger.isDebugEnabled()) {
+							logger.debug("null :((((");
+						}
+					}
+					
 				}
 			}
 		}
@@ -1470,15 +1519,39 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 					if (notificationPolicy
 							.isSipSessionActivationListenerInvocationAllowed(
 									this.clusterStatus, cause, keys[i])) {
-						if (event == null)
-							event = new SipSessionEvent(this);
+						if (event == null){
+							if(cause == ClusteredSessionNotificationCause.REPLICATION){
+								event = new SipSessionActivationEvent(this, SessionActivationNotificationCause.REPLICATION);
+							}else if(cause == ClusteredSessionNotificationCause.PASSIVATION){
+								event = new SipSessionActivationEvent(this, SessionActivationNotificationCause.PASSIVATION);
+							}else if(cause == ClusteredSessionNotificationCause.FAILOVER){
+								event = new SipSessionActivationEvent(this, SessionActivationNotificationCause.FAILOVER);
+							}else if(cause == ClusteredSessionNotificationCause.FAILAWAY){
+								event = new SipSessionActivationEvent(this, SessionActivationNotificationCause.FAILAWAY);
+							}else if(cause == ClusteredSessionNotificationCause.ACTIVATION){
+								event = new SipSessionActivationEvent(this, SessionActivationNotificationCause.ACTIVATION);
+							}else{
+								throw new IllegalStateException("can not translate clustered session notification cause to session activation notification cause");
+							}
+						}
 
+						ClassLoader oldLoader = java.lang.Thread.currentThread().getContextClassLoader();
+						   
+						java.lang.Thread.currentThread().setContextClassLoader(getSipApplicationSession().getSipContext().getSipContextClassLoader());
+						
 						try {
+							if(logger.isDebugEnabled()){
+								logger.debug(attribute);
+							}
 							((SipSessionActivationListener) attribute)
 									.sessionWillPassivate(event);
 						} catch (Throwable t) {
 							manager.getContainer().getLogger().error(MESSAGES.errorSessionActivationEvent(t));
+							new Exception(t).printStackTrace();
 						}
+						
+						java.lang.Thread.currentThread().setContextClassLoader(oldLoader);
+						
 					}
 				}
 			}
@@ -1528,14 +1601,37 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 					if (notificationPolicy
 							.isSipSessionActivationListenerInvocationAllowed(
 									this.clusterStatus, cause, keys[i])) {
-						if (event == null)
-							event = new SipSessionEvent(this);
+						
+						if (event == null){
+							if(cause == ClusteredSessionNotificationCause.REPLICATION){
+								event = new SipSessionActivationEvent(this, SessionActivationNotificationCause.REPLICATION);
+							}else if(cause == ClusteredSessionNotificationCause.PASSIVATION){
+								event = new SipSessionActivationEvent(this, SessionActivationNotificationCause.PASSIVATION);
+							}else if(cause == ClusteredSessionNotificationCause.FAILOVER){
+								event = new SipSessionActivationEvent(this, SessionActivationNotificationCause.FAILOVER);
+							}else if(cause == ClusteredSessionNotificationCause.FAILAWAY){
+								event = new SipSessionActivationEvent(this, SessionActivationNotificationCause.FAILAWAY);
+							}else if(cause == ClusteredSessionNotificationCause.ACTIVATION){
+								event = new SipSessionActivationEvent(this, SessionActivationNotificationCause.ACTIVATION);
+							}else{
+								throw new IllegalStateException("can not translate clustered session notification cause to session activation notification cause");
+							}
+						}
+
+						ClassLoader oldLoader = java.lang.Thread.currentThread().getContextClassLoader();
+						   
+						java.lang.Thread.currentThread().setContextClassLoader(getSipApplicationSession().getSipContext().getSipContextClassLoader());
+						
 						try {
 							((SipSessionActivationListener) attribute)
 									.sessionDidActivate(event);
 						} catch (Throwable t) {
 							manager.getContainer().getLogger().error(MESSAGES.errorSessionActivationEvent(t));
+							new Exception(t).printStackTrace();
 						}
+						
+						java.lang.Thread.currentThread().setContextClassLoader(oldLoader);
+						
 					}
 				}
 			}
