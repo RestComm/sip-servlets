@@ -427,7 +427,6 @@ public class SipAnnotationDeploymentProcessor implements DeploymentUnitProcessor
             }
             // distributable
             else if (value.name().compareTo("distributable") == 0) {
-            	// TODO: torolni ezt a sort throw (new DeploymentUnitProcessingException("Distributable not supported yet"));
                 if (logger.isDebugEnabled()) {
                 	logger.debug("parseSipApplication - distributable");
                 }

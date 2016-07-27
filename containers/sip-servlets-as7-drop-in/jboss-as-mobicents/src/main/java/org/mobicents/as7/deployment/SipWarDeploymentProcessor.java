@@ -123,30 +123,17 @@ public class SipWarDeploymentProcessor implements DeploymentUnitProcessor {
 	        	ServiceBuilder<?> builder = serviceTarget
 	        			.addService(deploymentServiceName, sipDeploymentService);
 	
-	        	if (logger.isDebugEnabled()){
-	        		logger.debug("processDeployment - start distributable stuff");
-	        	}
-	        	
-	        	
-	//        	TODO: when distributable is implemented
+	        	// Distributable stuff
 	        	if (sipMetaData.getDistributable() != null) {
+	        		if (logger.isDebugEnabled()){
+		        		logger.debug("processDeployment - distributable");
+		        	}
 	        		
-	        		
-	        		//--------------
-	            	final JBossWebMetaData metaData = warMetaData.getMergedJBossWebMetaData();
-	            	if (logger.isDebugEnabled()){
+	        		final JBossWebMetaData metaData = warMetaData.getMergedJBossWebMetaData();
+	            	if (metaData != null && logger.isDebugEnabled()){
 	            		logger.debug("processDeployment - is jbosswebmetadata distributable?: " + (metaData.getDistributable() != null));
 	            	}
-	            	//WebContextFactory contextFactory = deploymentUnit.getAttachment(WebContextFactory.ATTACHMENT);
-	            	//if (contextFactory == null) {
-	            	//	if (logger.isDebugEnabled()){
-	                //		logger.debug("processDeployment - contextFactory is null, using WebContextFactory.DEFAULT");
-	                //	}
-	                //    contextFactory = WebContextFactory.DEFAULT;
-	                //}
 	            	
-	            	// Create the context
-	            	//final SIPWebContext webContext = (SIPWebContext)contextFactory.createContext(deploymentUnit);
 	            	final SIPWebContext webContext = deploymentUnit.getAttachment(SIPWebContext.ATTACHMENT);
 	            	if (logger.isDebugEnabled()){
 	            		if (webContext == null){
@@ -155,56 +142,23 @@ public class SipWarDeploymentProcessor implements DeploymentUnitProcessor {
 	            			logger.debug("processDeployment - sip web context picked up successfully");
 	            		}
 	            	}
-	                //final JBossContextConfig config = new JBossContextConfig(deploymentUnit, this.service);
 	                final SipJBossContextConfig config = webContext.getSipJBossContextConfig();
-	                config.getDistributedCacheManagerFactoryInjector();
-	                //--------------
 	                
-	                if (logger.isDebugEnabled()){
-		        		logger.debug("processDeployment - distributable");
-		        	}
-	        		
-	        		//DistributedCacheManagerFactoryService factoryService = new DistributedCacheManagerFactoryService();
-	        		//DistributedCacheManagerFactory factory = factoryService.getValue();
-	        		
 	        		DistributedCacheManagerFactoryService factoryService = new DistributedConvergedCacheManagerFactoryService();
 	        		final DistributedCacheManagerFactory factory = factoryService.getValue();
 	        		
 	        		if (factory != null) {
 	        			if (logger.isDebugEnabled()){
-	    	        		logger.debug("processDeployment - factory not null");
+	    	        		logger.debug("processDeployment - distributed cache manager factory is not null");
 	    	        	}
 	        			
 	        			ServiceName factoryServiceName = deploymentServiceName.append("session");
-	        			if (logger.isDebugEnabled()){
-	    	        		logger.debug("processDeployment - factoryServiceName.getSimpleName() = " + factoryServiceName.getSimpleName());
-	    	        		logger.debug("processDeployment - factoryServiceName.getCanonicalName() = " + factoryServiceName.getCanonicalName());
-	    	        		logger.debug("processDeployment - factoryServiceName.toString() = " + factoryServiceName.toString());
-	    	        		logger.debug("processDeployment - factoryServiceName.getParent() = " + factoryServiceName.getParent());
-	    	        	}
-	        			
-	        			//----------
-	        			if (logger.isDebugEnabled()){
-	    	        		logger.debug("processDeployment - addInjection");
-	    	        	}
-	        			//builder.addInjection(config.getDistributedCacheManagerFactoryInjector(), (DistributedCacheConvergedSipManagerFactory)factory);
-	        			//----------
-	        			
-	        			if (logger.isDebugEnabled()){
-	    	        		logger.debug("processDeployment - addDependency");
-	    	        	}
-	        			builder.addDependency(DependencyType.REQUIRED, //DependencyType.OPTIONAL, 
+	        			builder.addDependency(DependencyType.REQUIRED, 
 	        					factoryServiceName, 
 	        					DistributedCacheConvergedSipManagerFactory.class, 
-	        					//DistributedCacheManagerFactory.class, 
 	        					config.getDistributedCacheManagerFactoryInjector());
 	
 	        			ServiceBuilder<DistributedCacheManagerFactory> factoryBuilder = serviceTarget.addService(factoryServiceName, factoryService);
-	        			
-	        			
-	        			if (logger.isDebugEnabled()){
-	    	        		logger.debug("processDeployment - addInjection to factoryBuilder");
-	    	        	}
 	        			
 	        			boolean enabled = factory.addDeploymentDependencies(deploymentServiceName, deploymentUnit.getServiceRegistry(), serviceTarget, factoryBuilder, metaData);
 	        			if (logger.isDebugEnabled()){
@@ -212,11 +166,13 @@ public class SipWarDeploymentProcessor implements DeploymentUnitProcessor {
 	    	        	}
 	        			factoryBuilder.setInitialMode(enabled ? ServiceController.Mode.ACTIVE : ServiceController.Mode.NEVER).install();
 	        			//factoryBuilder.setInitialMode(enabled ? ServiceController.Mode.ON_DEMAND : ServiceController.Mode.NEVER).install();
+	        		} else {
+	        			if (logger.isDebugEnabled()){
+	    	        		logger.debug("processDeployment - distributed cache manager factory is null");
+	    	        	}
 	        		}
 	        	}
-	        // TODO - VEGE, eddig tart a distributable-s resz
-	        	
-	        	
+	        	// Distributable stuff - END
 	        	
 	        	// add dependency to sip deployment service
 	        	if (logger.isDebugEnabled()){

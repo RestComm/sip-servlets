@@ -326,8 +326,6 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		
 		if(sipApplicationSession == null) {
 			if(logger.isDebugEnabled()) {
-				// TODO (posfai): ez itt erdekes, de ez nem a mi kodunk
-				logger.debug("dispatchMessage - calling sipManager.dumpSipApplicationSessions");
 				sipManager.dumpSipApplicationSessions();
 			}
 			//trying the join or replaces matching sip app sessions
@@ -394,6 +392,9 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		tmpSipSession = sipManager.getSipSession(key, false, sipFactoryImpl, sipApplicationSession);
 		if(logger.isDebugEnabled()) {
 			logger.debug("dispatchMessage - tmpSipSession=" + tmpSipSession);
+			if (tmpSipSession != null){
+				logger.debug("dispatchMessage - tmpSipSession.getId()=" + tmpSipSession.getId());
+			}
 		}
 		
 		// Added by Vladimir because the inversion detection on proxied requests doesn't work

@@ -91,7 +91,6 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 	private static UnsupportedOperationException UNSUPPORTED = 
 	      new UnsupportedOperationException("Attribute operations not supported with SESSION replication granularity.");
 	
-    //DistributedCacheConvergedSipManagerDelegate<OutgoingSessionGranularitySessionData> delegate;
 	final SessionAttributeStorage<V> attributeStorage;
     private final Cache<String, Map<Object, Object>> cache;
     
@@ -101,7 +100,6 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
     private final CacheInvoker txInvoker;
     private final SharedLocalYieldingClusterLockManager lockManager;
     
-    // delegate stuff
     public static final String SIP_SESSION_KEY_PREFIX = "SIP_SESSION/";
 	public static final String SIP_APP_SESSION_KEY_PREFIX = "SIP_APP_SESSION/";
 	
@@ -183,10 +181,6 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
     	this.attributeStorage = attributeStorage;
     	this.invoker = new ForceSynchronousCacheInvoker(invoker);
     	this.txInvoker = txInvoker;
-    	//delegate = new DistributedCacheConvergedSipManagerDelegate(
-    	//		this,
-    	//		manager,
-    	//		marshaller);
     	this.manager = manager;
 		this.marshaller = marshaller;
 		this.clusterCache = clusterCache;
@@ -210,8 +204,6 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 			logger.debug("start");
 		}
 		super.start();
-		//this.trace("startingDelegate(%s)", delegate);
-		//delegate.start();
 		trace("DistributedCacheManager.start() : sipApplicationName %s sipApplicationNameHashed %s", sipApplicationName, sipApplicationNameHashed);
 		if(sipApplicationName != null) {
 			createCacheListeners();
@@ -233,9 +225,6 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 				sipApplicationName, sipApplicationNameHashed,
 				this);
 		
-		//if (log_.isDebugEnabled()) {
-		//	log_.debug("DistributedCacheConvergedSipManagerDelegate.start() : sipCacheListener " + sipCacheListener_);
-		//}
 		trace("DistributedCacheManager.createCacheListeners()");
 		
 		getCache().addListener(sipCacheListener_);
@@ -255,7 +244,6 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 		if (logger.isDebugEnabled()){
 			logger.debug("stop");
 		}
-		//delegate.stop();
 		if (sipCacheListener_ != null) {
 			getCache().removeListener(sipCacheListener_);
 			/*if (sipPassivationListener_ != null) {
@@ -276,8 +264,6 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 			logger.debug("removeSipApplicationSession - sipAppSessionId=" + sipAppSessionId);
 		}
 		
-		//delegate.removeSipApplicationSession(sipApplicationSessionKey);
-		
 		trace("removeSipApplicationSession(%s)", sipAppSessionId);
 		
 		this.removeSipApplicationSession(sipAppSessionId, false);
@@ -295,7 +281,7 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
             @Override
             public Void invoke(Cache<String, Map<Object, Object>> cache) {
                 cache.remove(sipAppSessionKey);
-                // todo: also remove sip sessions of app session?
+                // TODO: also remove sip sessions of app session?
                 return null;
             }
         };
@@ -307,7 +293,6 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 		if (logger.isDebugEnabled()){
 			logger.debug("removeSipSession - sipAppSessionId=" + sipAppSessionId + ", sipSessionId=" + sipSessionId);
 		}
-		//delegate.removeSipSession(sipApplicationSessionKey, sipSessionKey);
 		
 		trace("removeSipSession(%s, %s)", sipAppSessionId, sipSessionId);
 		
@@ -338,7 +323,6 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 		if (logger.isDebugEnabled()){
 			logger.debug("removeSipApplicationSessionLocal - sipAppSessionId=" + sipAppSessionId);
 		}
-		// delegate.removeSipApplicationSessionLocal(key);
 		trace("removeSipApplicationSessionLocal(%s)", sipAppSessionId);
 		
         this.removeSipApplicationSession(sipAppSessionId, true);
@@ -350,7 +334,6 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 			logger.debug("removeSipApplicationSessionLocal - sipAppSessionId=" + sipAppSessionId + ", dataOwner=" + dataOwner);
 		}
 		
-		// delegate.removeSipApplicationSessionLocal(key, dataOwner);
 		trace("removeSipApplicationSessionLocal(%s, %s)", sipAppSessionId, dataOwner);
 		
 		if (dataOwner == null) {
@@ -363,9 +346,6 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 		if (logger.isDebugEnabled()){
 			logger.debug("removeSipSessionLocal - sipAppSessionId=" + sipAppSessionId + ", sipSessionId=" + sipSessionId);
 		}
-		
-		// delegate.removeSipSessionLocal(sipAppSessionKey, key);
-		
 		trace("removeSipSessionLocal(%s, %s)", sipAppSessionId, sipSessionId);
 		
 		this.removeSipSession(sipAppSessionId, sipSessionId, true);
@@ -376,14 +356,11 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 		if (logger.isDebugEnabled()){
 			logger.debug("removeSipSessionLocal - sipAppSessionId=" + sipAppSessionId + ", sipSessionId=" + sipSessionId + ", dataOwner=" + dataOwner);
 		}
-		// delegate.removeSipSessionLocal(sipAppSessionKey, key, dataOwner);
-		
 		trace("removeSipSessionLocal(%s, %s, %s)", sipAppSessionId, sipSessionId, dataOwner);
 		
 		if (dataOwner == null) {
             this.removeSipSession(sipAppSessionId, sipSessionId, true);
         }
-		
 	}
 
 	@Override
@@ -391,32 +368,9 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 		if (logger.isDebugEnabled()){
 			logger.debug("storeSipSessionData - sipSessionData.getRealId()=" + sipSessionData.getRealId());
 		}
-		// delegate.storeSipSessionData((OutgoingDistributableSipSessionData) sipSessionData);
 		
 		final OutgoingDistributableSipSessionData sessionData = (OutgoingDistributableSipSessionData) sipSessionData;
 		
-		
-		/*String sipApplicationSessionKey = sipSessionData.getSipApplicationSessionKey();
-		String sessionKey = sipSessionData.getSipSessionKey();
-
-		if (log_.isDebugEnabled()) {
-			log_.debug("storeSipSessionData(): putting sip session " + sessionKey.toString());
-		}
-
-		Fqn<String> fqn = getSipSessionFqn(infinispanCacheService.combinedPath_, sipApplicationSessionKey, sessionKey);
-
-		// Swap in/out the webapp classloader so we can deserialize
-        // attributes whose classes are only available to the webapp
-		ClassLoader prevTCL = Thread.currentThread().getContextClassLoader();
-		Thread.currentThread().setContextClassLoader(manager.getApplicationClassLoader());
-		try {
-			storeSipSessionMetaData(fqn, sipSessionData);
-			((DistributedCacheConvergedSipManager)infinispanCacheService).storeSipSessionAttributes(Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY), sipSessionData);
-		} finally {
-			Thread.currentThread().setContextClassLoader(prevTCL);
-		}*/
-		
-		// todo: swap?
 		final String sipApplicationSessionKey = sessionData.getSipApplicationSessionKey();
 		final String sipSessionId = sessionData.getSipSessionKey();
 		final String sipSessionKey = getSipSessionCacheKey(sipApplicationSessionKey, sipSessionId);
@@ -437,8 +391,8 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 	                if (dsm != null && dsm.isNew() && sessionData.isSessionMetaDataDirty()){
 		                if (dsm.isNew()){
 		                	
-		                	// TODO: ezt az id-beallitast csak beletettem kezzel h ne legyen null, mert akkor elszallt, nem kene mar "jonnie" az id-nak vhonnan?
 		                	if (sessionData.getMetadata().getId() == null){
+		                		// Setting the id manually. Otherwise it would cause exceptions.
 		                		if (logger.isDebugEnabled()){
 		                			logger.debug("storeSipSessionData - sessionData.getMetadata().getId() is null - setting id manually to " + sipSessionId);
 		                		}
@@ -482,32 +436,8 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 		if (logger.isDebugEnabled()){
 			logger.debug("storeSipApplicationSessionData - sipApplicationSessionData.getRealId()=" + sipApplicationSessionData.getRealId());
 		}
-		// delegate.storeSipApplicationSessionData((OutgoingDistributableSipApplicationSessionData) sipApplicationSessionData);
 		
 		final OutgoingDistributableSipApplicationSessionData sipAppSessionData = (OutgoingDistributableSipApplicationSessionData) sipApplicationSessionData;
-		
-		/*String fqnId = sipApplicationSessionData.getSipApplicationSessionKey();
-
-		if (log_.isTraceEnabled()) {
-			log_.trace("putSipSession(): putting sip session " + fqnId);
-		}
-
-		Fqn<String> fqn = getSipApplicationSessionFqn(infinispanCacheService.combinedPath_, fqnId);
-
-		Map<Object, Object> map = new HashMap<Object, Object>();
-		
-		// Swap in/out the webapp classloader so we can deserialize
-        // attributes whose classes are only available to the webapp
-		ClassLoader prevTCL = Thread.currentThread().getContextClassLoader();
-		Thread.currentThread().setContextClassLoader(manager.getApplicationClassLoader());
-		try {
-			storeSipApplicationSessionMetaData(fqn, sipApplicationSessionData);
-			((DistributedCacheConvergedSipManager)infinispanCacheService).storeSipApplicationSessionAttributes(Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY), sipApplicationSessionData);
-		} finally {
-			Thread.currentThread().setContextClassLoader(prevTCL);
-		}*/
-		
-		// todo: swap?
 		
 		final String sipAppSessionId = sipAppSessionData.getSipApplicationSessionKey();
 		final String sipAppSessionKey = getSipAppSessionCacheKey(sipAppSessionId);
@@ -540,8 +470,8 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
             		DistributableSipApplicationSessionMetadata dsm = (DistributableSipApplicationSessionMetadata)sipAppSessionData.getMetadata();
             		if (dsm != null && dsm.isNew() && sipAppSessionData.isSessionMetaDataDirty()){
             			if (dsm.isNew()){
-		                	// TODO: ezt az id-beallitast csak beletettem kezzel h ne legyen null, mert akkor elszallt, nem kene mar "jonnie" az id-nak vhonnan?
 		                	if (sipAppSessionData.getMetadata().getId() == null){
+			                	// Setting the id manually. Otherwise it would cause exceptions.
 		                		if (logger.isDebugEnabled()){
 		                			logger.debug("storeSipApplicationSessionData - sipAppSessionData.getMetadata().getId() is null - setting id manually to " + sipAppSessionId);
 		                		}
@@ -606,14 +536,6 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 		if (logger.isDebugEnabled()){
 			logger.debug("storeSipSessionAttributes - sipAppSessionId=" + sipAppSessionId + ", sipSessionId=" + sipSessionId);
 		}
-		
-		// TODO ? jobss5-ben volt ilyen, de ugy tunik, jboss7-ben mar nincs
-		// (szoval valszeg inkabb torolni kene innen es az if-bol is)
-		
-		//if(sipSessionData.getSessionAttributes() != null) {
-		//	cacheWrapper_.put(fqn, ATTRIBUTE_KEY.toString(), getMarshalledValue(sessionData.getSessionAttributes()));
-		//}
-		
 	}
 
 	@Override
@@ -636,8 +558,6 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 			logger.debug("getSipSessionData - sipAppSessionId=" + sipAppSessionId + ", sipSessionId=" + sipSessionId + ", initialLoad=" + initialLoad);
 		}
 		
-		//return delegate.getSipSessionData(sipAppSessionKey, key, initialLoad);
-		
 		trace("getSipSessionData(%s, %s, %s)", sipAppSessionId, sipSessionId, initialLoad);
 		
 		if (sipAppSessionId == null || sipSessionId == null) {
@@ -652,7 +572,6 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 		if (logger.isDebugEnabled()){
 			logger.debug("getSipSessionData - sipAppSessionId=" + sipAppSessionId + ", sipSessionId=" + sipSessionId + ", dataOwner=" + dataOwner + ", includeAttributes=" + includeAttributes);
 		}
-		//return delegate.getSipSessionData(sipAppSessionKey, key, dataOwner, includeAttributes);
 		trace("getSipSessionData(%s, %s, %s, %s)", sipAppSessionId, sipSessionId, dataOwner, includeAttributes);
 
         return (dataOwner == null) ? this.getSipSessionDataImpl(sipAppSessionId, sipSessionId, includeAttributes) : null;
@@ -663,7 +582,6 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 		if (logger.isDebugEnabled()){
 			logger.debug("getSipApplicationSessionData - sipAppSessionId=" + sipAppSessionId + ", initialLoad=" + initialLoad);
 		}
-		// return delegate.getSipApplicationSessionData(key, initialLoad);
 		trace("getSipApplicationSessionData(%s, %s)", sipAppSessionId, initialLoad);
 		
 		if (sipAppSessionId == null) {
@@ -678,7 +596,6 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 		if (logger.isDebugEnabled()){
 			logger.debug("getSipApplicationSessionData - sipAppSessionId=" + sipAppSessionId + ", dataOwner=" + dataOwner + ", includeAttributes=" + includeAttributes);
 		}
-		// return delegate.getSipApplicationSessionData(key, dataOwner, includeAttributes);
 		
 		trace("getSipApplicationSessionData(%s, %s, %s)", sipAppSessionId, dataOwner, includeAttributes);
 		
@@ -691,7 +608,6 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 			logger.debug("evictSipSession - sipAppSessionId=" + sipAppSessionId + ", sipSessionId=" + sipSessionId);
 		}
 		
-		//delegate.evictSipSession(sipAppSessionKey, key);
 		trace("evictSipSession(%s, %s)", sipAppSessionId, sipSessionId);
 		final String sipSessionKey = getSipSessionCacheKey(sipAppSessionId, sipSessionId);
 		
@@ -717,7 +633,6 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 			logger.debug("evictSipApplicationSession - sipAppSessionId=" + sipAppSessionId);
 		}
 		
-		//delegate.evictSipApplicationSession(key);
 		trace("evictSipApplicationSession(%s)", sipAppSessionId);
 		final String sipAppSessionKey = getSipAppSessionCacheKey(sipAppSessionId);
 		
@@ -736,7 +651,7 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
             ROOT_LOGGER.debugf(e, "Failed to evict sip app session %s", sipAppSessionId);
         }
         
-        // todo: also evict sip sessions of app session??
+        // TODO: also evict sip sessions of app session?
 	}
 
 	@Override
@@ -744,15 +659,6 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 		if (logger.isDebugEnabled()){
 			logger.debug("evictSipSession - sipAppSessionId=" + sipAppSessionId + ", sipSessionId=" + sipSessionId + ", dataOwner=" + dataOwner);
 		}
-		
-		//delegate.evictSipSession(sipAppSessionKey, key, dataOwner);
-		
-		//if (log_.isDebugEnabled()) {
-		//	log_
-		//			.debug("evictSession(): evicting sip session from my distributed store. sipAppSessionKey/sipSessionKey: "
-		//					+ sipAppSessionKey + "/" + key);
-		//}
-		
 		trace("evictSipSession(%s, %s, %s)", sipAppSessionId, sipSessionId, dataOwner);
 
         if (dataOwner == null) {
@@ -765,13 +671,6 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 		if (logger.isDebugEnabled()){
 			logger.debug("evictSipApplicationSession - sipAppSessionId=" + sipAppSessionId + ", dataOwner=" + dataOwner);
 		}
-		//delegate.evictSipApplicationSession(key, dataOwner);
-		
-		//if (log_.isDebugEnabled()) {
-		//	log_
-		//			.debug("evictSession(): evicting sip application session from my distributed store. Fqn: "
-		//					+ fqn);
-		//}
 		trace("evictSipApplicationSession(%s, %s)", sipAppSessionId, dataOwner);
 
 		if (dataOwner == null){
@@ -784,14 +683,11 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 		if (logger.isDebugEnabled()){
 			logger.debug("getSipSessionKeys");
 		}
-		//return delegate.getSipSessionKeys();
-		
 		Map<String, String> result = new HashMap<String, String>();
         Operation<Set<String>> operation = new Operation<Set<String>>() {
             @Override
             public Set<String> invoke(Cache<String, Map<Object, Object>> cache) {
-                //return cache.keySet();
-            	Set<String> sessionIds = new HashSet<String>();
+                Set<String> sessionIds = new HashSet<String>();
             	for (String key: cache.keySet()){
             		if (key.startsWith(SIP_SESSION_KEY_PREFIX)){
             			sessionIds.add(getSipSessionIdFromCacheKey(key));
@@ -812,14 +708,11 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 			logger.debug("getSipApplicationSessionKeys");
 		}
 		
-		// return delegate.getSipApplicationSessionKeys();
-		
 		Map<String, String> result = new HashMap<String, String>();
         Operation<Set<String>> operation = new Operation<Set<String>>() {
             @Override
             public Set<String> invoke(Cache<String, Map<Object, Object>> cache) {
-                //return cache.keySet();
-            	Set<String> sessionIds = new HashSet<String>();
+                Set<String> sessionIds = new HashSet<String>();
             	for (String key: cache.keySet()){
             		if (key.startsWith(SIP_APP_SESSION_KEY_PREFIX)){
             			sessionIds.add(getSipAppSessionIdFromCacheKey(key));
@@ -933,7 +826,7 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 	    return result == null ? Collections.EMPTY_MAP : result;
 	    */
 		
-		// todo? is this method even necessary?
+		// TODO: is this method even necessary?
 		return null;
 	}
 
@@ -1018,7 +911,6 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 		if (logger.isDebugEnabled()){
 			logger.debug("setApplicationName - applicationName=" + applicationName);
 		}
-		//delegate.setApplicationName(applicationName);
 		sipApplicationName = applicationName;
 	}
 
@@ -1028,12 +920,8 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 			logger.debug("setApplicationNameHashed - applicationNameHashed=" + applicationNameHashed);
 		}
 		
-		//delegate.setApplicationNameHashed(applicationNameHashed);
 		sipApplicationNameHashed = applicationNameHashed;
 		trace("DistributedCacheManager.setApplicationNameHashed() : sipApplicationName " + sipApplicationName + " sipApplicationNameHashed " + sipApplicationNameHashed);
-		//if (log_.isDebugEnabled()) {
-		//	log_.debug("DistributedCacheConvergedSipManagerDelegate.setApplicationNameHashed() : sipApplicationName " + sipApplicationName + " sipApplicationNameHashed " + sipApplicationNameHashed);
-		//}
 		if(sipCacheListener_ == null && sipApplicationNameHashed != null) {
 			createCacheListeners();
 		}
@@ -1048,8 +936,7 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
         Operation<Set<String>> operation = new Operation<Set<String>>() {
             @Override
             public Set<String> invoke(Cache<String, Map<Object, Object>> cache) {
-                //return cache.keySet();
-            	// todo? also return sip session and sip app session ids??
+                // TODO: Also return sip session and sip app session ids? Or it is just fine this way?
             	Set<String> sessionIds = new HashSet<String>();
             	for (String key: cache.keySet()){
             		if (!key.startsWith(SIP_SESSION_KEY_PREFIX) && !key.startsWith(SIP_APP_SESSION_KEY_PREFIX)){
@@ -1068,43 +955,43 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 	/*
 	@Override
     public boolean isPassivationEnabled() {
-        // todo?
+        // TODO ?
     }
 
     
     @Override
     public boolean isPersistenceEnabled() {
-        // todo?
+        // TODO ?
     }
 
 	@Override
     public void setForceSynchronous(boolean forceSynchronous) {
-        // todo?
+        // TODO ?
     }
     
     @Override
     public SessionOwnershipSupport getSessionOwnershipSupport() {
-        // todo?
+        // TODO ?
     }
     
 	@Override
     public boolean isLocal(String sessionId) {
-        // todo?
+        // TODO ?
     }
 
     @Override
     public String locate(String sessionId) {
-        // todo?
+        // TODO ?
     }
 
     @Override
     public String createSessionId() {
-        // todo?
+        // TODO ?
     }
 
     @Override
     public String getKey() {
-        // todo?
+        // TODO ?
     }
 	 */
 	
@@ -1132,27 +1019,7 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
                 // If requested sip app session or sip session is no longer in the cache; return null
             	if (map == null) return null;
             	
-                /*Map<Object, Object> sessionMetaData = (Map<Object, Object>) SipSessionMapEntry.SIP_SERVLETS_METADATA.get(map);
-                //Map<Object, Object> sessionMetaData = (Map<Object, Object>) sessionData.get(SIP_SERVLETS_METADATA_KEY);
-        		Map<String, Object> sipSessionMetaData = new java.util.concurrent.ConcurrentHashMap<String, Object>();
-        		if(sessionMetaData != null) {
-        			for(Entry<Object, Object> entry : sessionMetaData.entrySet()) {
-        				sipSessionMetaData.put((String)entry.getKey(), entry.getValue());
-        			}
-        		}*/
-        		
-        		// --
-        		/*if (includeAttributes) {
-                    try {
-                        result.setSessionAttributes(infinispanCacheService.attributeStorage.load(map));
-                    } catch (Exception e) {
-                        throw MESSAGES.failedToLoadSessionAttributes(e, sessionId);
-                    }
-                }*/
-        		//Map<Object, Object> sessionAttributesData = infinispanCacheService.cacheWrapper_.getData(Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY), true);
-        		
-        		
-            	try {
+                try {
 	        		Integer version = SipSessionMapEntry.VERSION.get(map);
 	        		
 	        		Long timestamp = SipSessionMapEntry.TIMESTAMP.get(map);
@@ -1170,8 +1037,7 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
                         result.setSessionAttributes(attributeStorage.load(map));
                     }
                 	
-                	// todo?
-                	// get sip sessions of sip app session
+                	// TODO : do we need to get sip sessions of this sip app session? (then they have to be stored in the first place and then they might be retrieved something like this)
                 	//for (String key: sipMetaData.getMetaData().keySet()){
                 	//	if (isKeySipSessionId(key)){
                 	//		String sipSessionId = getSipSessionIdFromKey(key);

@@ -35,35 +35,7 @@ public enum SipSessionMapEntry {
 			logger.debug("get - key=" + this.key() + " from Map<Object, Object>=" + map);
 		}
     	
-    	/*T value = this.<T> cast(map.get(this.key()));
-    	// TODO: torolni
-    	if(logger.isDebugEnabled()) {
-    		if (this.key() == 2){
-    			if (value instanceof DistributableSipSessionMetadata){
-					logger.debug("get - getting sip metadata from cache, metadata map=" + ((DistributableSipSessionMetadata)value).getMetaData());
-					if (((DistributableSipSessionMetadata)value).getMetaData() != null){
-						for (String metadataKey: ((DistributableSipSessionMetadata)value).getMetaData().keySet()){
-							logger.debug("get - sip metadata map entry: " + metadataKey + "=" + ((DistributableSipSessionMetadata)value).getMetaData().get(metadataKey));
-						}
-					}
-    			}	
-    			if (value instanceof DistributableSipApplicationSessionMetadata){
-					logger.debug("get - getting sip app metadata from cache, metadata map=" + ((DistributableSipApplicationSessionMetadata)value).getMetaData());
-					if (((DistributableSipApplicationSessionMetadata)value).getMetaData() != null){
-						for (String metadataKey: ((DistributableSipApplicationSessionMetadata)value).getMetaData().keySet()){
-							logger.debug("get - sip app metadata map entry: " + metadataKey + "=" + ((DistributableSipApplicationSessionMetadata)value).getMetaData().get(metadataKey));
-						}
-					}
-    			}
-			}
-    	}
-    	if(logger.isDebugEnabled()) {
-    		if (this.key() == 4){
-    			logger.debug("get - getting key 5 map=" + value);
-			}
-    	}
-    	return value;*/
-        return this.<T> cast(map.get(this.key()));
+    	return this.<T> cast(map.get(this.key()));
     }
 
     /**
@@ -77,32 +49,6 @@ public enum SipSessionMapEntry {
     public <T> T put(Map<Object, Object> map, Object value) throws IllegalArgumentException {
     	if(logger.isDebugEnabled()) {
 			logger.debug("put - putting value=" + value + " into map<Object, Object>=" + map + " with key=" + this.key() + ", targetClass.getCanonicalName()=" + targetClass.getCanonicalName());
-			
-			// TODO: torolni
-			/*if (this.key() == 2){
-				if (value instanceof DistributableSipSessionMetadata){
-					logger.debug("put - putting sip metadata into cache, metadata map=" + ((DistributableSipSessionMetadata)value).getMetaData());
-					if (((DistributableSipSessionMetadata)value).getMetaData() != null){
-						for (String metadataKey: ((DistributableSipSessionMetadata)value).getMetaData().keySet()){
-							logger.debug("put - sip metadata map entry: " + metadataKey + "=" + ((DistributableSipSessionMetadata)value).getMetaData().get(metadataKey));
-						}
-					}
-				}
-				if (value instanceof DistributableSipApplicationSessionMetadata){
-					logger.debug("put - putting sip app metadata into cache, metadata map=" + ((DistributableSipApplicationSessionMetadata)value).getMetaData());
-					if (((DistributableSipApplicationSessionMetadata)value).getMetaData() != null){
-						for (String metadataKey: ((DistributableSipApplicationSessionMetadata)value).getMetaData().keySet()){
-							logger.debug("put - sip app metadata map entry: " + metadataKey + "=" + ((DistributableSipApplicationSessionMetadata)value).getMetaData().get(metadataKey));
-						}
-					}
-				}
-			}
-			if(logger.isDebugEnabled()) {
-	    		if (this.key() == 4){
-	    			logger.debug("put - putting key 5 map=" + value);
-				}
-	    	}*/
-			
 		}
         if (value == null){
         	return null;
@@ -120,52 +66,6 @@ public enum SipSessionMapEntry {
     		}
             throw InfinispanSipMessages.MESSAGES.invalidMapValue(value.getClass().getName(), this);
         }
-
-        
-        /*T result = this.<T> cast(map.put(this.key(), value));
-        
-        // TODO: torolni
-        if(logger.isDebugEnabled()) {
-        	if (this.key() == 2){
-        		
-        		if (value instanceof DistributableSipSessionMetadata){
-		    		org.jboss.as.clustering.web.DistributableSessionMetadata metadata = SessionMapEntry.METADATA.get(map);
-		    		logger.debug("put - map entry after put: metadata=" + metadata + " - casting to sip meta data");
-		    		if (metadata != null){
-		        		DistributableSipSessionMetadata metadataSip = (DistributableSipSessionMetadata)metadata;
-		        		logger.debug("put - map entry after put and cast: metadataSip=" + metadataSip);
-		        		if (metadataSip != null){
-		        			logger.debug("put - map entry after put metadataSip.getMetaData()=" + metadataSip.getMetaData());
-		        			if (metadataSip.getMetaData() != null){
-		        				for (String tmpKey: metadataSip.getMetaData().keySet()){
-		        					logger.debug("put - map entry after put metadataSip.getMetaData() entry: " + tmpKey + "=" + metadataSip.getMetaData().get(tmpKey));		
-		        				}
-		        			}
-		        		}
-		    		}
-        		}
-        		if (value instanceof DistributableSipApplicationSessionMetadata){
-		    		org.jboss.as.clustering.web.DistributableSessionMetadata metadata = SessionMapEntry.METADATA.get(map);
-		    		logger.debug("put - map entry after put: metadata=" + metadata + " - casting to sip meta data");
-		    		if (metadata != null){
-		    			DistributableSipApplicationSessionMetadata metadataSip = (DistributableSipApplicationSessionMetadata)metadata;
-		        		logger.debug("put - map entry after put and cast: metadataSip=" + metadataSip);
-		        		if (metadataSip != null){
-		        			logger.debug("put - map entry after put metadataSip.getMetaData()=" + metadataSip.getMetaData());
-		        			if (metadataSip.getMetaData() != null){
-		        				for (String tmpKey: metadataSip.getMetaData().keySet()){
-		        					logger.debug("put - map entry after put metadataSip.getMetaData() entry: " + tmpKey + "=" + metadataSip.getMetaData().get(tmpKey));		
-		        				}
-		        			}
-		        		}
-		    		}
-        		}
-        		
-        	}
-		}
-        
-        
-        return result;*/
         return this.<T> cast(map.put(this.key(), value));
     }
 

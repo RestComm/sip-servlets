@@ -114,82 +114,7 @@ public class SIPWebContext extends SipStandardContext {
 
     public void postProcessContext(DeploymentUnit deploymentUnit) {
     	if (logger.isDebugEnabled()){ 
-    		logger.debug("postProcessContext");
-    	}
-    	
-    	//-----------
-    	/*final VirtualFile deploymentRoot = deploymentUnit.getAttachment(Attachments.DEPLOYMENT_ROOT).getRoot();
-        final Module module = deploymentUnit.getAttachment(Attachments.MODULE);
-        if (module == null) {
-            throw new DeploymentUnitProcessingException(MESSAGES.failedToResolveModule(deploymentRoot));
-        }
-        final SipMetaData sipMetaData = deploymentUnit.getAttachment(SipMetaData.ATTACHMENT_KEY);
-        if(sipMetaData != null) {
-	        final String appNameMgmt = sipMetaData.getApplicationName();
-	    	final ServiceName deploymentServiceName = SipSubsystemServices.deploymentServiceName(appNameMgmt);
-	        try {
-	        	final SipDeploymentService sipDeploymentService = new SipDeploymentService(deploymentUnit);
-	        	ServiceBuilder<?> builder = serviceTarget
-	        			.addService(deploymentServiceName, sipDeploymentService);
-	
-	        	if (logger.isDebugEnabled()){
-	        		logger.debug("processDeployment - start distributable stuff");
-	        	}
-	//        	TODO: when distributable is implemented
-	        	if (sipMetaData.getDistributable() != null) {
-	        		if (logger.isDebugEnabled()){
-		        		logger.debug("processDeployment - distributable");
-		        	}
-	        		//DistributedCacheManagerFactoryService factoryService = new DistributedCacheManagerFactoryService();
-	        		//DistributedCacheManagerFactory factory = factoryService.getValue();
-	        		final DistributedCacheManagerFactory factory = new DistributedConvergedCacheManagerFactoryService().getValue();
-	                
-	        		if (factory != null) {
-	        			ServiceName factoryServiceName = deploymentServiceName.append("session");
-	        			builder.addDependency(DependencyType.OPTIONAL, factoryServiceName, DistributedCacheManagerFactory.class, sipJBossContextConfig.getDistributedCacheManagerFactoryInjector());
-	
-	        			ServiceBuilder<DistributedCacheManagerFactory> factoryBuilder = serviceTarget.addService(factoryServiceName, factoryService);
-	        			boolean enabled = factory.addDeploymentDependencies(deploymentServiceName, deploymentUnit.getServiceRegistry(), serviceTarget, factoryBuilder, metaData);
-	        			factoryBuilder.setInitialMode(enabled ? ServiceController.Mode.ON_DEMAND : ServiceController.Mode.NEVER).install();
-	        		}
-	        	}
-	        // TODO - VEGE, eddig tart a distributable-s resz
-	        	
-	        	// add dependency to sip deployment service
-	            builder.addDependency(deploymentServiceName);
-	            builder.setInitialMode(Mode.ACTIVE).install();
-	        } catch (ServiceRegistryException e) {
-	        	throw new DeploymentUnitProcessingException(MESSAGES.failedToAddSipDeployment(), e);
-	        }        
-
-	        // Process sip related mgmt information
-	        final ModelNode node = deploymentUnit.getDeploymentSubsystemModel("sip");
-	        node.get(SipDeploymentDefinition.APP_NAME.getName()).set("".equals(appNameMgmt) ? "/" : appNameMgmt);
-	        processManagement(deploymentUnit, sipMetaData);
-        } else {
-        	
-        }*/
-    	//----------
-    	
-    }
-
-    void processManagement(final DeploymentUnit unit, final SipMetaData sipMetaData) {
-    	if(logger.isDebugEnabled()) {
-    		logger.debug("processManagement - " + deploymentUnit.getName());
-    	}
-    	if(sipMetaData.getSipServlets() != null) {
-	        for (final ServletMetaData servlet : sipMetaData.getSipServlets()) {
-	            try {
-	                final String name = servlet.getName().replace(' ', '_');
-	                final ModelNode node = unit.createDeploymentSubModel("sip", PathElement.pathElement("servlet", name));
-	                node.get("servlet-class").set(servlet.getServletClass());
-	                node.get("servlet-name").set(servlet.getServletName());
-	                node.get("load-on-startup").set(servlet.getLoadOnStartup());
-	            } catch (Exception e) {
-	                // Should a failure in creating the mgmt view also make to the deployment to fail?
-	                continue;
-	            }
-	        }
+    		logger.debug("postProcessContext"); 
     	}
     }
     
@@ -332,14 +257,6 @@ public class SIPWebContext extends SipStandardContext {
                 
                 // distributable
                 // TODO: josemrecio - distributable not supported yet
-                if (logger.isDebugEnabled()) {
-                	logger.debug("augmentAnnotations - TODO - distributable");
-                }
-                if (annotatedSipMetaData.getDistributable() != null) {
-                	if (logger.isDebugEnabled()) {
-                    	logger.debug("augmentAnnotations - TODO2 - distributable");
-                    }	
-                }
                 
 	            if (annotatedSipMetaData.getListeners() != null) {
 	                if (sipMetaData.getListeners() == null) {
@@ -414,17 +331,6 @@ public class SIPWebContext extends SipStandardContext {
         }
         //processJBossWebMetaData(sharedJBossWebMetaData);
         //processWebMetaData(sharedJBossWebMetaData);
-    	
-    	//???
-    	/*if (logger.isDebugEnabled()) {
-            logger.debug("new calls");
-        }
-    	sipJBossContextConfig.processJBossWebMetaData(mergedMetaData);
-    	sipJBossContextConfig.processWebMetaData(mergedMetaData);
-    	if (logger.isDebugEnabled()) {
-            logger.debug("new calls ended");
-        }*/
-    	//???
     	
         JBossSipMetaDataMerger.merge((JBossConvergedSipMetaData)mergedMetaData, null, sipMetaData);
         sipJBossContextConfig.processSipMetaData((JBossConvergedSipMetaData)mergedMetaData);

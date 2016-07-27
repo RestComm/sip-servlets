@@ -225,7 +225,6 @@ public class SipJBossContextConfig extends /*JBossContextConfig*/ ContextConfig 
             }
         }
 
-        // TODO: itt kell csinalni vmit? vagy csak az a lenyeg h ne dobjunk kivetelt, hiszen mostmar tamogatott a distributed mod?
         // Distributable
         if (convergedMetaData.getDistributable() != null) {
         	if(logger.isDebugEnabled()){
@@ -268,9 +267,6 @@ public class SipJBossContextConfig extends /*JBossContextConfig*/ ContextConfig 
                     WebLogger.WEB_LOGGER.clusteringNotSupported();
                 }
             }
-            
-            // TODO - ez a kiveteldobas volt itt eredetileg
-            // throw new SipDeploymentException("Distributable not supported yet");
         }
 
         // sip context params

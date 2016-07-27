@@ -201,6 +201,9 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 	 */
 	public SipStandardContext() {
 		super();
+		if(logger.isDebugEnabled()) {
+			logger.debug("SipStandardContext constructor");
+		}
 		sipApplicationSessionTimeout = DEFAULT_LIFETIME;
 		pipeline.setBasic(new SipStandardContextValve());
 		sipListeners = new CatalinaSipListenersHolder(this);
@@ -258,8 +261,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SIP_FACTORY,
 				sipFactoryFacade);
 		if(timerService == null) {
-// FIXME: distributable not supported
-			
+			// Distributable
 			if(logger.isDebugEnabled()) {
 				logger.debug("prepareServletContext - timerService is null" + getName());
 				logger.debug("prepareServletContext - getDistributable: " + getDistributable() + ", hasDistributableManager: " +  hasDistributableManager);
@@ -273,9 +275,6 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 			} else {
 				timerService = new TimerServiceImpl(sipApplicationDispatcher.getSipService(), applicationName);
 			}
-// FIXME - VEGE: distributable not supported
-			
-			
 		}
 		if(proxyTimerService == null) {
 			if(logger.isDebugEnabled()) {
@@ -406,8 +405,15 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 //                    ok = false;
                 }
             } else {
+            	if(logger.isDebugEnabled()) {
+        			logger.debug("start - calling setManager wit a new instance of SipStandardManager");
+        		}
                 setManager(new SipStandardManager());
             }
+        } else {
+        	if(logger.isDebugEnabled()) {
+    			logger.debug("start - manager is not null");
+    		}
         }
 
 		//JSR 289 Section 2.1.1 Step 1.Deploy the application.
@@ -419,7 +425,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
         	// we set the container on the manager right before the start and after the context have been init-ed
 			hasDistributableManager = true;				
 			if(logger.isDebugEnabled()) {
-				logger.debug("this context contains a manager that allows applications to work in a distributed environment");
+				logger.debug("start1 - this context contains a manager that allows applications to work in a distributed environment");
 			}			
 			((SipManager)getManager()).setMobicentsSipFactory(
 					(sipApplicationDispatcher.getSipFactory()));
@@ -450,7 +456,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 				// only call the setContainer on the manager when it has been fully initialized
 				hasDistributableManager = true;				
 				if(logger.isDebugEnabled()) {
-					logger.debug("this context contains a manager that allows applications to work in a distributed environment");
+					logger.debug("start2 - this context contains a manager that allows applications to work in a distributed environment");
 				}
 				((SipManager)getManager()).setMobicentsSipFactory(
 						(sipApplicationDispatcher.getSipFactory()));
@@ -993,7 +999,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
     @Override
     public synchronized void setManager(Manager manager) {
     	if(logger.isInfoEnabled()) {
-			logger.info("setManager");
+			logger.info("setManager - getName()=" + getName());
 		}
     	if(getManager() != null && !manager.equals(getManager())) {
     		// http://code.google.com/p/mobicents/issues/detail?id=2794 : TimerService object from JDNI lookup or injection is never HATimerService. This means that timers scheduled using that object will not survive across cluster changes.
@@ -1005,7 +1011,10 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
     	}
     	if(manager instanceof CatalinaSipManager && sipApplicationDispatcher != null) {
 			((SipManager)manager).setMobicentsSipFactory(
-					sipApplicationDispatcher.getSipFactory()); 
+					sipApplicationDispatcher.getSipFactory());
+			if(logger.isInfoEnabled()) {
+				logger.info("setManager - calling setContainer");
+			}
 			((CatalinaSipManager)manager).setContainer(this);
 		}    	
     	super.setManager(manager);
@@ -1254,7 +1263,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 			logger.debug("enterSipAppHa " + getName());
 		}
     	boolean batchStarted = false;
-// FIXME: distributable not supported
+// Distributable stuff
 		if(getDistributable() && hasDistributableManager) {
 			if(logger.isDebugEnabled()) {
 				logger.debug("enterSipAppHa - distributable, starting batch - " + getName());
@@ -1270,7 +1279,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 				ConvergedSessionReplicationContext.enterSipapp(null, null, startCacheActivity);
 //			}
 		}
-// FIXME - VEGE: distributable not supported
+// Distributable stuff - END
 		return batchStarted;
 	}
 	
@@ -1282,7 +1291,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 		if(logger.isDebugEnabled()) {
 			logger.debug("exitSipAppHa " + getName());
 		}
-// FIXME: distributable not supported
+		// Distributable stuff
 		if (getDistributable() && hasDistributableManager) {
 			if(logger.isInfoEnabled()) {
 				if(request != null) {
@@ -1336,10 +1345,10 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 				}
 			}
 		}
-// FIXME - VEGE: distributable not supported
+		// Distributable stuff - END
 	}
 	
-// FIXME: distributable not supported
+	// Distributable stuff
 	private boolean startBatchTransaction() {
 		if(logger.isDebugEnabled()) {
 			logger.debug("startBatchTransaction " + getName());
@@ -1362,9 +1371,8 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 
 		return started;
 	}
-// FIXME - VEGE: distributable not supported
 	
-// FIXME: distributable not supported
+	// Distributable stuff
 	private void endBatchTransaction(boolean wasStarted) {
 		if(logger.isDebugEnabled()) {
 			logger.debug("endBatchTransaction - wasStarted=" + wasStarted + " " + getName());
@@ -1372,13 +1380,6 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 		
 		DistributedCacheConvergedSipManager<? extends OutgoingDistributableSessionData> distributedConvergedManager = ((ClusteredSipSessionManager) manager)
 				.getDistributedCacheConvergedSipManager();
-		
-		if(logger.isDebugEnabled()) {
-			logger.debug("endBatchTransaction - distributedConvergedManager=" + distributedConvergedManager);
-			logger.debug("endBatchTransaction - distributedConvergedManager.getClass().getCanonicalName()=" + distributedConvergedManager.getClass().getCanonicalName());
-			logger.debug("endBatchTransaction - distributedConvergedManager.getInfinispanCache().getName()=" + distributedConvergedManager.getInfinispanCache().getName());
-			logger.debug("endBatchTransaction - get batching manager...");
-		}
 		
 		BatchingManager tm = distributedConvergedManager.getBatchingManager();
 		
@@ -1398,7 +1399,6 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 			// no need to rethrow an exception here as this is not recoverable and this could mess up the concurrency release of the semaphore on the session
 		}
 	}
-// FIXME - VEGE: distributable not supported
 	
 	public boolean notifySipContextListeners(SipContextEvent event) {
 		if(logger.isDebugEnabled()) {

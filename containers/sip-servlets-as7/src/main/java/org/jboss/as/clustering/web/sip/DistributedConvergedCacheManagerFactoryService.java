@@ -12,7 +12,6 @@ import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 
-//TODO: kell ide ez az extendelés? nem ront-e bele vmibe
 public class DistributedConvergedCacheManagerFactoryService extends DistributedCacheManagerFactoryService implements Service<DistributedCacheManagerFactory> {
 	private static final Logger logger = Logger.getLogger(DistributedConvergedCacheManagerFactoryService.class);
 	

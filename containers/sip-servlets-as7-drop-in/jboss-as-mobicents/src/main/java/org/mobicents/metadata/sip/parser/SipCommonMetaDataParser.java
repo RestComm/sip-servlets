@@ -69,8 +69,6 @@ public class SipCommonMetaDataParser extends MetaDataElementParser {
             //case DESCRIPTION:
             //    break;
             case DISTRIBUTABLE:
-                // TODO: itt mit kene csinalni? eleg csak annyi ami most itt van? 
-                //throw unexpectedElement(reader);
             	if (logger.isDebugEnabled()){
             		logger.debug("parse - DISTRIBUTABLE - application name: " + smd.getApplicationName());
             	}

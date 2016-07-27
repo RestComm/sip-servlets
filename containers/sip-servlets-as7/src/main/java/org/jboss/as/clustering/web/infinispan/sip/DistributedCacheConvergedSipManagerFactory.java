@@ -61,7 +61,7 @@ public class DistributedCacheConvergedSipManagerFactory extends DistributedCache
 
 	private static final ServiceName JVM_ROUTE_REGISTRY_SERVICE_NAME = DistributedConvergedCacheManagerFactoryService.JVM_ROUTE_REGISTRY_ENTRY_PROVIDER_SERVICE_NAME.getParent();
 
-	private SessionAttributeStorageFactory storageFactory = new SessionAttributeStorageFactoryImpl();//todo? atallni ConvergedSessionAttributeMarshallerFactory-ra?
+	private SessionAttributeStorageFactory storageFactory = new SessionAttributeStorageFactoryImpl();//TODO: do we need here a ConvergedSessionAttributeMarshallerFactory? Probably not.
 	private CacheInvoker invoker = new RetryingCacheInvoker(new BatchCacheInvoker(), 10, 100);
     private CacheInvoker txInvoker = new TransactionCacheInvoker();
 	private SessionAttributeMarshallerFactory marshallerFactory = new SessionAttributeMarshallerFactoryImpl();

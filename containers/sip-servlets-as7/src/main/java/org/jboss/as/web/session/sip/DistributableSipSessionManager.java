@@ -717,12 +717,6 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 								doTx = true;
 							}
 
-							// Tomcat calls Manager.findSession before setting the tccl,
-							// so we need to do it :(
-							// TODO: ez a CL switcher cucc kell? JBoss-7-ben mar nem latni nyomat, ellentetben a JBoss5-tel
-							//switcher = getContextClassLoaderSwitcher().getSwitchContext();
-							//switcher.setClassLoader(getApplicationClassLoader());
-
 							IncomingDistributableSessionData data = getDistributedCacheManager().getSessionData(realId, initialLoad);
 							if (data != null)
 							{
@@ -1037,12 +1031,10 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 		if (logger.isDebugEnabled()){
 			logger.debug("findSession - id=" + id);
 		}
-		//TODO: torolni - JBoss5-os ez a sor: String realId = getRealId(id);
 
 		String realId = this.parse(id).getKey().toString();
 
 		// Find it from the local store first
-		// TODO: torolni - JBoss5-os ez a sor: ClusteredSession<? extends OutgoingDistributableSessionData> session = findLocalSession(realId);
 
 		ClusteredSession<O> session = cast(this.sessions.get(realId));
 
@@ -1105,18 +1097,7 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 
 		return session;
 	}
-	/**
-	 * Gets the session id with any jvmRoute removed.
-	 * 
-	 * @param id a session id with or without an appended jvmRoute.
-	 *           Cannot be <code>null</code>.
-	 */
-	// TODO: torolni - jboss5-os
-	//private String getRealId(String id)
-	//{
-	//   return (getUseJK() ? Util.getRealId(id) : id);
-	//}
-
+	
 	/**
 	 * {@inheritDoc}
 	 * <p>
@@ -2803,7 +2784,7 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 			}
 		} else {
 			applicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(key.getApplicationName(), key.getApplicationSessionId(),
-					null); // TODO: ez a harmadik paraméter itt tényleg null kell h legyen? JBoss5-ben csak ket parametere volt ennek a metodusnak
+					null); // TODO: is ok that the third parameter is null? In JBoss5 there were only 2 parameters.
 			if (logger.isDebugEnabled()){
 				logger.debug("loadSipSession - sipApplicationSessionImpl is null - applicationSessionKey.getId()=" + applicationSessionKey.getId());
 			}
@@ -2845,77 +2826,55 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 			} else {
 				session.updateThisAccessedTime();
 			}
-			// Swap in/out the webapp classloader so we can deserialize
-			// attributes whose classes are only available to the webapp
-			// TODO: ? ezt az oda-vissza swapolást ki lehet commentezni? jboss-7ben mar nincsenek ilyen swap-ok
-			//ClassLoader prevTCL = Thread.currentThread().getContextClassLoader();
-			//Thread.currentThread().setContextClassLoader(getApplicationClassLoader());
 			
-			//try {
-				IncomingDistributableSessionData data = getDistributedCacheConvergedSipManager().getSipSessionData(applicationSessionKey.getId(), SessionManagerUtil.getSipSessionHaKey(key), initialLoad);
-				if (data != null)
-				{
-					if(logger.isDebugEnabled()) {
-						logger.debug("data for sip session " + key + " found in the distributed cache");
-						logger.debug("loadSipSession - data.getMetadata()=" + data.getMetadata());
-						if (data.getMetadata() != null && data.getMetadata() instanceof DistributableSipSessionMetadata){
-							logger.debug("loadSipSession - metadata is instanceof DistributableSipSessionMetadata");
-							if (((DistributableSipSessionMetadata)data.getMetadata()).getMetaData() != null){
-								logger.debug("loadSipSession - metadata is instanceof DistributableSipSessionMetadata - metadata map not null");
-								for (String tmpKey: ((DistributableSipSessionMetadata)data.getMetadata()).getMetaData().keySet()){
-									logger.debug("loadSipSession - metadata map entry: " + tmpKey + "=" + ((DistributableSipSessionMetadata)data.getMetadata()).getMetaData().get(tmpKey));	
-								}								
-							}
+			IncomingDistributableSessionData data = getDistributedCacheConvergedSipManager().getSipSessionData(applicationSessionKey.getId(), SessionManagerUtil.getSipSessionHaKey(key), initialLoad);
+			if (data != null)
+			{
+				if(logger.isDebugEnabled()) {
+					logger.debug("data for sip session " + key + " found in the distributed cache");
+					logger.debug("loadSipSession - data.getMetadata()=" + data.getMetadata());
+					if (data.getMetadata() != null && data.getMetadata() instanceof DistributableSipSessionMetadata){
+						logger.debug("loadSipSession - metadata is instanceof DistributableSipSessionMetadata");
+						if (((DistributableSipSessionMetadata)data.getMetadata()).getMetaData() != null){
+							logger.debug("loadSipSession - metadata is instanceof DistributableSipSessionMetadata - metadata map not null");
+							for (String tmpKey: ((DistributableSipSessionMetadata)data.getMetadata()).getMetaData().keySet()){
+								logger.debug("loadSipSession - metadata map entry: " + tmpKey + "=" + ((DistributableSipSessionMetadata)data.getMetadata()).getMetaData().get(tmpKey));	
+							}								
 						}
-						
 					}
-					if (session == null) {
-						if(sipApplicationSessionImpl != null) {
-							if(logger.isDebugEnabled()) {
-								logger.debug("parent sip application is " + sipApplicationSessionImpl.getId());
-							}	            			
-							// This is either the first time we've seen this session on this
-							// server, or we previously expired it and have since gotten
-							// a replication message from another server
-							mustAdd = true;
-							initialLoad = true;
-							session = (ClusteredSipSession<? extends OutgoingDistributableSessionData>) 
-							((ClusteredSipManagerDelegate)sipManagerDelegate).getNewMobicentsSipSession(key, (SipFactoryImpl)sipFactory, sipApplicationSessionImpl, true);
-							OwnedSessionUpdate osu = unloadedSipSessions_.get(key);
-							passivated = (osu != null && osu.passivated);
-							
-						} else {
-							if(logger.isDebugEnabled()) {
-								logger.debug("beware null parent sip application for session " + key);
-							}
-						}
-					} 
-					if(session!= null) {
-						if (logger.isDebugEnabled()){
-							logger.debug("loadSipSession - session not null, calling session.update");
-						}
-						session.update(data);						
-					}
-				} else if(logger.isDebugEnabled()) {
-					logger.debug("no data for sip session " + key + " in the distributed cache");
+					
 				}
-			//} finally {
-			//	Thread.currentThread().setContextClassLoader(prevTCL);
-			//}
+				if (session == null) {
+					if(sipApplicationSessionImpl != null) {
+						if(logger.isDebugEnabled()) {
+							logger.debug("parent sip application is " + sipApplicationSessionImpl.getId());
+						}	            			
+						// This is either the first time we've seen this session on this
+						// server, or we previously expired it and have since gotten
+						// a replication message from another server
+						mustAdd = true;
+						initialLoad = true;
+						session = (ClusteredSipSession<? extends OutgoingDistributableSessionData>) 
+						((ClusteredSipManagerDelegate)sipManagerDelegate).getNewMobicentsSipSession(key, (SipFactoryImpl)sipFactory, sipApplicationSessionImpl, true);
+						OwnedSessionUpdate osu = unloadedSipSessions_.get(key);
+						passivated = (osu != null && osu.passivated);
+						
+					} else {
+						if(logger.isDebugEnabled()) {
+							logger.debug("beware null parent sip application for session " + key);
+						}
+					}
+				} 
+				if(session!= null) {
+					if (logger.isDebugEnabled()){
+						logger.debug("loadSipSession - session not null, calling session.update");
+					}
+					session.update(data);						
+				}
+			} else if(logger.isDebugEnabled()) {
+				logger.debug("no data for sip session " + key + " in the distributed cache");
+			}
 			
-			//            else if(mustAdd)
-			//            {
-			//               // Clunky; we set the session variable to null to indicate
-			//               // no data so move on
-			//               session = null;
-			//            }
-			//            
-			//            if (session != null)
-			//            {
-			//               ClusteredSessionNotificationCause cause = passivated ? ClusteredSessionNotificationCause.ACTIVATION 
-			//                                                                    : ClusteredSessionNotificationCause.FAILOVER;
-			//               session.notifyDidActivate(cause);
-			//            }
 		} catch (Exception ex) {
 			try {
 				// if(doTx)
@@ -3042,44 +3001,37 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 			} else {
 				session.updateThisAccessedTime();
 			}
-			// Swap in/out the webapp classloader so we can deserialize
-			// attributes whose classes are only available to the webapp
-			// TODO: ? swap-olos dolgok tenyleg kihagyhatoak?? jboss-7ben mar nincsenek
-			//ClassLoader prevTCL = Thread.currentThread().getContextClassLoader();
-			//Thread.currentThread().setContextClassLoader(getApplicationClassLoader());
-			//try {
-				IncomingDistributableSessionData data = 
-					getDistributedCacheConvergedSipManager().getSipApplicationSessionData(key.getId(), initialLoad);
-				if (data != null) {
-					if (session == null) {
-						// This is either the first time we've seen this session on
-						// this
-						// server, or we previously expired it and have since gotten
-						// a replication message from another server
-						mustAdd = true;
-						initialLoad = true;
-						//since the session has to be recreated we don't recreate the sas timer since it is fault tolerant and has been failed over as well
-						session = (ClusteredSipApplicationSession) 
-						((ClusteredSipManagerDelegate)sipManagerDelegate).getNewMobicentsSipApplicationSession(key, ((SipContext)getContainer()), true);
-						OwnedSessionUpdate osu = unloadedSipApplicationSessions_.get(key.getId());
-						passivated = (osu != null && osu.passivated);
-					}
-					if(session != null) {					
-						session.update(data);					
-					}
-					if(mustAdd && ((SipContext)getContainer()).getConcurrencyControlMode() == ConcurrencyControlMode.SipApplicationSession) {
-						if(logger.isInfoEnabled()) {
-							logger.info("SipApplicationSession " + key + " has just been recreated and concurrency control is set to SipApplicationSession, colocating the timers here to ensure no concurrent access across the cluster");
-						}
-						// if the session has been recreated, reschedule the FT timers locally if they are not local already
-						((ClusteredSipApplicationSession) session).rescheduleTimersLocally();
-					}
-				} else if(logger.isDebugEnabled()) {
-					logger.debug("no data for sip application session " + key + " in the distributed cache");
+			
+			IncomingDistributableSessionData data = 
+				getDistributedCacheConvergedSipManager().getSipApplicationSessionData(key.getId(), initialLoad);
+			if (data != null) {
+				if (session == null) {
+					// This is either the first time we've seen this session on
+					// this
+					// server, or we previously expired it and have since gotten
+					// a replication message from another server
+					mustAdd = true;
+					initialLoad = true;
+					//since the session has to be recreated we don't recreate the sas timer since it is fault tolerant and has been failed over as well
+					session = (ClusteredSipApplicationSession) 
+					((ClusteredSipManagerDelegate)sipManagerDelegate).getNewMobicentsSipApplicationSession(key, ((SipContext)getContainer()), true);
+					OwnedSessionUpdate osu = unloadedSipApplicationSessions_.get(key.getId());
+					passivated = (osu != null && osu.passivated);
 				}
-			//} finally {
-			//	Thread.currentThread().setContextClassLoader(prevTCL);
-			//}
+				if(session != null) {					
+					session.update(data);					
+				}
+				if(mustAdd && ((SipContext)getContainer()).getConcurrencyControlMode() == ConcurrencyControlMode.SipApplicationSession) {
+					if(logger.isInfoEnabled()) {
+						logger.info("SipApplicationSession " + key + " has just been recreated and concurrency control is set to SipApplicationSession, colocating the timers here to ensure no concurrent access across the cluster");
+					}
+					// if the session has been recreated, reschedule the FT timers locally if they are not local already
+					((ClusteredSipApplicationSession) session).rescheduleTimersLocally();
+				}
+			} else if(logger.isDebugEnabled()) {
+				logger.debug("no data for sip application session " + key + " in the distributed cache");
+			}
+
 			//			else if (mustAdd) {
 			//				// Clunky; we set the session variable to null to indicate
 			//				// no data so move on
@@ -4073,7 +4025,7 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 		}
 		
 		// Remove the session from our local map
-		SipApplicationSessionKey key = new SipApplicationSessionKey(realId, applicationName, null); // TODO: a harmadik parameter tenyleg jo, ha null? JBoss5-ben nem volt harmadik parameter 
+		SipApplicationSessionKey key = new SipApplicationSessionKey(realId, applicationName, null); // TODO: is ok that the third parameter is null? In JBoss5 there were only 2 parameters. 
 		ClusteredSipApplicationSession<O> session = (ClusteredSipApplicationSession)sipManagerDelegate
 		.removeSipApplicationSession(key);
 		if (session == null) {
@@ -4257,7 +4209,7 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 			logger.debug("notifySipApplicationSessionLocalAttributeModification - realId=" + realId);
 		}
 		
-		SipApplicationSessionKey key = new SipApplicationSessionKey(realId, applicationName, null); // TODO: a harmadik parameter tenyleg jo, ha null? JBoss5-ben nem volt harmadik parameter
+		SipApplicationSessionKey key = new SipApplicationSessionKey(realId, applicationName, null); // TODO: is ok that the third parameter is null? In JBoss5 there were only 2 parameters.
 		ClusteredSipApplicationSession<O> session = (ClusteredSipApplicationSession) sipManagerDelegate
 		.getSipApplicationSession(key, false);
 		if (session != null) {
@@ -4325,7 +4277,7 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 		}
 		
 		boolean updated = true;
-		SipApplicationSessionKey key = new SipApplicationSessionKey(realId, applicationName, null);// TODO: a harmadik parameter tenyleg jo, ha null? JBoss5-ben nem volt harmadik parameter
+		SipApplicationSessionKey key = new SipApplicationSessionKey(realId, applicationName, null);// TODO: is ok that the third parameter is null? In JBoss5 there were only 2 parameters.
 
 		ClusteredSipApplicationSession<O> session = findLocalSipApplicationSession(
 				key, false);
@@ -4557,38 +4509,6 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 		super.stop();
 	}
 
-	// TODO: torolheto ez a metodus? JBoss-7ben nem latom nyomat
-	/*@Override
-	protected void registerManagerMBean() {
-		try {
-			MBeanServer server = getMBeanServer();
-
-			String domain;
-			if (container_ instanceof ContainerBase) {
-				domain = ((ContainerBase) container_).getDomain();
-			} else {
-				domain = server.getDefaultDomain();
-			}
-			String hostName = ((Host) container_.getParent()).getName();
-			hostName = (hostName == null) ? "localhost" : hostName;
-			ObjectName clusterName = new ObjectName(domain
-					+ ":type=SipManager,host=" + hostName + ",path="
-					+ ((Context) container_).getPath());
-
-			if (server.isRegistered(clusterName)) {
-				logger.warn("MBean " + clusterName + " already registered");
-				return;
-			}
-
-			objectName_ = clusterName;
-			server.registerMBean(this, clusterName);
-
-		} catch (Exception ex) {
-			logger.error("Could not register " + getClass().getSimpleName()
-					+ " to MBeanServer", ex);
-		}
-	}*/
-
 	@Override
 	public synchronized void start() throws LifecycleException {
 		if (logger.isDebugEnabled()){
@@ -4692,21 +4612,6 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 			.debug("We are using JK for load-balancing. Adding JvmRouteValve.");
 			this.installContextValve(new ConvergedJvmRouteValve(this));
 		}
-
-		// Handle batch replication if needed.
-		// TODO -- should we add this even if not FIELD in case a cross-context
-		// call traverses a field-based webapp?
-		// TODO: torolni ezt a reszt, jboss7-ben nincs
-		/*
-		 * BatchingManager valveBM = null;
-		if (getReplicationGranularity() == ReplicationGranularity.FIELD
-				&& Boolean.TRUE.equals(getReplicationConfig().getReplicationFieldBatchMode())) {
-			valveBM = getDistributedCacheConvergedSipManager().getBatchingManager();;
-			logger
-					.debug("Including transaction manager in ClusteredSessionValve to support batch replication.");
-		}
-		ConvergedClusteredSessionValve valve = new ConvergedClusteredSessionValve(this, valveBM);
-		*/
 
 		// Add clustered session valve
 		ConvergedClusteredSessionValve valve = new ConvergedClusteredSessionValve(this, null);

@@ -23,9 +23,7 @@
 package org.mobicents.servlet.sip.core.timers;
 
 import org.apache.log4j.Logger;
-//import org.jboss.web.tomcat.service.session.ClusteredSipManager;
 import org.jboss.as.web.session.sip.ClusteredSipSessionManager;
-//import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
 import org.jboss.as.clustering.web.OutgoingDistributableSessionData;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;

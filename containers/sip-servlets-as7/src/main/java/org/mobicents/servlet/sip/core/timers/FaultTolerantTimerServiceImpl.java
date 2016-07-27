@@ -46,13 +46,8 @@ import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.TimerListener;
 
 import org.apache.log4j.Logger;
-//import org.jboss.web.tomcat.service.session.ClusteredSipManager;
 import org.jboss.as.web.session.sip.ClusteredSipSessionManager;
-
-//import org.jboss.web.tomcat.service.session.ClusteredSipServletTimerService;
 import org.jboss.as.web.session.sip.ClusteredSipServletTimerService;
-
-//import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
 import org.jboss.as.clustering.web.OutgoingDistributableSessionData;
 
 import org.mobicents.servlet.sip.core.session.DistributableSipManager;

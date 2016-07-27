@@ -372,18 +372,8 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		haId = SessionManagerUtil.getSipSessionHaKey(key);
 	    this.clusterStatus = new ClusteredSessionManagementStatus(haId, true, null, null);
 		if(mobicentsSipApplicationSession.getSipContext() != null) {
-			setManager((ClusteredSipSessionManager<O>)mobicentsSipApplicationSession.getSipContext().getSipManager()); //TODO: kell ide a <O> ?
+			setManager((ClusteredSipSessionManager<O>)mobicentsSipApplicationSession.getSipContext().getSipManager());
 			this.invalidationPolicy = this.manager.getReplicationTrigger();
-			if(logger.isDebugEnabled()){
-				logger.debug("----------------------------------");
-				logger.debug(this.manager.getContainer());
-				logger.debug(Arrays.deepToString(this.manager.getContainer().findChildren()));
-				logger.debug(this.manager.getContainer().getParent());
-				logger.debug(Arrays.deepToString(this.manager.getContainer().getParent().findChildren()));
-				logger.debug(this.manager.getContainer().getParent().getParent());
-				logger.debug(Arrays.deepToString(this.manager.getContainer().getParent().getParent().findChildren()));
-				logger.debug(((Engine)this.manager.getContainer().getParent().getParent()).getService());
-			}
 		}		
 		this.isNew = true;
 		this.useJK = useJK;
@@ -424,7 +414,6 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		
 		if(logger.isDebugEnabled()){
 			logger.debug("setManager with : "  + manager);
-			new Exception().printStackTrace();
 		}
 		
 		@SuppressWarnings("unchecked")
@@ -432,7 +421,8 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		this.manager = unchecked;
 
 		this.invalidationPolicy = this.manager.getReplicationTrigger();
-		//TODO: torolni ezt a sort? JBoss-7-ben mar nincs benne: this.useJK = ((DistributableSessionManager)this.manager).getUseJK();
+		//TODO: Is the next row necessary? It does not exist anymore in the sources of JBoss7.
+		//this.useJK = ((DistributableSessionManager)this.manager).getUseJK();
 
 		int maxUnrep = this.manager.getMaxUnreplicatedInterval() * 1000;
 		setMaxUnreplicatedInterval(maxUnrep);
@@ -1129,11 +1119,12 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 									proxyBranchImpl.setOutgoingRequest((SipServletRequestImpl)transactionApplicationData.getSipServletMessage());
 									proxyBranchImpl.setOriginalRequest((SipServletRequestImpl)proxy.getOriginalRequest());
 									proxyBranchImpl.setProxy(proxy);
-									//proxy.addProxyBranch(proxyBranchImpl);
-									// TODO: proxy.getProxyBranchesMap() == null check? probably not neccessary
-									// meg jo-e ez itt ahogy ez most meg van csinalva
+									// The original (~JBoss5) code: proxy.addProxyBranch(proxyBranchImpl);
+									// Is replaced by the following:
 									SipFactory sipFactory = (SipFactory) getServletContext().getAttribute("javax.servlet.sip.SipFactory");
 									try {
+										// TODO: is this the right way to do it?
+										// TODO: proxy.getProxyBranchesMap() == null check? probably not neccessary?
 										proxy.getProxyBranchesMap().put(sipFactory.createURI(proxyBranchImpl.getTargetURI()), proxyBranchImpl);
 									} catch (ServletParseException e) {
 										logger.error("Error while adding proxy branch to proxy. Could not parse URI: " + e);
@@ -1198,8 +1189,6 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 				if(logger.isDebugEnabled()){
 					logger.debug("Service: " + service);
 					logger.debug("Service: " + service.getClass().getName());
-					new Exception().printStackTrace();
-
 				}
 				if(service instanceof SipService) {
 					SipService sipService = (SipService) service;
@@ -1215,8 +1204,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 					}
 				}else{
 					if(logger.isDebugEnabled()) {
-						logger.debug("Jean mondta " + sessionCreatingDialog);
-						
+						logger.debug("updateSipSession - retrieved service is not SipService --> workaround: getting the SipService from static holder - sessionCreatingDialog=" + sessionCreatingDialog);
 					}
 					SipService sipService = StaticServiceHolder.sipStandardService;
 					SipStack sipStack = sipService.getSipStack();					
@@ -1231,7 +1219,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 						}
 					}else{
 						if(logger.isDebugEnabled()) {
-							logger.debug("null :((((");
+							logger.debug("updateSipSession - could not inject dialog, sip stack is still null");
 						}
 					}
 					
@@ -1558,8 +1546,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 							((SipSessionActivationListener) attribute)
 									.sessionWillPassivate(event);
 						} catch (Throwable t) {
-							manager.getContainer().getLogger().error(MESSAGES.errorSessionActivationEvent(t));
-							new Exception(t).printStackTrace();
+							logger.error(MESSAGES.errorSessionActivationEvent(t));
 						}
 						
 						java.lang.Thread.currentThread().setContextClassLoader(oldLoader);
@@ -1638,8 +1625,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 							((SipSessionActivationListener) attribute)
 									.sessionDidActivate(event);
 						} catch (Throwable t) {
-							manager.getContainer().getLogger().error(MESSAGES.errorSessionActivationEvent(t));
-							new Exception(t).printStackTrace();
+							logger.error(MESSAGES.errorSessionActivationEvent(t));
 						}
 						
 						java.lang.Thread.currentThread().setContextClassLoader(oldLoader);

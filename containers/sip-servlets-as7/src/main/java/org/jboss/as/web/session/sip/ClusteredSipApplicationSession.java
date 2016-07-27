@@ -333,7 +333,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		
 		this.clusterStatus = new ClusteredSessionManagementStatus(key.getId(), true, null, null);
 		if(sipContext != null) {
-			setManager((ClusteredSipSessionManager<O>)sipContext.getSipManager());	//TODO: kell ide a <O> ?
+			setManager((ClusteredSipSessionManager<O>)sipContext.getSipManager());
 			this.invalidationPolicy = this.manager.getReplicationTrigger();
 		}	
 		this.useJK = useJK;
@@ -378,7 +378,8 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		this.manager = unchecked;
 
 		this.invalidationPolicy = this.manager.getReplicationTrigger();
-		//TODO: torolni ezt a sort? JBoss-7-ben mar nincs benne: this.useJK = this.manager.getUseJK();
+		// TODO: is the next row necessary? It seems it does not exist anymore in the sources of JBoss7. 
+		// this.useJK = this.manager.getUseJK();
 
 		int maxUnrep = this.manager.getMaxUnreplicatedInterval() * 1000;
 		setMaxUnreplicatedInterval(maxUnrep);
@@ -1109,8 +1110,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 							((SipApplicationSessionActivationListener) attribute)
 									.sessionWillPassivate(event);
 						} catch (Throwable t) {
-							manager.getContainer().getLogger().error(MESSAGES.errorSessionActivationEvent(t));
-							new Exception(t).printStackTrace();
+							logger.error(MESSAGES.errorSessionActivationEvent(t));
 						}
 					}
 				}
@@ -1177,8 +1177,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 							((SipApplicationSessionActivationListener) attribute)
 									.sessionDidActivate(event);
 						} catch (Throwable t) {
-							manager.getContainer().getLogger().error(MESSAGES.errorSessionActivationEvent(t));
-							new Exception(t).printStackTrace();
+							logger.error(MESSAGES.errorSessionActivationEvent(t));
 						}
 					}
 				}
