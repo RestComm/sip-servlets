@@ -42,7 +42,10 @@
         <module name="org.jboss.as.security"/>
         <module name="org.picketbox"/>
         <module name="javax.security.jacc.api"/>
+        <!--
         <module name="org.jboss.as.clustering.web.spi" optional="true"/>
+        -->
+        <module name="org.jboss.as.clustering.web.spi"/>
         
         <module name="org.infinispan"/>
         <module name="org.jboss.as.clustering.web.infinispan"/>

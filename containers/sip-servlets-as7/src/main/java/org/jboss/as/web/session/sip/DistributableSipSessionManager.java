@@ -55,6 +55,7 @@ import org.jboss.as.clustering.web.OutgoingDistributableSessionData;
 import org.jboss.as.clustering.web.OutgoingSessionGranularitySessionData;
 import org.jboss.as.clustering.web.SessionOwnershipSupport;
 import org.jboss.as.clustering.web.infinispan.sip.DistributedCacheManager;
+import org.jboss.as.clustering.web.sip.DistributableSipSessionMetadata;
 import org.jboss.as.clustering.web.sip.DistributedCacheConvergedSipManager;
 import org.jboss.as.clustering.web.sip.LocalDistributableConvergedSessionManager;
 import org.jboss.as.web.WebLogger;
@@ -2856,6 +2857,17 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 				{
 					if(logger.isDebugEnabled()) {
 						logger.debug("data for sip session " + key + " found in the distributed cache");
+						logger.debug("loadSipSession - data.getMetadata()=" + data.getMetadata());
+						if (data.getMetadata() != null && data.getMetadata() instanceof DistributableSipSessionMetadata){
+							logger.debug("loadSipSession - metadata is instanceof DistributableSipSessionMetadata");
+							if (((DistributableSipSessionMetadata)data.getMetadata()).getMetaData() != null){
+								logger.debug("loadSipSession - metadata is instanceof DistributableSipSessionMetadata - metadata map not null");
+								for (String tmpKey: ((DistributableSipSessionMetadata)data.getMetadata()).getMetaData().keySet()){
+									logger.debug("loadSipSession - metadata map entry: " + tmpKey + "=" + ((DistributableSipSessionMetadata)data.getMetadata()).getMetaData().get(tmpKey));	
+								}								
+							}
+						}
+						
 					}
 					if (session == null) {
 						if(sipApplicationSessionImpl != null) {
@@ -2871,6 +2883,7 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 							((ClusteredSipManagerDelegate)sipManagerDelegate).getNewMobicentsSipSession(key, (SipFactoryImpl)sipFactory, sipApplicationSessionImpl, true);
 							OwnedSessionUpdate osu = unloadedSipSessions_.get(key);
 							passivated = (osu != null && osu.passivated);
+							
 						} else {
 							if(logger.isDebugEnabled()) {
 								logger.debug("beware null parent sip application for session " + key);
@@ -4404,7 +4417,7 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 			String sipSessionId, String dataOwner, int distributedVersion,
 			long timestamp, DistributableSessionMetadata metadata) {
 		if (logger.isDebugEnabled()){
-			logger.debug("sipSessionChangedInDistributedCache - sipAppSessionId=" + sipAppSessionId + ", sipSessionId=" + sipSessionId);
+			logger.debug("sipSessionChangedInDistributedCache - sipAppSessionId=" + sipAppSessionId + ", sipSessionId=" + sipSessionId + ", metadata=" + metadata);
 		}
 		
 		SipSessionKey key = null;

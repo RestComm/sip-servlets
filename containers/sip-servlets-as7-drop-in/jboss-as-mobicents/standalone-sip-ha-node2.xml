@@ -181,6 +181,33 @@
                     <file-store/>
                 </distributed-cache>
             </cache-container>
+            
+            <cache-container name="siprep" jndi-name="java:jboss/infinispan/container/siprep" default-cache="repl" start="EAGER">
+                <transport lock-timeout="60000"/>
+                <!--<replicated-cache name="repl" mode="ASYNC" batching="true" start="EAGER">-->
+                <replicated-cache name="repl" mode="SYNC" start="EAGER">
+                    <file-store/>
+                </replicated-cache>
+                <replicated-cache name="cache.dialogs" mode="SYNC" start="EAGER">
+                    <file-store/>
+                </replicated-cache>
+                <replicated-cache name="cache.appdata" mode="SYNC" start="EAGER">
+                    <file-store/>
+                </replicated-cache>
+                <replicated-cache name="cache.serverTX" mode="SYNC" start="EAGER">
+                    <file-store/>
+                </replicated-cache>
+                <replicated-cache name="cache.serverTXApp" mode="SYNC" start="EAGER">
+                    <file-store/>
+                </replicated-cache>
+                <replicated-cache name="cache.clientTX" mode="SYNC" start="EAGER">
+                    <file-store/>
+                </replicated-cache>
+                <replicated-cache name="cache.clientTXApp" mode="SYNC" start="EAGER">
+                    <file-store/>
+                </replicated-cache>
+            </cache-container>
+            
             <!--<cache-container name="sip" aliases="standard-sip-session-cache" default-cache="repl" module="org.jboss.as.clustering.web.infinispan">
                 <transport lock-timeout="60000"/>
                 <replicated-cache name="repl" mode="ASYNC" batching="true">
@@ -404,7 +431,7 @@
             <client-config name="Standard-Client-Config"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:weld:1.0"/>
-        <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" application-router="configuration/dars/mobicents-dar.properties" stack-properties="configuration/mss-sip-stack.properties" path-name="org.mobicents.ha.balancing.only" app-dispatcher-class="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl" concurrency-control-mode="SipApplicationSession" congestion-control-interval="-1">
+        <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" application-router="configuration/dars/mobicents-dar.properties" stack-properties="configuration/mss-sip-stack.properties" path-name="org.mobicents.ha" app-dispatcher-class="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl" concurrency-control-mode="SipApplicationSession" congestion-control-interval="-1">
             <connector name="sip-udp" protocol="SIP/2.0" scheme="sip" socket-binding="sip-udp" use-load-balancer="true" load-balancer-address="127.0.0.1" load-balancer-sip-port="5065" load-balancer-rmi-port="2000"/>
             <connector name="sip-tcp" protocol="SIP/2.0" scheme="sip" socket-binding="sip-tcp" use-load-balancer="true" load-balancer-address="127.0.0.1" load-balancer-sip-port="5065" load-balancer-rmi-port="2000"/>
             <connector name="sip-tls" protocol="SIP/2.0" scheme="sip" socket-binding="sip-tls"/>

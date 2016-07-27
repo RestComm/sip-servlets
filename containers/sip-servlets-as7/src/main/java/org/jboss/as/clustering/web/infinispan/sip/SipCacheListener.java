@@ -102,11 +102,13 @@ public class SipCacheListener //extends CacheListenerBase
    private Cache cache;
    
    private LocalDistributableConvergedSessionManager manager;
+   private DistributedCacheManager cacheManager;
    
    SipCacheListener(Cache cache,
 		   LocalDistributableConvergedSessionManager manager, //String contextHostPath,
 			//ReplicationGranularity granularity, 
-			String sipApplicationName, String sipApplicationNameHashed) {
+			String sipApplicationName, String sipApplicationNameHashed,
+			DistributedCacheManager cacheManager) {
 		this.manager = manager;
 	   //super(manager, contextHostPath);
 		//if (granularity == ReplicationGranularity.FIELD)
@@ -116,6 +118,7 @@ public class SipCacheListener //extends CacheListenerBase
 		this.sipApplicationName = sipApplicationName;
 		this.sipApplicationNameHashed = sipApplicationNameHashed;
 		this.cache = cache;
+		this.cacheManager = cacheManager;
 		if (logger.isDebugEnabled()){
 			logger.debug("SipCacheListener constructor - sipApplicationName=" + sipApplicationName + ", sipApplicationNameHashed=" + sipApplicationNameHashed);
 		}
@@ -466,8 +469,6 @@ public class SipCacheListener //extends CacheListenerBase
             			logger.debug("modified - sipAppSessionId=" + sipAppSessionId);
             		}
                 	
-                	//DistributableSessionMetadata metadata = SessionMapEntry.METADATA.get(map);
-
                     if ((version != null) && (timestamp != null) /*&& (metadata != null)*/) {
                     	if(logger.isDebugEnabled()) {
                 			logger.debug("modified - call sipApplicationSessionChangedInDistributedCache");
@@ -502,8 +503,16 @@ public class SipCacheListener //extends CacheListenerBase
             			logger.debug("modified - sipAppSessionId=" + sipAppSessionId + ", sipSessionId=" + sipSessionId);
             		}
                 	
-                	//DistributableSessionMetadata metadata = SessionMapEntry.METADATA.get(map);
-
+                	//
+                	// If loading the sip-related sip session metadata would become necessary once, then it should be done like this:
+                	//
+                	//org.jboss.as.clustering.web.sip.DistributableSipSessionMetadata sipMetaData = SipSessionMapEntry.METADATA.get(map);
+	                //if (logger.isDebugEnabled()){
+	        		//	logger.debug("modified - getting metadata map");
+	        		//}
+	                //sipMetaData.setMetaData(this.cacheManager.loadSipMetaDataMap(map));
+                	
+	                
                     if ((version != null) && (timestamp != null) /*&& (metadata != null)*/) {
                     	
                     	if(logger.isDebugEnabled()) {

@@ -53,8 +53,10 @@
         <module name="org.jboss.modules"/>
         <module name="org.jboss.as.naming"/>
         <!-- mock clustering -->
-        <module name="org.jboss.as.clustering.web.spi" optional="true"/>
-        <module name="org.jboss.as.clustering.registry" optional="true"/>
+        <!-- <module name="org.jboss.as.clustering.web.spi" optional="true"/>
+        <module name="org.jboss.as.clustering.registry" optional="true"/> -->
+        <module name="org.jboss.as.clustering.web.spi"/>
+        <module name="org.jboss.as.clustering.registry"/>
         <module name="org.jboss.marshalling"/>
         <module name="org.jboss.as.clustering.api"/>
     </dependencies>

@@ -966,10 +966,6 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	 * {@inheritDoc}
 	 */
 	public void update(IncomingDistributableSessionData sessionData) {
-		if(logger.isDebugEnabled()) {
-			logger.debug("update - sessionData=" + sessionData);
-		}
-		
 		if (logger.isDebugEnabled()){
 			logger.debug("update - sessionData=" + sessionData + ", this.getHaId()=" + this.getHaId() + ", this.getId()=" + this.getId());
 		}
@@ -1038,7 +1034,13 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		
 		//From SipSession
 		final Map<String, Object> metaData = md.getMetaData();
-		handlerServlet = (String) metaData.get(HANDLER);		
+		if (logger.isDebugEnabled()){
+			logger.debug("updateSipSession - handlerServlet original value=" + handlerServlet
+					+", new value=" + (String) metaData.get(HANDLER)
+					+ ", this.getId()=" + this.getId()
+					+ ", this.getHaId()=" + this.getHaId());
+		}
+		handlerServlet = (String) metaData.get(HANDLER);
 		Boolean valid = (Boolean)metaData.get(IS_VALID);
 		if(valid != null) {
 			// call to super very important to avoid setting the session dirty on reload and rewrite to the cache
@@ -1179,11 +1181,14 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		if(sessionCreatingDialogId != null && sessionCreatingDialogId.length() > 0) {
 			//Container context = getManager().getContainer();
 			Container context = this.manager.getContainer();
-
-			if(logger.isDebugEnabled()){
-				logger.debug(context.getClass().getName());
+			if (logger.isDebugEnabled()){
+				logger.debug("updateSipSession - context=" + context);
 			}
+			
 			Container container = context.getParent().getParent();
+			if (logger.isDebugEnabled()){
+				logger.debug("updateSipSession - container=" + container);
+			}
 			if(container instanceof Engine) {
 				if(logger.isDebugEnabled()){
 					logger.debug("Engine: " + container);
@@ -1216,6 +1221,10 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 					SipService sipService = StaticServiceHolder.sipStandardService;
 					SipStack sipStack = sipService.getSipStack();					
 					if(sipStack != null) {
+						if (logger.isDebugEnabled()){
+							logger.debug("updateSipSession - sipStack.getClass().getName()=" + sipStack.getClass().getName());
+						}
+						
 						sessionCreatingDialog = ((ClusteredSipStack)sipStack).getDialog(sessionCreatingDialogId); 
 						if(logger.isDebugEnabled()) {
 							logger.debug("dialog injected " + sessionCreatingDialog);
@@ -1242,8 +1251,8 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		}
 		
 		// Replicate the session.
-		if (log.isDebugEnabled()) {
-			log
+		if (logger.isDebugEnabled()) {
+			logger
 					.debug("processSipSessionReplication(): session is dirty. Will increment "
 							+ "version from: "
 							+ getVersion()
@@ -1835,8 +1844,8 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 			logger.debug("sessionAttributesDirty - this.getHaId()=" + this.getHaId() + ", this.getId()=" + this.getId());
 		}
 		
-		if (!sessionAttributesDirty && log.isDebugEnabled()) {
-			log.debug("Marking session attributes dirty " + haId);
+		if (!sessionAttributesDirty && logger.isDebugEnabled()) {
+			logger.debug("Marking session attributes dirty " + haId);
 		}
 
 		sessionAttributesDirty = true;
@@ -1975,8 +1984,8 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		}
 		
 //		if (!sessionMetadataDirty && !isNew && log.isTraceEnabled())
-		if(log.isDebugEnabled()) {
-			log.debug("Marking session metadata dirty " + key);
+		if(logger.isDebugEnabled()) {
+			logger.debug("Marking session metadata dirty " + key);
 		}
 		sessionMetadataDirty = true;
 		ConvergedSessionReplicationContext.bindSipSession(this, manager.getSnapshotSipManager());
@@ -2041,6 +2050,9 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		}
 		
 		long oldCSeq = getCseq();
+		if (logger.isDebugEnabled()){
+			logger.debug("setCseq - oldCSeq=" + oldCSeq + ", cseq=" + cseq);
+		}
 		super.setCseq(cseq);
 		if(oldCSeq != cseq) {
 			sessionMetadataDirty();
@@ -2063,6 +2075,8 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	public String getHandler() {
 		if (logger.isDebugEnabled()){
 			logger.debug("getHandler - this.getHaId()=" + this.getHaId() + ", this.getId()=" + this.getId() + ", return=" + super.getHandler());
+			logger.debug("getHandler - this.getHaId()=" + this.getHaId());
+			logger.debug("getHandler - this.getId()=" + this.getId());
 		}
 		
 		return super.getHandler();
@@ -2110,21 +2124,23 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 			logger.debug("setSessionCreatingDialog - this.getHaId()=" + this.getHaId() + ", this.getId()=" + this.getId());
 		}
 		
-		if(log.isDebugEnabled()) {			
+		if(logger.isDebugEnabled()) {			
 			if(super.sessionCreatingDialog != null) {
-				log.debug(" oldDialogId " + sessionCreatingDialogId);
+				logger.debug(" oldDialogId " + sessionCreatingDialogId);
 			}
 		}
 		super.setSessionCreatingDialog(dialog);
-		if(log.isDebugEnabled()) {
-			log.debug(" dialog " + dialog);
+		if(logger.isDebugEnabled()) {
+			logger.debug(" dialog " + dialog);
 			if(dialog != null) {
-				log.debug(" dialogId " + dialog.getDialogId());
+				logger.debug(" dialogId " + dialog.getDialogId());
 			}			
 		}
 		if(dialog != null && dialog.getDialogId() != null && !dialog.getDialogId().equals(sessionCreatingDialogId)) {			
 			if(dialog != null) {
-				log.debug("DialogId set to " + dialog.getDialogId());
+				if (logger.isDebugEnabled()){
+					logger.debug("DialogId set to " + dialog.getDialogId());
+				}
 			}
 			sessionMetadataDirty();
 			metadata.getMetaData().put(DIALOG_ID, dialog.getDialogId() );

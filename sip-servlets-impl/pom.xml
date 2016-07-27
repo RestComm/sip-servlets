@@ -122,6 +122,13 @@
 			<version>${restcomm.jain.sip.ha.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		
+		<dependency>			
+			<groupId>org.mobicents.ha.javax.sip</groupId>
+			<artifactId>restcomm-jain-sip-ha-infinispan-backend</artifactId>
+			<version>${restcomm.jain.sip.ha.infinispan.version}</version>	
+			<scope>provided</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>org.mobicents.javax.sip</groupId>
@@ -213,7 +220,7 @@
 									<goal> copy-dependencies </goal>
 								</goals>
 								<configuration>
-									<includeArtifactIds>jain-sip-api,jain-sip-ri,log4j,commons-logging,dnsjava,stun4j,activation,mail,restcomm-jain-sip-ha-core,restcomm-jain-sip-ext,commons-codec</includeArtifactIds>
+									<includeArtifactIds>jain-sip-api,jain-sip-ri,log4j,commons-logging,dnsjava,stun4j,activation,mail,restcomm-jain-sip-ha-core,restcomm-jain-sip-ha-infinispan-backend,restcomm-jain-sip-ext,commons-codec</includeArtifactIds>
 									<outputDirectory>${CATALINA_HOME}/lib</outputDirectory>
 								</configuration>
 							</execution>
@@ -264,7 +271,7 @@
 									<goal> copy-dependencies </goal>
 								</goals>
 								<configuration>
-									<includeArtifactIds>jain-sip-api,jain-sip-ri,concurrent,log4j,commons-logging,dnsjava,stun4j,activation,mail,restcomm-jain-sip-ha-core,restcomm-jain-sip-ext,commons-codec</includeArtifactIds>
+									<includeArtifactIds>jain-sip-api,jain-sip-ri,concurrent,log4j,commons-logging,dnsjava,stun4j,activation,mail,restcomm-jain-sip-ha-core,restcomm-jain-sip-ha-infinispan-backend,restcomm-jain-sip-ext,commons-codec</includeArtifactIds>
 									<outputDirectory>${env.CATALINA_HOME}/lib</outputDirectory>
 								</configuration>
 							</execution>
@@ -315,7 +322,7 @@
 									<goal> copy-dependencies </goal>
 								</goals>
 								<configuration>
-									<includeArtifactIds>jain-sip-api,jain-sip-ri,log4j,commons-logging,dnsjava,stun4j,activation,mail,restcomm-jain-sip-ha-core,restcomm-jain-sip-ext,commons-codec</includeArtifactIds>
+									<includeArtifactIds>jain-sip-api,jain-sip-ri,log4j,commons-logging,dnsjava,stun4j,activation,mail,restcomm-jain-sip-ha-core,restcomm-jain-sip-ha-infinispan-backend,restcomm-jain-sip-ext,commons-codec</includeArtifactIds>
 									<outputDirectory>${CATALINA_HOME}/lib</outputDirectory>
 								</configuration>
 							</execution>
@@ -366,7 +373,7 @@
 									<goal> copy-dependencies </goal>
 								</goals>
 								<configuration>
-									<includeArtifactIds>jain-sip-api,jain-sip-ri,concurrent,log4j,commons-logging,dnsjava,stun4j,activation,mail,restcomm-jain-sip-ha-core,restcomm-jain-sip-ext,commons-codec</includeArtifactIds>
+									<includeArtifactIds>jain-sip-api,jain-sip-ri,concurrent,log4j,commons-logging,dnsjava,stun4j,activation,mail,restcomm-jain-sip-ha-core,restcomm-jain-sip-ha-infinispan-backend,restcomm-jain-sip-ext,commons-codec</includeArtifactIds>
 									<outputDirectory>${env.CATALINA_HOME}/lib</outputDirectory>
 								</configuration>
 							</execution>

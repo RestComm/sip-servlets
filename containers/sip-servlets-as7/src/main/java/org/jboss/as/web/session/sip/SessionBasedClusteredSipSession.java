@@ -48,6 +48,7 @@ import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
+import org.apache.log4j.Logger;
 
 /**
  * This class is based on the following Jboss class
@@ -68,6 +69,8 @@ import org.mobicents.servlet.sip.message.SipFactoryImpl;
 public class SessionBasedClusteredSipSession extends
 		ClusteredSipSession<OutgoingSessionGranularitySessionData> {
 
+	private static final Logger logger = Logger.getLogger(SessionBasedClusteredSipSession.class);
+	
 	/**
 	 * Descriptive information describing this Session implementation.
 	 */
@@ -94,6 +97,9 @@ public class SessionBasedClusteredSipSession extends
 
 	@Override
 	protected OutgoingSessionGranularitySessionData getOutgoingSipSessionData() {
+		if (logger.isDebugEnabled()){
+			logger.debug("getOutgoingSipSessionData");
+		}
 		Map<String, Object> attrs = isSessionAttributeMapDirty() ? getSessionAttributeMap() : null;
 		DistributableSipSessionMetadata metadata = isSessionMetadataDirty() ? (DistributableSipSessionMetadata) getSessionMetadata() : null;
 		Long timestamp = attrs != null || metadata != null
@@ -108,6 +114,9 @@ public class SessionBasedClusteredSipSession extends
 	@Override
 	protected Object removeAttributeInternal(String name, boolean localCall,
 			boolean localOnly) {
+		if (logger.isDebugEnabled()){
+			logger.debug("removeAttributeInternal - name=" + name + ", localCall=" + localCall);
+		}
 		if (localCall)
 			sessionAttributesDirty();
 		return getAttributesInternal().remove(name);
@@ -115,6 +124,9 @@ public class SessionBasedClusteredSipSession extends
 
 	@Override
 	protected Object setAttributeInternal(String name, Object value) {
+		if (logger.isDebugEnabled()){
+			logger.debug("setAttributeInternal - name=" + name + ", value=" + value);
+		}
 		sessionAttributesDirty();
 		return getAttributesInternal().put(name, value);
 	}
@@ -122,6 +134,10 @@ public class SessionBasedClusteredSipSession extends
 	// ----------------------------------------------------------------- Private
 
 	private Map<String, Object> getSessionAttributeMap() {
+		if (logger.isDebugEnabled()){
+			logger.debug("getSessionAttributeMap");
+		}
+		
 		Map<String, Object> attrs = new HashMap<String, Object>(
 				getAttributesInternal());
 		removeExcludedAttributes(attrs);
@@ -133,6 +149,7 @@ public class SessionBasedClusteredSipSession extends
 	private static class OutgoingData extends
 			OutgoingDistributableSipSessionDataImpl implements
 			OutgoingSessionGranularitySessionData {
+		
 		private final Map<String, Object> attributes;
 
 		public OutgoingData(String realId, int version, Long timestamp, String sipApplicationSessionKey, String sipSessionKey,
@@ -143,6 +160,10 @@ public class SessionBasedClusteredSipSession extends
 		}
 
 		public Map<String, Object> getSessionAttributes() {
+			if (logger.isDebugEnabled()){
+				logger.debug("OutgoingData - getSessionAttributes");
+			}
+			
 			return attributes;
 		}	
 	}

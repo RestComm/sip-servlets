@@ -125,22 +125,35 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 		return cacheKey.startsWith(SIP_APP_SESSION_KEY_PREFIX);
 	}
 	public static String getSipSessionIdFromCacheKey(String cacheKey){
+		if (logger.isDebugEnabled()){
+			logger.debug("getSipSessionIdFromCacheKey - cacheKey=" + cacheKey);
+		}
 		if (isKeySipSessionId(cacheKey)){
-			return cacheKey.substring(SIP_SESSION_KEY_PREFIX.length());
-		} else if (isKeySipAppSessionId(cacheKey)){
 			String tmp = cacheKey.substring(SIP_SESSION_KEY_PREFIX.length());
-			return tmp.substring(tmp.indexOf('/'));
+			if (logger.isDebugEnabled()){
+				logger.debug("getSipSessionIdFromCacheKey - return=" + tmp.substring(tmp.indexOf("/")+1));
+			}
+			return tmp.substring(tmp.indexOf("/")+1);
 		} else {
 			return null;
 		}
 	}
 	public static String getSipAppSessionIdFromCacheKey(String cacheKey){
+		if (logger.isDebugEnabled()){
+			logger.debug("getSipAppSessionIdFromCacheKey - cacheKey=" + cacheKey);
+		}
 		if (isKeySipAppSessionId(cacheKey)){
+			if (logger.isDebugEnabled()){
+				logger.debug("getSipAppSessionIdFromCacheKey - return=" + cacheKey.substring(SIP_APP_SESSION_KEY_PREFIX.length()));
+			}
 			return cacheKey.substring(SIP_APP_SESSION_KEY_PREFIX.length());
-		} else if (isKeySipSessionId(cacheKey)){
+		} else if (isKeySipSessionId(cacheKey)) {
 			String tmp = cacheKey.substring(SIP_SESSION_KEY_PREFIX.length());
-			return tmp.substring(0, tmp.indexOf('/'));
-		}else {
+			if (logger.isDebugEnabled()){
+				logger.debug("getSipSessionIdFromCacheKey (from sip session key) - return=" + tmp.substring(0, tmp.indexOf("/")));
+			}
+			return tmp.substring(0, tmp.indexOf("/"));
+		} else {
 			return null;
 		}
 	}
@@ -217,7 +230,8 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 				getCache(), (LocalDistributableConvergedSessionManager)manager, 
 				//infinispanCacheService.combinedPath_,
 				//Util.getReplicationGranularity(manager), 
-				sipApplicationName, sipApplicationNameHashed);
+				sipApplicationName, sipApplicationNameHashed,
+				this);
 		
 		//if (log_.isDebugEnabled()) {
 		//	log_.debug("DistributedCacheConvergedSipManagerDelegate.start() : sipCacheListener " + sipCacheListener_);
@@ -436,12 +450,18 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 		                if (dsm.getMetaData() != null){
 		                	if (logger.isDebugEnabled()){
 		            			logger.debug("storeSipSessionData - storing SIP_METADATA_MAP: " + dsm.getMetaData());
+		            			for (String tmpKey: dsm.getMetaData().keySet()){
+		            				logger.debug("storeSipSessionData - storing SIP_METADATA_MAP, entry: " + tmpKey + "=" + dsm.getMetaData().get(tmpKey));	
+		            			}
 		            		}
 		                	SipSessionMapEntry.SIP_METADATA_MAP.put(map, DistributedCacheManager.this.marshaller.marshal(dsm.getMetaDataCopy()));
 		                }
 		                
 	                }   
 	                if (sessionData.getTimestamp() != null){
+	                	if (logger.isDebugEnabled()){
+	                		logger.debug("storeSipSessionData - SipSessionMapEntry.TIMESTAMP.put");
+	                	}
 	                	SipSessionMapEntry.TIMESTAMP.put(map, sessionData.getTimestamp());
 	                }
                 
@@ -1185,11 +1205,20 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 	public Map<String, Object> loadSipMetaDataMap(Map<Object, Object> map) throws IOException, ClassNotFoundException {
 		if (logger.isDebugEnabled()){
 			logger.debug("loadSipMetaDataMap");
+			if (map != null){
+				for (Object tmpKey: map.keySet()){
+					logger.debug("loadSipMetaDataMap - map entries: " + tmpKey + "=" + map.get(tmpKey));
+				}
+			}
 		}
 		
 		Object tmpObject = SipSessionMapEntry.SIP_METADATA_MAP.get(map);
 		logger.debug("loadSipMetaDataMap - tmpObject=" + tmpObject);
-		Map<String, Object> result = (Map<String, Object>) this.marshaller.unmarshal(tmpObject);
+		
+		Map<String, Object> resultOriginalInstance = (Map<String, Object>) this.marshaller.unmarshal(tmpObject);
+		// Seems it is necessary here to make a copy of the nested map cache entry (similarly to how a copy of the map is created when it is put into the cache.)
+		// Not making a copy leads to strange errors, like e.g. the stored map sometimes becomes empty in the cache without any @CacheEntryModified event.
+		Map<String, Object> result = new HashMap<String, Object>(resultOriginalInstance);
 		
 		if (logger.isDebugEnabled()){
 			logger.debug("loadSipMetaDataMap - result=" + result);

@@ -256,6 +256,7 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         newControllers.add(context.getServiceTarget().addService(SipSubsystemServices.JBOSS_SIP, service)
                 .addDependency(PathManagerService.SERVICE_NAME, PathManager.class, service.getPathManagerInjector())
                 .addDependency(DependencyType.OPTIONAL, ServiceName.JBOSS.append("mbean", "server"), MBeanServer.class, service.getMbeanServer())
+                .addDependencies(ServiceName.JBOSS.append("cluster", "siprep"))
                 .setInitialMode(Mode.ACTIVE)
                 .install());
 

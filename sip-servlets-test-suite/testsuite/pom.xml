@@ -189,6 +189,12 @@
 		</dependency>
 		
 		<dependency>			
+			<groupId>org.mobicents.ha.javax.sip</groupId>
+			<artifactId>restcomm-jain-sip-ha-infinispan-backend</artifactId>
+			<version>${restcomm.jain.sip.ha.infinispan.version}</version>
+		</dependency>
+		
+		<dependency>			
 			<groupId>org.mobicents.javax.sip</groupId>
 			<artifactId>restcomm-jain-sip-ext</artifactId>
 			<version>${restcomm.jain.sip.ext.version}</version>				
