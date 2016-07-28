@@ -129,6 +129,7 @@ import org.restcomm.cluster.election.DefaultClusterElector;
  * @author Ben Wang
  * @author Brian Stansberry
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
+ * @author kokuti.andras@ext.alerant.hu
  * @author posfai.gergely@ext.alerant.hu
  *  
  */

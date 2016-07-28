@@ -81,7 +81,9 @@ import org.mobicents.servlet.sip.notification.SipSessionActivationEvent;
  * replication strategy can be implemented such as session- field- or attribute-based ones.
  * 
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
+ * @author kokuti.andras@ext.alerant.hu
  * @author posfai.gergely@ext.alerant.hu
+ * 
  */
 public abstract class ClusteredSipApplicationSession<O extends OutgoingDistributableSessionData> extends SipApplicationSessionImpl {
 
@@ -1572,7 +1574,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		return key.getId();
 	}
 
-	public void rescheduleTimersLocally() {		
+	public void rescheduleTimersLocally() {
 		((ClusteredSipApplicationSessionTimerService)sipContext.getSipApplicationSessionTimerService()).rescheduleTimerLocally(this);
 		if(servletTimerIds != null) {
 			if(logger.isDebugEnabled()) {
