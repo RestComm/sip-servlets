@@ -53,7 +53,7 @@ cp $BUILD_DIR/../../../../sip-servlets-examples/websocket-b2bua/websocket-dar.pr
 cp $BUILD_DIR/../../mss-sip-stack.properties $BUILD_DIR/$MSS_FINAL_NAME/standalone/configuration/
 cp $BUILD_DIR/../../mss-sip-stack.properties $BUILD_DIR/$MSS_FINAL_NAME/domain/configuration/mss-sip-stack.properties
 
-# move a jar file from the mobicents module to the jboss module in order to access package private class; necessary because: https://issues.jboss.org/browse/AS7-3305 
+# move a class file from the mobicents module jar to the jboss module jar in order to access package private class; necessary because: https://issues.jboss.org/browse/AS7-3305 
 mkdir tmp1
 unzip $BUILD_DIR/$MSS_FINAL_NAME/modules/system/layers/base/org/mobicents/libs/main/sip-servlets-as7-*.jar -d tmp1/
 zip -d $BUILD_DIR/$MSS_FINAL_NAME/modules/system/layers/base/org/mobicents/libs/main/sip-servlets-as7-*.jar org/jboss/as/web/session/ExposedSessionBasedClusteredSession.class
@@ -73,6 +73,9 @@ cp -f $DESTINATION_JAR_NAME $BUILD_DIR/$MSS_FINAL_NAME/modules/system/layers/bas
 rm $DESTINATION_JAR_NAME
 rm -rf tmp1
 rm -rf tmp2
+
+# extend the dependencies of the org.jboss.as.clustering.common:main module with the org.mobicents.libs:main module, to prevent ClassNotFound exceptions during runtime
+sed -i '/<\/dependencies>/i\\t<module name="org.mobicents.libs"/>' $BUILD_DIR/$MSS_FINAL_NAME/modules/system/layers/base/org/jboss/as/clustering/common/main/module.xml
 
 #Copy conf settings for standalone and domain profiles
 cp -vpr $BUILD_DIR/../../as7-standalone-conf $BUILD_DIR/$MSS_FINAL_NAME/bin/standalone.conf
@@ -96,7 +99,7 @@ patch -p0 --verbose < ../../../../../containers/sip-servlets-as7-drop-in/patches
 # Configure jboss-as-ee module
 patch -p0 --verbose < ../../../../../containers/sip-servlets-as7-drop-in/patches/patch.7.2.0.Final.jboss-as-ee.module.xml
 
-### TODO: a cp-s megoldást lecserélni a kikommentezett patch-elősre
+### TODO: replace the cp commands with the commented patch commands, (similarly to how the other xml files are constructed). To do this, the appropriate patch files have to be generated.
 # Create standalone-sip-ha.xml and standalone-sip-ha-node2.xml files for clustered mode
 # Node 1
 # patch -p0 --verbose -o ./standalone/configuration/standalone-sip-ha.xml < ../../../../../containers/sip-servlets-as7-drop-in/patches/patch.7.2.0.Final.standalone.sip.ha.dropin.xml

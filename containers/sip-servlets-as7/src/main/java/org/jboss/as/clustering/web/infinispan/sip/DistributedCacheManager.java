@@ -387,7 +387,7 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
             		
 	                SipSessionMapEntry.VERSION.put(map, Integer.valueOf(sessionData.getVersion()));
 	                DistributableSipSessionMetadata dsm = (DistributableSipSessionMetadata)(sessionData.getMetadata());
-	                if (dsm != null && dsm.isNew() && sessionData.isSessionMetaDataDirty()){
+	                if (dsm != null && sessionData.isSessionMetaDataDirty()){
 		                if (dsm.isNew()){
 		                	
 		                	if (sessionData.getMetadata().getId() == null){
@@ -467,7 +467,8 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
             		SipSessionMapEntry.VERSION.put(map, Integer.valueOf(sipAppSessionData.getVersion()));
 	                
             		DistributableSipApplicationSessionMetadata dsm = (DistributableSipApplicationSessionMetadata)sipAppSessionData.getMetadata();
-            		if (dsm != null && dsm.isNew() && sipAppSessionData.isSessionMetaDataDirty()){
+            		
+            		if (dsm != null && sipAppSessionData.isSessionMetaDataDirty()){
             			if (dsm.isNew()){
 		                	if (sipAppSessionData.getMetadata().getId() == null){
 			                	// Setting the id manually. Otherwise it would cause exceptions.
