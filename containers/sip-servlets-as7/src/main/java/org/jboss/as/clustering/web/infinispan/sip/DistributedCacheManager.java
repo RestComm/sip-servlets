@@ -387,6 +387,16 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
             		
 	                SipSessionMapEntry.VERSION.put(map, Integer.valueOf(sessionData.getVersion()));
 	                DistributableSipSessionMetadata dsm = (DistributableSipSessionMetadata)(sessionData.getMetadata());
+	                
+	                if (logger.isDebugEnabled()){
+            			logger.debug("storeSipSessionData - dsm=" + dsm);
+            			if (dsm != null){
+            				logger.debug("storeSipSessionData - dsm.isNew()=" + dsm.isNew());
+            				logger.debug("storeSipSessionData - dsm.isValid()=" + dsm.isValid());
+            				logger.debug("storeSipSessionData - sessionData.isSessionMetaDataDirty()=" + sessionData.isSessionMetaDataDirty());
+            			}
+            		}
+	                
 	                if (dsm != null && sessionData.isSessionMetaDataDirty()){
 		                if (dsm.isNew()){
 		                	
@@ -467,6 +477,16 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
             		SipSessionMapEntry.VERSION.put(map, Integer.valueOf(sipAppSessionData.getVersion()));
 	                
             		DistributableSipApplicationSessionMetadata dsm = (DistributableSipApplicationSessionMetadata)sipAppSessionData.getMetadata();
+            		
+            		if (logger.isDebugEnabled()){
+            			logger.debug("storeSipApplicationSessionData - dsm=" + dsm);
+            			if (dsm != null){
+            				logger.debug("storeSipApplicationSessionData - dsm.isNew()=" + dsm.isNew());
+            				logger.debug("storeSipApplicationSessionData - dsm.isValid()=" + dsm.isValid());
+            				logger.debug("storeSipApplicationSessionData - dsm.isServletTimersMapModified()=" + dsm.isServletTimersMapModified());
+            				logger.debug("storeSipApplicationSessionData - sipAppSessionData.isSessionMetaDataDirty()=" + sipAppSessionData.isSessionMetaDataDirty());
+            			}
+            		}
             		
             		if (dsm != null && sipAppSessionData.isSessionMetaDataDirty()){
             			if (dsm.isNew()){
@@ -1030,9 +1050,9 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 	        		}
 	                sipMetaData.setMetaData(loadSipMetaDataMap(map));
 	                
-	                IncomingDistributableSessionDataImpl result = null;
+	                IncomingDistributableSipSessionDataImpl result = null;
                 
-                	result = new IncomingDistributableSessionDataImpl(version, timestamp, sipMetaData);
+                	result = new IncomingDistributableSipSessionDataImpl(version, timestamp, sipMetaData);
                 	if (includeAttributes) {
                         result.setSessionAttributes(attributeStorage.load(map));
                     }
@@ -1180,9 +1200,9 @@ public class DistributedCacheManager<V extends OutgoingDistributableSessionData>
 	        		}
 	                sipMetaData.setMetaData(loadSipMetaDataMap(map));
 	                
-	                IncomingDistributableSessionDataImpl result = null;
+	                IncomingDistributableSipSessionDataImpl result = null;
 	                
-                	result = new IncomingDistributableSessionDataImpl(version, timestamp, sipMetaData);
+                	result = new IncomingDistributableSipSessionDataImpl(version, timestamp, sipMetaData);
                 	if (includeAttributes) {
                 		result.setSessionAttributes(attributeStorage.load(map));
                     }

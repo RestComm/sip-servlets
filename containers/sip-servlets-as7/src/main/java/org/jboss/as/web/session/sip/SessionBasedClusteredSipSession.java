@@ -108,6 +108,7 @@ public class SessionBasedClusteredSipSession extends
 	protected Object setAttributeInternal(String name, Object value) {
 		if (logger.isDebugEnabled()){
 			logger.debug("setAttributeInternal - name=" + name + ", value=" + value);
+			logger.debug("setAttributeInternal - original value=" + getAttributesInternal().get(name));
 		}
 		sessionAttributesDirty();
 		return getAttributesInternal().put(name, value);

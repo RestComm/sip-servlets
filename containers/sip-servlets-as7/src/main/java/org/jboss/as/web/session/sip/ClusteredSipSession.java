@@ -147,7 +147,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	/**
 	 * Set of attribute names which are not allowed to be replicated/persisted.
 	 */
-	protected static final String[] excludedAttributes = { Globals.SUBJECT_ATTR };
+	protected static final String[] excludedAttributes = { Globals.SUBJECT_ATTR};
 
 	/**
 	 * Set containing all members of {@link #excludedAttributes}.
@@ -720,6 +720,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		return (new Enumerator(getAttributesInternal().keySet(), true));
 	}
 
+	@Override
 	public void setAttribute(String name, Object value) {
 		if (logger.isDebugEnabled()){
 			logger.debug("setAttribute - this.getHaId()=" + this.getHaId() + ", this.getId()=" + this.getId() + " - name=" + name);
@@ -767,7 +768,14 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 
 		// Replace or add this attribute
 		Object unbound = setAttributeInternal(name, value);
-
+		
+		// TODO: shouldn't we replicate here (as we do at attribute removal)? However, simply uncommenting the following lines leads to exceptions.
+		// Do replication - so the dirty (updated local) metadata won't be replaced from the cache, when access() is called
+		//if (logger.isDebugEnabled()){
+		//	logger.debug("setAttribute - calling processSipSessionRepl");
+		//}
+		//((DistributableSipSessionManager)this.getManager()).processSipSessionRepl(this);
+		
 		// Call the valueUnbound() method if necessary
 		if ((unbound != null)
 				&& (unbound != value)
@@ -988,7 +996,10 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 
 		checkAlwaysReplicateTimestamp();
 
-		populateAttributes(sessionData.getSessionAttributes());
+		Map<String, Object> sessionAttributes = sessionData.getSessionAttributes();
+		if (sessionAttributes != null){
+			populateAttributes(sessionAttributes);
+		}
 
 		isNew = false;
 		// We are no longer outdated vis a vis distributed cache
@@ -1863,8 +1874,17 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		// Remove this attribute from our collection
 		Object value = removeAttributeInternal(name, localCall, localOnly);
 
+		// Do replication - so the dirty (updated local) metadata won't be replaced from the cache, when access() is called
+		if (logger.isDebugEnabled()){
+			logger.debug("removeAttributeInternal - calling processSipSessionRepl");
+		}
+		((DistributableSipSessionManager)this.getManager()).processSipSessionRepl(this);
+		
 		// Do we need to do valueUnbound() and attributeRemoved() notification?
 		if (!notify || (value == null)) {
+			if (logger.isDebugEnabled()){
+				logger.debug("removeAttributeInternal - returning without notification - notify=" + notify + ", value=" + value);
+			}
 			return;
 		}
 
@@ -1882,7 +1902,15 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		if (notificationPolicy.isSipSessionAttributeListenerInvocationAllowed(
 				this.clusterStatus, cause, name, localCall)) {
 			// Notify interested application event listeners
+			if (logger.isDebugEnabled()){
+				logger.debug("removeAttributeInternal - Notify interested application event listeners");
+			}
+			
 			List<SipSessionAttributeListener> listeners = getSipApplicationSession().getSipContext().getListeners().getSipSessionAttributeListeners();
+			if (logger.isDebugEnabled()){
+				logger.debug("removeAttributeInternal - listeners=" + listeners);
+			}
+			
 			if (listeners == null)
 				return;
 			for (SipSessionAttributeListener listener : listeners) {
@@ -1891,6 +1919,9 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 //							listener);
 					if (event == null) {
 						event = new SipSessionBindingEvent(this, name);
+					}
+					if (logger.isDebugEnabled()){
+						logger.debug("removeAttributeInternal - calling attributeRemoved for listener=" + listener);
 					}
 					listener.attributeRemoved(event);
 //					fireContainerEvent(context, "afterSessionAttributeRemoved",

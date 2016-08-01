@@ -1224,8 +1224,11 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		if(logger.isDebugEnabled()) {
 			logger.debug("putting following attributes " + distributedCacheAttributes + " in the sip session " + key);
 		}
+
+		if (distributedCacheAttributes != null){
+			existing.putAll(distributedCacheAttributes);
+		}
 		
-		existing.putAll(distributedCacheAttributes);
 		if (excluded != null)
 			existing.putAll(excluded);
 	}
