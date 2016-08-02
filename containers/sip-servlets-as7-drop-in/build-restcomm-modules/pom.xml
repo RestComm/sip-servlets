@@ -269,21 +269,21 @@
 				<dependency>
 			<groupId>org.restcomm.cluster</groupId>
 			<artifactId>core</artifactId>
-			<version>3.0.0.3</version>
+			<version>${org.restcomm.cluster.version}</version>
 			<scope>provided</scope>
 		</dependency>	
 		
 		<dependency>
 			<groupId>org.restcomm.cluster</groupId>
 			<artifactId>cache</artifactId>
-			<version>3.0.0.3</version>
+			<version>${org.restcomm.cluster.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.restcomm.cluster</groupId>
 			<artifactId>timers</artifactId>
-			<version>3.0.0.3</version>
+			<version>${org.restcomm.cluster.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		
