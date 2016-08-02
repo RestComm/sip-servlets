@@ -77,6 +77,9 @@ rm -rf tmp2
 # extend the dependencies of the org.jboss.as.clustering.common:main module with the org.mobicents.libs:main module, to prevent ClassNotFound exceptions during runtime
 sed -i '/<\/dependencies>/i\\t<module name="org.mobicents.libs"/>' $BUILD_DIR/$MSS_FINAL_NAME/modules/system/layers/base/org/jboss/as/clustering/common/main/module.xml
 
+# copy default deployments to another deployments directory for the second jboss node for failover testing
+cp -r $BUILD_DIR/$MSS_FINAL_NAME/standalone/deployments $BUILD_DIR/$MSS_FINAL_NAME/standalone/deployments-node2
+
 #Copy conf settings for standalone and domain profiles
 cp -vpr $BUILD_DIR/../../as7-standalone-conf $BUILD_DIR/$MSS_FINAL_NAME/bin/standalone.conf
 cp -vpr $BUILD_DIR/../../as7-domain-conf $BUILD_DIR/$MSS_FINAL_NAME/bin/domain.conf

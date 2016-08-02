@@ -2,6 +2,8 @@ export EXAMPLES_HOME=../../../sip-servlets-examples
 
 export config1="standalone-sip-ha.xml"
 export config2="standalone-sip-ha-node2.xml"
+export deployments_dir1="deployments"
+export deployments_dir2="deployments-node2"
 export KILL_PARAMS="-9"
 
 export FULLSTARTSLEEP=200
@@ -55,8 +57,8 @@ echo "SIP LB $SIPLB"
 ##################################
 echo "Test Custom B2BUA"
 echo "================================"
-./auto-prepare-example.sh custom-b2bua $config1
-./auto-prepare-example.sh custom-b2bua $config2
+./auto-prepare-example.sh custom-b2bua $deployments_dir1
+./auto-prepare-example.sh custom-b2bua $deployments_dir2
 
 ./auto-start-jboss-eap-6.4-server.sh $config2 config2.pid 1 custom-b2bua
 
