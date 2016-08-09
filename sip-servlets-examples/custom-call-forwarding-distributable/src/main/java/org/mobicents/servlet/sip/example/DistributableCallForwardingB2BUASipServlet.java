@@ -67,6 +67,7 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet imple
 	
 	/** Creates a new instance of CallForwardingB2BUASipServlet */
 	public DistributableCallForwardingB2BUASipServlet() {
+		new Composite(null, null);
 	}
 
 	@Override
@@ -336,6 +337,12 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet imple
 	}
 
 	public void timeout(ServletTimer arg0) {
+		
+		logger.info(Thread.currentThread().getContextClassLoader());
+		logger.info(getClass().getClassLoader());
+		logger.info(getClass().getClassLoader().getClass().getName());
+		
+		
 		final SipServletRequest request = (SipServletRequest) arg0.getInfo();
 		request.getSession().setAttribute("timerRequest", new Composite(request, request.getSession()));
 		
