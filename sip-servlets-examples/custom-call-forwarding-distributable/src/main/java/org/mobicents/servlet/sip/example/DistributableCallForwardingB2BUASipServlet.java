@@ -67,6 +67,7 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet imple
 	
 	/** Creates a new instance of CallForwardingB2BUASipServlet */
 	public DistributableCallForwardingB2BUASipServlet() {
+		// creating Composite object to workaround classloading issue, TODO find final solution
 		new Composite(null, null);
 	}
 
