@@ -844,6 +844,26 @@ public class ShootmeSipServletTest extends SipServletTestCase {
         assertEquals("CONFIRMED", allMessagesContent.get(0));        
     }
 	
+	public void testAddContactHeader() throws Exception {
+		String fromName = "testAddHeaderHandler";
+		String contact = "sip:1234@127.0.0.1:5060;transport=tcp";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(500);
+		
+		assertTrue(tomcat.getSipService().getSipApplicationDispatcher().getResponsesSentByStatusCode("3XX")>0);
+		ContactHeader contactHeader = (ContactHeader) sender.getFinalResponse().getHeader(ContactHeader.NAME);
+		assertTrue(((SipURI)contactHeader.getAddress().getURI()).toString().contains(contact));
+	}
+	
 	@Override
 	@After
 	protected void tearDown() throws Exception {					
