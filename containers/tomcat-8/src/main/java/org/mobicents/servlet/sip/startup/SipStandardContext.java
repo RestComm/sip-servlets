@@ -140,6 +140,10 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 	// application session is 3 minutes
 	private static int DEFAULT_LIFETIME = 3;
 
+    // default quotable params that their values need to be quoted.
+    private static final String DEFAULT_QUOTABLE_PARAMS = "vendor, model, version, cnonce, nextnonce,"
+        + "nonce, code, oc-algo, cid, text, domain, opaque, qop, realm, response, rspauth, uri, username";
+
 	protected String applicationName;
 	protected String smallIcon;
 	protected String largeIcon;
@@ -287,7 +291,29 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 				sipApplicationDispatcher.getSipService().findSipConnectors());
 		this.getServletContext().setAttribute("org.mobicents.servlet.sip.DNS_RESOLVER",
 				sipApplicationDispatcher.getDNSResolver());
+        this.getServletContext().setAttribute("org.restcomm.servlets.sip.QUOTABLE_PARAMETER",
+                getQuotableParams());
 	}
+
+    /**
+     *
+     * @return a list of known params that their values need to be quoted.
+     */
+    private List<String> getQuotableParams(){
+        List<String> retValue = new ArrayList<String>();
+        String quotableParameters = this.getServletContext().getInitParameter("org.restcomm.servlets.sip.QUOTABLE_PARAMETER");
+        if (quotableParameters == null){
+            quotableParameters = DEFAULT_QUOTABLE_PARAMS;
+        }
+        String[] parameters = quotableParameters.split(",");
+        for (int i = 0; i < parameters.length; i++){
+            String param = parameters[i].trim();
+            if (param != null && !param.isEmpty() && !retValue.contains(param)){
+                retValue.add(param);
+            }
+        }
+        return retValue;
+    }
 
 	/**
 	 * @throws Exception
