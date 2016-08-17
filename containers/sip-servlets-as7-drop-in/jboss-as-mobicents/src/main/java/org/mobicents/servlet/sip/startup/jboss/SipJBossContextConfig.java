@@ -27,22 +27,14 @@ import java.util.List;
 
 import javax.servlet.sip.SipServletRequest;
 
-import org.apache.catalina.LifecycleException;
-import org.apache.catalina.Loader;
 import org.apache.catalina.core.StandardWrapper;
 import org.apache.catalina.startup.ContextConfig;
 import org.jboss.as.clustering.ClassLoaderAwareClassResolver;
-import org.jboss.as.clustering.web.DistributedCacheManagerFactory;
 import org.jboss.as.clustering.web.OutgoingDistributableSessionData;
 import org.jboss.as.clustering.web.infinispan.sip.DistributedCacheConvergedSipManagerFactory;
-import org.jboss.as.clustering.web.sip.DistributedConvergedCacheManagerFactoryService;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.web.WebLogger;
-import org.jboss.as.web.deployment.JBossContextConfig;
-import org.jboss.as.web.deployment.WarMetaData;
-import org.jboss.as.web.session.DistributableSessionManager;
-import org.jboss.as.web.session.ExposedSessionBasedClusteredSession;
 import org.jboss.as.web.session.sip.DistributableSipSessionManager;
 import org.jboss.logging.Logger;
 import org.jboss.marshalling.ClassResolver;
@@ -57,14 +49,12 @@ import org.jboss.metadata.javaee.spec.IconsImpl;
 import org.jboss.metadata.javaee.spec.ParamValueMetaData;
 import org.jboss.metadata.javaee.spec.SecurityRoleRefMetaData;
 import org.jboss.metadata.javaee.spec.SecurityRoleRefsMetaData;
-import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.metadata.web.spec.ListenerMetaData;
 import org.jboss.metadata.web.spec.ServletMetaData;
 import org.jboss.metadata.web.spec.TransportGuaranteeType;
 import org.jboss.modules.Module;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.value.InjectedValue;
-import org.jboss.msc.value.Value;
 import org.mobicents.metadata.sip.jboss.JBossConvergedSipMetaData;
 import org.mobicents.metadata.sip.jboss.JBossSipServletsMetaData;
 import org.mobicents.metadata.sip.spec.AndMetaData;
@@ -96,9 +86,7 @@ import org.mobicents.servlet.sip.catalina.rules.ExistsRule;
 import org.mobicents.servlet.sip.catalina.rules.NotRule;
 import org.mobicents.servlet.sip.catalina.rules.OrRule;
 import org.mobicents.servlet.sip.catalina.rules.SubdomainRule;
-import org.mobicents.servlet.sip.core.SipContext;
 import org.mobicents.servlet.sip.core.descriptor.MatchingRule;
-import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
 
 /**
@@ -243,8 +231,8 @@ public class SipJBossContextConfig extends /*JBossContextConfig*/ ContextConfig 
                     ClassResolver resolver = ModularClassResolver.getInstance(module.getModuleLoader());
                     if(logger.isDebugEnabled()){
                 		logger.debug("processSipMetaData - " + this + " - got classResolver " + convergedMetaData.getApplicationName());
-                	}
-
+                	}                    
+                    
                     context.setManager(
                     		new DistributableSipSessionManager<OutgoingDistributableSessionData>(
                     				this.factory.getValue(), 
@@ -252,6 +240,7 @@ public class SipJBossContextConfig extends /*JBossContextConfig*/ ContextConfig 
                     				new ClassLoaderAwareClassResolver(resolver, module.getClassLoader())
                     			)
                     		);
+                    
                     if(logger.isDebugEnabled()){
                 		logger.debug("processSipMetaData - " + this + " - setManager returned " + convergedMetaData.getApplicationName());
                 	}

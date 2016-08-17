@@ -21,8 +21,6 @@ package org.jboss.as.clustering.web.sip;
 
 import java.util.ServiceLoader;
 
-import org.jboss.as.clustering.web.DistributedCacheManagerFactory;
-import org.jboss.as.clustering.web.DistributedCacheManagerFactoryService;
 import org.jboss.as.clustering.web.infinispan.sip.DistributedCacheConvergedSipManagerFactory;
 import org.jboss.logging.Logger;
 import org.jboss.msc.service.Service;
@@ -36,33 +34,34 @@ import org.jboss.msc.service.StopContext;
  * @author posfai.gergely@ext.alerant.hu
  * 
  */
-public class DistributedConvergedCacheManagerFactoryService extends DistributedCacheManagerFactoryService implements Service<DistributedCacheManagerFactory> {
+public class DistributedConvergedCacheManagerFactoryService implements Service<DistributedCacheConvergedSipManagerFactory> {
 	private static final Logger logger = Logger.getLogger(DistributedConvergedCacheManagerFactoryService.class);
 	
 	public static final ServiceName JVM_ROUTE_REGISTRY_SERVICE_NAME = ServiceName.JBOSS.append("sip", "jvm-route", "registry");
     public static final ServiceName JVM_ROUTE_REGISTRY_ENTRY_PROVIDER_SERVICE_NAME = JVM_ROUTE_REGISTRY_SERVICE_NAME.append("provider");
     
-    private final DistributedCacheManagerFactory factory;
+    private final DistributedCacheConvergedSipManagerFactory factory;
 
     public DistributedConvergedCacheManagerFactoryService() {
-    	this (new DistributedCacheConvergedSipManagerFactory());
+    	this (new DistributedCacheConvergedSipManagerFactory()); 
+    	//this (load());
     	if(logger.isDebugEnabled()) {
 			logger.debug("DistributedConvergedCacheManagerFactoryService");
 		}
     }
 
-    public DistributedConvergedCacheManagerFactoryService(DistributedCacheManagerFactory factory) {
+    public DistributedConvergedCacheManagerFactoryService(DistributedCacheConvergedSipManagerFactory factory) {
         this.factory = factory;
         if(logger.isDebugEnabled()) {
 			logger.debug("DistributedConvergedCacheManagerFactoryService - factory");
 		}
     }
 
-    private static DistributedCacheManagerFactory load() {
+    private static DistributedCacheConvergedSipManagerFactory load() {
     	if(logger.isDebugEnabled()) {
 			logger.debug("load");
 		}
-        for (DistributedCacheManagerFactory manager: ServiceLoader.load(DistributedCacheManagerFactory.class, DistributedCacheManagerFactory.class.getClassLoader())) {
+        for (DistributedCacheConvergedSipManagerFactory manager: ServiceLoader.load(DistributedCacheConvergedSipManagerFactory.class, DistributedCacheConvergedSipManagerFactory.class.getClassLoader())) {
         	if(logger.isDebugEnabled()) {
     			logger.debug("load - return manager");
     		}
@@ -72,7 +71,7 @@ public class DistributedConvergedCacheManagerFactoryService extends DistributedC
     }
 
     @Override
-    public DistributedCacheManagerFactory getValue() {
+    public DistributedCacheConvergedSipManagerFactory getValue() {
     	if(logger.isDebugEnabled()) {
 			logger.debug("getValue");
 		}

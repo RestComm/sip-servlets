@@ -43,17 +43,11 @@ import java.util.concurrent.locks.Lock;
 
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.servlet.http.HttpSession;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipSession.State;
 import javax.sip.SipStack;
-import javax.transaction.InvalidTransactionException;
-import javax.transaction.SystemException;
-import javax.transaction.Transaction;
-import javax.transaction.TransactionManager;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -64,7 +58,6 @@ import org.apache.catalina.Service;
 import org.apache.catalina.Session;
 import org.apache.catalina.Valve;
 import org.apache.catalina.connector.Connector;
-import org.infinispan.Cache;
 import org.jboss.as.clustering.web.BatchingManager;
 import org.jboss.as.clustering.web.ClusteringNotSupportedException;
 import org.jboss.as.clustering.web.DistributableSessionMetadata;
@@ -73,7 +66,6 @@ import org.jboss.as.clustering.web.IncomingDistributableSessionData;
 import org.jboss.as.clustering.web.OutgoingDistributableSessionData;
 import org.jboss.as.clustering.web.OutgoingSessionGranularitySessionData;
 import org.jboss.as.clustering.web.SessionOwnershipSupport;
-import org.jboss.as.clustering.web.infinispan.sip.DistributedCacheManager;
 import org.jboss.as.clustering.web.sip.DistributableSipSessionMetadata;
 import org.jboss.as.clustering.web.sip.DistributedCacheConvergedSipManager;
 import org.jboss.as.clustering.web.sip.LocalDistributableConvergedSessionManager;
@@ -259,7 +251,7 @@ public class DistributableSipSessionManager<O extends OutgoingDistributableSessi
 
 
 	public DistributableSipSessionManager(DistributedCacheManagerFactory factory, JBossWebMetaData metaData, ClassResolver resolver) throws ClusteringNotSupportedException {
-		super(factory, metaData, resolver);
+		super(factory, metaData, resolver);		
 		sipManagerDelegate = new ClusteredSipManagerDelegate(getReplicationGranularity(), getUseJK(), (ClusteredSipSessionManager)this);
 		this.sipApplicationSessionNotificationPolicyClass_ = getReplicationConfig().getSessionNotificationPolicy();
 		this.sipSessionNotificationPolicyClass_ = getReplicationConfig().getSessionNotificationPolicy();

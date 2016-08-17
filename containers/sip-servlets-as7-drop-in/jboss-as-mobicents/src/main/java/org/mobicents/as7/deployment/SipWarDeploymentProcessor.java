@@ -23,9 +23,6 @@ package org.mobicents.as7.deployment;
 
 import static org.mobicents.as7.SipMessages.MESSAGES;
 
-import org.apache.catalina.core.StandardContext;
-import org.jboss.as.clustering.web.DistributedCacheManagerFactory;
-import org.jboss.as.clustering.web.DistributedCacheManagerFactoryService;
 import org.jboss.as.clustering.web.infinispan.sip.DistributedCacheConvergedSipManagerFactory;
 import org.jboss.as.clustering.web.sip.DistributedConvergedCacheManagerFactoryService;
 import org.jboss.as.controller.PathElement;
@@ -34,10 +31,7 @@ import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.DeploymentUnitProcessor;
-import org.jboss.as.web.WebSubsystemServices;
-import org.jboss.as.web.deployment.JBossContextConfig;
 import org.jboss.as.web.deployment.WarMetaData;
-import org.jboss.as.web.ext.WebContextFactory;
 import org.jboss.dmr.ModelNode;
 import org.jboss.logging.Logger;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
@@ -55,8 +49,6 @@ import org.mobicents.as7.SipDeploymentDefinition;
 import org.mobicents.as7.SipSubsystemServices;
 import org.mobicents.metadata.sip.spec.SipMetaData;
 import org.mobicents.servlet.sip.startup.jboss.SipJBossContextConfig;
-import org.jboss.msc.service.ServiceController.Mode;
-import org.jboss.msc.value.InjectedValue;
 
 /**
  * {@code DeploymentUnitProcessor} creating the actual deployment services.
@@ -144,8 +136,8 @@ public class SipWarDeploymentProcessor implements DeploymentUnitProcessor {
 	            	}
 	                final SipJBossContextConfig config = webContext.getSipJBossContextConfig();
 	                
-	        		DistributedCacheManagerFactoryService factoryService = new DistributedConvergedCacheManagerFactoryService();
-	        		final DistributedCacheManagerFactory factory = factoryService.getValue();
+	                DistributedConvergedCacheManagerFactoryService factoryService = new DistributedConvergedCacheManagerFactoryService();
+	        		final DistributedCacheConvergedSipManagerFactory factory = factoryService.getValue();
 	        		
 	        		if (factory != null) {
 	        			if (logger.isDebugEnabled()){
@@ -158,7 +150,7 @@ public class SipWarDeploymentProcessor implements DeploymentUnitProcessor {
 	        					DistributedCacheConvergedSipManagerFactory.class, 
 	        					config.getDistributedCacheManagerFactoryInjector());
 	
-	        			ServiceBuilder<DistributedCacheManagerFactory> factoryBuilder = serviceTarget.addService(factoryServiceName, factoryService);
+	        			ServiceBuilder<DistributedCacheConvergedSipManagerFactory> factoryBuilder = serviceTarget.addService(factoryServiceName, factoryService);
 	        			
 	        			boolean enabled = factory.addDeploymentDependencies(deploymentServiceName, deploymentUnit.getServiceRegistry(), serviceTarget, factoryBuilder, metaData);
 	        			if (logger.isDebugEnabled()){

@@ -53,6 +53,7 @@ import org.jboss.as.clustering.web.SessionAttributeMarshaller;
 import org.jboss.as.clustering.web.SessionAttributeMarshallerFactory;
 import org.jboss.as.clustering.web.impl.SessionAttributeMarshallerFactoryImpl;
 import org.jboss.as.clustering.web.impl.TransactionBatchingManager;
+import org.jboss.as.clustering.web.infinispan.DistributedCacheManagerFactory;
 import org.jboss.as.clustering.web.infinispan.SessionAttributeStorage;
 import org.jboss.as.clustering.web.infinispan.SessionAttributeStorageFactory;
 import org.jboss.as.clustering.web.infinispan.SessionAttributeStorageFactoryImpl;
@@ -61,7 +62,6 @@ import org.jboss.as.clustering.web.sip.DistributedConvergedCacheManagerFactorySe
 import org.jboss.logging.Logger;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.metadata.web.jboss.ReplicationConfig;
-import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceBuilder.DependencyType;
 import org.jboss.msc.service.ServiceController;
@@ -70,7 +70,6 @@ import org.jboss.msc.service.ServiceRegistry;
 import org.jboss.msc.service.ServiceTarget;
 import org.jboss.msc.value.InjectedValue;
 import org.jboss.tm.XAResourceRecoveryRegistry;
-import org.jboss.as.clustering.web.infinispan.DistributedCacheManagerFactory;
 
 /**
  * 
@@ -232,17 +231,17 @@ public class DistributedCacheConvergedSipManagerFactory extends DistributedCache
         target.addService(cacheConfigurationServiceName, new WebSessionCacheConfigurationService(cacheName, container, config, metaData))
                 .addDependency(containerServiceName, EmbeddedCacheManager.class, container)
                 .addDependency(templateCacheConfigurationServiceName, Configuration.class, config)
-                .setInitialMode(ServiceController.Mode.ON_DEMAND)
+                .setInitialMode(ServiceController.Mode.ACTIVE)
                 .install()
         ;
         
         final InjectedValue<EmbeddedCacheManager> clusteredContainer = new InjectedValue<EmbeddedCacheManager>();
         final InjectedValue<Configuration> clusteredConfig = new InjectedValue<Configuration>();
         
-        target.addService(clusteredCacheConfigurationServiceName, new WebSessionCacheConfigurationService(clusteredCacheName, container, clusteredConfig, metaData))
+        target.addService(clusteredCacheConfigurationServiceName, new WebSessionCacheConfigurationService(clusteredCacheName, clusteredContainer, clusteredConfig, metaData))
         	.addDependency(containerServiceName, EmbeddedCacheManager.class, clusteredContainer)
         	.addDependency(templateCacheConfigurationServiceName, Configuration.class, clusteredConfig)
-        	.setInitialMode(ServiceController.Mode.ON_DEMAND)
+        	.setInitialMode(ServiceController.Mode.ACTIVE)
             .install();
         
         final InjectedValue<EmbeddedCacheManager> cacheContainer = new InjectedValue<EmbeddedCacheManager>();
