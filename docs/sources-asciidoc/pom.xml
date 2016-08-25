@@ -21,6 +21,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<asciidoctor.maven.plugin.version>1.5.3</asciidoctor.maven.plugin.version>
 		<asciidoctorj.pdf.version>1.5.0-alpha.11</asciidoctorj.pdf.version>
+		<asciidoctorj.diagram.version>1.5.0</asciidoctorj.diagram.version>                
 		<asciidoctorj.version>1.5.4</asciidoctorj.version>
 		<jruby.version>1.7.21</jruby.version>
 	</properties>	
@@ -55,7 +56,18 @@
 		                <artifactId>asciidoctorj</artifactId>
 		                <version>${asciidoctorj.version}</version>
 		            </dependency>
+                            
+		            <dependency>
+		                <groupId>org.asciidoctor</groupId>
+		                <artifactId>asciidoctorj-diagram</artifactId>
+		                <version>${asciidoctorj.diagram.version}</version>
+		            </dependency>                            
 		        </dependencies>
+                        <configuration>
+                            <requires>
+                                <require>asciidoctor-diagram</require>
+                            </requires>  
+                        </configuration>
 			<executions>
 				<execution>
 				    <id>output-html-website</id>              
