@@ -65,7 +65,7 @@ SIPApplicationDispatcher -> UAS : sendRequest
 deactivate SIPApplicationDispatcher
 
 note over SIPApplicationDispatcher 
-	step 5 to 13 can be done n times until
+	step 2 to 14 can be done n times until
 	chain ends when either an application acts as a UAS or
 	if no more applications are selected and the request is sent to an external SIP entity.
 end note
