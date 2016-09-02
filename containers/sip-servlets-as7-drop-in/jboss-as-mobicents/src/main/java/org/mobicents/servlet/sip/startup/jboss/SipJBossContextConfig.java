@@ -233,6 +233,30 @@ public class SipJBossContextConfig extends /*JBossContextConfig*/ ContextConfig 
                 		logger.debug("processSipMetaData - " + this + " - got classResolver " + convergedMetaData.getApplicationName());
                 	}                    
                     
+					
+					// TODO: Fix me properly!
+                    
+                    if(this.factory.getOptionalValue() == null){
+                 	
+                    	logger.debug("Factory value is still null, wait for it!");
+                    	
+                    	int numberOfLoops = 200;
+                    	
+	                    if(System.getProperty("restcomm.factory.loopnumber") != null){
+	                    	numberOfLoops = Integer.valueOf(System.getProperty("restcomm.factory.loopnumber"));
+	                    }
+
+                    	for(int i = 0; i < numberOfLoops; i ++){
+                    		Thread.sleep(50);
+                    		logger.trace("Factory optional value is " + this.factory.getOptionalValue());
+                    		if(this.factory.getOptionalValue() != null){
+                    			logger.debug("We got the factory, terminate the loop!");
+                    			break;
+                    		}
+                    	}
+                    	
+                    }
+					
                     context.setManager(
                     		new DistributableSipSessionManager<OutgoingDistributableSessionData>(
                     				this.factory.getValue(), 
