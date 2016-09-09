@@ -57,3 +57,4 @@ docs/sources-telscale/src/
 
 # Ignore deployment dir
 ${CATALINA_HOME}
+${env.JBOSS_HOME}
