@@ -17,17 +17,15 @@
 	<pluginRepositories>
 		<pluginRepository>
 			<id>gwt-maven-plugins</id>
-			<url>
-                http://gwt-maven.googlecode.com/svn/trunk/mavenrepo/
-            </url>
+			<url>https://maven-us.nuxeo.org/nexus/content/groups/public/</url>
+            <!-- url>http://gwt-maven.googlecode.com/svn/trunk/mavenrepo/</url-->
 		</pluginRepository>
 	</pluginRepositories>
 	<repositories>
 		<repository>
 			<id>gwt-maven</id>
-			<url>
-                http://gwt-maven.googlecode.com/svn/trunk/mavenrepo/
-            </url>
+			<url>https://maven-us.nuxeo.org/nexus/content/groups/public/</url>
+			<!--url>http://gwt-maven.googlecode.com/svn/trunk/mavenrepo/</url-->
 		</repository>
 	</repositories>
 
@@ -216,7 +214,7 @@
 						<version>1.1</version>
 						<executions>
 							<execution>
-								<phase>package</phase>
+								<phase>deploy</phase>
 								<configuration>
 									<tasks>
 										<copy verbose="true"

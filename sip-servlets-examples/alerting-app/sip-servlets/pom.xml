@@ -78,7 +78,7 @@
 				<version>1.1</version>
 				<executions>
 					<execution>
-						<phase>package</phase>
+						<phase>deploy</phase>
 						<configuration>
 							<tasks>
 								<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" tofile="${env.JBOSS_HOME}/server/default/deploy/alerting-app.war" />
