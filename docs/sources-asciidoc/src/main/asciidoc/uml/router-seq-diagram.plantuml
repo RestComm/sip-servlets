@@ -1,0 +1,72 @@
+@startuml
+autonumber
+actor UAC
+control SIPApplicationDispatcher
+control DefaultApplicationRouter
+control SipServlet
+actor UAS
+
+legend left
+	We have to record somewhere the application path
+	for dialog creating requests for 
+	subsequent requests JSR 289 Spec 15.6
+endlegend
+
+
+UAC -> SIPApplicationDispatcher: request
+activate SIPApplicationDispatcher
+SIPApplicationDispatcher -> SIPApplicationDispatcher : onRequest
+SIPApplicationDispatcher -> SIPApplicationDispatcher : translating jsip req to servlet req
+SIPApplicationDispatcher -> SIPApplicationDispatcher : isInitialRequest
+note right
+    use algorithm in Appendix B
+end note
+SIPApplicationDispatcher -> SIPApplicationDispatcher : checkDirective
+note right
+	Routing directive :
+	If request is received from an external SIP entity, directive is set to NEW.
+	If request is received from an application, directive is set either implicitly or explicitly by the application.
+	end note
+SIPApplicationDispatcher -> SIPApplicationDispatcher : setStateInfo
+
+activate DefaultApplicationRouter
+SIPApplicationDispatcher -> DefaultApplicationRouter: getNextApplication
+note right
+    check 15.4
+end note
+DefaultApplicationRouter --> SIPApplicationDispatcher : SipApplicationRouterInfo
+deactivate DefaultApplicationRouter
+
+SIPApplicationDispatcher -> SIPApplicationDispatcher : routeRequest
+note left
+    use Algorithm in JSR 289 Spec 15.4.1
+end note
+SIPApplicationDispatcher -> SIPApplicationDispatcher : maintainApplicationChain
+note left
+	the Application Chain can be encoded
+	directly in route headers/ Via Headers or 
+	the container can maintain the application
+	path by itself as stated in 15.6
+end note
+
+
+activate SipServlet
+SIPApplicationDispatcher -> SipServlet: invoke
+SipServlet -> SipServlet : appLogic
+note left
+	some Routing directive (NEW, CONTINUE or REVERSE) can be set 
+	by the application to clearly define its intentions. see JSR 289 Section 15.2
+end note
+SipServlet --> SIPApplicationDispatcher : sendRequest
+deactivate SipServlet
+
+SIPApplicationDispatcher -> SIPApplicationDispatcher : checkDirective
+SIPApplicationDispatcher -> UAS : sendRequest
+deactivate SIPApplicationDispatcher
+
+note over SIPApplicationDispatcher 
+	step 2 to 14 can be done n times until
+	chain ends when either an application acts as a UAS or
+	if no more applications are selected and the request is sent to an external SIP entity.
+end note
+@enduml
