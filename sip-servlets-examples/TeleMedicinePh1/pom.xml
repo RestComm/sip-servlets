@@ -4,25 +4,16 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip.examples</groupId>
 		<artifactId>sip-servlets-examples-parent</artifactId>
-		<version>1.6.0-SNAPSHOT</version>
+		<version>3.0.0-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
-	<groupId>org.mobicents.servlet.sip.examples</groupId>
 	<artifactId>tmph1</artifactId>
 	<packaging>war</packaging>
-	<version>1.6.0-SNAPSHOT</version>
 	<name>TeleMedicine Phase I Sip Servlet Example</name>
 	<url>http://www.mobicents.org/tmph1.html</url>
 
 	<build>
 		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
-				</configuration>
-			</plugin>
 			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>

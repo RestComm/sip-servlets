@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip.examples</groupId>
 		<artifactId>shopping-demo-parent-jsr309</artifactId>
-		<version>2.1.0-SNAPSHOT</version>
+		<version>3.0.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>shopping-demo-ear-jsr309</artifactId>
 	<packaging>ear</packaging>
@@ -13,7 +13,6 @@
 		<dependency>
 			<groupId>org.jboss.seam</groupId>
 			<artifactId>jboss-seam</artifactId>
-			<version>2.1.1.GA</version>
 			<exclusions>
 				<exclusion>
 					<groupId>jboss</groupId>
@@ -46,7 +45,6 @@
 		<dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
-			<version>1.7.0</version>
 			<exclusions>
 				<exclusion>
 					<groupId>commons-logging</groupId>
@@ -58,13 +56,13 @@
 		<dependency>
 			<groupId>org.mobicents.servlet.sip.examples</groupId>
 			<artifactId>shopping-demo-business-jsr309</artifactId>
-			<version>2.1.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<type>ejb</type>
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.servlet.sip.examples</groupId>
 			<artifactId>shopping-demo-web-jsr309</artifactId>
-			<version>2.1.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<type>war</type>
 		</dependency>
 		<dependency>
@@ -76,7 +74,6 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-commons-annotations</artifactId>
-			<version>${hibernate-common-annotations.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.hibernate</groupId>
@@ -92,7 +89,6 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-search</artifactId>
-			<version>${hibernate-search.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.hibernate</groupId>
@@ -104,7 +100,6 @@
 		<dependency>
 			<groupId>org.jbpm</groupId>
 			<artifactId>jbpm-jpdl</artifactId>
-			<version>3.2.1</version>
 			<exclusions>
 				<exclusion>
 					<groupId>commons-logging</groupId>
@@ -140,46 +135,37 @@
 		<finalName>shopping-demo</finalName>
 		<plugins>
 			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
-				</configuration>
-			</plugin>
-			<plugin>
 				<artifactId>maven-ear-plugin</artifactId>
 				<configuration>
 					<modules>	
 						<jarModule>
 							<groupId>org.mobicents.external.jsr309</groupId>
-			<artifactId>mscontrol</artifactId>
+							<artifactId>mscontrol</artifactId>
 							<bundleDir>APP-INF/lib</bundleDir>
 							<includeInApplicationXml>true</includeInApplicationXml>
 						</jarModule>
 						<jarModule>
 							<groupId>jain</groupId>
-			<artifactId>jain-mgcp-ri</artifactId>
+							<artifactId>jain-mgcp-ri</artifactId>
 							<bundleDir>APP-INF/lib</bundleDir>
 							<includeInApplicationXml>true</includeInApplicationXml>
 						</jarModule>
 						<jarModule>
-										<groupId>org.mobicents.protocols.mgcp</groupId>
-			<artifactId>mgcp-impl</artifactId>
+							<groupId>org.mobicents.protocols.mgcp</groupId>
+							<artifactId>mgcp-impl</artifactId>
 							<bundleDir>APP-INF/lib</bundleDir>
 							<includeInApplicationXml>true</includeInApplicationXml>
 						</jarModule>
 						<jarModule>
-						<groupId>org.mobicents.jsr309</groupId>
-			<artifactId>mobicents-jsr309-impl</artifactId>
+							<groupId>org.mobicents.jsr309</groupId>
+							<artifactId>mobicents-jsr309-impl</artifactId>
 							<bundleDir>APP-INF/lib</bundleDir>
 							<includeInApplicationXml>true</includeInApplicationXml>
 						</jarModule>				
 
 						<jarModule>
 							<groupId>org.hibernate</groupId>
-							<artifactId>
-								hibernate-commons-annotations
-							</artifactId>
+							<artifactId>hibernate-commons-annotations</artifactId>
 							<bundleDir>APP-INF/lib</bundleDir>
 							<includeInApplicationXml>true</includeInApplicationXml>
 						</jarModule>
