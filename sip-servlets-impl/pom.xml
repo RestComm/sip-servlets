@@ -14,7 +14,8 @@
 	<properties>
 		<restcomm.name>Restcomm</restcomm.name>
 		<maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
-		<release.timestamp>${maven.build.timestamp}</release.timestamp>		
+		<release.timestamp>${maven.build.timestamp}</release.timestamp>
+		<restcomm.statistics.server>https://statistics.restcomm.com/rest/</restcomm.statistics.server>
 	</properties>
 
 	<dependencies>
@@ -98,6 +99,18 @@
 			<artifactId>stun4j</artifactId>
 			<version>1.0.MOBICENTS</version>
 			<scope>provided</scope>
+		</dependency>
+	
+		<dependency>
+			<groupId>org.restcomm.commons</groupId>
+			<artifactId>restcomm-statistics</artifactId>
+			<version>${restcomm.commons.version}</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>io.dropwizard.metrics</groupId>
+		    <artifactId>metrics-core</artifactId>
+		    <version>${metrics.version}</version>
 		</dependency>
 
 		<!-- javax.mail deps for multipart support -->
@@ -213,7 +226,7 @@
 									<goal> copy-dependencies </goal>
 								</goals>
 								<configuration>
-									<includeArtifactIds>jain-sip-api,jain-sip-ri,log4j,commons-logging,dnsjava,stun4j,activation,mail,restcomm-jain-sip-ha-core,restcomm-jain-sip-ext,commons-codec</includeArtifactIds>
+									<includeArtifactIds>jain-sip-api,jain-sip-ri,log4j,commons-logging,dnsjava,stun4j,activation,mail,restcomm-jain-sip-ha-core,restcomm-jain-sip-ext,commons-codec,restcomm-statistics,metrics-core</includeArtifactIds>
 									<outputDirectory>${CATALINA_HOME}/lib</outputDirectory>
 								</configuration>
 							</execution>
@@ -264,7 +277,7 @@
 									<goal> copy-dependencies </goal>
 								</goals>
 								<configuration>
-									<includeArtifactIds>jain-sip-api,jain-sip-ri,concurrent,log4j,commons-logging,dnsjava,stun4j,activation,mail,restcomm-jain-sip-ha-core,restcomm-jain-sip-ext,commons-codec</includeArtifactIds>
+									<includeArtifactIds>jain-sip-api,jain-sip-ri,concurrent,log4j,commons-logging,dnsjava,stun4j,activation,mail,restcomm-jain-sip-ha-core,restcomm-jain-sip-ext,commons-codec,restcomm-statistics,metrics-core</includeArtifactIds>
 									<outputDirectory>${env.CATALINA_HOME}/lib</outputDirectory>
 								</configuration>
 							</execution>
@@ -315,7 +328,7 @@
 									<goal> copy-dependencies </goal>
 								</goals>
 								<configuration>
-									<includeArtifactIds>jain-sip-api,jain-sip-ri,log4j,commons-logging,dnsjava,stun4j,activation,mail,restcomm-jain-sip-ha-core,restcomm-jain-sip-ext,commons-codec</includeArtifactIds>
+									<includeArtifactIds>jain-sip-api,jain-sip-ri,log4j,commons-logging,dnsjava,stun4j,activation,mail,restcomm-jain-sip-ha-core,restcomm-jain-sip-ext,commons-codec,commons-statistics,metrics-core</includeArtifactIds>
 									<outputDirectory>${CATALINA_HOME}/lib</outputDirectory>
 								</configuration>
 							</execution>
@@ -366,7 +379,7 @@
 									<goal> copy-dependencies </goal>
 								</goals>
 								<configuration>
-									<includeArtifactIds>jain-sip-api,jain-sip-ri,concurrent,log4j,commons-logging,dnsjava,stun4j,activation,mail,restcomm-jain-sip-ha-core,restcomm-jain-sip-ext,commons-codec</includeArtifactIds>
+									<includeArtifactIds>jain-sip-api,jain-sip-ri,concurrent,log4j,commons-logging,dnsjava,stun4j,activation,mail,restcomm-jain-sip-ha-core,restcomm-jain-sip-ext,commons-codec,restcomm-statistics,metrics-core</includeArtifactIds>
 									<outputDirectory>${env.CATALINA_HOME}/lib</outputDirectory>
 								</configuration>
 							</execution>

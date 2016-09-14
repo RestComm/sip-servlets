@@ -89,13 +89,14 @@
 
 	<properties>
 		<restcomm.tools.mavenplugin.eclipse.version>1.0.0.FINAL</restcomm.tools.mavenplugin.eclipse.version>
-		<jain-sip-ri.version>1.2.300</jain-sip-ri.version>
+		<jain-sip-ri.version>1.2.301</jain-sip-ri.version>
 		<restcomm.cluster.version>1.15.26</restcomm.cluster.version>
 		<restcomm.balancer.version>2.0.41</restcomm.balancer.version>
 		<restcomm.jain.sip.ha.version>1.5.34</restcomm.jain.sip.ha.version>
-		<restcomm.jain.sip.ext.version>1.3.23</restcomm.jain.sip.ext.version>
-		<restcomm.commons.version>1.0.134</restcomm.commons.version>
+		<restcomm.jain.sip.ext.version>1.3.24</restcomm.jain.sip.ext.version>
+		<restcomm.commons.version>2.0.145</restcomm.commons.version>
 		<tomcat-7.version>7.0.64</tomcat-7.version>
+		<metrics.version>3.1.0</metrics.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 

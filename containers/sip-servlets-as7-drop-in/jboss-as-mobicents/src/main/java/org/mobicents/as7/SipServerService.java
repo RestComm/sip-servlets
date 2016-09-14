@@ -64,6 +64,7 @@ class SipServerService implements SipServer, Service<SipServer> {
     final String additionalParameterableHeaders;
     final String proxyTimerServiceImplementationType;
     final String sasTimerServiceImplementationType;
+    final boolean gatherStatistics;
     final int sipCongestionControlInterval;
     final String congestionControlPolicy;
     final String sipConcurrencyControlMode;
@@ -104,6 +105,7 @@ class SipServerService implements SipServer, Service<SipServer> {
     		String additionalParameterableHeaders, 
     		String proxyTimerServiceImplementationType,
             String sasTimerServiceImplementationType,
+            boolean gatherStatistics,
     		int sipCongestionControlInterval,
     		String congestionControlPolicy,
     		String sipConcurrencyControlMode, 
@@ -132,6 +134,7 @@ class SipServerService implements SipServer, Service<SipServer> {
     	this.additionalParameterableHeaders = additionalParameterableHeaders;
     	this.proxyTimerServiceImplementationType = proxyTimerServiceImplementationType;
         this.sasTimerServiceImplementationType = sasTimerServiceImplementationType;
+        this.gatherStatistics = gatherStatistics;
     	this.sipCongestionControlInterval = sipCongestionControlInterval;
     	this.congestionControlPolicy = congestionControlPolicy;
     	this.sipConcurrencyControlMode = sipConcurrencyControlMode;
@@ -227,6 +230,7 @@ class SipServerService implements SipServer, Service<SipServer> {
         
         sipService.setProxyTimerServiceImplementationType(proxyTimerServiceImplementationType);
         sipService.setSasTimerServiceImplementationType(sasTimerServiceImplementationType);
+        sipService.setGatherStatistics(gatherStatistics);
         //
         sipService.setCongestionControlCheckingInterval(sipCongestionControlInterval);
         //

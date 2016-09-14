@@ -947,7 +947,29 @@ public class SipSessionImpl implements MobicentsSipSession {
 		if(logger.isInfoEnabled()) {
 			logger.info("Invalidating the sip session " + key);
 		}
-				
+		/*
+         * Compute how long this session has been alive, and update
+         * session manager's related properties accordingly
+         */
+        final long timeNow = System.currentTimeMillis();
+        final int timeAlive = (int) ((timeNow - creationTime)/1000);        
+        
+		final SipApplicationDispatcher sipApplicationDispatcher = sipFactory.getSipApplicationDispatcher();
+		if(sipApplicationDispatcher.isGatherStatistics()) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("orginal method " + originalMethod);
+			} 
+			if(Request.MESSAGE.equalsIgnoreCase(originalMethod)) {
+				sipFactory.getSipApplicationDispatcher().incMessages();
+			}
+			if(Request.INVITE.equalsIgnoreCase(originalMethod)) {
+				sipFactory.getSipApplicationDispatcher().incCalls();
+				sipFactory.getSipApplicationDispatcher().incSeconds(timeAlive);
+				if(logger.isDebugEnabled()) {
+					logger.debug("seconds " + timeAlive);
+				}
+			}
+		}
 		
 		final MobicentsSipApplicationSession sipApplicationSession = getSipApplicationSession();
         SipManager manager = sipApplicationSession.getSipContext().getSipManager();
@@ -1015,13 +1037,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 			}
         }
         
-		/*
-         * Compute how long this session has been alive, and update
-         * session manager's related properties accordingly
-         */
-        long timeNow = System.currentTimeMillis();
-        int timeAlive = (int) ((timeNow - creationTime)/1000);        
-        synchronized (manager) {
+		synchronized (manager) {
             if (timeAlive > manager.getSipSessionMaxAliveTime()) {
                 manager.setSipSessionMaxAliveTime(timeAlive);
             }
@@ -1441,7 +1457,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	/**
 	 * @param sessionCreatingTransaction the sessionCreatingTransaction to set
 	 */
-	public void setSessionCreatingTransactionRequest(MobicentsSipServletMessage message) {		
+	public void setSessionCreatingTransactionRequest(MobicentsSipServletMessage message) {
 		if(message != null) {
 			if(message instanceof SipServletRequestImpl) {		
 				this.sessionCreatingTransactionRequest = (SipServletRequestImpl) message;

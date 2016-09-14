@@ -29,6 +29,12 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 
 public class Version {
+	protected static final String RELEASE_REVISION = "release.revision";
+	protected static final String RELEASE_DATE = "release.date";
+	protected static final String RELEASE_NAME = "release.name";
+	protected static final String RELEASE_VERSION = "release.version";
+	protected static final String STATISTICS_SERVER = "statistics.server";
+	protected static final String DEFAULT_STATISTICS_SERVER = "https://statistics.restcomm.com/rest/";
 	private static Logger logger = Logger.getLogger(Version.class);
 	public static void printVersion() {
 		if(logger.isInfoEnabled()) {
@@ -38,10 +44,10 @@ public class Version {
 				if(in != null) {
 					releaseProperties.load(in);
 					in.close();
-					String releaseVersion = releaseProperties.getProperty("release.version");
-					String releaseName = releaseProperties.getProperty("release.name");
-					String releaseDate = releaseProperties.getProperty("release.date");
-					String releaseRevision = releaseProperties.getProperty("release.revision");
+					String releaseVersion = releaseProperties.getProperty(RELEASE_VERSION);
+					String releaseName = releaseProperties.getProperty(RELEASE_NAME);
+					String releaseDate = releaseProperties.getProperty(RELEASE_DATE);
+					String releaseRevision = releaseProperties.getProperty(RELEASE_REVISION);
 					String releaseDisclaimer = releaseProperties.getProperty("release.disclaimer");
 					if(releaseVersion != null) {
 						// Follow the EAP Convention 
@@ -70,12 +76,27 @@ public class Version {
 			if(in != null) {
 				releaseProperties.load(in);
 				in.close();
-				String releaseVersion = releaseProperties.getProperty("release.version");
-				String releaseName = releaseProperties.getProperty("release.name");
-				String releaseDate = releaseProperties.getProperty("release.date");
-				String releaseRevision = releaseProperties.getProperty("release.revision");
+				String releaseVersion = releaseProperties.getProperty(RELEASE_VERSION);
+				String releaseName = releaseProperties.getProperty(RELEASE_NAME);
+				String releaseDate = releaseProperties.getProperty(RELEASE_DATE);
+				String releaseRevision = releaseProperties.getProperty(RELEASE_REVISION);
 
 				return "Release ID: (" + releaseName + ") Sip Servlets " + releaseVersion + " (build: Git Hash=" + releaseRevision + " date=" + releaseDate + ")";
+			}
+		} catch (Exception e) {
+			logger.warn("Unable to extract the version of Mobicents Sip Servlets currently running", e);
+		}	
+		return null;
+	}
+	
+	public static String getVersionProperty(String property) {
+		Properties releaseProperties = new Properties();
+		try {
+			InputStream in = SipApplicationDispatcherImpl.class.getResourceAsStream("release.properties");
+			if(in != null) {
+				releaseProperties.load(in);
+				in.close();
+				return releaseProperties.getProperty(property);
 			}
 		} catch (Exception e) {
 			logger.warn("Unable to extract the version of Mobicents Sip Servlets currently running", e);

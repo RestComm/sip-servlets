@@ -131,6 +131,10 @@ import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.router.ManageableApplicationRouter;
 import org.mobicents.servlet.sip.utils.NamingThreadFactory;
+import org.restcomm.commons.statistics.reporter.RestcommStatsReporter;
+
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.MetricRegistry;
 
 /**
  * Implementation of the SipApplicationDispatcher interface.
@@ -212,6 +216,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	private DNSResolver dnsResolver;
 	
 	// stats
+	RestcommStatsReporter statsReporter = RestcommStatsReporter.getRestcommStatsReporter();
+	MetricRegistry metrics = RestcommStatsReporter.getMetricRegistry();
+	//define metric name
+    Counter counterCalls = metrics.counter("calls");
+    Counter counterSeconds = metrics.counter("seconds");
+    Counter counterMessages = metrics.counter("messages");
+    //
 	private boolean gatherStatistics = true;
 	private final AtomicLong requestsProcessed = new AtomicLong(0);
 	private final AtomicLong responsesProcessed = new AtomicLong(0);
@@ -437,6 +448,16 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			}
 			
 		});
+		
+		String statisticsServer = Version.getVersionProperty(Version.STATISTICS_SERVER);
+		if(statisticsServer == null || !statisticsServer.contains("http")) {
+			statisticsServer = Version.DEFAULT_STATISTICS_SERVER;
+		}
+		//define remote server address (optionally)
+        statsReporter.setRemoteServer(statisticsServer);
+        statsReporter.setProjectName("sipservlets");
+        statsReporter.setProjectType("community");
+        statsReporter.setVersion(Version.getVersionProperty(Version.RELEASE_VERSION));
 	}
 	/**
 	 * {@inheritDoc}
@@ -462,6 +483,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		 		logger.info("No Congestion control background task started since the checking interval is equals to " + congestionControlCheckingInterval + " milliseconds.");
 		 	}
 		}
+		//define periodicy - default to once a day
+        statsReporter.start(86400, TimeUnit.SECONDS);
+
 		Version.printVersion();
 		// outbound interfaces set here and not in sipstandardcontext because
 		// depending on jboss or tomcat context can be started before or after
@@ -513,6 +537,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		sipApplicationRouter.destroy();
 		
 		stopSipStack();				
+		
+		statsReporter.stop();
 		
 		if(oname != null) {
 			try {
@@ -1059,6 +1085,21 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 					break;
 			}			
 		}
+	}
+	
+	@Override
+	public void incCalls() {
+		counterCalls.inc();
+	}
+
+	@Override
+	public void incMessages() {
+		counterMessages.inc();
+	}
+
+	@Override
+	public void incSeconds(long seconds) {
+		counterSeconds.inc(seconds);
 	}
 
 	/*

@@ -205,10 +205,22 @@
 				</dependency>
 
 				<dependency>
-					<groupId>org.mobicents.commons</groupId>
+					<groupId>org.restcomm.commons</groupId>
 					<artifactId>commons-congestion</artifactId>
 					<version>${restcomm.commons.version}</version>
+				</dependency>
+
+				<dependency>
+					<groupId>org.restcomm.commons</groupId>
+					<artifactId>restcomm-statistics</artifactId>
+					<version>${restcomm.commons.version}</version>
 				</dependency>	
+	
+				<dependency>
+				    <groupId>io.dropwizard.metrics</groupId>
+				    <artifactId>metrics-core</artifactId>
+				    <version>${metrics.version}</version>
+				</dependency>
 				
 				<dependency>
 					<groupId>javolution</groupId>

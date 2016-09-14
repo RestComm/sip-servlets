@@ -63,9 +63,11 @@
 	    <maven-resource group="org.mobicents.tools" artifact="sip-balancer-jar"/>
             <maven-resource group="dnsjava" artifact="dnsjava"/>
             <maven-resource group="net.java.stun4j" artifact="stun4j"/>
-	    <maven-resource group="org.mobicents.commons" artifact="commons-congestion"/>
+	    <maven-resource group="org.restcomm.commons" artifact="commons-congestion"/>
+	    <maven-resource group="org.restcomm.commons" artifact="restcomm-statistics"/>
 	    <maven-resource group="javolution" artifact="javolution"/>
 	    <maven-resource group="io.netty" artifact="netty-all"/>
+	    <maven-resource group="io.dropwizard.metrics" artifact="metrics-core"/>
         </module-def>
     </target>
 

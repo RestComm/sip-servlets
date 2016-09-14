@@ -225,16 +225,20 @@ public interface SipApplicationDispatcher extends SipListenerExt {
 	long getRequestsSentByMethod(String method);
 	long getResponsesSentByStatusCode(String statusCode);
         
-        /**
-         * reset all stats counter to initial value.
-         */
-        void resetStatsCounters();
+    /**
+     * reset all stats counter to initial value.
+     */
+    void resetStatsCounters();
 	
 	void setGatherStatistics(boolean gatherStatistics);	
 	boolean isGatherStatistics();
 	
 	void updateResponseStatistics(final Response response, final boolean processed);
 	void updateRequestsStatistics(final Request request, final boolean processed);
+	
+	void incCalls();
+	void incMessages();
+	void incSeconds(long seconds);
 	
 	void setBackToNormalMemoryThreshold(
 			int backToNormalMemoryThreshold);
