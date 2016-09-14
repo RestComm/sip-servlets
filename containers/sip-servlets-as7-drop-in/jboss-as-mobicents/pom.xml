@@ -40,6 +40,7 @@
 	<description>&gt;JBoss Application Server: Restcomm Sip Servlets Adaptation Layer</description>
 
     <properties>
+    	<jboss.infinispan.modules.version>7.5.0.Final-redhat-21</jboss.infinispan.modules.version>
         <junit.version>4.1</junit.version>
     </properties>
 
@@ -188,6 +189,13 @@
             <version>${restcomm.jain.sip.ha.version}</version>
             <scope>provided</scope>
         </dependency>
+        
+        <dependency>			
+			<groupId>org.mobicents.ha.javax.sip</groupId>
+			<artifactId>restcomm-jain-sip-ha-infinispan-backend</artifactId>
+			<version>${restcomm.jain.sip.ha.infinispan.version}</version>	
+			<scope>provided</scope>
+		</dependency>
 
         <dependency>
             <groupId>org.mobicents.servlet.sip</groupId>
@@ -215,7 +223,45 @@
             <artifactId>log4j</artifactId>
             <scope>provided</scope>
         </dependency>
+        
+        <dependency>
+            <groupId>org.jboss.as</groupId>
+            <artifactId>jboss-as-clustering-infinispan</artifactId>
+            <version>${jboss.infinispan.modules.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
+		<dependency>
+            <groupId>org.jboss.as</groupId>
+            <artifactId>jboss-as-clustering-impl</artifactId>
+            <version>${jboss.infinispan.modules.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging-processor</artifactId>
+            <!-- This is a compile-time dependency of this project, but is not needed at compile or runtime by other
+                  projects that depend on this project.-->
+            <version>1.1.0.Final</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.jboss.as</groupId>
+            <artifactId>jboss-as-clustering-web-infinispan</artifactId>
+            <scope>provided</scope>
+            <version>${jboss.infinispan.modules.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.as</groupId>
+            <artifactId>jboss-as-clustering-web-spi</artifactId>
+            <scope>provided</scope>
+            <version>${jboss.infinispan.modules.version}</version>
+        </dependency>
+        
     </dependencies>
 
     <profiles>

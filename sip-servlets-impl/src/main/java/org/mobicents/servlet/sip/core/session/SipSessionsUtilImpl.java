@@ -71,6 +71,9 @@ public class SipSessionsUtilImpl implements MobicentsSipSessionsUtil, Serializab
 	 * @see org.mobicents.javax.servlet.sip.SipSessionsUtilExt#getApplicationSessionById(java.lang.String, boolean)
 	 */
 	public SipApplicationSession getApplicationSessionById(String applicationSessionId, boolean isContainerManaged) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("getApplicationSessionById - applicationSessionId=" + applicationSessionId);
+		}
 		if(applicationSessionId == null) {
 			throw new NullPointerException("the given id is null !");
 		}
@@ -113,6 +116,10 @@ public class SipSessionsUtilImpl implements MobicentsSipSessionsUtil, Serializab
 	 */
 	public SipApplicationSession getApplicationSessionByKey(String applicationSessionKey,
 			boolean create, boolean isContainerManaged) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("getApplicationSessionByKey - applicationSessionKey=" + applicationSessionKey);
+		}
+		
 		if(applicationSessionKey == null) {
 			throw new NullPointerException("the given key is null !");
 		}

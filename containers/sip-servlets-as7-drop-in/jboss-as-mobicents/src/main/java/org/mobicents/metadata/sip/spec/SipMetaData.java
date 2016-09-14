@@ -24,6 +24,7 @@ package org.mobicents.metadata.sip.spec;
 import java.util.List;
 
 import org.jboss.as.server.deployment.AttachmentKey;
+import org.jboss.metadata.javaee.spec.EmptyMetaData;
 import org.jboss.metadata.javaee.spec.Environment;
 import org.jboss.metadata.web.spec.WebMetaData;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
@@ -43,7 +44,7 @@ public abstract class SipMetaData extends WebMetaData implements Environment {
 //    private String dtdSystemId;
 //    private String version;
     private String applicationName;
-//    private EmptyMetaData distributable;
+    private EmptyMetaData distributable;
 //    private List<ListenerMetaData> listeners;
 //    private List<ParamValueMetaData> contextParams;
     private SipServletSelectionMetaData servletSelection;
@@ -118,13 +119,13 @@ public abstract class SipMetaData extends WebMetaData implements Environment {
 //        return version != null && version.equals("1.1");
 //    }
 
-//    public EmptyMetaData getDistributable() {
-//        return distributable;
-//    }
+    public EmptyMetaData getDistributable() {
+    	return distributable;
+    }
 
-//    public void setDistributable(EmptyMetaData distributable) {
-//        this.distributable = distributable;
-//    }
+    public void setDistributable(EmptyMetaData distributable) {
+    	this.distributable = distributable;
+    }
 
 //    public SessionConfigMetaData getSipSessionConfig() {
 //        return sipSessionConfig;

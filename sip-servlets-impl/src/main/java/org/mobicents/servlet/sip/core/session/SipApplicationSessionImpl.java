@@ -981,12 +981,26 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 				calendar.setTimeInMillis(expirationTime);
 				logger.debug("sip application session "+ key +" will expires at " + new SimpleDateFormat().format(calendar.getTime()));
 			}
-			if(expirationTimerTask != null) {								
-				cancelExpirationTimer();
-//				expirationTimerFuture = null;
-			}
-			expirationTimerTask = sipContext.getSipApplicationSessionTimerService().createSipApplicationSessionTimerTask(this);
-			expirationTimerTask = sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, deltaMilliseconds, TimeUnit.MILLISECONDS);
+			
+			
+			final long milisecondsToGive = deltaMilliseconds;
+			
+			
+			//Run the timer in different transaction
+			new Thread(){
+				
+				@Override
+				public void run() {
+					if(expirationTimerTask != null) {								
+						cancelExpirationTimer();
+//						expirationTimerFuture = null;
+					}
+					expirationTimerTask = sipContext.getSipApplicationSessionTimerService().createSipApplicationSessionTimerTask(SipApplicationSessionImpl.this);
+					expirationTimerTask = sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, milisecondsToGive, TimeUnit.MILLISECONDS);
+				}
+				
+			}.start();
+			
 
 			return deltaMinutes;
 		}				
@@ -1369,7 +1383,17 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 							"transaction is about to timeout. THIS " +
 							"MIGHT ALSO BE CONCURRENCY CONTROL RISK." +						 
 							" app Session is" + this);
+					if(logger.isDebugEnabled()) {
+						logger.debug("releasing semaphore, this=" + this + ", semaphore=" + semaphore);
+					}
 					semaphore.release();
+					if(logger.isDebugEnabled()) {
+						logger.debug("semaphore released, this=" + this + ", semaphore=" + semaphore);
+					}
+				}
+				
+				if(logger.isDebugEnabled()) {
+					logger.debug("proceed, this=" + this + ", semaphore=" + semaphore);
 				}
 			} catch (InterruptedException e) {
 				logger.error("Problem acquiring semaphore on app session " + this, e);

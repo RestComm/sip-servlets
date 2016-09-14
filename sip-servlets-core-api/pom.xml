@@ -67,6 +67,14 @@
 			<version>${restcomm.jain.sip.ha.version}</version>	
 			<scope>provided</scope>
 		</dependency>
+		
+		<dependency>			
+			<groupId>org.mobicents.ha.javax.sip</groupId>
+			<artifactId>restcomm-jain-sip-ha-infinispan-backend</artifactId>
+			<version>${restcomm.jain.sip.ha.infinispan.version}</version>	
+			<scope>provided</scope>
+		</dependency>
+		
 	</dependencies>
 	<build>
 		<plugins>		

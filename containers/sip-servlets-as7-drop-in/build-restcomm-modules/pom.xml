@@ -245,6 +245,13 @@
 					<version>${restcomm.jain.sip.ha.version}</version>
 					<scope>provided</scope>
 				</dependency>
+				
+				<dependency>			
+					<groupId>org.mobicents.ha.javax.sip</groupId>
+					<artifactId>restcomm-jain-sip-ha-infinispan-backend</artifactId>
+					<version>${restcomm.jain.sip.ha.infinispan.version}</version>	
+					<scope>provided</scope>
+				</dependency>
 
 				<dependency>
 					<groupId>org.mobicents.servlet.sip</groupId>
@@ -258,8 +265,30 @@
 					<version>${restcomm.balancer.version}</version>
 					<scope>provided</scope>
 				</dependency>				
+				
+				<dependency>
+			<groupId>org.restcomm.cluster</groupId>
+			<artifactId>core</artifactId>
+			<version>${org.restcomm.cluster.version}</version>
+			<scope>provided</scope>
+		</dependency>	
+		
+		<dependency>
+			<groupId>org.restcomm.cluster</groupId>
+			<artifactId>cache</artifactId>
+			<version>${org.restcomm.cluster.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.restcomm.cluster</groupId>
+			<artifactId>timers</artifactId>
+			<version>${org.restcomm.cluster.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		
 
-			</dependencies>
+	</dependencies>
 
 			<properties>
 				<ant.target>all</ant.target>

@@ -1,0 +1,145 @@
+--- standalone-ha.xml	2014-01-28 13:37:55.000000000 +0100
++++ standalone-sip-ha-node2.xml	2016-05-17 17:26:49.000000000 +0200
+@@ -26,6 +26,7 @@
+         <extension module="org.jboss.as.web"/>
+         <extension module="org.jboss.as.webservices"/>
+         <extension module="org.jboss.as.weld"/>
++        <extension module="org.mobicents.as7"/>
+     </extensions>
+     <management>
+         <security-realms>
+@@ -77,7 +78,13 @@
+                 <level name="WARN"/>
+             </logger>
+             <logger category="org.jboss.as.config">
+-                <level name="DEBUG"/>
++                <level name="INFO"/>
++            </logger>
++            <logger category="org.mobicents.servlet.sip">
++                <level name="INFO"/>
++            </logger>
++            <logger category="gov.nist">
++                <level name="INFO"/>
+             </logger>
+             <logger category="sun.rmi">
+                 <level name="WARN"/>
+@@ -174,6 +181,14 @@
+                     <file-store/>
+                 </distributed-cache>
+             </cache-container>
++        
++
++            <!-- <cache-container name="web" aliases="standard-session-cache" default-cache="local-web" module="org.jboss.as.clustering.web.infinispan">
++                <local-cache name="local-web" batching="true">
++                    <file-store passivation="false" purge="false"/>
++                </local-cache>
++            </cache-container> -->
++
+             <cache-container name="ejb" aliases="sfsb sfsb-cache" default-cache="repl" module="org.jboss.as.clustering.ejb3.infinispan">
+                 <transport lock-timeout="60000"/>
+                 <replicated-cache name="repl" mode="ASYNC" batching="true">
+@@ -190,6 +205,7 @@
+                     <file-store/>
+                 </distributed-cache>
+             </cache-container>
++
+             <cache-container name="hibernate" default-cache="local-query" module="org.jboss.as.jpa.hibernate:4">
+                 <transport lock-timeout="60000"/>
+                 <local-cache name="local-query">
+@@ -207,6 +223,23 @@
+                     <eviction strategy="NONE"/>
+                 </replicated-cache>
+             </cache-container>
++
++            <!-- <cache-container name="hibernate" default-cache="local-query" module="org.jboss.as.jpa.hibernate:4">
++                <local-cache name="entity">
++                    <transaction mode="NON_XA"/>
++                    <eviction strategy="LRU" max-entries="10000"/>
++                    <expiration max-idle="100000"/>
++                </local-cache>
++                <local-cache name="local-query">
++                    <transaction mode="NONE"/>
++                    <eviction strategy="LRU" max-entries="10000"/>
++                    <expiration max-idle="100000"/>
++                </local-cache>
++                <local-cache name="timestamps">
++                    <transaction mode="NONE"/>
++                    <eviction strategy="NONE"/>
++                </local-cache>
++            </cache-container> -->
+         </subsystem>
+         <subsystem xmlns="urn:jboss:domain:jaxrs:1.0"/>
+         <subsystem xmlns="urn:jboss:domain:jca:1.1">
+@@ -315,6 +348,20 @@
+                         <policy-module code="Delegating" flag="required"/>
+                     </authorization>
+                 </security-domain>
++                <security-domain name="sip-servlets">
++                    <authentication>
++                        <login-module code="UsersRoles" flag="required">
++                            <module-option name="usersProperties" value="${jboss.server.config.dir}/sip-servlets-users.properties"/>
++                            <module-option name="rolesProperties" value="${jboss.server.config.dir}/sip-servlets-roles.properties"/>
++                            <module-option name="hashAlgorithm" value="MD5"/>
++                            <module-option name="hashEncoding" value="RFC2617"/>
++                            <module-option name="hashUserPassword" value="false"/>
++                            <module-option name="hashStorePassword" value="true"/>
++                            <module-option name="passwordIsA1Hash" value="true"/>
++                            <module-option name="storeDigestCallback" value="org.jboss.security.auth.callback.RFC2617Digest"/>
++                        </login-module>
++                    </authentication>
++                </security-domain>
+             </security-domains>
+         </subsystem>
+         <subsystem xmlns="urn:jboss:domain:threads:1.1"/>
+@@ -347,6 +394,13 @@
+             <client-config name="Standard-Client-Config"/>
+         </subsystem>
+         <subsystem xmlns="urn:jboss:domain:weld:1.0"/>
++        <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" application-router="configuration/dars/mobicents-dar.properties" stack-properties="configuration/mss-sip-stack.properties" path-name="org.mobicents.ha.balancing.only" app-dispatcher-class="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl" concurrency-control-mode="SipApplicationSession" congestion-control-interval="-1">
++            <connector name="sip-udp" protocol="SIP/2.0" scheme="sip" socket-binding="sip-udp"/>
++            <connector name="sip-tcp" protocol="SIP/2.0" scheme="sip" socket-binding="sip-tcp"/>
++            <connector name="sip-tls" protocol="SIP/2.0" scheme="sip" socket-binding="sip-tls"/>
++            <connector name="sip-ws" protocol="SIP/2.0" scheme="sip" socket-binding="sip-ws"/>
++	     <connector name="sip-wss" protocol="SIP/2.0" scheme="sip" socket-binding="sip-wss"/>
++        </subsystem>
+     </profile>
+     <interfaces>
+         <interface name="management">
+@@ -365,23 +419,30 @@
+         </interface>
+     </interfaces>
+     <socket-binding-group name="standard-sockets" default-interface="public" port-offset="${jboss.socket.binding.port-offset:0}">
+-        <socket-binding name="management-native" interface="management" port="${jboss.management.native.port:9999}"/>
+-        <socket-binding name="management-http" interface="management" port="${jboss.management.http.port:9990}"/>
++        <socket-binding name="management-native" interface="management" port="${jboss.management.native.port:10099}"/>
++        <socket-binding name="management-http" interface="management" port="${jboss.management.http.port:10090}"/>
+         <socket-binding name="management-https" interface="management" port="${jboss.management.https.port:9443}"/>
+-        <socket-binding name="ajp" port="8009"/>
+-        <socket-binding name="http" port="8080"/>
++        <socket-binding name="ajp" port="8109"/>
++        <socket-binding name="http" port="8180"/>
+         <socket-binding name="https" port="8443"/>
++
+         <socket-binding name="jgroups-mping" port="0" multicast-address="${jboss.default.multicast.address:230.0.0.4}" multicast-port="45700"/>
+         <socket-binding name="jgroups-tcp" port="7600"/>
+         <socket-binding name="jgroups-tcp-fd" port="57600"/>
+         <socket-binding name="jgroups-udp" port="55200" multicast-address="${jboss.default.multicast.address:230.0.0.4}" multicast-port="45688"/>
+         <socket-binding name="jgroups-udp-fd" port="54200"/>
+         <socket-binding name="modcluster" port="0" multicast-address="224.0.1.105" multicast-port="23364"/>
+-        <socket-binding name="remoting" port="4447"/>
++
++        <socket-binding name="sip-udp" port="5180"/>
++        <socket-binding name="sip-tcp" port="5180"/>
++        <socket-binding name="sip-tls" port="5181"/>
++        <socket-binding name="sip-ws" port="5182"/>
++        <socket-binding name="sip-wss" port="5183"/>
++        <socket-binding name="remoting" port="4547"/>
+         <socket-binding name="txn-recovery-environment" port="4712"/>
+         <socket-binding name="txn-status-manager" port="4713"/>
+         <outbound-socket-binding name="mail-smtp">
+             <remote-destination host="localhost" port="25"/>
+         </outbound-socket-binding>
+     </socket-binding-group>
+-</server>
+\ No newline at end of file
++</server>

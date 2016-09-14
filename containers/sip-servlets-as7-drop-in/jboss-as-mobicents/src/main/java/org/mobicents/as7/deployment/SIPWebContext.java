@@ -21,16 +21,24 @@
  */
 package org.mobicents.as7.deployment;
 
+import static org.mobicents.as7.SipMessages.MESSAGES;
+
 import java.util.ArrayList;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.catalina.LifecycleException;
+import org.jboss.as.clustering.web.DistributedCacheManagerFactory;
+import org.jboss.as.clustering.web.sip.DistributedConvergedCacheManagerFactoryService;
+import org.jboss.as.controller.PathElement;
 import org.jboss.as.ee.structure.DeploymentType;
 import org.jboss.as.ee.structure.DeploymentTypeMarker;
 import org.jboss.as.server.deployment.AttachmentKey;
+import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentUnit;
+import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.web.deployment.WarMetaData;
+import org.jboss.dmr.ModelNode;
 import org.jboss.logging.Logger;
 import org.jboss.metadata.merge.web.jboss.JBossWebMetaDataMerger;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
@@ -38,7 +46,16 @@ import org.jboss.metadata.web.spec.ListenerMetaData;
 import org.jboss.metadata.web.spec.ServletMetaData;
 import org.jboss.metadata.web.spec.SessionConfigMetaData;
 import org.jboss.metadata.web.spec.WebMetaData;
+import org.jboss.modules.Module;
+import org.jboss.msc.service.ServiceBuilder;
+import org.jboss.msc.service.ServiceName;
+import org.jboss.msc.service.ServiceRegistryException;
+import org.jboss.msc.service.ServiceBuilder.DependencyType;
+import org.jboss.msc.service.ServiceController.Mode;
+import org.jboss.vfs.VirtualFile;
+import org.mobicents.as7.SipDeploymentDefinition;
 import org.mobicents.as7.SipServer;
+import org.mobicents.as7.SipSubsystemServices;
 import org.mobicents.metadata.sip.jboss.JBossConvergedSipMetaData;
 import org.mobicents.metadata.sip.merge.JBossSipMetaDataMerger;
 import org.mobicents.metadata.sip.spec.ProxyConfigMetaData;
@@ -74,7 +91,7 @@ public class SIPWebContext extends SipStandardContext {
         // attach context to top-level deploymentUnit so it can be used to get context resources (SipFactory, etc.)
         final DeploymentUnit anchorDu = getSipContextAnchorDu(du);
         if (anchorDu != null) {
-        	if (logger.isDebugEnabled()) logger.debug("Attaching SIPWebContext " + this + " to " + anchorDu.getName());
+        	if (logger.isDebugEnabled()) logger.debug("Attaching SIPWebContext " + this + " to " + anchorDu.getName() + ". Deployment unit name: " + deploymentUnit.getName());
         	anchorDu.putAttachment(SIPWebContext.ATTACHMENT, this);
         }
         else {
@@ -96,10 +113,16 @@ public class SIPWebContext extends SipStandardContext {
     }
 
     public void postProcessContext(DeploymentUnit deploymentUnit) {
+    	if (logger.isDebugEnabled()){ 
+    		logger.debug("postProcessContext"); 
+    	}
     }
-
+    
     @Override
     public void init() throws Exception {
+    	if(logger.isDebugEnabled()) {
+    		logger.debug("init - " + deploymentUnit.getName());
+    	}
         SipServer sipServer = deploymentUnit.getAttachment(SipServer.ATTACHMENT_KEY);
         if (sipServer.getService() instanceof SipService) {
             super.sipApplicationDispatcher = ((SipService)sipServer.getService()).getSipApplicationDispatcher();
@@ -135,6 +158,9 @@ public class SIPWebContext extends SipStandardContext {
         try {
 			processMetaData(mergedMetaData, sipMetaData);
 		} catch (Exception e) {
+			if(logger.isDebugEnabled()) {
+	    		logger.error("An unexpected exception happened while parsing sip meta data from (" + deploymentUnit.getName() + "): ", e);
+	    	}
 			throw new LifecycleException("An unexpected exception happened while parsing sip meta data from " + deploymentUnit.getName(), e);
 		}
 
@@ -228,9 +254,10 @@ public class SIPWebContext extends SipStandardContext {
                         sipMetaData.setDescriptionGroup(annotatedSipMetaData.getDescriptionGroup());
                     }
                 }
+                
                 // distributable
                 // TODO: josemrecio - distributable not supported yet
-	
+                
 	            if (annotatedSipMetaData.getListeners() != null) {
 	                if (sipMetaData.getListeners() == null) {
 	                    sipMetaData.setListeners(new ArrayList<ListenerMetaData>());
@@ -299,14 +326,24 @@ public class SIPWebContext extends SipStandardContext {
     }
 
     private void processMetaData(JBossWebMetaData mergedMetaData, SipMetaData sipMetaData) throws Exception {
+    	if (logger.isDebugEnabled()) {
+            logger.debug("processMetaData");
+        }
         //processJBossWebMetaData(sharedJBossWebMetaData);
         //processWebMetaData(sharedJBossWebMetaData);
+    	
         JBossSipMetaDataMerger.merge((JBossConvergedSipMetaData)mergedMetaData, null, sipMetaData);
         sipJBossContextConfig.processSipMetaData((JBossConvergedSipMetaData)mergedMetaData);
     }
 
     private SipJBossContextConfig createContextConfig(SipStandardContext sipContext, DeploymentUnit deploymentUnit) {
+    	if (logger.isDebugEnabled()){
+        	logger.debug("createContextConfig - " + deploymentUnit.getName());
+        }
         SipJBossContextConfig config = new SipJBossContextConfig(deploymentUnit);
+        if (logger.isDebugEnabled()){
+        	logger.debug("createContextConfig - created: " + config);
+        }
         sipContext.addLifecycleListener(config);
         return config;
     }
@@ -327,5 +364,14 @@ public class SIPWebContext extends SipStandardContext {
         	return null;
         }
     }
+
+	public SipJBossContextConfig getSipJBossContextConfig() {
+		if (logger.isDebugEnabled()){
+        	logger.debug("getSipJBossContextConfig - " + deploymentUnit.getName());
+        }
+		return sipJBossContextConfig;
+	}
+    
+    
 
 }

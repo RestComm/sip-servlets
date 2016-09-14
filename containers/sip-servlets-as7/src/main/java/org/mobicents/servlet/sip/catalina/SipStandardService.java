@@ -245,6 +245,10 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 	
 	@Override
 	public void initialize() throws LifecycleException {
+		if(logger.isDebugEnabled()) {
+			logger.debug("initialize - this=" + this);
+		}
+		
 		//load the sip application disptacher from the class name specified in the server.xml file
 		//and initializes it
 		StaticServiceHolder.sipStandardService = this;
@@ -269,6 +273,7 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 		if(logger.isInfoEnabled()) {
 			logger.info("Sip Stack path name : " + sipPathName);
 		}
+		
 		sipApplicationDispatcher.setSipService(this);
 		sipApplicationDispatcher.getSipFactory().initialize(sipPathName, usePrettyEncoding);
 		
@@ -284,7 +289,11 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 		if(baseTimerInterval < 1) {
 			throw new LifecycleException("It's forbidden to set the Base Timer Interval to a non positive value");		
 		}
+		if(logger.isDebugEnabled()) {
+			logger.debug("initialize - calling initSipStack");
+		}
 		initSipStack();
+		
 		sipApplicationDispatcher.setBaseTimerInterval(baseTimerInterval);
 		sipApplicationDispatcher.setT2Interval(t2Interval);
 		sipApplicationDispatcher.setT4Interval(t4Interval);
@@ -553,12 +562,22 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 				logger.info("Mobicents Sip Servlets sip stack properties : " + sipStackProperties);
 			}
 			// Create SipStack object
-			sipStack = sipApplicationDispatcher.getSipFactory().getJainSipFactory().createSipStack(sipStackProperties);		
+			if (logger.isDebugEnabled()){
+				logger.debug("initSipStack - creating sip stack - sipStackProperties=" + sipStackProperties);
+			}
+			sipStack = sipApplicationDispatcher.getSipFactory().getJainSipFactory().createSipStack(sipStackProperties);
 			LoadBalancerHeartBeatingService loadBalancerHeartBeatingService = null;
 			if(sipStack instanceof ClusteredSipStack) {
+				if (logger.isDebugEnabled()){
+					logger.debug("initSipStack - sipStack is instanceof ClusteredSipStack");
+				}
+				
 				loadBalancerHeartBeatingService = ((ClusteredSipStack) sipStack).getLoadBalancerHeartBeatingService();
 				if ((this.container != null) && (this.container instanceof Engine) && ((Engine)container).getJvmRoute() != null) {
 					final String jvmRoute = ((Engine)container).getJvmRoute();
+					if (logger.isDebugEnabled()){
+						logger.debug("initSipStack - jvmRoute=" + jvmRoute);
+					}
 					if(jvmRoute != null) {
 						loadBalancerHeartBeatingService.setJvmRoute(jvmRoute);
 						setJvmRoute(jvmRoute);
@@ -605,6 +624,7 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 			}
 			throw new LifecycleException("A problem occured while initializing the SIP Stack", ex);
 		}
+		
 	}	
 
 	@Override
@@ -898,6 +918,9 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 	 * @param sipPathName the sipPathName to set
 	 */
 	public void setSipPathName(String sipPathName) {
+		if (logger.isDebugEnabled()){
+			logger.debug("setSipPathName - sipPathName=" + sipPathName);
+		}
 		this.sipPathName = sipPathName;
 	}
 
@@ -967,6 +990,10 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 	}
 	
 	public boolean addSipConnector(SipConnector sipConnector) throws Exception {
+		if(logger.isDebugEnabled()) {
+			logger.debug("addSipConnector");
+		}
+		
 		if(sipConnector == null) {
 			throw new IllegalArgumentException("The sip connector passed is null");
 		}

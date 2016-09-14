@@ -67,6 +67,8 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet imple
 	
 	/** Creates a new instance of CallForwardingB2BUASipServlet */
 	public DistributableCallForwardingB2BUASipServlet() {
+		// creating Composite object to workaround classloading issue, TODO find final solution
+		new Composite(null, null);
 	}
 
 	@Override
@@ -86,7 +88,11 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet imple
 	
 	@Override
 	protected void doAck(SipServletRequest request) throws ServletException,
-			IOException {		
+			IOException {
+		if(logger.isDebugEnabled()) {
+			logger.debug("doAck - request=" + request);
+			logger.debug("doAck - request.isInitial()=" + request.isInitial());
+		}
 		if(logger.isInfoEnabled()) {
 			logger.info("Got : " + request.toString());
 		}
@@ -95,11 +101,18 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet imple
 	@Override
 	protected void doInvite(SipServletRequest request) throws ServletException,
 			IOException {
+		if(logger.isDebugEnabled()) {
+			logger.debug("doInvite - request=" + request);
+			logger.debug("doInvite - request.isInitial()=" + request.isInitial());
+		}
 		if(logger.isInfoEnabled()) {
 			logger.info("Got INVITE: " + request.toString());
 			logger.info(request.getFrom().getURI().toString());
 		}
 		if(!request.isInitial()) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("doInvite - request is not initial: " + request.toString());
+			}
 			// REINVITE within the same session
 			SipServletResponse resp = (SipServletResponse) request.getApplicationSession().getAttribute("resp");
 			resp.getSession().getAttribute("justTestForNPE");
@@ -110,9 +123,14 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet imple
 			SipServletRequest testMessageMethodRequest = composite.request;
 			testMessageMethodRequest.getSession().createRequest("MESSAGE");
 			
-			
 			SipSession linkedSipSession = (SipSession) request.getSession().getAttribute("linkedSession");
+			if(logger.isDebugEnabled()) {
+				logger.debug("doInvite - calling createRequest on linkedSipSession=" + linkedSipSession);
+			}
 			SipServletRequest secondLegReinvite = (SipServletRequest) linkedSipSession.createRequest("INVITE");
+			if(logger.isDebugEnabled()) {
+				logger.debug("doInvite - secondLegReinvite=" + secondLegReinvite);
+			}
 			secondLegReinvite.getSession().getAttribute("fff");
 			secondLegReinvite.send();
 			SipServletRequest originalRequestLoadedFromSecondLeg = (SipServletRequest) linkedSipSession.getAttribute("originalRequest");
@@ -130,6 +148,9 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet imple
 			linkedSipSession.setAttribute("originalRequest", request);
 			
 			//forkedRequest.getSession().setAttribute("INVITE", RECEIVED);
+			if(logger.isDebugEnabled()) {
+				logger.debug("doInvite - early return");
+			}
 			return;
 		}
 
@@ -151,10 +172,16 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet imple
 			toHeaderSet.add(forwardingUri[0]);
 			headers.put("To", toHeaderSet);
 			
+			if(logger.isDebugEnabled()) {
+				logger.debug("doInvite - calling createRequest on sipFactory=" + sipFactory);
+			}
 			SipServletRequest forkedRequest = sipFactory.createRequest (request.getApplicationSession(), 
                     "INVITE",
                     request.getFrom().getURI().toString(),
                     forwardingUri[0]);
+            if(logger.isDebugEnabled()) {
+				logger.debug("doInvite - forkedRequest=" + forkedRequest);
+			}
 			forkedRequest.getSession().setAttribute("linkedSession", request.getSession());
 
 			request.getApplicationSession().setAttribute("S", forkedRequest.getSession());
@@ -183,6 +210,11 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet imple
 	@Override
 	protected void doBye(SipServletRequest request) throws ServletException,
 			IOException {
+		if(logger.isDebugEnabled()) {
+			logger.debug("doBye - request=" + request);
+			logger.debug("doBye - request.isInitial()=" + request.isInitial());
+		}
+		
 		if(logger.isInfoEnabled()) {
 			logger.info("Got BYE: " + request.toString());
 		}
@@ -306,6 +338,12 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet imple
 	}
 
 	public void timeout(ServletTimer arg0) {
+		
+		logger.info(Thread.currentThread().getContextClassLoader());
+		logger.info(getClass().getClassLoader());
+		logger.info(getClass().getClassLoader().getClass().getName());
+		
+		
 		final SipServletRequest request = (SipServletRequest) arg0.getInfo();
 		request.getSession().setAttribute("timerRequest", new Composite(request, request.getSession()));
 		

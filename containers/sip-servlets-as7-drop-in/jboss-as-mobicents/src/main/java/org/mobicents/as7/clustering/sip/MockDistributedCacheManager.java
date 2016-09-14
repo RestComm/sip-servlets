@@ -36,12 +36,15 @@ import org.jboss.as.clustering.web.SessionOwnershipSupport;
  * 
  */
 public class MockDistributedCacheManager implements DistributedCacheManager<OutgoingDistributableSessionData> {
+	
     public static final MockDistributedCacheManager INSTANCE = new MockDistributedCacheManager();
 
+    @Override
     public void evictSession(String realId) {
         // no-op
     }
 
+    @Override
     public void evictSession(String realId, String dataOwner) {
         // no-op
     }
@@ -58,22 +61,27 @@ public class MockDistributedCacheManager implements DistributedCacheManager<Outg
         return Collections.emptyMap();
     }
 
+    @Override
     public BatchingManager getBatchingManager() {
         return MockBatchingManager.INSTANCE;
     }
 
+    @Override
     public IncomingDistributableSessionData getSessionData(String realId, boolean initialLoad) {
         return null;
     }
 
+    @Override
     public IncomingDistributableSessionData getSessionData(String realId, String dataOwner, boolean includeAttributes) {
         return null;
     }
 
+    @Override
     public Map<String, String> getSessionIds() {
         return Collections.emptyMap();
     }
 
+    @Override
     public boolean isPassivationEnabled() {
         return false;
     }
@@ -102,22 +110,27 @@ public class MockDistributedCacheManager implements DistributedCacheManager<Outg
         // no-op
     }
 
+    @Override
     public void removeSession(String realId) {
         // no-op
     }
 
+    @Override
     public void removeSessionLocal(String realId) {
         // no-op
     }
 
+    @Override
     public void removeSessionLocal(String realId, String dataOwner) {
         // no-op
     }
 
+    @Override
     public void start() {
         // no-op
     }
 
+    @Override
     public void stop() {
         // no-op
     }
@@ -126,22 +139,27 @@ public class MockDistributedCacheManager implements DistributedCacheManager<Outg
         return true;
     }
 
+    @Override
     public void sessionCreated(String realId) {
         // no-op
     }
 
+    @Override
     public void storeSessionData(OutgoingDistributableSessionData sessionData) {
         // no-op
     }
 
+    @Override
     public void setForceSynchronous(boolean forceSynchronous) {
         // no-op
     }
 
+    @Override
     public SessionOwnershipSupport getSessionOwnershipSupport() {
         return null;
     }
 
+    @Override
     public boolean isLocal(String realId) {
         return false;
     }

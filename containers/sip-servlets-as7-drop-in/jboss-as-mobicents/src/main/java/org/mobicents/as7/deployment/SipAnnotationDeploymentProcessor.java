@@ -59,6 +59,7 @@ import org.jboss.metadata.javaee.spec.DescriptionImpl;
 import org.jboss.metadata.javaee.spec.DescriptionsImpl;
 import org.jboss.metadata.javaee.spec.DisplayNameImpl;
 import org.jboss.metadata.javaee.spec.DisplayNamesImpl;
+import org.jboss.metadata.javaee.spec.EmptyMetaData;
 import org.jboss.metadata.javaee.spec.IconImpl;
 import org.jboss.metadata.javaee.spec.IconsImpl;
 import org.jboss.metadata.web.spec.ListenerMetaData;
@@ -148,7 +149,9 @@ public class SipAnnotationDeploymentProcessor implements DeploymentUnitProcessor
      * @throws DeploymentUnitProcessingException
      */
     protected SipMetaData processAnnotations(SipAnnotationMetaData sipAnotationsMetaData, Index index) throws DeploymentUnitProcessingException {
-        Sip11MetaData sipMetaData = null;
+    	if (logger.isDebugEnabled()) logger.debug("processAnnotations()");
+    	
+    	Sip11MetaData sipMetaData = null;
         // @SipListener
         final List<AnnotationInstance> sipListenerAnnotations = index.getAnnotations(sipListener);
         if (sipListenerAnnotations != null && sipListenerAnnotations.size() > 0) {
@@ -390,7 +393,11 @@ public class SipAnnotationDeploymentProcessor implements DeploymentUnitProcessor
     }
 
     private void parseSipApplication(SipMetaData sipMetaData, AnnotationInstance sipAppAnnInstance, String packageName) throws DeploymentUnitProcessingException {
-        String description = null;
+    	if (logger.isDebugEnabled()){
+    		logger.debug("parseSipApplication");
+    	}
+    	
+    	String description = null;
         String displayName = null;
         String largeIcon = null;
         String smallIcon = null;
@@ -420,8 +427,10 @@ public class SipAnnotationDeploymentProcessor implements DeploymentUnitProcessor
             }
             // distributable
             else if (value.name().compareTo("distributable") == 0) {
-                throw (new DeploymentUnitProcessingException("Distributable not supported yet"));
-                // sipMetaData.setDistributable(new EmptyMetaData());
+                if (logger.isDebugEnabled()) {
+                	logger.debug("parseSipApplication - distributable");
+                }
+                sipMetaData.setDistributable(new EmptyMetaData());
             }
             // large icon
             else if (value.name().compareTo("largeIcon") == 0) {

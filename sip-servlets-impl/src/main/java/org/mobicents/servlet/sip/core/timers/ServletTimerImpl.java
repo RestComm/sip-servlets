@@ -218,7 +218,9 @@ public class ServletTimerImpl implements MobicentsServletTimer, Runnable {
 	}
 
 	public MobicentsSipApplicationSession getApplicationSession() {
-
+		if(logger.isDebugEnabled()) {
+			logger.debug("getApplicationSession with appSessionKey=" + appSessionKey);
+		}
 		synchronized (TIMER_LOCK) {
 			return sipManager.getSipApplicationSession(appSessionKey, false);
 		}

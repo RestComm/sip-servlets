@@ -21,6 +21,7 @@
  */
 package org.mobicents.metadata.sip.merge;
 
+import org.jboss.logging.Logger;
 import org.jboss.metadata.javaee.spec.MessageDestinationsMetaData;
 import org.jboss.metadata.javaee.spec.SecurityRolesMetaData;
 import org.jboss.metadata.merge.javaee.spec.MessageDestinationsMetaDataMerger;
@@ -31,6 +32,7 @@ import org.mobicents.metadata.sip.jboss.JBossSipServletsMetaData;
 import org.mobicents.metadata.sip.spec.Sip11MetaData;
 import org.mobicents.metadata.sip.spec.SipMetaData;
 import org.mobicents.metadata.sip.spec.SipServletsMetaData;
+import org.mobicents.servlet.sip.startup.jboss.SipJBossContextConfig;
 
 /**
  * The combined web.xml/jboss-web.xml metadata
@@ -43,6 +45,9 @@ import org.mobicents.metadata.sip.spec.SipServletsMetaData;
  */
 public class JBossSipMetaDataMerger extends NamedModuleImplMerger {
 
+	private static transient Logger logger = Logger.getLogger(JBossSipMetaDataMerger.class);
+
+	
     public static void merge(JBossConvergedSipMetaData dest, JBossConvergedSipMetaData override, SipMetaData original) {
         merge(dest, override, original, null, "sip.xml", false);
     }
@@ -50,6 +55,10 @@ public class JBossSipMetaDataMerger extends NamedModuleImplMerger {
     public static void merge(JBossConvergedSipMetaData dest, JBossConvergedSipMetaData override, SipMetaData original, String overrideFile, String overridenFile,
             boolean mustOverride) {
 
+    	if (logger.isDebugEnabled()){
+    		logger.debug("merge");
+    	}
+    	
         NamedModuleImplMerger.merge(dest, override, original);
 
         if (override != null && override.getApplicationName() != null)
@@ -140,6 +149,11 @@ public class JBossSipMetaDataMerger extends NamedModuleImplMerger {
             Sip11MetaData sip11MD = (Sip11MetaData) original;
             dest.setMetadataComplete(sip11MD.isMetadataComplete());
         }
+        
+        if (override != null && override.getDistributable() != null)
+            dest.setDistributable(override.getDistributable());
+        else if (original != null && original.getDistributable() != null)
+            dest.setDistributable(original.getDistributable());
 
    }
 }

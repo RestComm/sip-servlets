@@ -100,6 +100,11 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 	 * {@inheritDoc}
 	 */
 	public void dispatchMessage(SipProvider sipProvider, SipServletMessageImpl sipServletMessage) throws DispatcherException {
+		if(logger.isDebugEnabled()) {
+			logger.debug("dispatchMessage - sipProvider=" + sipProvider
+					+ ", sipServletMessage=" + sipServletMessage);
+		}
+		
 		final SipApplicationRouter sipApplicationRouter = sipApplicationDispatcher.getSipApplicationRouter();
 		final MobicentsSipFactory sipFactoryImpl = sipApplicationDispatcher.getSipFactory();
 		final SipServletRequestImpl sipServletRequest = (SipServletRequestImpl) sipServletMessage;
@@ -121,9 +126,15 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		SipApplicationRoutingRegion routingRegion = null;
 		if(poppedRoute != null) {
 			Parameters poppedAddress = (Parameters)poppedRoute.getAddress().getURI();
+			if(logger.isDebugEnabled()) {
+				logger.debug("dispatchMessage - poppedAddress=" + poppedAddress);
+			}
 			// get the state info associated with the request because it means 
 			// that is has been routed back to the container			
 			String directive = poppedAddress.getParameter(ROUTE_PARAM_DIRECTIVE);
+			if(logger.isDebugEnabled()) {
+				logger.debug("dispatchMessage - directive=" + directive);
+			}
 			if(directive != null && directive.length() > 0) {
 				//If request is received from an application, directive is set either implicitly 
 				//or explicitly by the application. 
@@ -172,11 +183,17 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		// Request-URI (in that order) to see if it contains an encoded URI. 
 		// If it does, the container MUST use the encoded URI to locate the targeted SipApplicationSession object
 		URI requestURI = request.getRequestURI();
+		if(logger.isDebugEnabled()) {
+			logger.debug("dispatchMessage - requestURI=" + requestURI);
+		}
 		// From horacimacias : Fix for Issue 2115 MSS unable to handle GenericURI URIs
 		// check the URI is an instance of Parameters. GenericURI doesn't implement Parameters
 		String targetedApplicationKey;
 		if(requestURI instanceof Parameters) {
 			targetedApplicationKey = ((Parameters)requestURI).getParameter(MobicentsSipApplicationSession.SIP_APPLICATION_KEY_PARAM_NAME);
+			if(logger.isDebugEnabled()) {
+				logger.debug("dispatchMessage - requestURI is instanceof Parameters - targetedApplicationKey=" + targetedApplicationKey);
+			}
 		} else {
 			targetedApplicationKey = null;
 		}
@@ -184,12 +201,21 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		SipTargetedRequestInfo targetedRequestInfo = null;
 		if(encodeURISipApplicationSession != null) {
 			targetedRequestInfo = new SipTargetedRequestInfo(SipTargetedRequestType.ENCODED_URI, encodeURISipApplicationSession.getApplicationName());
+			if(logger.isDebugEnabled()) {
+				logger.debug("dispatchMessage - encodeURISipApplicationSession not null - targetedRequestInfo=" + targetedRequestInfo);
+			}
 		} else if(poppedRoute != null) {
 			Parameters poppedAddress = (Parameters)poppedRoute.getAddress().getURI();
 			targetedApplicationKey = poppedAddress.getParameter(MobicentsSipApplicationSession.SIP_APPLICATION_KEY_PARAM_NAME);
 			encodeURISipApplicationSession = retrieveTargetedApplication(targetedApplicationKey);
 			if(encodeURISipApplicationSession != null) {
 				targetedRequestInfo = new SipTargetedRequestInfo(SipTargetedRequestType.ENCODED_URI, encodeURISipApplicationSession.getApplicationName());
+			}
+			
+			if(logger.isDebugEnabled()) {
+				logger.debug("dispatchMessage - encodeURISipApplicationSession is null - targetedApplicationKey=" + targetedApplicationKey
+						+ ", encodeURISipApplicationSession=" + encodeURISipApplicationSession
+						+ ", targetedRequestInfo" + targetedRequestInfo);
 			}
 		}	
 		
@@ -317,6 +343,27 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 	 * @throws DispatcherException a problem occured while dispatching the request
 	 */
 	private void dispatchInsideContainer(final SipProvider sipProvider, final SipApplicationRouterInfo applicationRouterInfo, final SipServletRequestImpl sipServletRequest, final MobicentsSipFactory sipFactoryImpl, MobicentsSipSession joinReplacesSipSession, MobicentsSipApplicationSession encodeURISipApplicationSession) throws DispatcherException {
+		if(logger.isDebugEnabled()) {
+			logger.debug("dispatchInsideContainer - sipProvider=" + sipProvider
+					+ ", applicationRouterInfo=" + applicationRouterInfo
+					+ ", joinReplacesSipSession=" + joinReplacesSipSession
+					+ ", sipServletRequest=" + sipServletRequest
+					+ ", sipFactoryImpl=" + sipFactoryImpl
+					+ ", encodeURISipApplicationSession=" + encodeURISipApplicationSession);
+			if (joinReplacesSipSession != null){
+				logger.debug("dispatchInsideContainer - joinReplacesSipSession.getCallId()=" + joinReplacesSipSession.getCallId()
+						+ ", joinReplacesSipSession.getId()=" + joinReplacesSipSession.getId()
+						+ ", joinReplacesSipSession.getKey()=" + joinReplacesSipSession.getKey()
+						+ ", joinReplacesSipSession.getApplicationSession()=" + joinReplacesSipSession.getApplicationSession()
+						+ ", joinReplacesSipSession.getSipApplicationSession()=" + joinReplacesSipSession.getSipApplicationSession());
+				
+				if (joinReplacesSipSession.getSipApplicationSession() != null){
+					logger.debug("dispatchInsideContainer - joinReplacesSipSession.getSipApplicationSession().getId()=" + joinReplacesSipSession.getSipApplicationSession().getId()
+							+ ", joinReplacesSipSession.getSipApplicationSession().getKey()=" + joinReplacesSipSession.getSipApplicationSession().getKey());
+				}
+			}
+		}
+		
 		final String nextApplicationName = applicationRouterInfo.getNextApplicationName();
 		if(logger.isDebugEnabled()) {
 			logger.debug("Dispatching the request event to " + nextApplicationName);
@@ -386,12 +433,22 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 
 			SipApplicationSessionKey sipApplicationSessionKey = makeAppSessionKey(
 					sipContext, sipServletRequest, nextApplicationName);
+			
+			if(logger.isDebugEnabled())  {
+				logger.debug("dispatchInsideContainer - newly created sipApplicationSessionKey.getId()=" + sipApplicationSessionKey.getId()
+						+ ", sipApplicationSessionKey.getAppGeneratedKey()" + sipApplicationSessionKey.getAppGeneratedKey()
+						+ ", sipApplicationSessionKey.getApplicationName()" + sipApplicationSessionKey.getApplicationName());
+			}
+			
 			sipApplicationSession = sipManager.getSipApplicationSession(
 					sipApplicationSessionKey, true);
 
 			if(StaticServiceHolder.sipStandardService.isHttpFollowsSip()) {
 				String jvmRoute = StaticServiceHolder.sipStandardService.getJvmRoute();
 				if(jvmRoute != null) {
+					if(logger.isDebugEnabled())  {
+						logger.debug("dispatchInsideContainer - setting jvmRoute to " + jvmRoute);
+					}
 					sipApplicationSession.setJvmRoute(jvmRoute);
 				}
 			}
@@ -634,9 +691,15 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 	 */
 	private final MobicentsSipApplicationSession retrieveTargetedApplication(
 			String targetedApplicationKey) {
+		if (logger.isDebugEnabled()){
+    		logger.debug("retrieveTargetedApplication - targetedApplicationKey=" + targetedApplicationKey);
+    	}
 		if( targetedApplicationKey != null && 
 				targetedApplicationKey.length() > 0) {
 			targetedApplicationKey = RFC2396UrlDecoder.decode(targetedApplicationKey);
+			if (logger.isDebugEnabled()){
+	    		logger.debug("retrieveTargetedApplication - decoded targetedApplicationKey=" + targetedApplicationKey);
+	    	}
 			SipApplicationSessionKey targetedApplicationSessionKey;
 			try {
 				targetedApplicationSessionKey = SessionManagerUtil.parseSipApplicationSessionKey(targetedApplicationKey);
@@ -646,6 +709,9 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 			}
 			SipContext sipContext = sipApplicationDispatcher.findSipApplication(targetedApplicationSessionKey.getApplicationName());
 			if(sipContext != null) {
+				if (logger.isDebugEnabled()){
+		    		logger.debug("retrieveTargetedApplication - sipContext not null");
+		    	}
 				return sipContext.getSipManager().getSipApplicationSession(targetedApplicationSessionKey, false);
 			}						
 		}
@@ -700,14 +766,36 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		}
 		
 		public void dispatch() throws DispatcherException {
+			if(logger.isDebugEnabled()) {
+				logger.debug("InitialDispatchTask - dispatch");
+			}
+			
 			final SipServletRequestImpl sipServletRequest = (SipServletRequestImpl)sipServletMessage;
+			if(logger.isDebugEnabled()) {
+				logger.debug("InitialDispatchTask - dispatch - sipServletRequest=" + sipServletRequest);
+			}
+			
 			final MobicentsSipSession sipSessionImpl = sipServletRequest.getSipSession();
+			if(logger.isDebugEnabled()) {
+				logger.debug("InitialDispatchTask - dispatch - sipSessionImpl=" + sipSessionImpl);
+			}
+			
 			final MobicentsSipApplicationSession appSession = sipSessionImpl.getSipApplicationSession();
+			if(logger.isDebugEnabled()) {
+				logger.debug("InitialDispatchTask - dispatch - appSession=" + appSession);
+			}
 			final SipContext sipContext = appSession.getSipContext();
+			if(logger.isDebugEnabled()) {
+				logger.debug("InitialDispatchTask - dispatch - sipContext=" + sipContext);
+			}
 			final Request request = (Request) sipServletRequest.getMessage();
+			if(logger.isDebugEnabled()) {
+				logger.debug("InitialDispatchTask - dispatch - request=" + request);
+			}
 			
 			boolean batchStarted = sipContext.enterSipAppHa(true);
 			try {
+				
 				sipSessionImpl.setSessionCreatingTransactionRequest(sipServletRequest);
 				
 				String sipSessionHandlerName = sipSessionImpl.getHandler();
