@@ -161,7 +161,7 @@
 						<version>1.1</version>
 						<executions>
 							<execution>
-								<phase>package</phase>
+								<phase>deploy</phase>
 								<configuration>
 									<tasks>
 										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${CATALINA_HOME}/lib" />
@@ -179,7 +179,7 @@
 						<executions>
 							<execution>
 								<id>copy-to-tomcat-lib</id>
-								<phase>package</phase>
+								<phase>deploy</phase>
 								<goals>
 									<goal> copy-dependencies </goal>
 								</goals>
@@ -203,7 +203,7 @@
 						<version>1.1</version>
 						<executions>
 							<execution>
-								<phase>package</phase>
+								<phase>deploy</phase>
 								<configuration>
 									<tasks>
 										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${CATALINA_HOME}/lib" />
@@ -221,7 +221,7 @@
 						<executions>
 							<execution>
 								<id>copy-to-tomcat-lib</id>
-								<phase>package</phase>
+								<phase>deploy</phase>
 								<goals>
 									<goal> copy-dependencies </goal>
 								</goals>

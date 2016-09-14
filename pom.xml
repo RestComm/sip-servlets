@@ -109,64 +109,67 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-				<configuration>
-					<allowTimestampedSnapshots>true</allowTimestampedSnapshots>
-					<preparationGoals>clean install</preparationGoals>
-					<autoVersionSubmodules>true</autoVersionSubmodules>
-					<arguments>-Dmaven.test.skip</arguments>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<compilerArguments>
-						<g />
-					</compilerArguments>
-					<source>1.7</source>
-					<target>1.7</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-site-plugin</artifactId>
-				<version>2.0-beta-6</version>
-			</plugin>
-			<plugin>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<groupId>org.mobicents.tools</groupId>
-				<version>${restcomm.tools.mavenplugin.eclipse.version}</version>
-				<inherited>false</inherited>
-				<executions />
-				<configuration>
-					<!--generateProjectsForModules>true</generateProjectsForModules -->
-					<resolveTransitiveDependencies>true</resolveTransitiveDependencies>
-					<eclipseProjectName>sip-servlets-bootstrap</eclipseProjectName>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<artifactId>maven-clean-plugin</artifactId>
-				<version>2.4.1</version>
-				<configuration>
-					<filesets>
-						<fileset>
-							<directory>${basedir}</directory>
-							<includes>
-								<include>$${**}/</include>
-								<include>bin/</include>
-							</includes>
-							<followSymlinks>false</followSymlinks>
-						</fileset>
-					</filesets>
-				</configuration>
-			</plugin>
-
-		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-release-plugin</artifactId>
+					<configuration>
+						<allowTimestampedSnapshots>true</allowTimestampedSnapshots>
+						<preparationGoals>clean install</preparationGoals>
+						<autoVersionSubmodules>true</autoVersionSubmodules>
+						<arguments>-Dmaven.test.skip</arguments>
+					</configuration>
+				</plugin>
+	
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.5.1</version>
+					<configuration>
+						<compilerArguments>
+							<g />
+						</compilerArguments>
+						<source>1.7</source>
+						<target>1.7</target>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-site-plugin</artifactId>
+					<version>2.0-beta-6</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-eclipse-plugin</artifactId>
+					<groupId>org.mobicents.tools</groupId>
+					<version>${restcomm.tools.mavenplugin.eclipse.version}</version>
+					<inherited>false</inherited>
+					<executions />
+					<configuration>
+						<!--generateProjectsForModules>true</generateProjectsForModules -->
+						<resolveTransitiveDependencies>true</resolveTransitiveDependencies>
+						<eclipseProjectName>sip-servlets-bootstrap</eclipseProjectName>
+					</configuration>
+				</plugin>
+	
+				<plugin>
+					<artifactId>maven-clean-plugin</artifactId>
+					<version>2.4.1</version>
+					<configuration>
+						<filesets>
+							<fileset>
+								<directory>${basedir}</directory>
+								<includes>
+									<include>$${**}/</include>
+									<include>bin/</include>
+								</includes>
+								<followSymlinks>false</followSymlinks>
+							</fileset>
+						</filesets>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 	<profiles>
 		<profile>

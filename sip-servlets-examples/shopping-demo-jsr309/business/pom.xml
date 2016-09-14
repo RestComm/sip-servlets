@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip.examples</groupId>
 		<artifactId>shopping-demo-parent-jsr309</artifactId>
-		<version>2.1.0-SNAPSHOT</version>
+		<version>3.0.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>shopping-demo-business-jsr309</artifactId>
 	<packaging>jar</packaging>
@@ -12,7 +12,6 @@
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
-			<version>2.5</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -32,7 +31,6 @@
 		<dependency>
 			<groupId>org.jbpm</groupId>
 			<artifactId>jbpm-jpdl</artifactId>
-			<version>3.2.1</version>
 			<exclusions>
 				<exclusion>
 					<groupId>commons-logging</groupId>
@@ -68,13 +66,11 @@
 		<dependency>
 			<groupId>org.jboss.deployers</groupId>
 			<artifactId>jboss-deployers-client-spi</artifactId>
-			<version>2.0.0.Beta18</version> 
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jboss.deployers</groupId>
 			<artifactId>jboss-deployers-core-spi</artifactId>
-			<version>2.0.0.Beta18</version> 
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -86,25 +82,21 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-annotations</artifactId>
-			<version>${hibernate-annotations.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-commons-annotations</artifactId>
-			<version>${hibernate-common-annotations.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-search</artifactId>
-			<version>${hibernate-search.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
-			<version>${hibernate-validator.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -122,19 +114,16 @@
 		<dependency>
 			<groupId>javax.faces</groupId>
 			<artifactId>jsf-api</artifactId>
-			<version>1.2_02</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.facelets</groupId>
 			<artifactId>jsf-facelets</artifactId>
-			<version>1.1.11</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jboss.seam</groupId>
 			<artifactId>jboss-seam</artifactId>
-			<version>2.1.1.GA</version>
 			<scope>provided</scope>
 		</dependency>	
 		<dependency>

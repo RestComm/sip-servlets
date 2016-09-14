@@ -415,10 +415,30 @@ public class SipStandardService implements SipService {
                         + sipStackPropertiesFileLocation;
             }
             boolean isPropsLoaded = false;
+
             if (sipStackProperties == null) {
                 sipStackProperties = new Properties();
             } else {
                 isPropsLoaded = true;
+            }
+
+            if (!isPropsLoaded) {
+                // Set default values, then load from property file to override
+                sipStackProperties.setProperty("gov.nist.javax.sip.LOG_MESSAGE_CONTENT", "true");
+                sipStackProperties.setProperty("gov.nist.javax.sip.TRACE_LEVEL", "LOG4J");
+                sipStackProperties.setProperty(DEBUG_LOG_STACK_PROP, catalinaBase + "/" + "mss-jsip-" + getName()
+                        + "-debug.txt");
+                sipStackProperties.setProperty(SERVER_LOG_STACK_PROP, catalinaBase + "/" + "mss-jsip-" + getName()
+                        + "-messages.xml");
+                sipStackProperties.setProperty("javax.sip.STACK_NAME", "mss-" + getName());
+                sipStackProperties.setProperty(AUTOMATIC_DIALOG_SUPPORT_STACK_PROP, "off");
+                sipStackProperties.setProperty("gov.nist.javax.sip.DELIVER_UNSOLICITED_NOTIFY", "true");
+                sipStackProperties.setProperty("gov.nist.javax.sip.THREAD_POOL_SIZE", "64");
+                sipStackProperties.setProperty("gov.nist.javax.sip.REENTRANT_LISTENER", "true");
+                sipStackProperties.setProperty("gov.nist.javax.sip.MAX_FORK_TIME_SECONDS", "0");
+                sipStackProperties.setProperty(LOOSE_DIALOG_VALIDATION, "true");
+                sipStackProperties.setProperty(PASS_INVITE_NON_2XX_ACK_TO_LISTENER, "true");
+                sipStackProperties.setProperty("gov.nist.javax.sip.AUTOMATIC_DIALOG_ERROR_HANDLING", "false");
             }
 
             if (logger.isDebugEnabled()) {
@@ -475,25 +495,6 @@ public class SipStandardService implements SipService {
                 isPropsLoaded = true;
             } else {
                 logger.warn("no sip stack properties file defined ");
-            }
-            if (!isPropsLoaded) {
-                logger.warn("loading default Mobicents Sip Servlets sip stack properties");
-                // Silently set default values
-                sipStackProperties.setProperty("gov.nist.javax.sip.LOG_MESSAGE_CONTENT", "true");
-                sipStackProperties.setProperty("gov.nist.javax.sip.TRACE_LEVEL", "LOG4J");
-                sipStackProperties.setProperty(DEBUG_LOG_STACK_PROP, catalinaBase + "/" + "mss-jsip-" + getName()
-                        + "-debug.txt");
-                sipStackProperties.setProperty(SERVER_LOG_STACK_PROP, catalinaBase + "/" + "mss-jsip-" + getName()
-                        + "-messages.xml");
-                sipStackProperties.setProperty("javax.sip.STACK_NAME", "mss-" + getName());
-                sipStackProperties.setProperty(AUTOMATIC_DIALOG_SUPPORT_STACK_PROP, "off");
-                sipStackProperties.setProperty("gov.nist.javax.sip.DELIVER_UNSOLICITED_NOTIFY", "true");
-                sipStackProperties.setProperty("gov.nist.javax.sip.THREAD_POOL_SIZE", "64");
-                sipStackProperties.setProperty("gov.nist.javax.sip.REENTRANT_LISTENER", "true");
-                sipStackProperties.setProperty("gov.nist.javax.sip.MAX_FORK_TIME_SECONDS", "0");
-                sipStackProperties.setProperty(LOOSE_DIALOG_VALIDATION, "true");
-                sipStackProperties.setProperty(PASS_INVITE_NON_2XX_ACK_TO_LISTENER, "true");
-                sipStackProperties.setProperty("gov.nist.javax.sip.AUTOMATIC_DIALOG_ERROR_HANDLING", "false");
             }
 
             if (sipStackProperties.get(TCP_POST_PARSING_THREAD_POOL_SIZE) == null) {

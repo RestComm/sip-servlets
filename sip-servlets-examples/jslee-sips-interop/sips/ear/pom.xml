@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip.examples</groupId>
 		<artifactId>jslee-sips-interop-demo-sips-parent</artifactId>
-		<version>1.8.0-SNAPSHOT</version>
+		<version>3.0.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>jslee-sips-interop-demo-sips-ear</artifactId>
 	<packaging>ear</packaging>
@@ -152,7 +152,7 @@
 				<version>1.1</version>
 				<executions>
 					<execution>
-						<phase>package</phase>
+						<phase>deploy</phase>
 						<configuration>
 							<tasks>
 								<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/default/deploy" />

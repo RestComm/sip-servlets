@@ -17,17 +17,15 @@
 	<pluginRepositories>
 		<pluginRepository>
 			<id>gwt-maven-plugins</id>
-			<url>
-                http://gwt-maven.googlecode.com/svn/trunk/mavenrepo/
-            </url>
+			<url>https://maven-us.nuxeo.org/nexus/content/groups/public/</url>
+            <!-- url>http://gwt-maven.googlecode.com/svn/trunk/mavenrepo/</url-->
 		</pluginRepository>
 	</pluginRepositories>
 	<repositories>
 		<repository>
 			<id>gwt-maven</id>
-			<url>
-                http://gwt-maven.googlecode.com/svn/trunk/mavenrepo/
-            </url>
+			<url>https://maven-us.nuxeo.org/nexus/content/groups/public/</url>
+			<!--url>http://gwt-maven.googlecode.com/svn/trunk/mavenrepo/</url-->
 		</repository>
 	</repositories>
 
@@ -189,15 +187,6 @@
 					<warSourceExcludes>.gwt-tmp/**</warSourceExcludes>
 				</configuration>
 			</plugin>
-			<!-- tell the compiler we can use 1.5 -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
-				</configuration>
-			</plugin>
 		</plugins>
 	</build>
 
@@ -216,7 +205,7 @@
 						<version>1.1</version>
 						<executions>
 							<execution>
-								<phase>package</phase>
+								<phase>deploy</phase>
 								<configuration>
 									<tasks>
 										<copy verbose="true"

@@ -73,7 +73,7 @@
 						<version>1.1</version>
 						<executions>
 							<execution>
-								<phase>package</phase>
+								<phase>deploy</phase>
 								<configuration>
 									<tasks>
 										<echo message="${env.CATALINA_HOME}" />
@@ -102,7 +102,7 @@
 						<version>1.1</version>
 						<executions>
 							<execution>
-								<phase>package</phase>
+								<phase>deploy</phase>
 								<configuration>
 									<tasks>
 										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${CATALINA_HOME}/lib" />
@@ -130,7 +130,7 @@
 						<version>1.1</version>
 						<executions>
 							<execution>
-								<phase>package</phase>
+								<phase>deploy</phase>
 								<configuration>
 									<tasks>
 										<echo message="${env.CATALINA_HOME}" />
@@ -159,7 +159,7 @@
 						<version>1.1</version>
 						<executions>
 							<execution>
-								<phase>package</phase>
+								<phase>deploy</phase>
 								<configuration>
 									<tasks>
 										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${CATALINA_HOME}/lib" />
