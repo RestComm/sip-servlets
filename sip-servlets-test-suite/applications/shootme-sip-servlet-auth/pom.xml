@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip.testsuite.applications</groupId>
 		<artifactId>sip-servlets-test-suite-applications</artifactId>
-		<version>3.0.0-SNAPSHOT</version>
+		<version>3.1.752</version>
 	</parent>
 	<artifactId>shootme-sip-servlet-auth</artifactId>
 	<packaging>war</packaging>
