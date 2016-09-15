@@ -182,7 +182,7 @@ public class SipDefinition extends SimpleResourceDefinition {
                     .setAllowExpression(true)
                     .setXmlName(Constants.GATHER_STATISTICS)
                     .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
-                    .setDefaultValue(new ModelNode(false))
+                    .setDefaultValue(new ModelNode(true))
                     .build();
     protected static final SimpleAttributeDefinition DNS_SERVER_LOCATOR_CLASS =
             new SimpleAttributeDefinitionBuilder(Constants.DNS_SERVER_LOCATOR_CLASS, ModelType.STRING, true)

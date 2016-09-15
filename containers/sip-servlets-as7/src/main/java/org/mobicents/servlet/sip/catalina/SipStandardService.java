@@ -735,12 +735,12 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 	}
 
 	/**
-	 * @param skipStatistics the skipStatistics to set
+	 * @param gatherStatistics the skipStatistics to set
 	 */
-	public void setGatherStatistics(boolean skipStatistics) {
-		this.gatherStatistics = skipStatistics;
+	public void setGatherStatistics(boolean gatherStatistics) {
+		this.gatherStatistics = gatherStatistics;
 		if(logger.isInfoEnabled()) {
-			logger.info("Gathering Statistics set to " + skipStatistics);
+			logger.info("Gathering Statistics set to " + gatherStatistics);
 		}
 	}
 
