@@ -54,6 +54,12 @@
         <module name="org.jboss.as.security"/>
         <module name="org.picketbox"/>
         <module name="javax.security.jacc.api"/>
+	<!-- restcomm stats dependency -->
+	<module name="sun.jdk" export="true" >
+            <imports>
+                <include path="sun/misc/Unsafe" />
+            </imports>
+        </module>
     </dependencies>
 
 </module>

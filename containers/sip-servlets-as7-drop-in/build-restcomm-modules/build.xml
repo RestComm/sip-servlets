@@ -73,6 +73,7 @@
 	    <maven-resource group="org.apache.httpcomponents" artifact="httpcore"/>
 	    <maven-resource group="org.slf4j" artifact="slf4j-api"/>
 	    <maven-resource group="org.slf4j" artifact="slf4j-simple"/>
+	    <maven-resource group="commons-logging" artifact="commons-logging"/>
         </module-def>
 
     </target>
