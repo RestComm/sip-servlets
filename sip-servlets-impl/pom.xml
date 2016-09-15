@@ -340,7 +340,7 @@
 									<goal> copy-dependencies </goal>
 								</goals>
 								<configuration>
-									<includeArtifactIds>jain-sip-api,jain-sip-ri,concurrent,log4j,commons-logging,dnsjava,stun4j,activation,mail,restcomm-jain-sip-ha-core,restcomm-jain-sip-ext,commons-codec,commons-statistics,metrics-core,gson,slf4j-api,slf4j-simple,httpcore,httpclient</includeArtifactIds>
+									<includeArtifactIds>jain-sip-api,jain-sip-ri,concurrent,log4j,commons-logging,dnsjava,stun4j,activation,mail,restcomm-jain-sip-ha-core,restcomm-jain-sip-ext,commons-codec,restcomm-statistics,metrics-core,gson,slf4j-api,slf4j-simple,httpcore,httpclient</includeArtifactIds>
 									<outputDirectory>${CATALINA_HOME}/lib</outputDirectory>
 								</configuration>
 							</execution>
