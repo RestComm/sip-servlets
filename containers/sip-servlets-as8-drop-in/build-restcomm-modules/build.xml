@@ -68,6 +68,9 @@
 	    <maven-resource group="javolution" artifact="javolution"/>
 	    <maven-resource group="io.netty" artifact="netty-all"/>
 	    <maven-resource group="io.dropwizard.metrics" artifact="metrics-core"/>
+	    <maven-resource group="com.google.code.gson" artifact="gson"/>
+	    <maven-resource group="org.apache.httpcomponents" artifact="httpclient"/>
+	    <maven-resource group="org.slf4j" artifact="slf4j-simple"/>
         </module-def>
     </target>
 
