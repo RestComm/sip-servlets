@@ -954,21 +954,12 @@ public class SipSessionImpl implements MobicentsSipSession {
         final long timeNow = System.currentTimeMillis();
         final int timeAlive = (int) ((timeNow - creationTime)/1000);        
         
-		final SipApplicationDispatcher sipApplicationDispatcher = sipFactory.getSipApplicationDispatcher();
-		if(sipApplicationDispatcher.isGatherStatistics()) {
-			if(logger.isDebugEnabled()) {
-				logger.debug("orginal method " + originalMethod);
-			} 
-			if(Request.MESSAGE.equalsIgnoreCase(originalMethod)) {
-				sipFactory.getSipApplicationDispatcher().incMessages();
-			}
-			if(Request.INVITE.equalsIgnoreCase(originalMethod)) {
-				sipFactory.getSipApplicationDispatcher().incCalls();
-				sipFactory.getSipApplicationDispatcher().incSeconds(timeAlive);
-				if(logger.isDebugEnabled()) {
-					logger.debug("seconds " + timeAlive);
-				}
-			}
+		if(Request.MESSAGE.equalsIgnoreCase(originalMethod)) {
+			sipFactory.getSipApplicationDispatcher().incMessages();
+		}
+		if(Request.INVITE.equalsIgnoreCase(originalMethod)) {
+			sipFactory.getSipApplicationDispatcher().incCalls();
+			sipFactory.getSipApplicationDispatcher().incSeconds(timeAlive);
 		}
 		
 		final MobicentsSipApplicationSession sipApplicationSession = getSipApplicationSession();
