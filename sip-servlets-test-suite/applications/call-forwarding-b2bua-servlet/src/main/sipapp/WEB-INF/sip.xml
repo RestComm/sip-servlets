@@ -20,6 +20,10 @@
 		</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
+    <context-param>
+        <param-name>org.restcomm.servlets.sip.OVERRIDE_SYSTEM_HEADER_MODIFICATION</param-name>
+        <param-value>Modifiable</param-value>
+    </context-param>           
 
 	<listener>
 		<listener-class>

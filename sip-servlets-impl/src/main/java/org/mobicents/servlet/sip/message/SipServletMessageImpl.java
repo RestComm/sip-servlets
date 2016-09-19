@@ -1622,7 +1622,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	 */
 	public abstract ModifiableRule getModifiableRule(String headerName);
 
-        private static final String SYS_HDR_MOD_OVERRIDE ="org.restcomm.servlets.sip.OVERRIDE_SYSTEM_HEADER_MODIFICATION";
+        static final String SYS_HDR_MOD_OVERRIDE ="org.restcomm.servlets.sip.OVERRIDE_SYSTEM_HEADER_MODIFICATION";
 
         /**
          * Allows to override the System header modifiable rule assignment.

@@ -379,7 +379,13 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		List<String> toHeaderList = new ArrayList<String>();
 		toHeaderList.add(forwardingUri[0]);
 		headers.put("To", toHeaderList);
-		
+                
+                if (request.getHeader("P-SetCallId") != null) {
+                    List<String> callIdHeaderList = new ArrayList<String>();
+                    callIdHeaderList.add(request.getHeader("P-SetCallId"));		
+                    headers.put("Call-ID", callIdHeaderList);                
+                }
+                
 		List<String> userAgentHeaderList = new ArrayList<String>();
 		userAgentHeaderList.add("CallForwardingB2BUASipServlet");
 		headers.put("User-Agent", userAgentHeaderList);

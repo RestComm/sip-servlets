@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.servlet.ServletContext;
 
 import javax.servlet.ServletException;
 import javax.servlet.sip.SipServletMessage;
@@ -70,6 +71,8 @@ import javax.sip.message.Request;
 import org.apache.log4j.Logger;
 import org.mobicents.ha.javax.sip.SipLoadBalancer;
 import org.mobicents.servlet.sip.JainSipUtils;
+import org.mobicents.servlet.sip.address.AddressImpl;
+import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
 import org.mobicents.servlet.sip.core.MobicentsExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.MobicentsSipFactory;
@@ -150,7 +153,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 		if(origRequest == null) {
 			throw new NullPointerException("original request cannot be null");
 		}
-		
+
 		if(origRequest.getMaxForwards() == 0) {
 			throw new TooManyHopsException();
 		}
@@ -192,7 +195,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 			newRequest.setHeader(callIdHeader);
 			
 			final List<String> contactHeaderSet = retrieveContactHeaders(headerMap,
-					newRequest);	
+					newRequest, origRequest.getSession().getServletContext());	
 			final FromHeader newFromHeader = (FromHeader) newRequest.getHeader(FromHeader.NAME);
 			newFromHeader.removeParameter("tag");
 			((ToHeader) newRequest.getHeader(ToHeader.NAME))
@@ -355,7 +358,8 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 			//in accordance with section 4.1.3 of the specification.
 			//They will be added later after the sip servlet request has been created
 			final List<String> contactHeaderSet = retrieveContactHeaders(headerMap,
-					(Request) newSubsequentServletRequest.getMessage());
+					(Request) newSubsequentServletRequest.getMessage(),
+                                        originalSession.getServletContext());
 						
 			//If Contact header is present in the headerMap 
 			//then relevant portions of Contact header is to be used in the request created, 
@@ -545,15 +549,21 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 	 * @throws ParseException
 	 */
 	private final List<String> retrieveContactHeaders(
-			Map<String, List<String>> headerMap, Request newRequest)
+			Map<String, List<String>> headerMap, Request newRequest, ServletContext servCtx)
 			throws ParseException {
 		List<String> contactHeaderList = new ArrayList<String>();
 		if(headerMap != null) {
 			for (Entry<String, List<String>> entry : headerMap.entrySet()) {
 				final String headerName = entry.getKey();
 				if(!headerName.equalsIgnoreCase(ContactHeader.NAME)) {
-					if(B2BUA_SYSTEM_HEADERS.contains(headerName)) {
-						throw new IllegalArgumentException(headerName + " in the provided map is a system header");
+
+                                        if (B2BUA_SYSTEM_HEADERS.contains(headerName)) {
+                                            String overridenRuleStr = servCtx.getInitParameter(SipServletMessageImpl.SYS_HDR_MOD_OVERRIDE);
+                                            if (overridenRuleStr != null &&
+                                                    !AddressImpl.ModifiableRule.valueOf(overridenRuleStr).equals(ModifiableRule.Modifiable))
+                                            {
+                                                    throw new IllegalArgumentException(headerName + " in the provided map is a system header");
+                                            }
 					}
 					// Fix for Issue 1002 : The header field map is then used to 
 					// override the headers in the newly created request so the header copied from the original request is removed 
