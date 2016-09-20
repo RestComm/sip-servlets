@@ -61,6 +61,7 @@ import javax.sip.header.ContactHeader;
 import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
+import org.mobicents.javax.servlet.sip.SipFactoryExt;
 import org.mobicents.javax.servlet.sip.SipSessionExt;
 import org.mobicents.servlet.sip.message.B2buaHelperImpl;
 
@@ -104,6 +105,8 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		forwardingUris.put("sip:blocked-sender@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "", 
 				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"});
 		forwardingUris.put("sip:forward-tcp-sender@sip-servlets.com", 
+			new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090;transport=tcp"});
+		forwardingUris.put("sip:forward-tcp-sender-factory@sip-servlets.com", 
 			new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090;transport=tcp"});
 		forwardingUris.put("sip:forward-udp-sender@sip-servlets.com", 
 				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080"});
@@ -428,7 +431,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 	}
 
 	private void forwardInviteUsingSipFactory(SipServletRequest origReq, String[] forwardingUri) throws ServletParseException, UnsupportedEncodingException, IOException {
-		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
+		SipFactoryExt sipFactory = (SipFactoryExt) getServletContext().getAttribute(
 				SIP_FACTORY);
 		B2buaHelper b2buaHelper = origReq.getB2buaHelper();
         URI from = origReq.getTo().getURI();
@@ -440,11 +443,20 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
         		origReq.createResponse(SipServletResponse.SC_BUSY_HERE).send();
         		origReq.getSession().invalidate();        		
         	}
-        	newRequest = sipFactory.createRequest(origReq, true);   
+        	newRequest = sipFactory.createRequest(origReq, true);
         	newRequest.setRequestURI(to);
         } else {
-        	newRequest = sipFactory.createRequest(appSession, "INVITE", from, to);
+                if (origReq.getHeader("P-SetCallId") != null) {
+                    newRequest = sipFactory.createRequestWithCallID(appSession, "INVITE", from, to,origReq.getHeader("P-SetCallId"));
+                    //rewrite req uri because transport param is removed
+                    newRequest.setRequestURI(sipFactory.createURI(forwardingUri[1]));
+                } else {
+                    newRequest = sipFactory.createRequest(appSession, "INVITE", from, to);
+                }
         }
+        if (origReq.getHeader("P-SetCallId") != null) {
+            newRequest.setHeader("Call-ID", origReq.getHeader("P-SetCallId"));                
+        }                 
         if(origReq.getContent() != null) {
         	newRequest.setContent(origReq.getContent(), origReq.getContentType());
         }

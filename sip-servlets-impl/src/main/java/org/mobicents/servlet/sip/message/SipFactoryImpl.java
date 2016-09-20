@@ -35,6 +35,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.sip.Address;
@@ -139,7 +140,7 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 			}
 		}
 	}
-	
+
 	public static class NamesComparator implements Comparator<String>, Serializable {		
 		private static final long serialVersionUID = 1L;
 
@@ -352,7 +353,79 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 		return createSipServletRequest(sipAppSession, method, fromA, toA, handler, null, null);
 
 	}
+        
+        @Override 
+        public SipServletRequest createRequestWithCallID(SipApplicationSession sipAppSession,
+                        String method, Address from, Address to, String callID){
+		if (logger.isDebugEnabled()) {
+			logger
+					.debug("Creating new SipServletRequest for SipApplicationSession["
+							+ sipAppSession
+							+ "] METHOD["
+							+ method
+							+ "] FROM_A[" + from + "] TO_A[" + to + "]");
+		}
 
+		validateCreation(method, sipAppSession);
+
+		try { 
+                        String handler = ((MobicentsSipApplicationSession)sipAppSession).getCurrentRequestHandler();
+			//javadoc specifies that a copy of the address should be done hence the clone
+			return createSipServletRequest(sipAppSession, method, (Address)from.clone(), (Address)to.clone(), handler, callID, null);
+		} catch (ServletParseException e) {
+			logger.error("Error creating sipServletRequest", e);
+			return null;
+		}
+        }
+
+        @Override 
+        public SipServletRequest createRequestWithCallID(SipApplicationSession sipAppSession,
+                        String method, String from, String to, String callID) throws ServletParseException{
+		if (logger.isDebugEnabled()) {
+			logger
+					.debug("Creating new SipServletRequest for SipApplicationSession["
+							+ sipAppSession
+							+ "] METHOD["
+							+ method
+							+ "] FROM["
+							+ from + "] TO[" + to + "]");
+		}
+
+		validateCreation(method, sipAppSession);
+
+		Address toA = this.createAddress(to);
+		Address fromA = this.createAddress(from);
+                String handler = ((MobicentsSipApplicationSession)sipAppSession).getCurrentRequestHandler();
+		return createSipServletRequest(sipAppSession, method, fromA, toA, handler, callID, null);
+        }
+
+        @Override 
+        public SipServletRequest createRequestWithCallID(SipApplicationSession sipAppSession,
+                        String method, URI from, URI to, String callID){
+		if (logger.isDebugEnabled()) {
+			logger
+					.debug("Creating new SipServletRequest for SipApplicationSession["
+							+ sipAppSession
+							+ "] METHOD["
+							+ method
+							+ "] FROM_URI[" + from + "] TO_URI[" + to + "]");
+		}
+
+		validateCreation(method, sipAppSession);
+
+		//javadoc specifies that a copy of the uri should be done hence the clone
+		Address toA = this.createAddress(to.clone());
+		Address fromA = this.createAddress(from.clone());
+
+		try {
+                        String handler = ((MobicentsSipApplicationSession)sipAppSession).getCurrentRequestHandler();
+			return createSipServletRequest(sipAppSession, method, fromA, toA, handler, callID, null);
+		} catch (ServletParseException e) {
+			logger.error("Error creating sipServletRequest", e);
+			return null;
+		}       
+        }          
+        
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -500,7 +573,7 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 					"Illegal arg ecnountered while creatigng b2bua", ex);
 		}			
 	}
-	
+        
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -1040,7 +1113,7 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 			String method, URI from, URI to) {
 		throw new UnsupportedOperationException("Use the one createRequest(SipApplicationSession appSession, String method, URI from, URI to, String handler) method instead");
 	}
-	
+      
 	/* (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.core.MobicentsSipFactoryImpl#getAddressFactory()
 	 */

@@ -19,8 +19,12 @@
 
 package org.mobicents.javax.servlet.sip;
 
+import javax.servlet.sip.Address;
+import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
+import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.URI;
 
 /**
  * Interface Extension that adds extra features to the JSR 289 SipFactory interface to allow proxying of orphaned requests.</br>
@@ -87,4 +91,53 @@ public interface SipFactoryExt extends SipFactory {
      * @since 7.0.2
      */
     SipApplicationSession createApplicationSessionByKey(java.lang.String sipApplicationKey, boolean isContainerManaged);
+    
+
+    /**
+     * Extension variant to the spec allowing to specify CallID.
+     * 
+     * This method requires org.restcomm.servlets.sip.OVERRIDE_SYSTEM_HEADER_MODIFICATION
+     * param to be set at web/sip.xml descriptor. Value "Modifiable"
+     * 
+     * @param appSession
+     * @param method
+     * @param from
+     * @param to
+     * @param callID If null, the container will autogenerate the callId as usual
+     * @return 
+     */
+    public SipServletRequest createRequestWithCallID(SipApplicationSession appSession,
+                    String method, Address from, Address to, String callID);
+
+    /**
+     * Extension variant to the spec allowing to specify CallID
+     * 
+     * This method requires org.restcomm.servlets.sip.OVERRIDE_SYSTEM_HEADER_MODIFICATION
+     * param to be set at web/sip.xml descriptor. Value "Modifiable"
+     * 
+     * @param appSession
+     * @param method
+     * @param from
+     * @param to
+     * @param callID If null, the container will autogenerate the callId as usual
+     * @return 
+     */
+    public SipServletRequest createRequestWithCallID(SipApplicationSession appSession,
+                    String method, String from, String to, String callID) throws ServletParseException;
+
+    /**
+     * Extension variant to the spec allowing to specify CallID
+     * 
+     * This method requires org.restcomm.servlets.sip.OVERRIDE_SYSTEM_HEADER_MODIFICATION
+     * param to be set at web/sip.xml descriptor. Value "Modifiable"
+     * 
+     * @param appSession
+     * @param method
+     * @param from
+     * @param to
+     * @param callID If null, the container will autogenerate the callId as usual
+     * @return 
+     */    
+    public SipServletRequest createRequestWithCallID(SipApplicationSession appSession,
+                    String method, URI from, URI to, String callID);
 }

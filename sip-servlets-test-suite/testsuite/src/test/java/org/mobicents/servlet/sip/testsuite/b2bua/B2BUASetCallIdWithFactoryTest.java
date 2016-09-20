@@ -44,9 +44,9 @@ import org.mobicents.servlet.sip.testsuite.TestSipListener;
  * @author Filip Olsson 
  *
  */
-public class B2BUASetCallIdTest extends SipServletTestCase {
+public class B2BUASetCallIdWithFactoryTest extends SipServletTestCase {
 	
-	private static transient Logger logger = Logger.getLogger(B2BUASetCallIdTest.class);
+	private static transient Logger logger = Logger.getLogger(B2BUASetCallIdWithFactoryTest.class);
 
 	private static final String TRANSPORT_UDP = "udp";
 	private static final String TRANSPORT_TCP = "tcp";
@@ -60,7 +60,7 @@ public class B2BUASetCallIdTest extends SipServletTestCase {
 	ProtocolObjects	receiverProtocolObjects;
 	SipStandardManager sipStandardManager = null;
 
-	public B2BUASetCallIdTest(String name) {
+	public B2BUASetCallIdWithFactoryTest(String name) {
 		super(name);
 		startTomcatOnStartup = false;
 		autoDeployOnStartup = false;
@@ -105,7 +105,7 @@ public class B2BUASetCallIdTest extends SipServletTestCase {
         
         private static final String B2BUACALL_ID="f81d4fae-7dec-11d0-a765-00a0c91e6bf6@foo.bar.com";
 	
-	public void testSetCallIdWithHelper() throws Exception {
+	public void testSetCallIdWithFactory() throws Exception {
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
 		SipProvider senderProvider = sender.createProvider();
 
@@ -118,7 +118,7 @@ public class B2BUASetCallIdTest extends SipServletTestCase {
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
 
-		String fromName = "forward-tcp-sender";
+		String fromName = "forward-tcp-sender-factory";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
 				fromName, fromSipAddress);
@@ -139,7 +139,8 @@ public class B2BUASetCallIdTest extends SipServletTestCase {
                 assertEquals(B2BUACALL_ID, receiverCallIdHeader.getCallId());
 
 	}
-
+        
+        
 	@Override
 	protected void tearDown() throws Exception {	
 		senderProtocolObjects.destroy();

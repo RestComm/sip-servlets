@@ -282,4 +282,23 @@ public class SipFactoryFacade implements SipFactoryExt, Serializable {
 	public void setRouteOrphanRequests(boolean routeOrphanRequets) {
 		sipFactoryImpl.setRouteOrphanRequests(routeOrphanRequets);
 	}
+
+    @Override
+    public SipServletRequest createRequestWithCallID(SipApplicationSession appSession, String method, Address from, Address to, String callID) {
+        SipServletRequest sipServletRequest = sipFactoryImpl.createRequestWithCallID(appSession, method, from, to, callID);
+        return sipServletRequest;
+    }
+
+    @Override
+    public SipServletRequest createRequestWithCallID(SipApplicationSession appSession, String method, String from, String to, String callID) throws ServletParseException {
+        SipServletRequest sipServletRequest = sipFactoryImpl.createRequestWithCallID(appSession, method, from, to, callID);
+        return sipServletRequest;
+    }
+
+    @Override
+    public SipServletRequest createRequestWithCallID(SipApplicationSession appSession, String method, URI from, URI to, String callID) {
+            SipServletRequest sipServletRequest = sipFactoryImpl.createRequestWithCallID(appSession, method, from, to, callID);
+            return sipServletRequest;
+    }
+
 }
