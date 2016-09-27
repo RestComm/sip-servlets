@@ -455,9 +455,15 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		}
 		//define remote server address (optionally)
         statsReporter.setRemoteServer(statisticsServer);
-        statsReporter.setProjectName("sipservlets");
-        statsReporter.setProjectType("community");
-        statsReporter.setVersion(Version.getVersionProperty(Version.RELEASE_VERSION));
+        String projectName = System.getProperty("RestcommProjectName", "sipservlets");
+        String projectType = System.getProperty("RestcommProjectType", "product");
+        String projectVersion = System.getProperty("RestcommProjectVersion", Version.getVersionProperty(Version.RELEASE_VERSION));
+        if(logger.isDebugEnabled()) {
+	 		logger.debug("Restcomm Stats " + projectName + " " + projectType + " " + projectVersion);
+	 	}
+        statsReporter.setProjectName(projectName);
+        statsReporter.setProjectType(projectType);
+        statsReporter.setVersion(projectVersion);
 	}
 	/**
 	 * {@inheritDoc}
