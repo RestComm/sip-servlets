@@ -1066,10 +1066,18 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 			if(Request.CANCEL.equals(requestMethod)) {
 				getSipSession().setRequestsPending(0);
 	    		Transaction tx = inviteTransactionToCancel;
+	    		if(logger.isDebugEnabled()) {
+	    			logger.debug("INVITE transaction for CANCEL is " + tx);
+	    		}
     			if(tx != null) {
+    				if(logger.isDebugEnabled()) {
+    					logger.debug("State of INVITE transaction " + tx + " for CANCEL, tx state " + tx.getState());
+					}
     				// we rely on the transaction state to know if we send the cancel or not
     				if(tx.getState() == null || tx.getState().equals(TransactionState.CALLING) || tx.getState().equals(TransactionState.TRYING)) {
-	    				logger.debug("Can not send CANCEL. Will try to STOP retransmissions " + tx + " tx state " + tx.getState());
+    					if(logger.isDebugEnabled()) {
+    						logger.debug("Can not send CANCEL. Will try to STOP retransmissions " + tx + " tx state " + tx.getState());
+    					}
 	    				// We still haven't received any response on this call, so we can not send CANCEL,
 	    				// we will just stop the retransmissions
 	    				StaticServiceHolder.disableRetransmissionTimer.invoke(tx);
@@ -1080,8 +1088,10 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 	    				return;
     				}
     			} else {
-    				logger.debug("Can not send CANCEL because no responses arrived. " +
+    				if(logger.isDebugEnabled()) {
+    					logger.debug("Can not send CANCEL because no responses arrived. " +
     						"Can not stop retransmissions. The transaction is null");
+    				}
     			}
 	    	} 						
 			
