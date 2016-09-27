@@ -456,7 +456,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		//define remote server address (optionally)
         statsReporter.setRemoteServer(statisticsServer);
         String projectName = System.getProperty("RestcommProjectName", "sipservlets");
-        String projectType = System.getProperty("RestcommProjectType", "product");
+        String projectType = System.getProperty("RestcommProjectType", "project");
         String projectVersion = System.getProperty("RestcommProjectVersion", Version.getVersionProperty(Version.RELEASE_VERSION));
         if(logger.isDebugEnabled()) {
 	 		logger.debug("Restcomm Stats " + projectName + " " + projectType + " " + projectVersion);
