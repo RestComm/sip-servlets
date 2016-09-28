@@ -725,7 +725,9 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 					} else {
 						MobicentsSipServletMapping sipServletMapping = sipContext.findSipServletMappings(sipServletRequest);
 						if(sipServletMapping == null && sipContext.getSipRubyController() == null) {
-							logger.error("Sending 404 because no matching servlet found for this request ");
+							if(logger.isInfoEnabled()) {
+								logger.info("Sending 404 because no matching servlet found for this request " + sipServletRequest);
+							}
 							sendErrorResponse(sipContext.getSipApplicationDispatcher(), Response.NOT_FOUND, sipServletRequest, sipProvider);
 							return;
 						} else if(sipServletMapping != null) {							
