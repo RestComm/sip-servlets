@@ -559,7 +559,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 
                                         if (B2BUA_SYSTEM_HEADERS.contains(headerName)) {
                                             String overridenRuleStr = servCtx.getInitParameter(SipServletMessageImpl.SYS_HDR_MOD_OVERRIDE);
-                                            if (overridenRuleStr != null &&
+                                            if (overridenRuleStr == null || 
                                                     !AddressImpl.ModifiableRule.valueOf(overridenRuleStr).equals(ModifiableRule.Modifiable))
                                             {
                                                     throw new IllegalArgumentException(headerName + " in the provided map is a system header");
