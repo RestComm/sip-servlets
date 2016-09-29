@@ -89,7 +89,7 @@
 
 	<properties>
 		<restcomm.tools.mavenplugin.eclipse.version>1.0.0.FINAL</restcomm.tools.mavenplugin.eclipse.version>
-		<jain-sip-ri.version>1.2.305</jain-sip-ri.version>
+		<jain-sip-ri.version>1.2.307</jain-sip-ri.version>
 		<restcomm.cluster.version>1.15.26</restcomm.cluster.version>
 		<restcomm.balancer.version>2.0.41</restcomm.balancer.version>
 		<restcomm.jain.sip.ha.version>1.5.41</restcomm.jain.sip.ha.version>
