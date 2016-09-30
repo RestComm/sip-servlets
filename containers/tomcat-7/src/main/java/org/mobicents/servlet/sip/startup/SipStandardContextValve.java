@@ -22,6 +22,7 @@ package org.mobicents.servlet.sip.startup;
 import java.io.IOException;
 import java.text.ParseException;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletRequestEvent;
@@ -181,6 +182,17 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
                 notFound(response);
                 return;
             }
+        }
+        
+        // Acknowledge the request
+        try {
+            response.sendAcknowledgement();
+        } catch (IOException ioe) {
+            container.getLogger().error(sm.getString(
+                    "standardContextValve.acknowledgeException"), ioe);
+            request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, ioe);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
         }
 
         // Normal request processing
