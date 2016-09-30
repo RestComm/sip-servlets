@@ -22,6 +22,7 @@ package org.mobicents.servlet.sip.startup;
 import java.io.IOException;
 import java.text.ParseException;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletRequestEvent;
