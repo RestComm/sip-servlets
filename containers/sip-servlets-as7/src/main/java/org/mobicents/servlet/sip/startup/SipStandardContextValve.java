@@ -179,8 +179,7 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
         try {
             response.sendAcknowledgement();
         } catch (IOException ioe) {
-            container.getLogger().error(sm.getString(
-                    "standardContextValve.acknowledgeException"), ioe);
+            container.getLogger().error(MESSAGES.errorAcknowledgingRequest("standardContextValve.acknowledgeException"), ioe);
             request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, ioe);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return;
