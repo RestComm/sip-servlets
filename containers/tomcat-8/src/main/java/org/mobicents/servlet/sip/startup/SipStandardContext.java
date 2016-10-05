@@ -143,6 +143,8 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
     // default quotable params that their values need to be quoted.
     private static final String DEFAULT_QUOTABLE_PARAMS = "vendor, model, version, cnonce, nextnonce,"
         + "nonce, code, oc-algo, cid, text, domain, opaque, qop, realm, response, rspauth, uri, username";
+    
+    private static final String TIMER_SERVICE_POOL_SIZE = "org.restcomm.servlets.sip.TIMER_SERVICE_THREADS";
 
 	protected String applicationName;
 	protected String smallIcon;
@@ -257,7 +259,20 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 			if(proxyTimerServiceType != null && proxyTimerServiceType.equalsIgnoreCase("Standard")) {
                 proxyTimerService = new ProxyTimerServiceImpl(applicationName);
             } else if(proxyTimerServiceType != null && proxyTimerServiceType.equalsIgnoreCase("Default")) {
-                proxyTimerService = new DefaultProxyTimerService(applicationName);
+            	String strCorePoolSize = this.getServletContext().getInitParameter(TIMER_SERVICE_POOL_SIZE);
+            	if (strCorePoolSize != null && !strCorePoolSize.isEmpty()) {
+            		try {
+            			int CorePoolSize = Integer.parseInt(strCorePoolSize);
+            			proxyTimerService = new DefaultProxyTimerService(applicationName, CorePoolSize);
+            		}catch (NumberFormatException ex) {
+            			if (logger.isDebugEnabled()) {
+							logger.debug("Failed to parse timer service pool size, use default value.");
+						}
+            			proxyTimerService = new DefaultProxyTimerService(applicationName);
+            		}
+            	} else {
+            		proxyTimerService = new DefaultProxyTimerService(applicationName);
+            	}
             } else {
                 proxyTimerService = new ProxyTimerServiceImpl(applicationName);
             }

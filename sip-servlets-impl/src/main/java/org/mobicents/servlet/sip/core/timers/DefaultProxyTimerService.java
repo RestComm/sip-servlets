@@ -56,6 +56,11 @@ public class DefaultProxyTimerService extends ScheduledThreadPoolExecutor implem
         super(corePoolSize);
         schedulePurgeTaskIfNeeded();
     }
+    
+    public DefaultProxyTimerService(String applicationName, int corePoolSize) {
+        super(corePoolSize, new NamingThreadFactory(applicationName + "_sip_default_proxy_timer_service"));
+        schedulePurgeTaskIfNeeded();
+    }
 
     /**
      * @param corePoolSize
