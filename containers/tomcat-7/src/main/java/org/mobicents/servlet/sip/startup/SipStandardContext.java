@@ -260,9 +260,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
             			int CorePoolSize = Integer.parseInt(strCorePoolSize);
             			proxyTimerService = new DefaultProxyTimerService(applicationName, CorePoolSize);
             		}catch (NumberFormatException ex) {
-            			if (logger.isDebugEnabled()) {
-							logger.debug("Failed to parse timer service pool size, use default value.");
-						}
+            			logger.warn("Failed to parse timer service pool size with string value [" + strCorePoolSize + "], use default value.");
             			proxyTimerService = new DefaultProxyTimerService(applicationName);
             		}
             	} else {
