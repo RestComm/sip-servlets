@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip.examples</groupId>
 		<artifactId>alerting-app-parent</artifactId>
-		<version>3.0.0-SNAPSHOT</version>
+		<version>4.0.114</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>alerting-app</artifactId>
