@@ -229,14 +229,14 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 		// is correctly initialized too
 		super.initInternal();
 		
-		prepareServletContext();
+		initInternalApplicationComponents();
 		
 		if(logger.isInfoEnabled()) {
 			logger.info("sip context Initialized " + getName());
 		}	
 	}
-
-	protected void prepareServletContext() throws LifecycleException {
+	
+	protected void initInternalApplicationComponents() throws LifecycleException {
 		if(sipApplicationDispatcher == null) {
 			setApplicationDispatcher();
 		}
@@ -249,6 +249,34 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 		if(timerService == null) {			
 			timerService = new TimerServiceImpl(sipApplicationDispatcher.getSipService(), applicationName);			
 		}
+		if(sasTimerService == null || !sasTimerService.isStarted()) {
+			String sasTimerServiceType = sipApplicationDispatcher.getSipService().getSasTimerServiceImplementationType();
+			if(sasTimerServiceType != null && sasTimerServiceType.equalsIgnoreCase("Standard")) {
+                sasTimerService = new StandardSipApplicationSessionTimerService(applicationName);
+            } else if (sasTimerServiceType != null && sasTimerServiceType.equalsIgnoreCase("Default")) {
+                sasTimerService = new DefaultSipApplicationSessionTimerService(applicationName);
+            } else {
+                sasTimerService = new StandardSipApplicationSessionTimerService(applicationName);
+            }
+		}
+		// needed when restarting applications through the tomcat manager
+		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SIP_FACTORY, sipFactoryFacade);
+		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE, timerService);
+		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SUPPORTED,
+				Arrays.asList(sipApplicationDispatcher.getExtensionsSupported()));
+		this.getServletContext().setAttribute("javax.servlet.sip.100rel", Boolean.TRUE);
+		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SUPPORTED_RFCs,
+				Arrays.asList(sipApplicationDispatcher.getRfcSupported()));
+		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SIP_SESSIONS_UTIL, sipSessionsUtil);
+		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,
+				sipApplicationDispatcher.getOutboundInterfaces());
+		this.getServletContext().setAttribute("org.mobicents.servlet.sip.SIP_CONNECTORS",
+				sipApplicationDispatcher.getSipService().findSipConnectors());
+		this.getServletContext().setAttribute("org.mobicents.servlet.sip.DNS_RESOLVER",
+				sipApplicationDispatcher.getDNSResolver());
+	}
+
+	protected void prepareServletContext() throws LifecycleException {
 		if(proxyTimerService == null) {
 			String proxyTimerServiceType = sipApplicationDispatcher.getSipService().getProxyTimerServiceImplementationType();
 			if(proxyTimerServiceType != null && proxyTimerServiceType.equalsIgnoreCase("Standard")) {
@@ -270,35 +298,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
                 proxyTimerService = new ProxyTimerServiceImpl(applicationName);
             }		
 		}
-
-		if(sasTimerService == null || !sasTimerService.isStarted()) {
-			String sasTimerServiceType = sipApplicationDispatcher.getSipService().getSasTimerServiceImplementationType();
-			if(sasTimerServiceType != null && sasTimerServiceType.equalsIgnoreCase("Standard")) {
-                sasTimerService = new StandardSipApplicationSessionTimerService(applicationName);
-            } else if (sasTimerServiceType != null && sasTimerServiceType.equalsIgnoreCase("Default")) {
-                sasTimerService = new DefaultSipApplicationSessionTimerService(applicationName);
-            } else {
-                sasTimerService = new StandardSipApplicationSessionTimerService(applicationName);
-            }
-		}
-		//needed when restarting applications through the tomcat manager 
-		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SIP_FACTORY,
-				sipFactoryFacade);		
-		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE,
-				timerService);
-		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SUPPORTED,
-				Arrays.asList(sipApplicationDispatcher.getExtensionsSupported()));
-		this.getServletContext().setAttribute("javax.servlet.sip.100rel", Boolean.TRUE);
-		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SUPPORTED_RFCs,
-				Arrays.asList(sipApplicationDispatcher.getRfcSupported()));
-		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SIP_SESSIONS_UTIL,
-				sipSessionsUtil);
-		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,
-				sipApplicationDispatcher.getOutboundInterfaces());	
-		this.getServletContext().setAttribute("org.mobicents.servlet.sip.SIP_CONNECTORS",
-				sipApplicationDispatcher.getSipService().findSipConnectors());
-		this.getServletContext().setAttribute("org.mobicents.servlet.sip.DNS_RESOLVER",
-				sipApplicationDispatcher.getDNSResolver());
+		
 		this.getServletContext().setAttribute("org.restcomm.servlets.sip.QUOTABLE_PARAMETER", 
 				getQuotableParams());
 	}
@@ -346,7 +346,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 			logger.info("Starting the sip context " + getName());
 		}
 //		if( this.getState().equals(LifecycleState.INITIALIZED)) { 
-			prepareServletContext();
+		initInternalApplicationComponents();
 //		}	
 		 // Add missing components as necessary
 		boolean ok = true;
@@ -1177,16 +1177,16 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 		if(logger.isDebugEnabled()) {
 			logger.debug(childrenMap.size() + " container to notify of " + event.getEventType());
 		}
-		if(event.getEventType() == SipContextEventType.SERVLET_INITIALIZED) {
-                        //fixes https://github.com/RestComm/sip-servlets/issues/165
-                        //now the SipService is totally ready/started, we prepare 
-                        //the context again just in case some att was not properly
-                        //initiated
-                        try {
-                            prepareServletContext();
-                        } catch (Exception e) {
-                            logger.warn("Couldnt prepare context", e);
-                        }                      
+		if (event.getEventType() == SipContextEventType.SERVLET_INITIALIZED) {
+			// fixes https://github.com/RestComm/sip-servlets/issues/165
+			// now the SipService is totally ready/started, we prepare
+			// the context again just in case some att was not properly
+			// initiated
+			try {
+				prepareServletContext();
+			} catch (Exception e) {
+				logger.warn("Couldnt prepare context", e);
+			}                      
 			if(!timerService.isStarted()) {
 				timerService.start();
 			}
