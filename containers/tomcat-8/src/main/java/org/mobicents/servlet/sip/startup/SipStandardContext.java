@@ -143,6 +143,8 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
     // default quotable params that their values need to be quoted.
     private static final String DEFAULT_QUOTABLE_PARAMS = "vendor, model, version, cnonce, nextnonce,"
         + "nonce, code, oc-algo, cid, text, domain, opaque, qop, realm, response, rspauth, uri, username";
+    
+    private static final String TIMER_SERVICE_POOL_SIZE = "org.restcomm.servlets.sip.TIMER_SERVICE_THREADS";
 
 	protected String applicationName;
 	protected String smallIcon;
@@ -232,14 +234,14 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 		// is correctly initialized too
 		super.initInternal();
 
-		prepareServletContext();
+		initInternalApplicationComponents();
 
 		if(logger.isInfoEnabled()) {
 			logger.info("sip context Initialized " + getName());
 		}	
 	}
-
-	protected void prepareServletContext() throws LifecycleException {
+	
+	protected void initInternalApplicationComponents() throws LifecycleException {
 		if(sipApplicationDispatcher == null) {
 			setApplicationDispatcher();
 		}
@@ -252,17 +254,6 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 		if(timerService == null) {			
 			timerService = new TimerServiceImpl(sipApplicationDispatcher.getSipService(), applicationName);			
 		}
-		if(proxyTimerService == null) {
-			String proxyTimerServiceType = sipApplicationDispatcher.getSipService().getProxyTimerServiceImplementationType();
-			if(proxyTimerServiceType != null && proxyTimerServiceType.equalsIgnoreCase("Standard")) {
-                proxyTimerService = new ProxyTimerServiceImpl(applicationName);
-            } else if(proxyTimerServiceType != null && proxyTimerServiceType.equalsIgnoreCase("Default")) {
-                proxyTimerService = new DefaultProxyTimerService(applicationName);
-            } else {
-                proxyTimerService = new ProxyTimerServiceImpl(applicationName);
-            }
-		}
-
 		if(sasTimerService == null || !sasTimerService.isStarted()) {
 			String sasTimerServiceType = sipApplicationDispatcher.getSipService().getSasTimerServiceImplementationType();
 			if(sasTimerServiceType != null && sasTimerServiceType.equalsIgnoreCase("Standard")) {
@@ -291,6 +282,30 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 				sipApplicationDispatcher.getSipService().findSipConnectors());
 		this.getServletContext().setAttribute("org.mobicents.servlet.sip.DNS_RESOLVER",
 				sipApplicationDispatcher.getDNSResolver());
+	}
+
+	protected void prepareServletContext() throws LifecycleException {
+		if(proxyTimerService == null) {
+			String proxyTimerServiceType = sipApplicationDispatcher.getSipService().getProxyTimerServiceImplementationType();
+			if(proxyTimerServiceType != null && proxyTimerServiceType.equalsIgnoreCase("Standard")) {
+                proxyTimerService = new ProxyTimerServiceImpl(applicationName);
+            } else if(proxyTimerServiceType != null && proxyTimerServiceType.equalsIgnoreCase("Default")) {
+            	String strCorePoolSize = this.getServletContext().getInitParameter(TIMER_SERVICE_POOL_SIZE);
+            	if (strCorePoolSize != null && !strCorePoolSize.isEmpty()) {
+            		try {
+            			int CorePoolSize = Integer.parseInt(strCorePoolSize);
+            			proxyTimerService = new DefaultProxyTimerService(applicationName, CorePoolSize);
+            		}catch (NumberFormatException ex) {
+            			logger.warn("Failed to parse timer service pool size with string value [" + strCorePoolSize + "], use default value.");
+            			proxyTimerService = new DefaultProxyTimerService(applicationName);
+            		}
+            	} else {
+            		proxyTimerService = new DefaultProxyTimerService(applicationName);
+            	}
+            } else {
+                proxyTimerService = new ProxyTimerServiceImpl(applicationName);
+            }
+		}
         this.getServletContext().setAttribute("org.restcomm.servlets.sip.QUOTABLE_PARAMETER",
                 getQuotableParams());
 	}
@@ -338,7 +353,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 			logger.info("Starting the sip context " + getName());
 		}
 		//		if( this.getState().equals(LifecycleState.INITIALIZED)) { 
-		prepareServletContext();
+		initInternalApplicationComponents();
 		//		}	
 		// Add missing components as necessary
 		boolean ok = true;
@@ -1281,16 +1296,16 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 		if(logger.isDebugEnabled()) {
 			logger.debug(childrenMap.size() + " container to notify of " + event.getEventType());
 		}
-		if(event.getEventType() == SipContextEventType.SERVLET_INITIALIZED) {
-                        //fixes https://github.com/RestComm/sip-servlets/issues/165
-                        //now the SipService is totally ready/started, we prepare 
-                        //the context again just in case some att was not properly
-                        //initiated
-                        try {
-                            prepareServletContext();
-                        } catch (Exception e) {
-                            logger.warn("Couldnt prepare context", e);
-                        }                      
+		if (event.getEventType() == SipContextEventType.SERVLET_INITIALIZED) {
+			// fixes https://github.com/RestComm/sip-servlets/issues/165
+			// now the SipService is totally ready/started, we prepare
+			// the context again just in case some att was not properly
+			// initiated
+			try {
+				prepareServletContext();
+			} catch (Exception e) {
+				logger.warn("Couldnt prepare context", e);
+			}                     
 			if(!timerService.isStarted()) {
 				timerService.start();
 			}
