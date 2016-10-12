@@ -22,9 +22,6 @@
 			<id>all</id>			
 			<modules>
 				<module>sources-asciidoc</module>
-				<!--module>sources-telscale</module>
-				<module>jdocbook-restcomm</module>
-				<module>jdocbook-telscale</module-->
 			</modules>
 		</profile>
 		<profile>
@@ -34,14 +31,12 @@
 			</activation>			
 			<modules>
 				<module>sources-asciidoc</module>
-				<!--module>jdocbook-restcomm</module-->				
 			</modules>
 		</profile>
 		<profile>
 			<id>telscale</id>
 			<modules>
 				<module>sources-asciidoc</module>
-				<!--module>jdocbook-restcomm</module-->				
 			</modules>
 		</profile>
 	</profiles>
