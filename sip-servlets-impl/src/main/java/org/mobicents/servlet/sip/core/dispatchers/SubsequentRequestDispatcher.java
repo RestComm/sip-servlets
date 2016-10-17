@@ -191,10 +191,10 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 							return ;
 						} else {
 							if(poppedRouteHeader != null) {
-								throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot find the application to handle this subsequent request " + request +
+								throw new DispatcherException(Response.CALL_OR_TRANSACTION_DOES_NOT_EXIST, "cannot find the application to handle this subsequent request " + request +
 									"in this popped routed header " + poppedRouteHeader);
 							} else {
-								throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot find the application to handle this subsequent request " + request);
+								throw new DispatcherException(Response.CALL_OR_TRANSACTION_DOES_NOT_EXIST, "cannot find the application to handle this subsequent request " + request);
 							}
 						}
 					}

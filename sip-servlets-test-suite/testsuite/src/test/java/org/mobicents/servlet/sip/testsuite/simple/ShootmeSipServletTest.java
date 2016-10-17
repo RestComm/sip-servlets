@@ -844,6 +844,30 @@ public class ShootmeSipServletTest extends SipServletTestCase {
         assertEquals("CONFIRMED", allMessagesContent.get(0));        
     }
 	
+	public void testErrorResponseCodeForNonExistingDialog() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+        String fromName = "sender";
+        String fromSipAddress = "sip-servlets.com";
+        SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+                fromName, fromSipAddress);
+                
+        String toUser = "receiverWithTag";
+        String toSipAddress = "sip-servlets.com";
+        SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+                toUser, toSipAddress);
+        
+        sender.setSendBye(false);
+        // This trick is for creating fake dialog at UA for sending sub sequence 
+        sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
+        Thread.sleep(2000);
+        sender.sendInDialogSipRequest("INFO", "1", "text", "plain", null, null);
+        Thread.sleep(100);
+        assertTrue(sender.getFinalResponse().getStatusCode() == 481);
+        sender.sendBye();
+        Thread.sleep(100);
+        assertTrue(!sender.getOkToByeReceived());
+        assertTrue(sender.getFinalResponse().getStatusCode() == 481);
+    }
+	
 	@Override
 	@After
 	protected void tearDown() throws Exception {					

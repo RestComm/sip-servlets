@@ -2146,6 +2146,9 @@ public class TestSipListener implements SipListener {
 				.createAddress(toURI);			
 		ToHeader toHeader = protocolObjects.headerFactory.createToHeader(
 				toNameAddress, null);
+		if (toURI.toString().contains("receiverWithTag")) {
+		    toHeader.setTag("123456");
+		}
 
 		if(toURI instanceof SipURI) {
 			SipURI toSipUri = (SipURI) toURI;
