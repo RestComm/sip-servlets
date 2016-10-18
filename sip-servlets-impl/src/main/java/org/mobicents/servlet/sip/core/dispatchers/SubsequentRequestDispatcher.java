@@ -190,6 +190,10 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 							}				
 							return ;
 						} else {
+						    // Fixed github issue: https://github.com/RestComm/sip-servlets/issues/189
+						    // RFC 3261: https://tools.ietf.org/html/rfc3261#section-12.2.2
+						    // If there is no existing dialog for this subsequence, UAS MUST respond to the request with a 
+						    // 481 (Call/Transaction Does Not Exist) status code and pass that to the server transaction."
 							if(poppedRouteHeader != null) {
 								throw new DispatcherException(Response.CALL_OR_TRANSACTION_DOES_NOT_EXIST, "cannot find the application to handle this subsequent request " + request +
 									"in this popped routed header " + poppedRouteHeader);

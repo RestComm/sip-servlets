@@ -101,7 +101,7 @@ public class ConcurrentyControlSipSessionIsolationTest extends SipServletTestCas
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
 				fromName, fromSipAddress);
 				
-		String toUser = "receiverWithTag";
+		String toUser = "receiver";
 		String toSipAddress = "sip-servlets.com";
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
