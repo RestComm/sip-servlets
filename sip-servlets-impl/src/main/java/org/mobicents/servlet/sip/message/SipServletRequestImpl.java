@@ -237,7 +237,7 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 			}
 		}
 		
-		if(hName.equals(ContactHeader.NAME)) {
+		if(hName.equalsIgnoreCase(ContactHeader.NAME)) {
 			Request request = (Request) this.message;
 	
 			String method = request.getMethod();

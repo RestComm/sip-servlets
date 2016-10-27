@@ -168,7 +168,7 @@ public abstract class SipServletResponseImpl extends SipServletMessageImpl imple
 			return ModifiableRule.NotModifiable;
 		}
 
-		if(hName.equals(ContactHeader.NAME)) {
+		if(hName.equalsIgnoreCase(ContactHeader.NAME)) {
 			Response sipResponse = (Response) this.message;
 	
 			String method = ((CSeqHeader) sipResponse.getHeader(CSeqHeader.NAME))
