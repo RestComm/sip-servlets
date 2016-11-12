@@ -23,6 +23,30 @@ The application servers within a clustered environment will use what is called a
 In the case of failure, another server (secondary) will take over the task of responding to client's requests without impacting user experience.
 In some clustered ecosystem, load balancing is used as explained below.
  
+Replication 
+
+Replication is a simple clustered mode where cache instances automatically discover neighboring instances on other JVMs on the same local network, and form a cluster. 
+Entries added to any of these cache instances will be replicated to all other cache instances in the cluster, and can be retrieved locally from any instance. 
+This clustered mode provides a quick and easy way to share state across a cluster.
+
+Replication can be synchronous or asynchronous. Use of either one of the options is application dependent. 
+Synchronous replication blocks the caller (e.g. on a put() ) until the modifications have been replicated successfully to all nodes in a cluster. 
+Asynchronous replication performs replication in the background (the put() returns immediately).
+
+Asynchronous replication is faster (no caller blocking), because synchronous replication requires acknowledgments from all nodes in a cluster that they received and applied the modification successfully (round-trip time). 
+However, when a synchronous replication returns successfully, the caller knows for sure that all modifications have been applied to all cache instances, whereas this is not be the case with asynchronous replication. 
+With asynchronous replication, errors are simply written to a log. Even when using transactions, a transaction may succeed but replication may not succeed on all cache instances.
+
+Replication strategy can be EarlyDialog or ConfirmDialog. EarlyDialog replication strategy is to replicate data when the dialog goes to EARLY state. 
+In the figure, the EarlyDialog replication supports from step 5 to step 12. When 1xx response (except 100 Trying) with To tag is sent out (step 5), the sip application session, transaction and dialog will be replicated. 
+There are a lot of overhead and the performance shall be decreased in term of EarlyDialog replication stratergy. 
+
+ConfirmDialog replication strategy is to replicate data when the dialog goes to CONFIRM state (step 7 to step 12). When 200 OK is sent out (step 7), the sip application session, dialog and sip session will be replicated.
+
+[.text-center]
+.Figure 1
+image::images/replication-seq-diagram.png[align="center"]
+
 
 Load Balancing
 

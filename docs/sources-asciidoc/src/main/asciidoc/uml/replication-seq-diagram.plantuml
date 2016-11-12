@@ -1,0 +1,32 @@
+@startuml
+actor UA1
+control SipServlet
+actor UA2
+
+UA1 -> SipServlet: INVITE             
+hnote over SipServlet: 1
+UA1 <- SipServlet: Trying
+hnote over SipServlet: 2
+UA2 <- SipServlet: INVITE
+hnote over SipServlet: 3
+UA2 -> SipServlet: Ringing
+hnote over SipServlet: 4
+UA1 <- SipServlet: Ringing
+hnote over SipServlet: 5
+UA2 -> SipServlet: OK
+hnote over SipServlet: 6
+UA1 <- SipServlet: OK
+hnote over SipServlet: 7
+UA1 -> SipServlet: ACK
+hnote over SipServlet: 8
+UA2 <- SipServlet: ACK
+hnote over SipServlet: 9
+
+UA1 -> SipServlet: BYE
+hnote over SipServlet: 10
+UA2 <- SipServlet: BYE
+hnote over SipServlet: 11
+UA2 -> SipServlet: OK
+hnote over SipServlet: 12
+UA1 <- SipServlet: OK
+@enduml
