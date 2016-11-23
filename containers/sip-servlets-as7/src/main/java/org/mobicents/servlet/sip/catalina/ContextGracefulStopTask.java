@@ -46,14 +46,18 @@ public class ContextGracefulStopTask implements Runnable {
 	public void run() {		
 		int numberOfActiveSipApplicationSessions = ((SipContext)sipContext).getSipManager().getActiveSipApplicationSessions();
 		int numberOfActiveHttpSessions = sipContext.getManager().getActiveSessions();
-		if(logger.isTraceEnabled()) {
-			logger.trace("ContextGracefulStopTask running for context " + sipContext.getName() + ", number of Sip Application Sessions still active " + numberOfActiveSipApplicationSessions + " number of HTTP Sessions still active " + numberOfActiveHttpSessions);
-		}
+		
 		boolean stopPrematuraly = false;
 		long currentTime = System.currentTimeMillis();
 		// if timeToWait is positive, then we check the time since the task started, if the time is greater than timeToWait we can safely stop the context 
 		if(timeToWait > 0 && ((currentTime - startTime) > timeToWait)) {
 			stopPrematuraly = true;			
+		}
+		if(logger.isDebugEnabled()) {
+			logger.debug("ContextGracefulStopTask running for context " + sipContext.getName() + 
+					", number of Sip Application Sessions still active " + numberOfActiveSipApplicationSessions + 
+					" number of HTTP Sessions still active " + numberOfActiveHttpSessions + 
+					", stopPrematurely " + stopPrematuraly);
 		}
 		if((numberOfActiveSipApplicationSessions <= 0 &&  numberOfActiveHttpSessions <= 0) || stopPrematuraly) {
 			try {

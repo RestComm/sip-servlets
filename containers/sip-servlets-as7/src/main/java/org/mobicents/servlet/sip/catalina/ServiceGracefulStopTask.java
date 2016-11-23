@@ -36,17 +36,28 @@ public class ServiceGracefulStopTask implements Runnable {
 	private static final Logger logger = Logger.getLogger(ServiceGracefulStopTask.class);		
 	
 	StandardService sipService;
+	long timeToWait;
+	long startTime;	
 	
-	public ServiceGracefulStopTask(StandardService sipService) {
+	public ServiceGracefulStopTask(StandardService sipService, long timeToWait) {
 		this.sipService = sipService;
+		this.timeToWait = timeToWait;
+		startTime = System.currentTimeMillis();
 	}
 	
 	public void run() {
 		int numberOfSipApplicationsDeployed = ((SipService)sipService).getSipApplicationDispatcher().findInstalledSipApplications().length;
-		if(logger.isTraceEnabled()) {
-			logger.trace("ServiceGracefulStopTask running, number of Sip Application still running " + numberOfSipApplicationsDeployed);
+		boolean stopPrematuraly = false;
+		long currentTime = System.currentTimeMillis();
+		// if timeToWait is positive, then we check the time since the task started, if the time is greater than timeToWait we can safely stop the context 
+		if(timeToWait > 0 && ((currentTime - startTime) > timeToWait)) {
+			stopPrematuraly = true;			
 		}
-		if(numberOfSipApplicationsDeployed <= 0) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("ServiceGracefulStopTask running, number of Sip Application still running " + numberOfSipApplicationsDeployed 
+					+ ", stopPrematurely " + stopPrematuraly);
+		}
+		if(numberOfSipApplicationsDeployed <= 0 || stopPrematuraly) {
 			try {
 				sipService.stop();
 				((SipStandardService)sipService).shutdownServer();

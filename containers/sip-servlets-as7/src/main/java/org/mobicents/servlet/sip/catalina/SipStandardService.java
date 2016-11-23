@@ -1352,22 +1352,30 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 				SipContext sipContext = sipContexts.next();
 				sipContext.stopGracefully(timeToWait);
 			}
-			gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().scheduleWithFixedDelay(new ServiceGracefulStopTask(this), 30000, 30000, TimeUnit.MILLISECONDS);
-			if(timeToWait > 0) {
-				gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().schedule(
-						new Runnable() {
-							public void run() { 
-								gracefulStopFuture.cancel(false);
-								try {
-									stop();
-									shutdownServer();
-								} catch (Exception e) {
-									logger.error("The server couldn't be stopped", e);
-								}
-							}
-						}
-	                , timeToWait, TimeUnit.MILLISECONDS);
+			long gracefulStopTaskInterval = 30000;
+			if(timeToWait > 0 && timeToWait < gracefulStopTaskInterval) {
+				// if the time to Wait is positive and < to the gracefulStopTaskInterval then we schedule the task directly once to the time to wait
+				gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().schedule(new ServiceGracefulStopTask(this, timeToWait), timeToWait, TimeUnit.MILLISECONDS);         
+			} else {
+				// if the time to Wait is > to the gracefulStopTaskInterval or infinite (negative value) then we schedule the task to run every gracefulStopTaskInterval, not needed to be exactly precise on the timeToWait in this case
+				gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().scheduleWithFixedDelay(new ServiceGracefulStopTask(this, timeToWait), gracefulStopTaskInterval, gracefulStopTaskInterval, TimeUnit.MILLISECONDS);                      
 			}
+//			gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().scheduleWithFixedDelay(new ServiceGracefulStopTask(this), 30000, 30000, TimeUnit.MILLISECONDS);
+//			if(timeToWait > 0) {
+//				gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().schedule(
+//						new Runnable() {
+//							public void run() { 
+//								gracefulStopFuture.cancel(false);
+//								try {
+//									stop();
+//									shutdownServer();
+//								} catch (Exception e) {
+//									logger.error("The server couldn't be stopped", e);
+//								}
+//							}
+//						}
+//	                , timeToWait, TimeUnit.MILLISECONDS);
+//			}
 		}		
 	}
 	
