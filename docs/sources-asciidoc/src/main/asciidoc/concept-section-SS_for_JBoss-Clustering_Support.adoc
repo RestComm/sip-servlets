@@ -38,15 +38,14 @@ However, when a synchronous replication returns successfully, the caller knows f
 With asynchronous replication, errors are simply written to a log. Even when using transactions, a transaction may succeed but replication may not succeed on all cache instances.
 
 Replication strategy can be EarlyDialog or ConfirmDialog. EarlyDialog replication strategy is to replicate data when the dialog goes to EARLY state. 
-In the figure, the EarlyDialog replication supports from step 5 to step 12. When 1xx response (except 100 Trying) with To tag is sent out (step 5), the sip application session, transaction and dialog will be replicated. 
+In the figure, the EarlyDialog replication supports from step 5 to step 12. When 1xx response (except 100 Trying) with To tag is sent out (step 5), sip session and dialog will be replicated. 
 There are a lot of overhead and the performance shall be decreased in term of EarlyDialog replication stratergy. 
 
-ConfirmDialog replication strategy is to replicate data when the dialog goes to CONFIRM state (step 7 to step 12). When 200 OK is sent out (step 7), the sip application session, dialog and sip session will be replicated.
+ConfirmDialog replication strategy is to replicate data when the dialog goes to CONFIRM state (step 7 to step 12). When 200 OK is sent out (step 7),dialog and sip session will be replicated.
 
-[.text-center]
-.Figure 1
-image::images/replication-seq-diagram.png[align="center"]
+Ether EarlyDialog mode or ConfirmDialog mode is enabled, right after Sip-Servlet dispatchs the request to application, Sip app session is replicated to another node.
 
+image:http://www.plantuml.com/plantuml/proxy?src=uml/replication-seq-diagram.plantuml
 
 Load Balancing
 
