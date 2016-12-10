@@ -1,0 +1,45 @@
+@startuml
+actor UA1
+control SipServlet
+actor UA2
+
+UA1 -> SipServlet: INVITE             
+hnote over SipServlet: 1
+UA1 <- SipServlet: Trying
+hnote over SipServlet: 2
+UA2 <- SipServlet: INVITE
+hnote over SipServlet: 3
+note left
+When Sip-servlet dispatched the request to the application, 
+sip application session is replicated.
+end note
+UA2 -> SipServlet: Ringing
+hnote over SipServlet: 4
+UA1 <- SipServlet: Ringing
+hnote over SipServlet: 5
+UA2 -> SipServlet: OK
+hnote over SipServlet: 6
+note left
+When EarlyDialog mode is enabled and 
+Sip-servlet received 1xx With To tag, 
+sip session and dialog are replicated.
+end note
+UA1 <- SipServlet: OK
+hnote over SipServlet: 7
+UA1 -> SipServlet: ACK
+hnote over SipServlet: 8
+note right
+When ConfirmDialog mode is enabled and 
+Sip-servlet received successful response, 
+sip session and dialog are replicated.
+end note
+UA2 <- SipServlet: ACK
+hnote over SipServlet: 9
+UA1 -> SipServlet: BYE
+hnote over SipServlet: 10
+UA2 <- SipServlet: BYE
+hnote over SipServlet: 11
+UA2 -> SipServlet: OK
+hnote over SipServlet: 12
+UA1 <- SipServlet: OK
+@enduml
