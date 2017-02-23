@@ -22,6 +22,8 @@
 
 package org.mobicents.servlet.sip.testsuite;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
@@ -41,7 +43,7 @@ import javax.sip.message.MessageFactory;
  * @author M. Ranganathan
  * 
  */
-public class ProtocolObjects {
+public class ProtocolObjects implements Closeable {
 	public final AddressFactory addressFactory;
 
 	public final MessageFactory messageFactory;
@@ -162,4 +164,8 @@ public class ProtocolObjects {
 		this.isStarted = true;
 
 	}
+
+    public void close() throws IOException {
+        destroy();
+    }
 }

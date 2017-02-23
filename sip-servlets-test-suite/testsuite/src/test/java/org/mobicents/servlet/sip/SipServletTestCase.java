@@ -19,8 +19,11 @@
 
 package org.mobicents.servlet.sip;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import javax.sip.ListeningPoint;
@@ -56,10 +59,23 @@ public abstract class SipServletTestCase extends TestCase {
 	public SipServletTestCase(String name) {
 		super(name);
 	}
+        
+        protected List<Closeable> testResources;
+    
+        private void closeResources() throws Exception {
+            for (Closeable rAux : testResources) {
+                try {
+                    rAux.close();
+                } catch (Exception e) {
+
+                }
+            }
+        }         
 	
 	@Override
 	protected void setUp() throws Exception {
-		super.setUp();		
+		super.setUp();
+                testResources = new ArrayList();
 		if(System.getProperty("org.mobicents.testsuite.testhostaddr") == null) {
 			System.setProperty("org.mobicents.testsuite.testhostaddr", "127.0.0.1");// [::1] for IPv6			
 		}
@@ -138,6 +154,7 @@ public abstract class SipServletTestCase extends TestCase {
 
 	@Override
 	protected void tearDown() throws Exception {
+                closeResources();
 		if(createTomcatOnStartup)
 			tomcat.stopTomcat();
 		super.tearDown();

@@ -33,14 +33,16 @@ import org.cafesip.sipunit.SipCall;
 import org.cafesip.sipunit.SipPhone;
 import org.cafesip.sipunit.SipStack;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.testsuite.PhoneCloseable;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
+import org.mobicents.servlet.sip.testsuite.StackCloseable;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
 public class B2BUASipUnitTest extends SipServletTestCase {
 	private static final Logger logger = Logger.getLogger(B2BUASipUnitTest.class);
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
-	private static final int TIMEOUT = 10000;
+	private static final int TIMEOUT = 15000;
 //	private static final int TIMEOUT = 100000000; 
 	SipStack sipStackA;
 	SipStack sipStackB;
@@ -52,8 +54,8 @@ public class B2BUASipUnitTest extends SipServletTestCase {
 	TestSipListener receiver;
 	ProtocolObjects senderProtocolObjects;
 	ProtocolObjects	receiverProtocolObjects;
-	
-	public B2BUASipUnitTest(String name) {
+        
+        public B2BUASipUnitTest(String name) {
 		super(name);
 	}
 
@@ -105,6 +107,10 @@ public class B2BUASipUnitTest extends SipServletTestCase {
 
 		sipStackB = new SipStack(SipStack.PROTOCOL_UDP , 5059, properties2);
 		sipPhoneB = sipStackB.createSipPhone("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "", SipStack.PROTOCOL_UDP, 5070, b);
+                testResources.add(new PhoneCloseable(sipPhoneA));
+                testResources.add(new PhoneCloseable(sipPhoneB));
+                testResources.add(new StackCloseable(sipStackA));
+                testResources.add(new StackCloseable(sipStackB));                
 	}			
 
 	public void testB2BUASipUnit() throws Exception {
@@ -135,11 +141,6 @@ public class B2BUASipUnitTest extends SipServletTestCase {
 		assertTrue(callB.waitForDisconnect(TIMEOUT));
 		assertTrue(callB.respondToDisconnect());
 		
-		sipPhoneA.dispose();
-		sipPhoneB.dispose();
-		sipStackA.dispose();
-		sipStackB.dispose();
-		Thread.sleep(TIMEOUT);
 	}
 	
 	public void testB2BUASipUnitCancelNoResponse() throws Exception {
@@ -154,12 +155,6 @@ public class B2BUASipUnitTest extends SipServletTestCase {
 		//Dialog.createRequest(Request.ACK)
 		//assertTrue(callA.sendInviteOkAck());
 		callA.sendInviteOkAck();				
-		
-		sipPhoneA.dispose();
-		sipPhoneB.dispose();
-		sipStackA.dispose();
-		sipStackB.dispose();
-		Thread.sleep(TIMEOUT);
 	}
 	
 	public void testB2BUASipUnitGenerateResponses() throws Exception {
@@ -191,7 +186,9 @@ public class B2BUASipUnitTest extends SipServletTestCase {
 		senderProvider.addSipListener(sender);
 
 		senderProtocolObjects.start();
+                testResources.add(senderProtocolObjects);
 		receiverProtocolObjects.start();
+                testResources.add(receiverProtocolObjects);
 		
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
@@ -200,9 +197,7 @@ public class B2BUASipUnitTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());
-		
-		senderProtocolObjects.destroy();
-		receiverProtocolObjects.destroy();			
+					
 		logger.info("Test completed");
 	}
 }
