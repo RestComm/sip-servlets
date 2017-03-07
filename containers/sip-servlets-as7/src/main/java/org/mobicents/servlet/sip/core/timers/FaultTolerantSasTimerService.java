@@ -144,7 +144,7 @@ public class FaultTolerantSasTimerService implements ClusteredSipApplicationSess
 	private FaultTolerantScheduler getScheduler() {
 		if(scheduledExecutor == null) {
 			TimerTaskFactory timerTaskFactory = new SipApplicationSessionTaskFactory(this.sipManager);
-			scheduledExecutor = new FaultTolerantScheduler(NAME + ((SipContext)sipManager.getContainer()).getApplicationNameHashed(), corePoolSize, this.sipManager.getMobicentsCluster(), (byte) 0, this.sipManager.getMobicentsCluster().getMobicentsCache().getJBossCache().getCache().getAdvancedCache().getTransactionManager(), timerTaskFactory, StaticServiceHolder.sipStandardService.getCanceledTimerTasksPurgePeriod());
+			scheduledExecutor = new FaultTolerantScheduler(NAME + ((SipContext)sipManager.getContainer()).getApplicationNameHashed(), corePoolSize, this.sipManager.getMobicentsCluster(), (byte) 0, this.sipManager.getMobicentsCluster().getMobicentsCache().getJBossCache().getAdvancedCache().getTransactionManager(), timerTaskFactory, StaticServiceHolder.sipStandardService.getCanceledTimerTasksPurgePeriod());
 		}
 		return scheduledExecutor;
 	}
@@ -180,18 +180,32 @@ public class FaultTolerantSasTimerService implements ClusteredSipApplicationSess
 		if(timerTask == null) {
 			SipApplicationSessionTaskData timerTaskData = (SipApplicationSessionTaskData) getScheduler().getTimerTaskData(taskId);
 			// we recreate the task locally 
-			FaultTolerantSasTimerTask faultTolerantSasTimerTask = new FaultTolerantSasTimerTask(sipApplicationSession, timerTaskData);
+			final FaultTolerantSasTimerTask faultTolerantSasTimerTask = new FaultTolerantSasTimerTask(sipApplicationSession, timerTaskData);
 			sipApplicationSession.setExpirationTimerTask(faultTolerantSasTimerTask);
 			if(timerTaskData != null) {
 				if(logger.isDebugEnabled()) {
 					logger.debug("Task for sip application session " + taskId + " is not present locally, but on another node, cancelling the remote one and rescheduling it locally.");
 				}
-				// we cancel it, this will cause the remote owner node to remove it and cancel its local task 
-				getScheduler().cancel(taskId);
-				// and reset its start time to the correct one
-				faultTolerantSasTimerTask.beforeRecover();				
-				// and reschedule it locally
-				getScheduler().schedule(faultTolerantSasTimerTask, false);
+				
+				
+				//has to be run in a different transaction not in batch!
+				new Thread(){
+					
+					public void run() {
+						
+						
+						// we cancel it, this will cause the remote owner node to remove it and cancel its local task 
+						FaultTolerantSasTimerService.this.getScheduler().cancel(taskId);
+						// and reset its start time to the correct one
+						faultTolerantSasTimerTask.beforeRecover();				
+						// and reschedule it locally
+						getScheduler().schedule(faultTolerantSasTimerTask, false);
+						
+						
+					};
+	
+				}.start();
+				
 			} else {
 				if(logger.isDebugEnabled()) {
 					logger.debug("Task for sip application session " + taskId + " is not present locally, nor on another node, nothing can be done.");
