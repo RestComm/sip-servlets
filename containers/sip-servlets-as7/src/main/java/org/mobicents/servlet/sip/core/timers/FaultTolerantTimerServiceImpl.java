@@ -195,7 +195,7 @@ public class FaultTolerantTimerServiceImpl implements ClusteredSipServletTimerSe
 	public FaultTolerantScheduler getScheduler() {
 		if(scheduledExecutor == null) {
 			TimerTaskFactory timerTaskFactory = new TimerServiceTaskFactory(this.sipManager);
-			scheduledExecutor = new FaultTolerantScheduler(NAME + ((SipContext)sipManager.getContainer()).getApplicationNameHashed(), SCHEDULER_THREAD_POOL_DEFAULT_SIZE, this.sipManager.getMobicentsCluster(), (byte) 1, this.sipManager.getMobicentsCluster().getMobicentsCache().getJBossCache().getAdvancedCache().getTransactionManager(), timerTaskFactory, StaticServiceHolder.sipStandardService.getCanceledTimerTasksPurgePeriod());
+			scheduledExecutor = new FaultTolerantScheduler(NAME + ((SipContext)sipManager.getContainer()).getApplicationNameHashed(), SCHEDULER_THREAD_POOL_DEFAULT_SIZE, this.sipManager.getMobicentsCluster(), (byte) 1, this.sipManager.getMobicentsCluster().getMobicentsCache().getJBossCache().getCache().getAdvancedCache().getTransactionManager(), timerTaskFactory, StaticServiceHolder.sipStandardService.getCanceledTimerTasksPurgePeriod());
 		}
 		return scheduledExecutor;
 	}
@@ -240,7 +240,7 @@ public class FaultTolerantTimerServiceImpl implements ClusteredSipServletTimerSe
 	 * (non-Javadoc)
 	 * @see org.jboss.web.tomcat.service.session.ClusteredSipServletTimerService#rescheduleTimerLocally(org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession, java.lang.String)
 	 */
-	public ServletTimer rescheduleTimerLocally(MobicentsSipApplicationSession sipApplicationSession,final String timerId) {		
+	public ServletTimer rescheduleTimerLocally(MobicentsSipApplicationSession sipApplicationSession, String timerId) {		
 		TimerTask timerTask = getScheduler().getLocalRunningTask(timerId);
 		if(timerTask == null) {
 			TimerServiceTaskData timerTaskData = (TimerServiceTaskData) getScheduler().getTimerTaskData(timerId);
@@ -251,7 +251,8 @@ public class FaultTolerantTimerServiceImpl implements ClusteredSipServletTimerSe
 				if(logger.isDebugEnabled()) {
 					logger.debug("Timer Task " + timerId + " is not present locally, but on another node, cancelling the remote one and rescheduling it locally with strategy " + periodicScheduleStrategy + ", delay " + timerTaskData.getDelay() + ", period " + timerTaskData.getPeriod());
 				}
-				
+				// we cancel it, this will cause the remote owner node to remove it and cancel its local task
+				cancel(timerId);				
 				boolean fixedDelay = false;
 				ServletTimerImpl servletTimerImpl = null;
 				if(periodicScheduleStrategy != null) {
@@ -262,33 +263,12 @@ public class FaultTolerantTimerServiceImpl implements ClusteredSipServletTimerSe
 				} else {
 					servletTimerImpl = new ServletTimerImpl(timerTaskData.getData(), timerTaskData.getDelay(), sipApplicationSession.getSipContext().getListeners().getTimerListener(), sipApplicationSession);
 				}
-				final TimerServiceTask timerServiceTask = new TimerServiceTask(sipManager, servletTimerImpl, timerTaskData);
+				TimerServiceTask timerServiceTask = new TimerServiceTask(sipManager, servletTimerImpl, timerTaskData);
 				
-				
-				//has to be run in a different transaction not in batch!
-				
-				new Thread(){
-					
-					
-					public void run() {
-						
-						// we cancel it, this will cause the remote owner node to remove it and cancel its local task
-						cancel(timerId);
-						
-						
-						// and reset its start time to the correct one
-						timerServiceTask.beforeRecover();				
-						// and reschedule it locally
-						getScheduler().schedule(timerServiceTask, false);
-						
-						
-					};
-										
-				}.start();
-				
-				
-				
-				
+				// and reset its start time to the correct one
+				timerServiceTask.beforeRecover();				
+				// and reschedule it locally
+				getScheduler().schedule(timerServiceTask, false);
 				return timerServiceTask;
 			} else {
 //				if(logger.isWarningEnabled()) {

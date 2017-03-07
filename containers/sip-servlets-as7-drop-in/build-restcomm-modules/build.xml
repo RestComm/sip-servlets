@@ -63,7 +63,8 @@
             <maven-resource group="org.mobicents.ha.javax.sip" artifact="restcomm-jain-sip-ha-infinispan-backend"/>
             <maven-resource group="org.restcomm.cluster" artifact="core"/>
             <maven-resource group="org.restcomm.cluster" artifact="cache"/>
-            <maven-resource group="org.restcomm.cluster" artifact="timers"/>            
+            <maven-resource group="org.restcomm.cluster" artifact="timers"/>
+            <maven-resource group="org.infinispan" artifact="infinispan-tree"/>
 	    <maven-resource group="org.mobicents.tools" artifact="sip-balancer-jar"/>
             <maven-resource group="dnsjava" artifact="dnsjava"/>
             <maven-resource group="net.java.stun4j" artifact="stun4j"/>

@@ -981,26 +981,12 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 				calendar.setTimeInMillis(expirationTime);
 				logger.debug("sip application session "+ key +" will expires at " + new SimpleDateFormat().format(calendar.getTime()));
 			}
-			
-			
-			final long milisecondsToGive = deltaMilliseconds;
-			
-			
-			//Run the timer in different transaction
-			new Thread(){
-				
-				@Override
-				public void run() {
-					if(expirationTimerTask != null) {								
-						cancelExpirationTimer();
-//						expirationTimerFuture = null;
-					}
-					expirationTimerTask = sipContext.getSipApplicationSessionTimerService().createSipApplicationSessionTimerTask(SipApplicationSessionImpl.this);
-					expirationTimerTask = sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, milisecondsToGive, TimeUnit.MILLISECONDS);
-				}
-				
-			}.start();
-			
+			if(expirationTimerTask != null) {								
+				cancelExpirationTimer();
+//				expirationTimerFuture = null;
+			}
+			expirationTimerTask = sipContext.getSipApplicationSessionTimerService().createSipApplicationSessionTimerTask(this);
+			expirationTimerTask = sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, deltaMilliseconds, TimeUnit.MILLISECONDS);
 
 			return deltaMinutes;
 		}				
