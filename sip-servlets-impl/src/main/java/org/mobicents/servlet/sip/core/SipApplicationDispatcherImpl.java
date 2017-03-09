@@ -48,8 +48,6 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import javax.imageio.spi.ServiceRegistry;
 import javax.management.MBeanRegistration;
@@ -198,7 +196,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	//sip servlet applications
 	private SipApplicationRouter sipApplicationRouter = null;
 	//map of applications deployed
-	private Map<String, SipContext> applicationDeployed = null;
+	Map<String, SipContext> applicationDeployed = null;
 	//map hashes to app names
 	private Map<String, String> mdToApplicationName = null;
 	//map app names to hashes
@@ -206,11 +204,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	//List of host names managed by the container
 	private Set<String> hostNames = null;
 	
-	private Boolean started = Boolean.FALSE;
-	private Lock statusLock = new ReentrantLock();
+	DispatcherFSM fsm;
 
 	protected SipStack sipStack;
-	private SipNetworkInterfaceManager sipNetworkInterfaceManager;
+	SipNetworkInterfaceManagerImpl sipNetworkInterfaceManager;
 	private DNSServerLocator dnsServerLocator;
 	private int dnsTimeout;
 	private DNSResolver dnsResolver;
@@ -240,7 +237,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	private int memoryThreshold;
 	private int backToNormalMemoryThreshold;
 	private boolean rejectSipMessages = false;
-	private long congestionControlCheckingInterval; //30 sec
+	long congestionControlCheckingInterval; //30 sec
 	@Deprecated
 	protected transient CongestionControlTimerTask congestionControlTimerTask;
 	@Deprecated
@@ -293,6 +290,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		sipNetworkInterfaceManager = new SipNetworkInterfaceManagerImpl(this);
 		maxMemory = Runtime.getRuntime().maxMemory() / (double) 1024;
 		congestionControlPolicy = CongestionControlPolicy.ErrorResponse;
+                fsm = new DispatcherFSM(this);
 	}
         
         @Override
@@ -319,10 +317,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
                                
         }
 	
-	/**
-	 * {@inheritDoc} 
-	 */
-	public void init() throws IllegalArgumentException {
+        class InitAction implements DispatcherFSM.Action {
+
+        @Override
+        public void execute(DispatcherFSM.Context ctx) {
 		//load the sip application router from the javax.servlet.sip.ar.spi.SipApplicationRouterProvider system property
 		//and initializes it if present
 		String sipApplicationRouterProviderClassName = System.getProperty("javax.servlet.sip.ar.spi.SipApplicationRouterProvider");
@@ -393,7 +391,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		if( oname == null ) {
 			try {				
                 oname=new ObjectName(domain + ":type=SipApplicationDispatcher");                
-                ((MBeanServer) MBeanServerFactory.findMBeanServer(null).get(0)).registerMBean(this, oname);
+                ((MBeanServer) MBeanServerFactory.findMBeanServer(null).get(0)).registerMBean(SipApplicationDispatcherImpl.this, oname);
                 if(logger.isInfoEnabled()) {
                 	logger.info("Sip Application dispatcher registered under following name " + oname);
                 }
@@ -413,8 +411,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		}
 		int tagHashMaxTotalLength = sipService.getTagHashMaxLength();
 		if(tagHashMaxTotalLength > 0) {
-			this.tagHashMaxLength = (tagHashMaxTotalLength - NUMBER_OF_TAG_SEPARATORS) / 4;
-			APP_ID_HASHING_MAX_LENGTH = tagHashMaxTotalLength - NUMBER_OF_TAG_SEPARATORS - (this.tagHashMaxLength * NUMBER_OF_TAG_SEPARATORS);
+			tagHashMaxLength = (tagHashMaxTotalLength - NUMBER_OF_TAG_SEPARATORS) / 4;
+			APP_ID_HASHING_MAX_LENGTH = tagHashMaxTotalLength - NUMBER_OF_TAG_SEPARATORS - (tagHashMaxLength * NUMBER_OF_TAG_SEPARATORS);
 			if(logger.isInfoEnabled()) {
 				logger.info("tagHashMaxLength ? " + tagHashMaxLength);
 				logger.info("DEFAULT_TAG_HASHING_MAX_LENGTH ? " + APP_ID_HASHING_MAX_LENGTH);
@@ -423,7 +421,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		applicationServerId = "" + UUID.randomUUID();
 		applicationServerIdHash = GenericUtils.hashString(applicationServerId, tagHashMaxLength);
 		
-		messageDispatcherFactory = new MessageDispatcherFactory(this);
+		messageDispatcherFactory = new MessageDispatcherFactory(ctx.dispatcher);
 		asynchronousScheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(2, new NamingThreadFactory("sip_servlets_congestion_control"),
 				new ThreadPoolExecutor.CallerRunsPolicy());
 		asynchronousScheduledThreadPoolExecutor.prestartAllCoreThreads();	
@@ -449,35 +447,41 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			
 		});
 		
-		String statisticsServer = Version.getVersionProperty(Version.STATISTICS_SERVER);
-		if(statisticsServer == null || !statisticsServer.contains("http")) {
-			statisticsServer = Version.DEFAULT_STATISTICS_SERVER;
-		}
-		//define remote server address (optionally)
-        statsReporter.setRemoteServer(statisticsServer);
-        String projectName = System.getProperty("RestcommProjectName", "sipservlets");
-        String projectType = System.getProperty("RestcommProjectType", "project");
-        String projectVersion = System.getProperty("RestcommProjectVersion", Version.getVersionProperty(Version.RELEASE_VERSION));
-        if(logger.isDebugEnabled()) {
-	 		logger.debug("Restcomm Stats " + projectName + " " + projectType + " " + projectVersion);
-	 	}
-        statsReporter.setProjectName(projectName);
-        statsReporter.setProjectType(projectType);
-        statsReporter.setVersion(projectVersion);
+                if (getGatherStatistics()) {
+                    statsReporter = new RestcommStatsReporter();
+
+                        String statisticsServer = Version.getVersionProperty(Version.STATISTICS_SERVER);
+                        if(statisticsServer == null || !statisticsServer.contains("http")) {
+                                statisticsServer = Version.DEFAULT_STATISTICS_SERVER;
+                        }
+                            //define remote server address (optionally)
+                    statsReporter.setRemoteServer(statisticsServer);
+                    String projectName = System.getProperty("RestcommProjectName", "sipservlets");
+                    String projectType = System.getProperty("RestcommProjectType", "product");
+                    String projectVersion = System.getProperty("RestcommProjectVersion", Version.getVersionProperty(Version.RELEASE_VERSION));
+                    if(logger.isDebugEnabled()) {
+                                    logger.debug("Restcomm Stats " + projectName + " " + projectType + " " + projectVersion);
+                            }
+                    statsReporter.setProjectName(projectName);
+                    statsReporter.setProjectType(projectType);
+                    statsReporter.setVersion(projectVersion);
+                }
+            
+        }
+        @Override
+	public void init() throws IllegalArgumentException {
+            fsm.fireEvent(fsm.new Event(DispatcherFSM.EventType.INIT));
 	}
-	/**
-	 * {@inheritDoc}
-	 */
-	public void start() {		
-		statusLock.lock();
-		try {
-			if(started) {
-				return;
-			}
-			started = Boolean.TRUE;
-		} finally {
-			statusLock.unlock();
-		}		
+        
+        @Override
+	public void putInService() throws IllegalArgumentException {
+            fsm.fireEvent(fsm.new Event(DispatcherFSM.EventType.IN_SERVICE));
+	}        
+
+        
+        class StartAction implements DispatcherFSM.Action {
+        @Override
+        public void execute(DispatcherFSM.Context ctx) {	
 		congestionControlTimerTask = new CongestionControlTimerTask();
 		if(congestionControlTimerFuture == null && congestionControlCheckingInterval > 0) { 
 				congestionControlTimerFuture = asynchronousScheduledThreadPoolExecutor.scheduleWithFixedDelay(congestionControlTimerTask, congestionControlCheckingInterval, congestionControlCheckingInterval, TimeUnit.MILLISECONDS);
@@ -515,6 +519,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		if(logger.isDebugEnabled()) {
 			logger.debug("SipApplicationDispatcher Started");
 		}	
+        }
+            
+        }
+        @Override
+	public void start() {		
+            fsm.fireEvent(fsm .new Event(DispatcherFSM.EventType.START));
 	}	
 	
 	/*
@@ -525,19 +535,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		sipService.stopGracefully(timeToWait);
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 */
-	public void stop() {
-		statusLock.lock();
-		try {
-			if(!started) {
-				return;
-			}
-			started = Boolean.FALSE;
-		} finally {
-			statusLock.unlock();
-		}
+        class StopAction implements DispatcherFSM.Action {
+
+        @Override
+        public void execute(DispatcherFSM.Context ctx) {
 		asynchronousScheduledThreadPoolExecutor.shutdownNow();
 		asynchronousExecutor.shutdownNow();						
 		sipApplicationRouter.destroy();
@@ -555,97 +556,123 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		}		
 		if(logger.isDebugEnabled()) {
 			logger.debug("SipApplicationDispatcher Stopped");
-		}
+		}        }
+            
+        }
+                
+	public void stop() {
+            fsm.fireEvent(fsm .new Event(DispatcherFSM.EventType.STOP));
 	}
 	
+        class AddAppAction implements DispatcherFSM.Action {
+
+
+        @Override
+        public void execute(DispatcherFSM.Context ctx) {
+            SipContext sipApplication = (SipContext)ctx.lastEvent.data.get(CONTEXT_EV_DATA);
+            String sipApplicationName = sipApplication.getApplicationName();
+            
+            if (logger.isDebugEnabled()) {
+                logger.debug("Adding the following sip servlet application " + sipApplicationName + ", SipContext=" + sipApplication);
+            }
+            if (sipApplicationName == null) {
+                throw new IllegalArgumentException("Something when wrong while initializing a sip servlets or converged application ");
+            }
+            if (sipApplication == null) {
+                throw new IllegalArgumentException("Something when wrong while initializing the following application " + sipApplicationName);
+            }
+            // Issue 1417 http://code.google.com/p/mobicents/issues/detail?id=1417
+            // Deploy 2 applications with the same app-name should fail
+            SipContext app = applicationDeployed.get(sipApplicationName);
+            if (app != null) {
+                logger.error("An application with the app name " + sipApplicationName + " is already deployed under the following context " + app.getPath());
+                throw new IllegalStateException("An application with the app name " + sipApplicationName + " is already deployed under the following context " + app.getPath());
+            }
+            //if the application has not set any concurrency control mode, we default to the container wide one
+            if (sipApplication.getConcurrencyControlMode() == null) {
+                sipApplication.setConcurrencyControlMode(concurrencyControlMode);
+                if (logger.isInfoEnabled()) {
+                    logger.info("No concurrency control mode for application " + sipApplicationName + " , defaulting to the container wide one : " + concurrencyControlMode);
+                }
+            } else if (logger.isInfoEnabled()) {
+                logger.info("Concurrency control mode for application " + sipApplicationName + " is " + sipApplication.getConcurrencyControlMode());
+            }
+            sipApplication.getServletContext().setAttribute(ConcurrencyControlMode.class.getCanonicalName(), sipApplication.getConcurrencyControlMode());
+
+            applicationDeployed.put(sipApplicationName, sipApplication);
+
+            String hash = GenericUtils.hashString(sipApplicationName, tagHashMaxLength);
+            mdToApplicationName.put(hash, sipApplicationName);
+            applicationNameToMd.put(sipApplicationName, hash);
+
+            List<String> newlyApplicationsDeployed = new ArrayList<String>();
+            newlyApplicationsDeployed.add(sipApplicationName);
+            if (sipApplicationRouter != null) {
+                // https://code.google.com/p/sipservlets/issues/detail?id=277
+                // sipApplicationRouter may not be initialized yet if container is fast to boot
+                sipApplicationRouter.applicationDeployed(newlyApplicationsDeployed);
+            }
+
+            if (logger.isInfoEnabled()) {
+                logger.info(this + " the following sip servlet application has been added : " + sipApplicationName);
+            }
+            if (logger.isInfoEnabled()) {
+                logger.info("It contains the following Sip Servlets : ");
+                for (String servletName : sipApplication.getChildrenMap().keySet()) {
+                    logger.info("SipApplicationName : " + sipApplicationName + "/ServletName : " + servletName);
+                }
+                if (sipApplication.getSipRubyController() != null) {
+                    logger.info("It contains the following Sip Ruby Controller : " + sipApplication.getSipRubyController());
+                }
+            }
+        }
+
+    }
+        
+        static final String CONTEXT_EV_DATA = "Context";
 	/**
 	 * {@inheritDoc}
 	 */
 	public void addSipApplication(String sipApplicationName, SipContext sipApplication) {
-		if(logger.isDebugEnabled()) {
-			logger.debug("Adding the following sip servlet application " + sipApplicationName + ", SipContext=" + sipApplication);
-		}
-		if(sipApplicationName == null) {
-			throw new IllegalArgumentException("Something when wrong while initializing a sip servlets or converged application ");
-		}
-		if(sipApplication == null) {
-			throw new IllegalArgumentException("Something when wrong while initializing the following application " + sipApplicationName);
-		}
-		// Issue 1417 http://code.google.com/p/mobicents/issues/detail?id=1417
-		// Deploy 2 applications with the same app-name should fail
-		SipContext app = applicationDeployed.get(sipApplicationName);
-		if(app != null) {
-			logger.error("An application with the app name " + sipApplicationName + " is already deployed under the following context " + app.getPath());
-			throw new IllegalStateException("An application with the app name " + sipApplicationName + " is already deployed under the following context " + app.getPath());
-		}
-		//if the application has not set any concurrency control mode, we default to the container wide one
-		if(sipApplication.getConcurrencyControlMode() == null) {			
-			sipApplication.setConcurrencyControlMode(concurrencyControlMode);
-			if(logger.isInfoEnabled()) {
-				logger.info("No concurrency control mode for application " + sipApplicationName + " , defaulting to the container wide one : " + concurrencyControlMode);
-			}
-		} else {
-			if(logger.isInfoEnabled()) {
-				logger.info("Concurrency control mode for application " + sipApplicationName + " is " + sipApplication.getConcurrencyControlMode());
-			}
-		}
-		sipApplication.getServletContext().setAttribute(ConcurrencyControlMode.class.getCanonicalName(), sipApplication.getConcurrencyControlMode());		
-		
-		applicationDeployed.put(sipApplicationName, sipApplication);
+            DispatcherFSM.Event ev = fsm.new Event(DispatcherFSM.EventType.ADD_APP);
+            ev.data.put(CONTEXT_EV_DATA, sipApplication);
+            fsm.fireEvent(ev);            
+	}
+        
+    static final String APP_NAME = "AppName";
 
-		String hash = GenericUtils.hashString(sipApplicationName, tagHashMaxLength);
-		mdToApplicationName.put(hash, sipApplicationName);
-		applicationNameToMd.put(sipApplicationName, hash);
-		
-		List<String> newlyApplicationsDeployed = new ArrayList<String>();
-		newlyApplicationsDeployed.add(sipApplicationName);
-		if(sipApplicationRouter != null) {
-			// https://code.google.com/p/sipservlets/issues/detail?id=277
-			// sipApplicationRouter may not be initialized yet if container is fast to boot
-			sipApplicationRouter.applicationDeployed(newlyApplicationsDeployed);
-		}
-		//if the ApplicationDispatcher is started, notification is sent that the servlets are ready for service
-		//otherwise the notification will be delayed until the ApplicationDispatcher has started
-		statusLock.lock();
-		try {
-			if(started) {
-				sipApplication.notifySipContextListeners(new SipContextEventImpl(SipContextEventType.SERVLET_INITIALIZED, null));
-			}
-		} finally {
-			statusLock.unlock();
-		}
-		if(logger.isInfoEnabled()) {
-			logger.info(this + " the following sip servlet application has been added : " + sipApplicationName);
-		}
-		if(logger.isInfoEnabled()) {
-			logger.info("It contains the following Sip Servlets : ");
-			for(String servletName : sipApplication.getChildrenMap().keySet()) {
-				logger.info("SipApplicationName : " + sipApplicationName + "/ServletName : " + servletName);
-			}
-			if(sipApplication.getSipRubyController() != null) {
-				logger.info("It contains the following Sip Ruby Controller : " + sipApplication.getSipRubyController());
-			}
-		}
-	}
-	/**
-	 * {@inheritDoc}
-	 */
-	public SipContext removeSipApplication(String sipApplicationName) {
-		SipContext sipContext = applicationDeployed.remove(sipApplicationName);
-		List<String> applicationsUndeployed = new ArrayList<String>();
-		applicationsUndeployed.add(sipApplicationName);
-		sipApplicationRouter.applicationUndeployed(applicationsUndeployed);
-		if(sipContext != null) {
-			sipContext.getSipManager().removeAllSessions();
-		}
-		String hash = GenericUtils.hashString(sipApplicationName, tagHashMaxLength);
-		mdToApplicationName.remove(hash);
-		applicationNameToMd.remove(sipApplicationName);
-		if(logger.isInfoEnabled()) {
-			logger.info("the following sip servlet application has been removed : " + sipApplicationName);
-		}
-		return sipContext;
-	}
+    class RemoveApp implements DispatcherFSM.Action {
+
+        @Override
+        public void execute(DispatcherFSM.Context ctx) {
+            String sipApplicationName = (String) ctx.lastEvent.data.get(APP_NAME);
+            SipContext sipContext = applicationDeployed.remove(sipApplicationName);
+            List<String> applicationsUndeployed = new ArrayList<String>();
+            applicationsUndeployed.add(sipApplicationName);
+            sipApplicationRouter.applicationUndeployed(applicationsUndeployed);
+            if (sipContext != null) {
+                sipContext.getSipManager().removeAllSessions();
+            }
+            String hash = GenericUtils.hashString(sipApplicationName, tagHashMaxLength);
+            mdToApplicationName.remove(hash);
+            applicationNameToMd.remove(sipApplicationName);
+            if (logger.isInfoEnabled()) {
+                logger.info("the following sip servlet application has been removed : " + sipApplicationName);
+            }
+            ctx.lastEvent.data.put(CONTEXT_EV_DATA, sipContext);
+        }
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public SipContext removeSipApplication(String sipApplicationName) {
+        DispatcherFSM.Event ev = fsm.new Event(DispatcherFSM.EventType.REMOVE_APP);
+        ev.data.put(APP_NAME, sipApplicationName);
+        fsm.fireEvent(ev);
+        return (SipContext) ev.data.get(CONTEXT_EV_DATA);
+    }
 	
 	
 	/*
@@ -2275,34 +2302,35 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		return responsesSent.get();
 	}
 
+        static final String INTERVAL_ATT = "Interval";     
+        class SetCongAction implements DispatcherFSM.Action {
+            @Override
+            public void execute(DispatcherFSM.Context ctx) {
+                if (congestionControlTimerFuture != null) {
+                    congestionControlTimerFuture.cancel(false);
+                }
+                if (congestionControlCheckingInterval > 0) {
+                    congestionControlTimerFuture = asynchronousScheduledThreadPoolExecutor.scheduleWithFixedDelay(congestionControlTimerTask, congestionControlCheckingInterval, congestionControlCheckingInterval, TimeUnit.MILLISECONDS);
+                    if (logger.isInfoEnabled()) {
+                        logger.info("Congestion control background task modified to check every " + congestionControlCheckingInterval + " milliseconds.");
+                    }
+                } else if (logger.isInfoEnabled()) {
+                    logger.info("No Congestion control background task started since the checking interval is equals to " + congestionControlCheckingInterval + " milliseconds.");
+                }
+            }
+            
+        }
 	/**
 	 * @param congestionControlCheckingInterval the congestionControlCheckingInterval to set
 	 */
 	public void setCongestionControlCheckingInterval(
 			long congestionControlCheckingInterval) {
-		if(congestionControlCheckingInterval != this.congestionControlCheckingInterval) {
-			this.congestionControlCheckingInterval = congestionControlCheckingInterval;
-			statusLock.lock();
-			try {
-				if(started) {
-					if(congestionControlTimerFuture != null) {
-						congestionControlTimerFuture.cancel(false);
-					}
-					if(congestionControlCheckingInterval > 0) {
-						congestionControlTimerFuture = asynchronousScheduledThreadPoolExecutor.scheduleWithFixedDelay(congestionControlTimerTask, congestionControlCheckingInterval, congestionControlCheckingInterval, TimeUnit.MILLISECONDS);
-						if(logger.isInfoEnabled()) {
-					 		logger.info("Congestion control background task modified to check every " + congestionControlCheckingInterval + " milliseconds.");
-					 	}
-					} else {
-						if(logger.isInfoEnabled()) {
-					 		logger.info("No Congestion control background task started since the checking interval is equals to " + congestionControlCheckingInterval + " milliseconds.");
-					 	}
-					}
-				}
-			} finally {
-				statusLock.unlock();
-			}
-		}
+            //save value anyway,during start actual scheduling will take place
+            this.congestionControlCheckingInterval = congestionControlCheckingInterval;
+            //fire event so congestion reschedule is only invoked after start.
+            DispatcherFSM.Event congEvent = fsm.new Event(DispatcherFSM.EventType.SET_CONGESTION);
+            congEvent.data.put(INTERVAL_ATT, new Long(congestionControlCheckingInterval));
+            fsm.fireEvent(congEvent);
 	}
 
 	/**

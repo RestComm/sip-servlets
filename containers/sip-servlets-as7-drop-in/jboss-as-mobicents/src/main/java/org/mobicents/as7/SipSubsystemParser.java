@@ -31,6 +31,7 @@ import static org.mobicents.as7.Constants.NAME;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -57,6 +58,7 @@ import org.jboss.staxmapper.XMLExtendedStreamWriter;
 class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<ModelNode>>, XMLElementWriter<SubsystemMarshallingContext> {
 
     private static final SipSubsystemParser INSTANCE = new SipSubsystemParser();
+    AtomicInteger parsedConnectors = new AtomicInteger(0);
 
     static SipSubsystemParser getInstance() {
         return INSTANCE;
@@ -258,6 +260,7 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
         PathAddress address = PathAddress.pathAddress(parent, PathElement.pathElement(CONNECTOR, name));
         connector.get(OP_ADDR).set(address.toModelNode());
         list.add(connector);
+        getInstance().parsedConnectors.incrementAndGet();
 
         while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
             switch (Namespace.forUri(reader.getNamespaceURI())) {

@@ -65,6 +65,11 @@ public interface SipApplicationDispatcher extends SipListenerExt {
 	 * @throws LifecycleException The Sip Application Router cannot be initialized correctly
 	 */
 	void init();
+        
+	/**
+	 * once in service apps will be notified of servletInitialized
+	 */        
+        public void putInService() throws IllegalArgumentException;         
 	
 	/**
 	 * Start the sip application dispatcher
@@ -219,7 +224,7 @@ public interface SipApplicationDispatcher extends SipListenerExt {
 	public Map<String, AtomicLong> getResponsesProcessedByStatusCode();	
 	long getRequestsProcessedByMethod(String method);
 	long getResponsesProcessedByStatusCode(String statusCode);
-	// https://github.com/Mobicents/sip-servlets/issues/65
+	// https://telestax.atlassian.net/browse/MSS-74
 	public Map<String, AtomicLong> getRequestsSentByMethod();
 	public Map<String, AtomicLong> getResponsesSentByStatusCode();	
 	long getRequestsSentByMethod(String method);

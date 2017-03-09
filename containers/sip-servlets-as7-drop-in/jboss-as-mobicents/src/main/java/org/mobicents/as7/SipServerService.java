@@ -21,6 +21,8 @@
  */
 package org.mobicents.as7;
 
+import com.arjuna.ats.arjuna.AtomicAction;
+import java.util.concurrent.atomic.AtomicInteger;
 import static org.mobicents.as7.SipMessages.MESSAGES;
 
 import javax.management.MBeanServer;
@@ -292,6 +294,8 @@ class SipServerService implements SipServer, Service<SipServer> {
     public synchronized SipServer getValue() throws IllegalStateException {
         return this;
     }
+    
+    private AtomicInteger addedConnectors = new AtomicInteger(0);
 
     /** {@inheritDoc} */
     public synchronized void addConnector(Connector connector) {
@@ -300,6 +304,17 @@ class SipServerService implements SipServer, Service<SipServer> {
             sipService.addConnector(connector);
         }
     }
+    
+    public synchronized void connectorAdded(Connector connector) {
+        if (connector.getProtocolHandler() instanceof SipProtocolHandler) {
+            int currentConnectors = addedConnectors.incrementAndGet();
+            if (currentConnectors >= SipSubsystemParser.getInstance().parsedConnectors.get()) {
+                logger.debug("Time to put dispatcher in service.");
+                sipService.getSipApplicationDispatcher().putInService();
+                
+            }
+        }
+    }    
 
     /** {@inheritDoc} */
     public synchronized void removeConnector(Connector connector) {

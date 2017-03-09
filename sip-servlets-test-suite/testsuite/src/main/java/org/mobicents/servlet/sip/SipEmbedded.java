@@ -247,7 +247,8 @@ public class SipEmbedded {
 	 */
 	public void startTomcat() throws Exception {
 		// Start the embedded server
-		sipService.start();		
+		sipService.start();
+                sipService.getSipApplicationDispatcher().putInService();
 	}
 
 	/**

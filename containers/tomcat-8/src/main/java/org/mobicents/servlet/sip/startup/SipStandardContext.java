@@ -242,28 +242,31 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 		}	
 	}
 	
-	/**
+    /**
      * This function is to prepare basic servlet context attributes before the underlying
      * context is really ready.
+     * 
+     * The method is designed to be idempotent, so we may call it as many times as
+     * required to actually initiate all possible structures/atts.
      * 
      * @throws LifecycleException
      */
     protected void initInternalApplicationComponents() throws LifecycleException {
-        if(sipApplicationDispatcher == null) {
+        if (sipApplicationDispatcher == null) {
             setApplicationDispatcher();
         }
-        if(sipFactoryFacade == null) {
-            sipFactoryFacade = new SipFactoryFacade((SipFactoryImpl)sipApplicationDispatcher.getSipFactory(), this);
+        if (sipFactoryFacade == null) {
+            sipFactoryFacade = new SipFactoryFacade((SipFactoryImpl) sipApplicationDispatcher.getSipFactory(), this);
         }
-        if(sipSessionsUtil == null) {
+        if (sipSessionsUtil == null) {
             sipSessionsUtil = new SipSessionsUtilImpl(this);
         }
-        if(timerService == null) {          
-            timerService = new TimerServiceImpl(sipApplicationDispatcher.getSipService(), applicationName);         
+        if (timerService == null) {
+            timerService = new TimerServiceImpl(sipApplicationDispatcher.getSipService(), applicationName);
         }
-        if(sasTimerService == null || !sasTimerService.isStarted()) {
+        if (sasTimerService == null || !sasTimerService.isStarted()) {
             String sasTimerServiceType = sipApplicationDispatcher.getSipService().getSasTimerServiceImplementationType();
-            if(sasTimerServiceType != null && sasTimerServiceType.equalsIgnoreCase("Standard")) {
+            if (sasTimerServiceType != null && sasTimerServiceType.equalsIgnoreCase("Standard")) {
                 sasTimerService = new StandardSipApplicationSessionTimerService(applicationName);
             } else if (sasTimerServiceType != null && sasTimerServiceType.equalsIgnoreCase("Default")) {
                 sasTimerService = new DefaultSipApplicationSessionTimerService(applicationName);
@@ -271,6 +274,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
                 sasTimerService = new StandardSipApplicationSessionTimerService(applicationName);
             }
         }
+
         // needed when restarting applications through the tomcat manager
         this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SIP_FACTORY, sipFactoryFacade);
         this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE, timerService);
@@ -286,25 +290,18 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
                 sipApplicationDispatcher.getSipService().findSipConnectors());
         this.getServletContext().setAttribute("org.mobicents.servlet.sip.DNS_RESOLVER",
                 sipApplicationDispatcher.getDNSResolver());
-    }
 
-    /**
-     * This function is to prepare the rest of the context when underlying context is ready.
-     * 
-     * @throws LifecycleException
-     */
-	protected void prepareServletContext() throws LifecycleException {
-		if(proxyTimerService == null) {
-			String proxyTimerServiceType = sipApplicationDispatcher.getSipService().getProxyTimerServiceImplementationType();
-			if(proxyTimerServiceType != null && proxyTimerServiceType.equalsIgnoreCase("Standard")) {
+        if (proxyTimerService == null) {
+            String proxyTimerServiceType = sipApplicationDispatcher.getSipService().getProxyTimerServiceImplementationType();
+            if (proxyTimerServiceType != null && proxyTimerServiceType.equalsIgnoreCase("Standard")) {
                 proxyTimerService = new ProxyTimerServiceImpl(applicationName);
-            } else if(proxyTimerServiceType != null && proxyTimerServiceType.equalsIgnoreCase("Default")) {
+            } else if (proxyTimerServiceType != null && proxyTimerServiceType.equalsIgnoreCase("Default")) {
                 String strCorePoolSize = this.getServletContext().getInitParameter(TIMER_SERVICE_POOL_SIZE);
                 if (strCorePoolSize != null && !strCorePoolSize.isEmpty()) {
                     try {
                         int CorePoolSize = Integer.parseInt(strCorePoolSize);
                         proxyTimerService = new DefaultProxyTimerService(applicationName, CorePoolSize);
-                    }catch (NumberFormatException ex) {
+                    } catch (NumberFormatException ex) {
                         logger.warn("Failed to parse timer service pool size with string value [" + strCorePoolSize + "], use default value.");
                         proxyTimerService = new DefaultProxyTimerService(applicationName);
                     }
@@ -314,10 +311,12 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
             } else {
                 proxyTimerService = new ProxyTimerServiceImpl(applicationName);
             }
-		}
+        }
         this.getServletContext().setAttribute("org.restcomm.servlets.sip.QUOTABLE_PARAMETER",
                 getQuotableParams());
-	}
+        this.getServletContext().setAttribute("org.restcomm.servlets.sip.REQUEST_TERMINATED_REASON",
+                this.getServletContext().getInitParameter("org.restcomm.servlets.sip.REQUEST_TERMINATED_REASON"));
+    }
 
     /**
      *
@@ -1311,7 +1310,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
                         //the context again just in case some att was not properly
                         //initiated
                         try {
-                            prepareServletContext();
+                            initInternalApplicationComponents();
                         } catch (Exception e) {
                             logger.warn("Couldnt prepare context", e);
                         }                      

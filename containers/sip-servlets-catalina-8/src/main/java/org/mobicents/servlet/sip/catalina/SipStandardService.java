@@ -354,6 +354,7 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 		}
 		if(!connectorsStartedExternally) {
 			sipApplicationDispatcher.start();
+                        sipApplicationDispatcher.putInService();
 		}
 		
 		if(this.getSipMessageQueueSize() <= 0)

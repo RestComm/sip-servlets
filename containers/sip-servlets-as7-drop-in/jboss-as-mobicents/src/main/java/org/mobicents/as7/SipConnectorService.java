@@ -150,7 +150,8 @@ class SipConnectorService implements Service<Connector> {
             // TODO set Executor on ProtocolHandler
             // TODO use server socket factory - or integrate with {@code ManagedBinding}
 
-            getSipServer().addConnector(connector);
+            getSipServer().addConnector(connector); 
+            
             connector.init();
             connector.start();
             this.connector = connector;
@@ -159,6 +160,8 @@ class SipConnectorService implements Service<Connector> {
         }
         // Register the binding after the connector is started
         binding.getSocketBindings().getNamedRegistry().registerBinding(new ConnectorBinding(binding));
+        //notify SipServer only when connector has already been added/started
+        getSipServer().connectorAdded(connector);
     }
 
     /** {@inheritDoc} */
