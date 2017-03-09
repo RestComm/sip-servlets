@@ -287,14 +287,8 @@
 			<scope>provided</scope>
 		</dependency>
 		
-				<dependency>
-			<groupId>org.infinispan</groupId>
-			<artifactId>infinispan-tree</artifactId>
-			<version>5.2.10.Final</version>
-			<scope>provided</scope>
-		</dependency>
 
-			</dependencies>
+	</dependencies>
 
 			<properties>
 				<ant.target>all</ant.target>

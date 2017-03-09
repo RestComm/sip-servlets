@@ -233,9 +233,8 @@ public class SipJBossContextConfig extends /*JBossContextConfig*/ ContextConfig 
                 		logger.debug("processSipMetaData - " + this + " - got classResolver " + convergedMetaData.getApplicationName());
                 	}                    
                     
-					
-					// TODO: Fix me properly!
-                    
+                    // TODO: Fix me properly!
+
                     if(this.factory.getOptionalValue() == null){
                  	
                     	logger.debug("Factory value is still null, wait for it!");
@@ -256,7 +255,7 @@ public class SipJBossContextConfig extends /*JBossContextConfig*/ ContextConfig 
                     	}
                     	
                     }
-					
+
                     context.setManager(
                     		new DistributableSipSessionManager<OutgoingDistributableSessionData>(
                     				this.factory.getValue(), 
