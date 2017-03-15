@@ -19,6 +19,7 @@
 
 package org.mobicents.servlet.sip.testsuite;
 
+import gov.nist.javax.sip.header.extensions.SessionExpiresHeader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -101,6 +102,7 @@ public class SimpleSipServlet
 	private static final String TEST_SERIALIZATION = "serialization";
 	private static final String TEST_FROM_TO_HEADER_MODIFICATION = "fromToHeaderModification";
 	private static final String TEST_LOCALLY_GENERATED_REMOTE_ADDRESS = "locallyGeneratedRemoteAddress";
+        private static final String TEST_SESSION_EXPIRES_PARAMETERABLE = "testSessionExpiresParameterable";
 	
 	@Resource
 	SipFactory sipFactory;
@@ -148,7 +150,19 @@ public class SimpleSipServlet
 		if(fromString.contains(TEST_NO_ACK_RECEIVED)) {
 			request.createResponse(SipServletResponse.SC_OK).send();
 			return;
-		}				
+		}
+                if(fromString.contains(TEST_SESSION_EXPIRES_PARAMETERABLE)){
+                    SipServletResponse res = request.createResponse(SipServletResponse.SC_OK);
+                    res.addHeader(SessionExpiresHeader.NAME, "3000");
+                    try {
+                        res.getParameterableHeader(SessionExpiresHeader.NAME).setParameter("session-param", "value");
+                        res.send();
+                        return;
+                    } catch (ServletParseException e) {
+                        request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR).send();
+                        return;
+                    }
+                }
 		if(fromString.contains(TEST_LOCALLY_GENERATED_REMOTE_ADDRESS)) {
 		    // https://code.google.com/p/sipservlets/issues/detail?id=137
 		    SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);

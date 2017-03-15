@@ -269,6 +269,8 @@ public final class JainSipUtils {
         PARAMETERABLE_HEADER_NAMES.add(EventHeader.NAME);
         // https://github.com/Mobicents/sip-servlets/issues/45
         PARAMETERABLE_HEADER_NAMES.add(SubscriptionStateHeader.NAME);
+        // https://telestax.zendesk.com/agent/tickets/34008
+        PARAMETERABLE_HEADER_NAMES.add(SessionExpiresHeader.NAME);
 	}
 
 	

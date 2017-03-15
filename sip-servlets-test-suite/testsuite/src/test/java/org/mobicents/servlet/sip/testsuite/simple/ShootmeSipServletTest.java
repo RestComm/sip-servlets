@@ -19,6 +19,7 @@
 
 package org.mobicents.servlet.sip.testsuite.simple;
 
+import gov.nist.javax.sip.header.extensions.SessionExpiresHeader;
 import java.io.File;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -716,6 +717,25 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
 		assertEquals(200, sender.getFinalResponseStatus());
+		assertTrue(sender.isAckSent());
+		assertTrue(sender.getOkToByeReceived());
+	}
+        
+        public void testShootmeSessionExpiresParameterable() throws Exception {
+		String fromName = "testSessionExpiresParameterable";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertEquals(200, sender.getFinalResponseStatus());
+                assertTrue(sender.getInviteOkResponse().getHeader(SessionExpiresHeader.NAME).toString().contains("session-param=value"));
 		assertTrue(sender.isAckSent());
 		assertTrue(sender.getOkToByeReceived());
 	}
