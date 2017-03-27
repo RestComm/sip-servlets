@@ -22,6 +22,8 @@
 
 package org.mobicents.servlet.sip.address;
 
+import gov.nist.javax.sip.header.ParametersExt;
+
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -29,8 +31,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.sip.Parameterable;
@@ -164,7 +166,11 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 		this.parameters.put(name.toLowerCase(), value);
 		if(header != null) {
 			try {
-				header.setParameter(name, "".equals(value) ? null : value);
+				if (isQuotableParam(name) && (header instanceof ParametersExt)){
+					((ParametersExt) header).setQuotedParameter(name, value);
+				}else{
+					header.setParameter(name, "".equals(value) ? null : value);
+				}
 			} catch (ParseException e) {
 				throw new IllegalArgumentException("Problem setting parameter",e);
 			}
