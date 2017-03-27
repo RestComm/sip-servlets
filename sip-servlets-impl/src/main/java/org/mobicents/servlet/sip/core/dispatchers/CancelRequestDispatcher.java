@@ -96,6 +96,8 @@ import org.mobicents.servlet.sip.message.TransactionApplicationData;
 public class CancelRequestDispatcher extends RequestDispatcher {
 
 	private static final Logger logger = Logger.getLogger(CancelRequestDispatcher.class);
+        // Name of the parameter for the reason text of 487 request terminated Reason Header
+        private static final String REQUEST_TERMINATED_REASON = "org.restcomm.servlets.sip.REQUEST_TERMINATED_REASON";
 	
 	public CancelRequestDispatcher() {}
 	
@@ -180,6 +182,19 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 		}
 		try {
 			Response requestTerminatedResponse = (Response) inviteResponse.getMessage();
+                        SipContext context = SipApplicationSessionCreationThreadLocal.lookupContext();
+                        if (context != null) {
+                            // bug zendesk#34106, because of JBOSS lifcycle and save the cost, get context param dirrectly 
+                            // from init param.
+                            String reasonHeaderText = (String) context.getServletContext().getInitParameter(REQUEST_TERMINATED_REASON);
+                            if (reasonHeaderText != null && !reasonHeaderText.isEmpty()) {
+                                if(logger.isDebugEnabled()) {
+					logger.debug("487 Request Terminated is being sent, adding Reason header with text: " + reasonHeaderText);
+				}
+                                ReasonHeader reasonHeader = SipFactoryImpl.headerFactory.createReasonHeader("SIP", Response.REQUEST_TERMINATED, reasonHeaderText);
+                                requestTerminatedResponse.addHeader(reasonHeader);
+                            }
+                        }
 			((ServerTransaction)inviteTransaction).sendResponse(requestTerminatedResponse);	
 			inviteRequest.getSipSession().getSipApplicationSession().getSipContext().getSipApplicationDispatcher().updateResponseStatistics(requestTerminatedResponse, false);
 		} catch (SipException e) {

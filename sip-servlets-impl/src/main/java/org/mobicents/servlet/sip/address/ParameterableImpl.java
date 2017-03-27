@@ -22,13 +22,11 @@
 
 package org.mobicents.servlet.sip.address;
 
-import gov.nist.javax.sip.header.ParametersExt;
-
 import java.io.Serializable;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -38,10 +36,7 @@ import javax.servlet.sip.Parameterable;
 import javax.sip.header.Header;
 import javax.sip.header.Parameters;
 
-import gov.nist.javax.sip.header.ParametersExt;
 import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
-import org.mobicents.servlet.sip.core.SipContext;
-import org.mobicents.servlet.sip.core.session.SipApplicationSessionCreationThreadLocal;
 
 
 /**
@@ -57,6 +52,11 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 //	private static Logger logger = Logger.getLogger(ParameterableImpl.class.getCanonicalName());	
 	private static final String PARAM_SEPARATOR = ";";
 	private static final String PARAM_NAME_VALUE_SEPARATOR = "=";
+        // default quotable params that their values need to be quoted.
+	private static final String DEFAULT_QUOTABLE_PARAMS = "vendor, model, version, cnonce, nextnonce,"
+			+ "nonce, code, oc-algo, cid, text, domain, opaque, qop, realm, response, rspauth, uri, username";
+        // Name of the parameter for the list of quotable params
+        private static final String QUOTABLE_PARAMS = "org.restcomm.servlets.sip.QUOTABLE_PARAMETER";
 	
 	protected Map<String,String> parameters = new ConcurrentHashMap<String, String>();
 	
@@ -161,11 +161,7 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 		this.parameters.put(name.toLowerCase(), value);
 		if(header != null) {
 			try {
-				if (isQuotableParam(name) && (header instanceof ParametersExt)){
-					((ParametersExt) header).setQuotedParameter(name, value);
-				}else{
-					header.setParameter(name, "".equals(value) ? null : value);
-				}
+				header.setParameter(name, "".equals(value) ? null : value);
 			} catch (ParseException e) {
 				throw new IllegalArgumentException("Problem setting parameter",e);
 			}
@@ -178,21 +174,43 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 	 * @param name - a string specifying the parameter name
 	 * 
 	 */
-	private boolean isQuotableParam(String name){
-		boolean isQuotableParameter = false;
-		SipContext context = SipApplicationSessionCreationThreadLocal.lookupContext();
-		if (context != null){
-			List<String> params = (List<String>)context.getServletContext().getAttribute("org.restcomm.servlets.sip.QUOTABLE_PARAMETER");
-			for (String param : params){
-				if (param.equalsIgnoreCase(name)){
-					isQuotableParameter = true;
-					break;
-				}
-			}
-		}
-		
-		return isQuotableParameter;
-	}
+        private boolean isQuotableParam(String name){
+            boolean isQuotableParameter = false;
+            List<String> params = getQuotableParams();
+            for (String param : params){
+                if (param.equalsIgnoreCase(name)){
+                    isQuotableParameter = true;
+                    break;
+                }
+            }
+            return isQuotableParameter;
+        }
+        
+        /**
+	 * 
+	 * @return a list of known params that their values need to be quoted.
+	 */
+        private List<String> getQuotableParams(){
+            List<String> retValue = new ArrayList<String>();
+            SipContext context = SipApplicationSessionCreationThreadLocal.lookupContext();
+            if (context != null){
+                // bug zendesk#34106, because of JBOSS lifcycle and save the cost, get context param dirrectly 
+                // from init param.
+                String quotableParameters = context.getServletContext().getInitParameter(QUOTABLE_PARAMS);
+                if (quotableParameters == null){
+                    quotableParameters = DEFAULT_QUOTABLE_PARAMS;
+                }
+                String[] parameters = quotableParameters.split(",");
+                for (int i = 0; i < parameters.length; i++){
+                    String param = parameters[i].trim();
+                    if (param != null && !param.isEmpty() && !retValue.contains(param)){
+                        retValue.add(param);
+                    }
+                }
+            }
+            
+            return retValue;
+        }
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.Parameterable#getParameters()
