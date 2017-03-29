@@ -22,6 +22,7 @@ package org.mobicents.servlet.sip.core.dispatchers;
 import gov.nist.javax.sip.ServerTransactionExt;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 import javax.servlet.ServletException;
 import javax.servlet.sip.SipSession.State;
@@ -42,6 +43,8 @@ import org.mobicents.servlet.sip.core.SipContext;
 import org.mobicents.servlet.sip.core.proxy.MobicentsProxy;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
+import org.mobicents.servlet.sip.core.session.SipApplicationSessionCreationThreadLocal;
+import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
@@ -201,7 +204,9 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Impossible to send the 487 to the INVITE transaction corresponding to CANCEL", e);
 		} catch (InvalidArgumentException e) {
 			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Impossible to send the 487 to the INVITE transaction corresponding to CANCEL", e);
-		}		
+		} catch (ParseException e) {
+                    throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Impossible to send the 487 to the INVITE transaction corresponding to CANCEL", e);
+                }		
 	}
 	
 	public static class CancelDispatchTask extends DispatchTask {
