@@ -94,7 +94,7 @@
 		<restcomm.balancer.version>2.0.41</restcomm.balancer.version>
 		<restcomm.jain.sip.ha.version>1.5.43</restcomm.jain.sip.ha.version>
 		<restcomm.jain.sip.ext.version>1.3.24</restcomm.jain.sip.ext.version>
-		<restcomm.commons.version>2.0.145</restcomm.commons.version>
+		<restcomm.commons.version>2.0.147</restcomm.commons.version>
 		<tomcat-7.version>7.0.64</tomcat-7.version>
 		<metrics.version>3.1.0</metrics.version>
 		<slf4j.version>1.5.5</slf4j.version>
