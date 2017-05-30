@@ -27,6 +27,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -37,6 +38,8 @@ import javax.sip.header.Header;
 import javax.sip.header.Parameters;
 
 import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
+import org.mobicents.servlet.sip.core.SipContext;
+import org.mobicents.servlet.sip.core.session.SipApplicationSessionCreationThreadLocal;
 
 
 /**
