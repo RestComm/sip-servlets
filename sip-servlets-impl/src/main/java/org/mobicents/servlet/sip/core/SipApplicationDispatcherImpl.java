@@ -468,6 +468,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
                 }
             
         }
+        }
         @Override
 	public void init() throws IllegalArgumentException {
             fsm.fireEvent(fsm.new Event(DispatcherFSM.EventType.INIT));
