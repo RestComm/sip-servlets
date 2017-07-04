@@ -2,6 +2,7 @@ RestComm Sip Servlets
 ============
 
 [![Join the chat at https://gitter.im/RestComm/sip-servlets](https://badges.gitter.im/RestComm/sip-servlets.svg)](https://gitter.im/RestComm/sip-servlets?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bhttps%3A%2F%2Fgithub.com%2FRestComm%2Fsip-servlets.svg?type=shield)](https://app.fossa.io/projects/git%2Bhttps%3A%2F%2Fgithub.com%2FRestComm%2Fsip-servlets?ref=badge_shield)
 
 RestComm SIP Servlets is a SIP, IMS and WebRTC Application Server. 
 RestComm SIP Servlets facilitates the shift towards Cloud Communications by enabling deployment and autoscaling of real time SIP Servlets applications across all major IaaS (Infrastructure as a Service) providers or on premises.
@@ -60,3 +61,7 @@ Continuous Integration and Delivery
 Acknowledgements
 ========
 [See who has been contributing to RestComm](http://www.telestax.com/opensource/acknowledgments/)
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bhttps%3A%2F%2Fgithub.com%2FRestComm%2Fsip-servlets.svg?type=large)](https://app.fossa.io/projects/git%2Bhttps%3A%2F%2Fgithub.com%2FRestComm%2Fsip-servlets?ref=badge_large)
