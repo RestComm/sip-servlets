@@ -267,31 +267,40 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
                 logger.debug("prepareServletContext - timerService is null" + getName());
                 logger.debug("prepareServletContext - getDistributable: " + getDistributable() + ", hasDistributableManager: " + hasDistributableManager);
             }
-
-            if (getDistributable() && hasDistributableManager) {
-                if (logger.isInfoEnabled()) {
-                    logger.info("Using the Fault Tolerant Timer Service to schedule fault tolerant timers in a distributed environment");
-                }
-                timerService = new FaultTolerantTimerServiceImpl((DistributableSipManager) getSipManager());
-            } else {
-                timerService = new TimerServiceImpl(sipApplicationDispatcher.getSipService(), applicationName);
-            }
+            
+// FIXME: distributable not supported
+//          if(getDistributable() && hasDistributableManager) {
+//              if(logger.isInfoEnabled()) {
+//                  logger.info("Using the Fault Tolerant Timer Service to schedule fault tolerant timers in a distributed environment");
+//              }
+//              timerService = new FaultTolerantTimerServiceImpl((DistributableSipManager)getSipManager());
+//          } else {
+//              timerService = new TimerServiceImpl();
+//          }            
+            timerService = new TimerServiceImpl(sipApplicationDispatcher.getSipService(), applicationName);
         }
         this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE, timerService);
 
         if (sasTimerService == null || !sasTimerService.isStarted()) {
+            // FIXME: distributable not supported
+            // distributable if(getDistributable() && hasDistributableManager) {
+            // sasTimerService = new
+            // FaultTolerantSasTimerService((DistributableSipManager)getSipManager(),
+            // 4);
+            // } else {
+            // sasTimerService = new
+            // StandardSipApplicationSessionTimerService();
+            // }
             String sasTimerServiceType = sipApplicationDispatcher.getSipService()
                     .getSasTimerServiceImplementationType();
-            if (getDistributable() && hasDistributableManager) {
-                sasTimerService = new FaultTolerantSasTimerService((DistributableSipManager) getSipManager(), 4);
-            } else if (sasTimerServiceType != null && sasTimerServiceType.equalsIgnoreCase("Standard")) {
+            if (sasTimerServiceType != null && sasTimerServiceType.equalsIgnoreCase("Standard")) {
                 sasTimerService = new StandardSipApplicationSessionTimerService(applicationName);
             } else if (sasTimerServiceType != null && sasTimerServiceType.equalsIgnoreCase("Default")) {
                 sasTimerService = new DefaultSipApplicationSessionTimerService(applicationName);
             } else {
                 sasTimerService = new StandardSipApplicationSessionTimerService(applicationName);
             }
-        }
+        }            
 
         if (proxyTimerService == null) {
             String proxyTimerServiceType = sipApplicationDispatcher.getSipService().getProxyTimerServiceImplementationType();
