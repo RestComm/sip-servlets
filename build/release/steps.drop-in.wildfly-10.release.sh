@@ -22,8 +22,9 @@ mkdir -p $CHECKOUT_DIR
 
 # get JBoss AS 10 release 
 cd $CHECKOUT_DIR
-wget http://download.jboss.org/wildfly/10.0.0.Final/wildfly-10.0.0.Final.zip
-unzip wildfly-10.0.0.Final.zip
+wget http://download.jboss.org/wildfly/10.1.0.Final/wildfly-10.1.0.Final.zip 
+unzip wildfly-10.1.0.Final.zip
+mv wildfly-10.1.0.Final wildfly-10.0.0.Final
 
 cd ../../../..
 mv $CHECKOUT_DIR/$AS10_FINAL_NAME $BUILD_DIR
@@ -42,7 +43,8 @@ mvn clean install war:inplace -f ./sip-servlets-examples/media-jsr309-servlet/po
 cp -pr ./sip-servlets-examples/media-jsr309-servlet/target/media-jsr309-servlet.war $BUILD_DIR/$MSS_FINAL_NAME/standalone/deployments/media-jsr309-servlet.war
 mvn clean install war:inplace -f ./management/sip-servlets-management/pom.xml
 cp -pr ./management/sip-servlets-management/target/sip-servlets-management.war $BUILD_DIR/$MSS_FINAL_NAME/standalone/deployments/sip-servlets-management.war
-wget -nc http://labs.consol.de/maven/repository/org/jolokia/jolokia-war/1.1.0/jolokia-war-1.1.0.war -O  $BUILD_DIR/$MSS_FINAL_NAME/standalone/deployments/jolokia.war
+wget --no-check-certificate http://labs.consol.de/maven/repository/org/jolokia/jolokia-war/1.1.0/jolokia-war-1.1.0.war -O  $BUILD_DIR/$MSS_FINAL_NAME/standalone/deployments/jolokia.war
+#read -n1 -r -p "Press space to continue..." key
 mkdir -p $BUILD_DIR/$MSS_FINAL_NAME/standalone/configuration/dars
 mkdir -p $BUILD_DIR/$MSS_FINAL_NAME/domain/configuration/dars
 cp -vprf $BUILD_DIR/../../../../sip-servlets-examples/websocket-b2bua/websocket-dar.properties $BUILD_DIR/$MSS_FINAL_NAME/standalone/configuration/dars/mobicents-dar.properties
