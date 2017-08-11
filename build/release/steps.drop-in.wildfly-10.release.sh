@@ -22,9 +22,8 @@ mkdir -p $CHECKOUT_DIR
 
 # get JBoss AS 10 release 
 cd $CHECKOUT_DIR
-wget http://download.jboss.org/wildfly/10.1.0.Final/wildfly-10.1.0.Final.zip 
-unzip wildfly-10.1.0.Final.zip
-mv wildfly-10.1.0.Final wildfly-10.0.0.Final
+wget http://download.jboss.org/wildfly/10.0.0.Final/wildfly-10.0.0.Final.zip 
+unzip wildfly-10.0.0.Final.zip
 
 cd ../../../..
 mv $CHECKOUT_DIR/$AS10_FINAL_NAME $BUILD_DIR
