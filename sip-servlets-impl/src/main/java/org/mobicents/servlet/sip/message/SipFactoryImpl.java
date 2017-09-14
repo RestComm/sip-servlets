@@ -969,6 +969,12 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 	public void addLoadBalancerRouteHeader(Request request, MobicentsExtendedListeningPoint mobicentsExtendedListeningPoint) {
 		try {
 			String transport = JainSipUtils.findTransport(request);
+			if ( mobicentsExtendedListeningPoint != null ) {
+				transport = mobicentsExtendedListeningPoint.getTransport();
+				if (logger.isDebugEnabled()){
+					logger.debug("addLoadBalancerRouteHeader - setting transport to " + transport + " from listening point in use");
+				}
+			}
 			String host = null;
 			int port = -1; 
 			OutboundProxy proxy = StaticServiceHolder.sipStandardService.getOutboundProxy();
