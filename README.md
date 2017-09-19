@@ -40,7 +40,9 @@ Want to Contribute ?
 
 Issue Tracking and Roadmap
 ========
-[Issue Tracker](https://github.com/RestComm/sip-servlets/issues)
+We are in the process of moving to JIRA, so please create issue at https://telestax.atlassian.net/projects/RES/issues
+
+[Old Issue Tracker](https://github.com/RestComm/sip-servlets/issues)
 
 Questions ?
 ========
