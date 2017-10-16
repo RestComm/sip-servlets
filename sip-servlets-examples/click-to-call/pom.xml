@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip.examples</groupId>
 		<artifactId>sip-servlets-examples-parent</artifactId>
-		<version>3.0.0-SNAPSHOT</version>
+		<version>3.2.0-47</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>click-to-call-servlet</artifactId>
