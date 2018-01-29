@@ -26,14 +26,12 @@ RestComm SIP Servlets implements the latest SIP Servlet v1.1 (JSR 289) standard.
 
 Downloads
 ========
-[Get the latest stable release!](https://github.com/RestComm/sip-servlets/releases/latest) or 
-[Snapshot Releases for 3.x](https://mobicents.ci.cloudbees.com/job/RestcommSipServlets-Release/lastSuccessfulBuild/artifact/ ) or [Snapshot Releases for 4.x](https://mobicents.ci.cloudbees.com/job/RestcommSipServlets-4.X-Release/lastSuccessfulBuild/artifact/) 
-
- It only takes a few minutes to set it up and running.
+[Get the latest releases!](https://www.restcomm.com/downloads/) from the Restcomm website Downloads section.
+It only takes a few minutes to set it up and running.
 
 Documentation
 ========
-Read the [Online SIP Servlets Documentation](http://docs.telestax.com/sip-servlets-homepage/) or it is also contained in the download binary
+Read the [Online SIP Servlets Documentation](http://documentation.telestax.com/core/sip_servlets/SIP_Servlets_Server_User_Guide.html) or it is also contained in the download binary
 
 Want to Contribute ? 
 ========
