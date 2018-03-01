@@ -69,6 +69,8 @@ public class ClassFileScanner {
 
 	private ClassLoader classLoader;
 
+        private boolean scanningEnabled = true;
+
 	public ClassFileScanner(String docbase, CatalinaSipContext ctx) {
 		this.docbase = docbase;
 		this.sipContext = ctx;
