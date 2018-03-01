@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip.docs</groupId>
 		<artifactId>sip-servlets-docs</artifactId>
-		<version>3.0.0-SNAPSHOT</version>
+		<version>3.2.0-92</version>
 	</parent>
 	
 	<artifactId>sip-servlets-asciidoc-sources</artifactId>
@@ -19,11 +19,11 @@
 		<mss4t.release.size>20MB</mss4t.release.size>					
 		<holder>TeleStax, Inc.</holder>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<asciidoctor.maven.plugin.version>1.5.3</asciidoctor.maven.plugin.version>
-		<asciidoctorj.pdf.version>1.5.0-alpha.11</asciidoctorj.pdf.version>
+		<asciidoctor.maven.plugin.version>1.5.5</asciidoctor.maven.plugin.version>
+		<asciidoctorj.pdf.version>1.5.0-alpha.15</asciidoctorj.pdf.version>
 		<asciidoctorj.diagram.version>1.5.0</asciidoctorj.diagram.version>                
-		<asciidoctorj.version>1.5.4</asciidoctorj.version>
-		<jruby.version>1.7.21</jruby.version>
+		<asciidoctorj.version>1.5.5</asciidoctorj.version>
+		<jruby.version>1.7.26</jruby.version>
 	</properties>	
 	
 	<build>
