@@ -87,9 +87,9 @@ public class ClassFileScanner {
 	 * @throws AnnotationVerificationException thrown if some annotations doesn't follow the restrictions given by the annotation contract
 	 */
 	public void scan() throws AnnotationVerificationException {
-            if (sipContext.getServletContext().getInitParameter(ANNOTATION_SCAN) != null){
+            if (sipContext.findParameter(ANNOTATION_SCAN) != null){
                 logger.debug("Scanning context param present");
-                scanningEnabled = Boolean.valueOf(sipContext.getServletContext().getInitParameter(ANNOTATION_SCAN));
+                scanningEnabled = Boolean.valueOf(sipContext.findParameter(ANNOTATION_SCAN));
                 logger.info("ScanningEnabled:" + scanningEnabled);
             }
 
