@@ -57,7 +57,11 @@ RestComm SIP Servlets is licensed under dual license policy. The default license
 
 Acknowledgements
 ========
-[See who has been contributing to RestComm](https://www.restcomm.com/acknowledgements/)
+
+* [![JProfiler](https://www.ej-technologies.com/images/product_banners/jprofiler_large.png)](https://www.ej-technologies.com/products/jprofiler/overview.html) JProfiler Open Source License
+
+---
+We also maintain a list of [all Restcomm contributors](http://www.telestax.com/opensource/acknowledgments/) on the Restcomm website, to acknowledge contributions by the broad open source community.
 
 
 ## License
