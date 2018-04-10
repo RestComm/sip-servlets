@@ -140,7 +140,8 @@ public class ConvergedSessionDelegate {
             if (scheme != null && ("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme))
                     && listener instanceof HttpListenerService) {
                 if (listener.getBinding().getValue() != null) {
-                    port = listener.getBinding().getValue().getPort();
+                    //use absolute port to support offset configuration
+                    port = listener.getBinding().getValue().getAbsolutePort();
                     if (listener.getBinding().getValue().getAddress() != null) {
                         hostname = listener.getBinding().getValue().getAddress().getHostName();
                     }

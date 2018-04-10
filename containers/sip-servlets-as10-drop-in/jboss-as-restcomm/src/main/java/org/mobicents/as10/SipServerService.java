@@ -18,6 +18,7 @@
  */
 package org.mobicents.as10;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import static org.mobicents.as10.SipMessages.MESSAGES;
 
 import javax.management.MBeanServer;
@@ -78,6 +79,7 @@ class SipServerService implements SipServer, Service<SipServer> {
     final int memoryThreshold;
     final int backToNormalMemoryThreshold;
     final String outboundProxy;
+    private long gracefulInterval=30000;
 
     private final String instanceId;
 
@@ -252,6 +254,7 @@ class SipServerService implements SipServer, Service<SipServer> {
         sipService.setCongestionControlPolicy(congestionControlPolicy);
         sipService.setOutboundProxy(outboundProxy);
         sipService.setName(JBOSS_SIP);
+        sipService.setGracefulInterval(gracefulInterval);
 
         // FIXME: kakonyii
         // sipService.setServer(server);
@@ -296,6 +299,8 @@ class SipServerService implements SipServer, Service<SipServer> {
     public synchronized SipServer getValue() throws IllegalStateException {
         return this;
     }
+    
+    private AtomicInteger addedConnectors = new AtomicInteger(0);    
 
     /** {@inheritDoc} */
     public synchronized void addConnector(SipConnectorListener connector) {
@@ -304,6 +309,17 @@ class SipServerService implements SipServer, Service<SipServer> {
             sipService.addConnector(connector.getProtocolHandler());
         }
     }
+    
+    public synchronized void connectorAdded(SipConnectorListener connector) {
+        if (connector.getProtocolHandler() instanceof SipProtocolHandler) {
+            int currentConnectors = addedConnectors.incrementAndGet();
+            if (currentConnectors >= SipSubsystemParser.getInstance().parsedConnectors.get()) {
+                logger.debug("Time to put dispatcher in service.");
+                sipService.getSipApplicationDispatcher().putInService();
+                
+            }
+        }
+    }       
 
     /** {@inheritDoc} */
     public synchronized void removeConnector(SipConnectorListener connector) {
@@ -358,4 +374,7 @@ class SipServerService implements SipServer, Service<SipServer> {
         return sipService;
     }
 
+    public void setGracefulInterval(long gracefulInterval) {
+        this.gracefulInterval = gracefulInterval;
+    }
 }

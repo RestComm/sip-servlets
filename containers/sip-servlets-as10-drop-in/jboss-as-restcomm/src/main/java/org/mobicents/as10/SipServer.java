@@ -72,5 +72,7 @@ public interface SipServer {
      * return the service (StandardService)
      */
     SipStandardService getService();
+    
+    void connectorAdded(SipConnectorListener connector);    
 
 }

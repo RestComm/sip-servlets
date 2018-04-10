@@ -75,6 +75,7 @@ public interface Constants {
     String FLAGS = "flags";
     String GATHER_STATISTICS = "gather-statistics";
     String GENERATE_STRINGS_AS_CHAR_ARRAYS = "generate-strings-as-char-arrays";
+    String GRACEFUL_INTERVAL = "graceful-interval";    
     String INSTANCE_ID = "instance-id";
     String JAVA_ENCODING = "java-encoding";
     String JSP_CONFIGURATION = "jsp-configuration";

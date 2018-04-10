@@ -31,6 +31,7 @@ import static org.mobicents.as10.Constants.NAME;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -62,6 +63,7 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
         XMLElementWriter<SubsystemMarshallingContext> {
 
     private static final SipSubsystemParser INSTANCE = new SipSubsystemParser();
+    AtomicInteger parsedConnectors = new AtomicInteger(0);    
 
     static SipSubsystemParser getInstance() {
         return INSTANCE;
@@ -103,6 +105,7 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
         SipDefinition.MEMORY_THRESHOLD.marshallAsAttribute(node, false, writer);
         SipDefinition.BACK_TO_NORMAL_MEMORY_THRESHOLD.marshallAsAttribute(node, false, writer);
         SipDefinition.OUTBOUND_PROXY.marshallAsAttribute(node, false, writer);
+        SipDefinition.GRACEFUL_INTERVAL.marshallAsAttribute(node, false, writer);        
         if (node.hasDefined(CONNECTOR)) {
             for (final Property connector : node.get(CONNECTOR).asPropertyList()) {
                 final ModelNode config = connector.getValue();
@@ -158,6 +161,7 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
                 case OUTBOUND_PROXY:
                 case CONCURRENCY_CONTROL_MODE:
                 case USE_PRETTY_ENCODING:
+                case GRACEFUL_INTERVAL:
                     subsystem.get(attribute.getLocalName()).set(value);
                     break;
                 default:
@@ -264,6 +268,7 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
         PathAddress address = PathAddress.pathAddress(parent, PathElement.pathElement(CONNECTOR, name));
         connector.get(OP_ADDR).set(address.toModelNode());
         list.add(connector);
+        getInstance().parsedConnectors.incrementAndGet();        
 
         while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
             switch (Namespace.forUri(reader.getNamespaceURI())) {

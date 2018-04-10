@@ -146,6 +146,8 @@ public class SipConnectorService implements Service<SipConnectorListener> {
         }
         // Register the binding after the connector is started
         binding.getSocketBindings().getNamedRegistry().registerBinding(new ConnectorBinding(binding));
+        //notify SipServer only when connector has already been added/started
+        getSipServer().connectorAdded(connector);        
     }
 
     /** {@inheritDoc} */

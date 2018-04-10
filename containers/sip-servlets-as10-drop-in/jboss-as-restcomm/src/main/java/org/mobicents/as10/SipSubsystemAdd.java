@@ -121,6 +121,7 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         SipDefinition.MEMORY_THRESHOLD.validateAndSet(operation, model);
         SipDefinition.BACK_TO_NORMAL_MEMORY_THRESHOLD.validateAndSet(operation, model);
         SipDefinition.OUTBOUND_PROXY.validateAndSet(operation, model);
+        SipDefinition.GRACEFUL_INTERVAL.validateAndSet(operation, model);        
     }
 
     @Override
@@ -233,6 +234,9 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
         final ModelNode outboundProxyModel = SipDefinition.OUTBOUND_PROXY.resolveModelAttribute(context, fullModel);
         final String outboundProxy = outboundProxyModel.isDefined() ? outboundProxyModel.asString() : null;
+        
+        final ModelNode gracefulIntervalModel = SipDefinition.GRACEFUL_INTERVAL.resolveModelAttribute(context, fullModel);
+        final Long gracefulInterval = gracefulIntervalModel.isDefined() ? gracefulIntervalModel.asLong(): null;
 
         // final String instanceId = operation.hasDefined(Constants.INSTANCE_ID) ?
         // operation.get(Constants.INSTANCE_ID).asString() : null;
@@ -266,6 +270,7 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 dialogPendingRequestChecking, dnsServerLocatorClass, dnsTimeout, dnsResolverClass, callIdMaxLength,
                 tagHashMaxLength, canceledTimerTasksPurgePeriod, memoryThreshold, backToNormalMemoryThreshold, outboundProxy,
                 instanceId);
+        service.setGracefulInterval(gracefulInterval);
         newControllers.add(context
                 .getServiceTarget()
                 .addService(SipSubsystemServices.JBOSS_SIP, service)

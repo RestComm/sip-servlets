@@ -127,6 +127,7 @@ public class SipStandardService implements SipService {
     protected boolean dialogPendingRequestChecking = false;
     protected int callIdMaxLength;
     protected int tagHashMaxLength;
+    private long gracefulInterval = 30000;    
 
     protected boolean httpFollowsSip = false;
     protected String jvmRoute;
@@ -350,6 +351,7 @@ public class SipStandardService implements SipService {
         }
         if (!connectorsStartedExternally) {
             sipApplicationDispatcher.start();
+            sipApplicationDispatcher.putInService();
         }
 
         if (this.getSipMessageQueueSize() <= 0)
@@ -1152,9 +1154,10 @@ public class SipStandardService implements SipService {
 			Iterator<SipContext> sipContexts = sipApplicationDispatcher.findSipApplications();
 			while (sipContexts.hasNext()) {
 				SipContext sipContext = sipContexts.next();
+                                sipContext.setGracefulInterval(gracefulInterval);                                
 				sipContext.stopGracefully(timeToWait);
 			}
-			gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().scheduleWithFixedDelay(new ServiceGracefulStopTask(this), 30000, 30000, TimeUnit.MILLISECONDS);
+			gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().scheduleWithFixedDelay(new ServiceGracefulStopTask(this), gracefulInterval, gracefulInterval, TimeUnit.MILLISECONDS);
 			if(timeToWait > 0) {
 				gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().schedule(
 						new Runnable() {
@@ -1172,4 +1175,8 @@ public class SipStandardService implements SipService {
 			}
 		}		
 	}
+        
+    public void setGracefulInterval(long gracefulStopTaskInterval) {
+        this.gracefulInterval = gracefulStopTaskInterval;
+    }        
 }

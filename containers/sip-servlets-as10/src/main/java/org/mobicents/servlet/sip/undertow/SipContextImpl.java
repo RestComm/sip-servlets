@@ -50,6 +50,7 @@ import javax.servlet.sip.TimerService;
 
 import org.apache.log4j.Logger;
 import org.mobicents.io.undertow.servlet.api.DeploymentInfoFacade;
+import org.mobicents.javax.servlet.GracefulShutdownStartedEvent;
 import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.MobicentsSipServlet;
@@ -721,6 +722,15 @@ public class SipContextImpl implements SipContext {
             logger.debug(this.deploymentInfoFacade.getSipServlets().size() + " container to notify of " + event.getEventType());
         }
         if (event.getEventType() == SipContextEventType.SERVLET_INITIALIZED) {
+            //fixes https://github.com/RestComm/sip-servlets/issues/165
+            //now the SipService is totally ready/started, we prepare 
+            //the context again just in case some att was not properly
+            //initiated
+            try {
+                prepareServletContext();
+            } catch (Exception e) {
+                logger.warn("Couldnt prepare context", e);
+            }            
             if (!timerService.isStarted()) {
                 timerService.start();
             }
@@ -1154,13 +1164,17 @@ public class SipContextImpl implements SipContext {
         DEFAULT;
     }
 
-    @Override
+        private long gracefulInterval = 30000;
+
+	@Override
 	public void stopGracefully(long timeToWait) {
 		// http://code.google.com/p/sipservlets/issues/detail?id=195 
 		// Support for Graceful Shutdown of SIP Applications and Overall Server
 		if(logger.isInfoEnabled()) {
 			logger.info("Stopping the Context " + getApplicationName() + " Gracefully in " + timeToWait + " ms");
 		}
+                GracefulShutdownStartedEvent startEvent = new GracefulShutdownStartedEvent(timeToWait);
+                getListeners().callbackContainerListener(startEvent);
 		// Guarantees that the application won't be routed any initial requests anymore but will still handle subsequent requests
 		List<String> applicationsUndeployed = new ArrayList<String>();
 		applicationsUndeployed.add(getApplicationName());
@@ -1175,14 +1189,13 @@ public class SipContextImpl implements SipContext {
 			} catch (ServletException e) {
 				logger.error("The server couldn't be stopped", e);
 			}
-		} else { 
-			long gracefulStopTaskInterval = 30000;
-			if(timeToWait > 0 && timeToWait < gracefulStopTaskInterval) {
+		} else {
+			if(timeToWait > 0 && timeToWait < gracefulInterval) {
 				// if the time to Wait is positive and < to the gracefulStopTaskInterval then we schedule the task directly once to the time to wait
 				gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().schedule(new ContextGracefulStopTask(this, timeToWait), timeToWait, TimeUnit.MILLISECONDS);         
 			} else {
 				// if the time to Wait is > to the gracefulStopTaskInterval or infinite (negative value) then we schedule the task to run every gracefulStopTaskInterval, not needed to be exactly precise on the timeToWait in this case
-				gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().scheduleWithFixedDelay(new ContextGracefulStopTask(this, timeToWait), gracefulStopTaskInterval, gracefulStopTaskInterval, TimeUnit.MILLISECONDS);                      
+				gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().scheduleWithFixedDelay(new ContextGracefulStopTask(this, timeToWait), 0, gracefulInterval, TimeUnit.MILLISECONDS);                      
 			}
 		}		
 	}
@@ -1193,5 +1206,9 @@ public class SipContextImpl implements SipContext {
 			return true;
 		return false;
 	}
+        
+    public void setGracefulInterval(long gracefulInterval) {
+        this.gracefulInterval = gracefulInterval;
+    }        
 
 }
