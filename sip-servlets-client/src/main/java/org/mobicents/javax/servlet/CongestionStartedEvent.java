@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
+ * Copyright 2011, Red Hat Middleware LLC, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -22,21 +22,16 @@
 package org.mobicents.javax.servlet;
 
 /**
- * Congestion Control Policy for the Mobicents Sip Servlets Server. <br/>
- *
- * The congestion control policy defines how an incoming message is handled when
- * the server is overloaded. The following parameters are configurable :
- *
- * <ul>
- * <li>DropMessage - drop any incoming message</li>
- * <li>ErrorResponse - send a 503 - Service Unavailable response to any incoming
- * request (Default).</li>
- * </ul>
- *
- * @author jean.deruelle@gmail.com
+ * As soon as congestion starts in the underlying source, it notifies this event.
+ * 
+ * Notification is only one-time till the congestion abates
+ * in which case CongestionStoppedEvent is notified
  *
  */
-public enum CongestionControlPolicy {
-    ErrorResponse,
-    DropMessage
+public class CongestionStartedEvent extends CongestionControlEvent {
+
+    public CongestionStartedEvent(Reason reason, String message) {
+        super(ContainerEventType.CONGESTION_STARTED, reason, message);
+    }
+
 }

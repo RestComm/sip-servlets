@@ -22,39 +22,47 @@
 package org.mobicents.javax.servlet;
 
 /**
- * Defines a Congestion Control Event when the congestion control is triggered by the Container
- * 
- * It allows to get the Reason whether the memory usage or CPU usage or any other condition in the future has triggered the callback
- * 
+ * Defines a Congestion Control Event when the congestion control is triggered
+ * by the Container
+ *
+ * It allows to get the Reason whether the memory usage or CPU usage or any
+ * other condition in the future has triggered the callback
+ *
  * @author jean.deruelle@gmail.com
  *
  */
-public class CongestionControlEvent {
-	public enum Reason {
-		Memory, Queue //, TODO add CPU Usage congestion control
-	}
+public class CongestionControlEvent extends ContainerEvent {
 
-	Reason reason;
-	String message;
-	
-	public CongestionControlEvent(Reason reason, String message) {
-		this.reason = reason;
-		this.message = message;
-	}
-	
-	/**
-	 * Gives the reason on whether the memory usage or CPU usage or any other condition in the future has triggered the callback
-	 * @return the reason on whether the memory usage or CPU usage or any other condition in the future has triggered the callback
-	 */
-	public Reason getReason() {
-		return reason;
-	}
-	
-	/**
-	 * Gives the reason message on what exactly triggered the callback
-	 * @return the reason message on what exactly triggered the callback
-	 */
-	public String getMessage() {
-		return message;
-	}
+    public enum Reason {
+        Memory, Queue //, TODO add CPU Usage congestion control
+    }
+
+    Reason reason;
+    String message;
+
+    public CongestionControlEvent(ContainerEventType eventType, Reason reason, String message) {
+        super(eventType);
+        this.reason = reason;
+        this.message = message;
+    }
+
+    /**
+     * Gives the reason on whether the memory usage or CPU usage or any other
+     * condition in the future has triggered the callback
+     *
+     * @return the reason on whether the memory usage or CPU usage or any other
+     * condition in the future has triggered the callback
+     */
+    public Reason getReason() {
+        return reason;
+    }
+
+    /**
+     * Gives the reason message on what exactly triggered the callback
+     *
+     * @return the reason message on what exactly triggered the callback
+     */
+    public String getMessage() {
+        return message;
+    }
 }

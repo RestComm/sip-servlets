@@ -19,46 +19,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.javax.servlet;
 
-import javax.servlet.sip.SipServletRequest;
-import javax.servlet.sip.SipServletResponse;
+import javax.servlet.ServletContext;
 
 /**
- * Causes applications to be notified of various events occuring the Container.
+ * Causes applications to be notified of various events ocurring in the Container.
  */
-public interface ContainerListener extends java.util.EventListener{
-	
-	 /**
-     * As soon as congestion starts in the underlying source, it calls this
-     * method to notify about it. Notification is only one-time till the
-     * congestion abates in which case
-     * {@link CongestionListener#onCongestionControlStopped(CongestionEvent)} is called
-     * 
-     * @param source
-     *            The underlying source which is facing congestion
-     */
-    public void onCongestionControlStarted(CongestionControlEvent event);
+public interface ContainerListener extends java.util.EventListener {
 
     /**
-     * As soon as congestion abates in the underlying source, it calls this
-     * method to notify about it. Notification is only one-time till the
-     * congestion starts again in which case
-     * {@link CongestionListener#onCongestionStart(String)} is called
      * 
-     * @param source
-     *            The underlying source
+     * @param event the event fired.
+     * @param ctx the ServletContext for this service allowing to check or modify the
+     * existing context.
      */
-    public void onCongestionControlStopped(CongestionControlEvent event);
-    
-    /**
-     * When a request that comes in is not passed up to the application because of congestion control.
-     * 
-     * @param request the request that wasn't passed up to the application because of congestion control
-     * @param event giving details on what triggered the throttling
-     * @return a SipServletResponse that should be sent back to the originator of the request. If null, then 
-     * the container will generate the response automatically
-     */
-    public SipServletResponse onRequestThrottled(SipServletRequest request, CongestionControlEvent event);    
+    public void sendEvent(ContainerEvent event, ServletContext ctx);
 }
