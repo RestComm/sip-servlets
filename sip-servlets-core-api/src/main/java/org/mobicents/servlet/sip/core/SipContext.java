@@ -186,4 +186,6 @@ public interface SipContext {
 	 */
 	void stopGracefully(long timeToWait);
 	boolean isStoppingGracefully();
+        
+        void setGracefulInterval(long gracefulInterval);
 }
