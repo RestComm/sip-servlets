@@ -62,6 +62,11 @@ public class SipExtension implements Extension {
         final SubsystemRegistration subsystem = context.registerSubsystem(SUBSYSTEM_NAME, MANAGEMENT_API_MAJOR_VERSION, MANAGEMENT_API_MINOR_VERSION);
         final ManagementResourceRegistration registration = subsystem.registerSubsystemModel(SipDefinition.INSTANCE);
         registration.registerOperationHandler(DESCRIBE, GenericSubsystemDescribeHandler.INSTANCE, GenericSubsystemDescribeHandler.INSTANCE, false, OperationEntry.EntryType.PRIVATE);
+        
+        registration.registerOperationHandler("gracefulShutdown", MobicentsGracefulShutdownOperationHandler.INSTANCE, MobicentsGracefulShutdownOperationHandler.INSTANCE);
+        registration.registerOperationHandler("contextGracefulShutdown", MobicentsContextGracefulShutdownOperationHandler.INSTANCE, MobicentsContextGracefulShutdownOperationHandler.INSTANCE);
+        registration.registerOperationHandler("listSipAppplications", MobicentsListApplicationsOperationHandler.INSTANCE, MobicentsListApplicationsOperationHandler.INSTANCE);
+        
         //final ManagementResourceRegistration registration = subsystem.registerSubsystemModel(SipSubsystemDescriptionProviders.SUBSYSTEM);
         //registration.registerOperationHandler(ADD, SipSubsystemAdd.INSTANCE, SipSubsystemAdd.INSTANCE, false);
         //registration.registerOperationHandler(DESCRIBE, SipSubsystemDescribe.INSTANCE, SipSubsystemDescribe.INSTANCE, false, OperationEntry.EntryType.PRIVATE);

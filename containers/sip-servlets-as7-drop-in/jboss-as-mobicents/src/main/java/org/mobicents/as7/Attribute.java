@@ -86,6 +86,7 @@ enum Attribute {
     NAME(Constants.NAME),
     NATIVE(Constants.NATIVE),
     OUTBOUND_PROXY(Constants.OUTBOUND_PROXY),
+    GRACEFUL_INTERVAL(Constants.GRACEFUL_INTERVAL),
     PASSWORD(Constants.PASSWORD),
     PATH(Constants.PATH),
     PATTERN(Constants.PATTERN),

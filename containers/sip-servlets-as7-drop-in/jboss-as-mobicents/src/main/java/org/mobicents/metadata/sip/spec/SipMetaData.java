@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -62,7 +62,7 @@ public abstract class SipMetaData extends WebMetaData implements Environment {
 //    private MessageDestinationsMetaData messageDestinations;
 
     // AS7 isolated class loading does not allow to fetch Method,
-    // so processors fill SipApplicationKeyMethodInfo and Method is fetched afterwards 
+    // so processors fill SipApplicationKeyMethodInfo and Method is fetched afterwards
     // private Method sipApplicationKeyMethod;
     private SipApplicationKeyMethodInfo sipApplicationKeyMethodInfo;
     private ConcurrencyControlMode concurrencyControlMode;

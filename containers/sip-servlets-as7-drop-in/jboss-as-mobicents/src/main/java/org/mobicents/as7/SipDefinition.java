@@ -260,6 +260,13 @@ public class SipDefinition extends SimpleResourceDefinition {
                     .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
                     .setDefaultValue(null)
                     .build();
+    protected static final SimpleAttributeDefinition GRACEFUL_INTERVAL =
+            new SimpleAttributeDefinitionBuilder(Constants.GRACEFUL_INTERVAL, ModelType.LONG, true)
+                    .setAllowExpression(true)
+                    .setXmlName(Constants.GRACEFUL_INTERVAL)
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    .setDefaultValue(new ModelNode(30000))
+                    .build();    
     
     
     private SipDefinition() {
@@ -306,6 +313,7 @@ public class SipDefinition extends SimpleResourceDefinition {
         registration.registerReadWriteAttribute(MEMORY_THRESHOLD, null, new ReloadRequiredWriteAttributeHandler(MEMORY_THRESHOLD));
         registration.registerReadWriteAttribute(BACK_TO_NORMAL_MEMORY_THRESHOLD, null, new ReloadRequiredWriteAttributeHandler(BACK_TO_NORMAL_MEMORY_THRESHOLD));
         registration.registerReadWriteAttribute(OUTBOUND_PROXY, null, new ReloadRequiredWriteAttributeHandler(OUTBOUND_PROXY));
+        registration.registerReadWriteAttribute(GRACEFUL_INTERVAL, null, new ReloadRequiredWriteAttributeHandler(GRACEFUL_INTERVAL));        
         for (SipStackStat stat : SipStackStat.values()) {
             registration.registerMetric(stat.definition, SipStackStatsHandler.getInstance());
         }

@@ -21,7 +21,6 @@
  */
 package org.mobicents.as7;
 
-import com.arjuna.ats.arjuna.AtomicAction;
 import java.util.concurrent.atomic.AtomicInteger;
 import static org.mobicents.as7.SipMessages.MESSAGES;
 
@@ -86,6 +85,7 @@ class SipServerService implements SipServer, Service<SipServer> {
  	final int memoryThreshold;
  	final int backToNormalMemoryThreshold;
  	final String outboundProxy;
+        private long gracefulInterval;
  	
     private final String instanceId;
 
@@ -258,6 +258,7 @@ class SipServerService implements SipServer, Service<SipServer> {
         sipService.setOutboundProxy(outboundProxy);
         sipService.setName(JBOSS_SIP);
         sipService.setServer(server);
+        sipService.setGracefulInterval(gracefulInterval);
 
         sipEngine = new SipStandardEngine();
         sipEngine.setName(JBOSS_SIP);
@@ -359,5 +360,9 @@ class SipServerService implements SipServer, Service<SipServer> {
     public SipStandardService getSipService() {
         return sipService;
     }
+
+    public void setGracefulInterval(long gracefulInterval) {
+        this.gracefulInterval = gracefulInterval;
+    } 
 
 }

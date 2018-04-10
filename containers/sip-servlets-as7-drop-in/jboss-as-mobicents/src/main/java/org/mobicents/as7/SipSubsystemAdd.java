@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -62,7 +62,7 @@ import org.mobicents.ext.javax.sip.dns.DefaultDNSServerLocator;
  * @author josemrecio@gmail.com
  */
 class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
-	private static final Logger logger = Logger.getLogger(SipServerService.class);
+	private static final Logger logger = Logger.getLogger(SipSubsystemAdd.class);
 	// FIXME: these priorities should be substituted by values from with org.jboss.as.server.deployment.Phase
 	//   aligned with those used by web subsystem
     static int PARSE_SIP_DEPLOYMENT_PRIORITY = 0x4000;
@@ -74,7 +74,7 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
 //    private static final boolean DEFAULT_NATIVE = true;
 
     private SipSubsystemAdd() {
-        //
+    	//
     }
 
 //    @Override
@@ -84,6 +84,10 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
     @Override
     protected void populateModel(ModelNode operation, ModelNode model) throws OperationFailedException {
+    	if(logger.isDebugEnabled()) {
+			logger.debug("populateModel");
+		}
+
         SipDefinition.INSTANCE_ID.validateAndSet(operation, model);
         SipDefinition.APPLICATION_ROUTER.validateAndSet(operation, model);
         SipDefinition.SIP_STACK_PROPS.validateAndSet(operation, model);
@@ -111,12 +115,16 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         SipDefinition.MEMORY_THRESHOLD.validateAndSet(operation, model);
         SipDefinition.BACK_TO_NORMAL_MEMORY_THRESHOLD.validateAndSet(operation, model);
         SipDefinition.OUTBOUND_PROXY.validateAndSet(operation, model);
+        SipDefinition.GRACEFUL_INTERVAL.validateAndSet(operation, model);
     }
 
     @Override
     protected void performBoottime(OperationContext context, ModelNode operation, ModelNode model,
                                    ServiceVerificationHandler verificationHandler,
                                    List<ServiceController<?>> newControllers) throws OperationFailedException {
+    	if(logger.isDebugEnabled()) {
+			logger.debug("performBoottime");
+		}
         ModelNode fullModel = Resource.Tools.readModel(context.readResource(PathAddress.EMPTY_ADDRESS));
 
         final ModelNode instanceIdModel = SipDefinition.INSTANCE_ID.resolveModelAttribute(context, fullModel);
@@ -133,10 +141,10 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
         final ModelNode sipAppDispatcherClassModel = SipDefinition.SIP_APP_DISPATCHER_CLASS.resolveModelAttribute(context, fullModel);
         final String sipAppDispatcherClass = sipAppDispatcherClassModel.isDefined() ? sipAppDispatcherClassModel.asString() : null;
-        
+
         final ModelNode usePrettyEncodingModel = SipDefinition.USE_PRETTY_ENCODING.resolveModelAttribute(context, fullModel);
         final boolean usePrettyEncoding = usePrettyEncodingModel.isDefined() ? usePrettyEncodingModel.asBoolean() : true;
-        
+
         final ModelNode additionalParameterableHeadersModel = SipDefinition.ADDITIONAL_PARAMETERABLE_HEADERS.resolveModelAttribute(context, fullModel);
         final String additionalParameterableHeaders = additionalParameterableHeadersModel.isDefined() ? additionalParameterableHeadersModel.asString() : null;
 
@@ -145,61 +153,64 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
         final ModelNode sasTimerServiceImplementationTypeModel = SipDefinition.SAS_TIMER_SERVICE_IMPEMENTATION_TYPE.resolveModelAttribute(context, fullModel);
         final String sasTimerServiceImplementationType = sasTimerServiceImplementationTypeModel.isDefined() ? sasTimerServiceImplementationTypeModel.asString() : Constants.STANDARD;
-        
+
         final ModelNode sipCongestionControlIntervalModel = SipDefinition.CONGESTION_CONTROL_INTERVAL.resolveModelAttribute(context, fullModel);
         final int sipCongestionControlInterval = sipCongestionControlIntervalModel.isDefined() ? sipCongestionControlIntervalModel.asInt() : -1;
 
         final ModelNode congestionControlPolicyModel = SipDefinition.CONGESTION_CONTROL_POLICY.resolveModelAttribute(context, fullModel);
         final String congestionControlPolicy = congestionControlPolicyModel.isDefined() ? congestionControlPolicyModel.asString() : "ErrorResponse";
-        
+
         final ModelNode sipConcurrencyControlModeModel = SipDefinition.CONCURRENCY_CONTROL_MODE.resolveModelAttribute(context, fullModel);
         final String sipConcurrencyControlMode = sipConcurrencyControlModeModel.isDefined() ? sipConcurrencyControlModeModel.asString() : null;
 
         final ModelNode baseTimerIntervalModel = SipDefinition.BASE_TIMER_INTERVAL.resolveModelAttribute(context, fullModel);
         final int baseTimerInterval = baseTimerIntervalModel.isDefined() ? baseTimerIntervalModel.asInt() : 500;
-        
+
         final ModelNode t2IntervalModel = SipDefinition.T2_INTERVAL.resolveModelAttribute(context, fullModel);
         final int t2Interval = t2IntervalModel.isDefined() ? t2IntervalModel.asInt() : 4000;
-        
+
         final ModelNode t4IntervalModel = SipDefinition.T4_INTERVAL.resolveModelAttribute(context, fullModel);
         final int t4Interval = t4IntervalModel.isDefined() ? t4IntervalModel.asInt() : 5000;
-        
+
         final ModelNode timerDIntervalModel = SipDefinition.TIMER_D_INTERVAL.resolveModelAttribute(context, fullModel);
         final int timerDInterval = timerDIntervalModel.isDefined() ? timerDIntervalModel.asInt() : 32000;
-        
+
         final ModelNode gatherStatisticsModel = SipDefinition.GATHER_STATISTICS.resolveModelAttribute(context, fullModel);
         final boolean gatherStatistics = gatherStatisticsModel.isDefined() ? gatherStatisticsModel.asBoolean() : true;
-        
+
         final ModelNode dialogPendingRequestCheckingModel = SipDefinition.DIALOG_PENDING_REQUEST_CHECKING.resolveModelAttribute(context, fullModel);
         final boolean dialogPendingRequestChecking = dialogPendingRequestCheckingModel.isDefined() ? dialogPendingRequestCheckingModel.asBoolean() : false;
-        
+
         final ModelNode dnsServerLocatorClassModel = SipDefinition.DNS_SERVER_LOCATOR_CLASS.resolveModelAttribute(context, fullModel);
         final String dnsServerLocatorClass = dnsServerLocatorClassModel.isDefined() ? dnsServerLocatorClassModel.asString() : DefaultDNSServerLocator.class.getName();
-        
+
         final ModelNode dnsTimeoutModel = SipDefinition.DNS_TIMEOUT.resolveModelAttribute(context, fullModel);
         final int dnsTimeout = dnsTimeoutModel.isDefined() ? dnsTimeoutModel.asInt() : null;
-        
+
         final ModelNode dnsResolverClassModel = SipDefinition.DNS_RESOLVER_CLASS.resolveModelAttribute(context, fullModel);
         final String dnsResolverClass = dnsResolverClassModel.isDefined() ? dnsResolverClassModel.asString() : null;
-        
+
         final ModelNode callIdMaxLengthModel = SipDefinition.CALL_ID_MAX_LENGTH.resolveModelAttribute(context, fullModel);
         final int callIdMaxLength = callIdMaxLengthModel.isDefined() ? callIdMaxLengthModel.asInt() : -1;
-        
+
         final ModelNode tagHashMaxLengthModel = SipDefinition.TAG_HASH_MAX_LENGTH.resolveModelAttribute(context, fullModel);
         final int tagHashMaxLength = tagHashMaxLengthModel.isDefined() ? tagHashMaxLengthModel.asInt() : -1;
-        
+
         final ModelNode canceledTimerTasksPurgePeriodModel = SipDefinition.CANCELED_TIMER_TASKS_PURGE_PERIOD.resolveModelAttribute(context, fullModel);
         final int canceledTimerTasksPurgePeriod = canceledTimerTasksPurgePeriodModel.isDefined() ? canceledTimerTasksPurgePeriodModel.asInt() : -1;
-        
+
         final ModelNode memoryThresholdModel = SipDefinition.MEMORY_THRESHOLD.resolveModelAttribute(context, fullModel);
         final int memoryThreshold = memoryThresholdModel.isDefined() ? memoryThresholdModel.asInt() : -1;
-        
+
         final ModelNode backToNormalMemoryThresholdModel = SipDefinition.BACK_TO_NORMAL_MEMORY_THRESHOLD.resolveModelAttribute(context, fullModel);
         final int backToNormalMemoryThreshold = backToNormalMemoryThresholdModel.isDefined() ? backToNormalMemoryThresholdModel.asInt() : -1;
-        
+
         final ModelNode outboundProxyModel = SipDefinition.OUTBOUND_PROXY.resolveModelAttribute(context, fullModel);
         final String outboundProxy = outboundProxyModel.isDefined() ? outboundProxyModel.asString() : null;
-        
+
+        final ModelNode gracefulIntervalModel = SipDefinition.GRACEFUL_INTERVAL.resolveModelAttribute(context, fullModel);
+        final Long gracefulInterval = gracefulIntervalModel.isDefined() ? gracefulIntervalModel.asLong() : null;
+
 //    	final String instanceId = operation.hasDefined(Constants.INSTANCE_ID) ? operation.get(Constants.INSTANCE_ID).asString() : null;
 //    	final String sipAppRouterFile = operation.hasDefined(Constants.APPLICATION_ROUTER) ? operation.get(Constants.APPLICATION_ROUTER).asString() : null;
 //    	final String sipStackPropertiesFile = operation.hasDefined(Constants.SIP_STACK_PROPS) ? operation.get(Constants.SIP_STACK_PROPS).asString() : null;
@@ -217,35 +228,36 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 !Constants.DEFAULT.equalsIgnoreCase(proxyTimerServiceImplementationType) && !Constants.STANDARD.equalsIgnoreCase(proxyTimerServiceImplementationType)) {
             throw new OperationFailedException("Invalid value is set for "+Constants.PROXY_TIMER_SERVICE_IMPEMENTATION_TYPE+" property: "+proxyTimerServiceImplementationType+"! Valid values are: "+Constants.DEFAULT +", "+Constants.STANDARD+".");
         }
-        
+
         final SipServerService service = new SipServerService(
-        		sipAppRouterFile, 
-        		sipStackPropertiesFile, 
-        		sipPathName, 
-        		sipAppDispatcherClass, 
-        		additionalParameterableHeaders, 
-        		proxyTimerServiceImplementationType, 
+        		sipAppRouterFile,
+        		sipStackPropertiesFile,
+        		sipPathName,
+        		sipAppDispatcherClass,
+        		additionalParameterableHeaders,
+        		proxyTimerServiceImplementationType,
         		sasTimerServiceImplementationType,
         		gatherStatistics,
         		sipCongestionControlInterval,
         		congestionControlPolicy,
-        		sipConcurrencyControlMode, 
-        		usePrettyEncoding, 
-        		baseTimerInterval, 
-        		t2Interval, 
-        		t4Interval, 
-        		timerDInterval, 
+        		sipConcurrencyControlMode,
+        		usePrettyEncoding,
+        		baseTimerInterval,
+        		t2Interval,
+        		t4Interval,
+        		timerDInterval,
         		dialogPendingRequestChecking,
         		dnsServerLocatorClass,
         		dnsTimeout,
         		dnsResolverClass,
         		callIdMaxLength,
         		tagHashMaxLength,
-        		canceledTimerTasksPurgePeriod, 
+        		canceledTimerTasksPurgePeriod,
         		memoryThreshold,
         		backToNormalMemoryThreshold,
         		outboundProxy,
         		instanceId);
+        service.setGracefulInterval(gracefulInterval);
         newControllers.add(context.getServiceTarget().addService(SipSubsystemServices.JBOSS_SIP, service)
                 .addDependency(PathManagerService.SERVICE_NAME, PathManager.class, service.getPathManagerInjector())
                 .addDependency(DependencyType.OPTIONAL, ServiceName.JBOSS.append("mbean", "server"), MBeanServer.class, service.getMbeanServer())
@@ -311,9 +323,9 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
                     .setInitialMode(Mode.ON_DEMAND)
                     .install());
             newControllers.addAll(factory.installServices(target));
-        }
+    		}
 
-        
+
     }
 
     @Override

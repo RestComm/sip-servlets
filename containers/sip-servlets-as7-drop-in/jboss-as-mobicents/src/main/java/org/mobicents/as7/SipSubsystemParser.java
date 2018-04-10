@@ -100,6 +100,7 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
         SipDefinition.MEMORY_THRESHOLD.marshallAsAttribute(node, false, writer);
         SipDefinition.BACK_TO_NORMAL_MEMORY_THRESHOLD.marshallAsAttribute(node, false, writer);
         SipDefinition.OUTBOUND_PROXY.marshallAsAttribute(node, false, writer);
+        SipDefinition.GRACEFUL_INTERVAL.marshallAsAttribute(node, false, writer);
         if(node.hasDefined(CONNECTOR)) {
         	for(final Property connector : node.get(CONNECTOR).asPropertyList()) {
         		final ModelNode config = connector.getValue();
@@ -156,6 +157,7 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
 	            case OUTBOUND_PROXY:
 	            case CONCURRENCY_CONTROL_MODE:
 	            case USE_PRETTY_ENCODING:
+                    case GRACEFUL_INTERVAL:
 	                subsystem.get(attribute.getLocalName()).set(value);
 	                break;
 	            default:

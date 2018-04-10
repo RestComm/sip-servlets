@@ -156,6 +156,7 @@ interface Constants {
     String WEBDAV = "webdav";
     String WELCOME_FILE = "welcome-file";
     String X_POWERED_BY = "x-powered-by";
+    String GRACEFUL_INTERVAL = "graceful-interval";
 
     /* Connect stats attributes */
     String BYTES_SENT = "bytesSent";
