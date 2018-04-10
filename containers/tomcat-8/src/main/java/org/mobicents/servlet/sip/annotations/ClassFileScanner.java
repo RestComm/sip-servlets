@@ -46,36 +46,33 @@ import org.mobicents.servlet.sip.catalina.SipServletImpl;
  * if I look directly in a classloader it would have loaded all libs includeing third
  * party libs in WEB-INF/jar, and system libs. Parsing all these would be slow, so for
  * now we will only look in WEB-INF/classes since it works.
- *
+ * 
  * General TODO: Validation
- *
+ * 
  * @author Vladimir Ralev
  *
  */
 public class ClassFileScanner {
-        private static final String ANNOTATION_SCAN = "org.restcomm.servlets.sip.ANNOTATION_SCAN";
 
 	private static transient final Logger logger = Logger.getLogger(ClassFileScanner.class);
-
+			
 	private String docbase;
-
+	
 	private CatalinaSipContext sipContext;
-
+	
 	private String parsedAnnotatedPackage = null;
-
+	
 	private boolean applicationParsed = false;
-
+	
 	private Method sipAppKey = null;
-
+	
 	private ClassLoader classLoader;
-
-        private boolean scanningEnabled = true;
-
+	
 	public ClassFileScanner(String docbase, CatalinaSipContext ctx) {
 		this.docbase = docbase;
 		this.sipContext = ctx;
 	}
-
+	
 	/**
 	 * Scan the application for annotations with the contextconfig classloader.
 	 * It scans in the following locations :
@@ -83,31 +80,22 @@ public class ClassFileScanner {
 	 * WEB-INF/lib
 	 * ../APP-INF/lib
 	 * ../APP-INF/classes
-	 *
+	 * 
 	 * @throws AnnotationVerificationException thrown if some annotations doesn't follow the restrictions given by the annotation contract
 	 */
 	public void scan() throws AnnotationVerificationException {
-            if (sipContext.findParameter(ANNOTATION_SCAN) != null){
-                logger.debug("Scanning context param present");
-                scanningEnabled = Boolean.valueOf(sipContext.findParameter(ANNOTATION_SCAN));
-                logger.info("ScanningEnabled:" + scanningEnabled);
-            }
-
-            if (scanningEnabled) {
-
-
 		ClassLoader cl = this.sipContext.getClass().getClassLoader();
 		this.classLoader = sipContext.getLoader().getClassLoader();
 //		this.classLoader.setResources(this.sipContext.getResources());
 //		this.classLoader.setAntiJARLocking(true);
-
+		
 		if(logger.isInfoEnabled()) {
 			logger.info("Annotations docBase : " + this.docbase);
 		}
-
+		
 //		this.classLoader.setWorkDir(new File(this.docbase + "/tmp"));
-
-		// Add this SAR/WAR's binary file from WEB-INF/classes and WEB-INF/lib
+		
+		// Add this SAR/WAR's binary file from WEB-INF/classes and WEB-INF/lib		
 //		this.classLoader.addRepository("/WEB-INF/classes/", new File(this.docbase + "/WEB-INF/classes/"));
 //		this.classLoader.addJarDir(this.docbase + "/WEB-INF/lib/");
 		//Add those only for EAR files
@@ -115,7 +103,7 @@ public class ClassFileScanner {
 //			//Adding root dir to include jars located here like ejb modules and so on...
 //			//Ideally we may want to parse the application.xml and get the jars that are defined in it...?
 //			this.classLoader.addJarDir(this.docbase + "/../");
-//
+//			
 //			// Try to add the EAR binaries as repositories
 //			File earJarDir = new File(this.docbase + "/../APP-INF/lib");
 //			File earClassesDir = new File(this.docbase + "/../APP-INF/classes");
@@ -125,12 +113,11 @@ public class ClassFileScanner {
 //				this.classLoader.addRepository(this.docbase + "/../APP-INF/classes");
 //		}
 		// TODO: Add META-INF classpath
-
+			
 		_scan(new File(this.docbase));
-            }
 	}
-
-	protected void _scan(File folder) throws AnnotationVerificationException {
+	
+	protected void _scan(File folder) throws AnnotationVerificationException {    	
         File[] files = folder.listFiles();
         if(files != null) {
 	        for(int j = 0; j < files.length; j++) {
@@ -144,7 +131,7 @@ public class ClassFileScanner {
 	        }
         }
     }
-
+	
 	private void scanJar(String path) throws AnnotationVerificationException {
 		if(logger.isDebugEnabled()) {
     		logger.debug("scanning jar " + path + " for annotations");
@@ -155,7 +142,7 @@ public class ClassFileScanner {
 			while (jarEntries.hasMoreElements()) {
 				JarEntry jarEntry = jarEntries.nextElement();
 				String entryName = jarEntry.getName();
-
+								
 				if(entryName.endsWith(".class")) {
 					String className =  entryName.substring(0, entryName.indexOf(".class"));
 					className = className.replace('/', '.');
@@ -173,9 +160,9 @@ public class ClassFileScanner {
 			}
 		} catch (IOException e) {
 			throw new AnnotationVerificationException("couldn't read the following jar file for parsing annotations " + path, e);
-		}
+		} 
 	}
-
+    
     protected void analyzeClass(String path) throws AnnotationVerificationException {
     	if(logger.isDebugEnabled()) {
     		logger.debug("analyzing class " + path + " for annotations");
@@ -199,17 +186,17 @@ public class ClassFileScanner {
     				logger.debug("Failed to parse annotations for class " + className, e);
     			}
     		}
-    	}
+    	} 
     }
-
+    
     protected void processAnnotations(Class clazz) throws AnnotationVerificationException {
     	if(logger.isDebugEnabled()) {
     		logger.debug("analyzing class " + clazz + " for annotations");
-    	}
+    	}    	
     	processListenerAnnotation(clazz);
 		processServletAnnotation(clazz);
 		processSipApplicationKeyAnnotation(clazz);
-		processConcurrencyAnnotation(clazz);
+		processConcurrencyAnnotation(clazz);   
 		if(clazz.toString().contains("package-info")) {
 			if(logger.isDebugEnabled()) {
 	    		logger.debug("scanning " + clazz.getCanonicalName() + " for @SipApplication annotation");
@@ -226,11 +213,11 @@ public class ClassFileScanner {
 									+ packageName + " and "
 									+ this.parsedAnnotatedPackage);
 				}
-
+				
 				if (this.parsedAnnotatedPackage == null) {
 					this.parsedAnnotatedPackage = packageName;
 					parseSipApplication(appData, packageName);
-				}
+				}								
 			} else {
 				if(logger.isDebugEnabled()) {
 		    		logger.debug("no @SipApplication annotation in " + clazz.getCanonicalName());
@@ -251,7 +238,7 @@ public class ClassFileScanner {
     		sipContext.addSipApplicationListener(clazz.getCanonicalName());
     	}
     }
-
+    
 	protected void processSipApplicationKeyAnnotation(Class<?> clazz) throws AnnotationVerificationException {
     	if(logger.isDebugEnabled()) {
     		logger.debug("scanning " + clazz.getCanonicalName() + " for sip application key annotation");
@@ -283,10 +270,10 @@ public class ClassFileScanner {
 	    		}
 				sipContext.setSipApplicationKeyMethod(method);
 			}
-		}
+		}    	
     }
-
-
+    
+    
     protected void processServletAnnotation(Class<?> clazz) {
     	if(logger.isDebugEnabled()) {
     		logger.debug("scanning " + clazz.getCanonicalName() + " for servlet annotations");
@@ -294,7 +281,7 @@ public class ClassFileScanner {
 		SipServlet servlet = (SipServlet) clazz.getAnnotation(SipServlet.class);
 		if (servlet == null)
 			return;
-
+		
 		SipServletImpl parsedServletData = (SipServletImpl) sipContext.createWrapper();
 
 		String appName = null;
@@ -315,7 +302,7 @@ public class ClassFileScanner {
 									+ packageName + " and "
 									+ this.parsedAnnotatedPackage);
 				}
-
+				
 				if (this.parsedAnnotatedPackage == null) {
 					this.parsedAnnotatedPackage = packageName;
 					parseSipApplication(appData, packageName);
@@ -337,7 +324,7 @@ public class ClassFileScanner {
 		} else {
 			name = servlet.name();
 		}
-
+		
 		if (sipContext.getMainServlet() == null
 				|| sipContext.getMainServlet().equals("")) {
 			sipContext.setMainServlet(name);
@@ -358,17 +345,17 @@ public class ClassFileScanner {
 		sipContext.addChild(parsedServletData);
 		this.applicationParsed = true;
 	}
-
+    
     protected void parseSipApplication(SipApplication appData, String packageName) {
     	sipContext.setMainServlet(appData.mainServlet());
     	sipContext.setProxyTimeout(appData.proxyTimeout());
     	sipContext.setSipApplicationSessionTimeout(appData.sessionTimeout());
-
+    	
     	if(appData.name() == null || appData.name().equals(""))
     		sipContext.setApplicationName(packageName);
     	else
     		sipContext.setApplicationName(appData.name());
-
+    	
     	if(appData.displayName() == null || appData.displayName().equals(""))
     		sipContext.setDisplayName(packageName);
     	else
@@ -383,13 +370,13 @@ public class ClassFileScanner {
     	sipContext.setSmallIcon(appData.smallIcon());
     	sipContext.setDistributable(appData.distributable());
     }
-
+    
     protected SipApplication getApplicationAnnotation(Package pack) {
     	if(logger.isDebugEnabled()) {
 			logger.debug("Analyzing " + pack + " for @SipApplication annotations");
     	}
-    	if(pack == null) return null;
-
+    	if(pack == null) return null;    	    	
+    	
     	SipApplication sipApp = (SipApplication) pack.getAnnotation(SipApplication.class);
     	if(sipApp != null) {
     		return sipApp;
@@ -398,7 +385,7 @@ public class ClassFileScanner {
     }
 
     /**
-     * Check if the @ConcurrencyControl annotation is present in the package and if so process it
+     * Check if the @ConcurrencyControl annotation is present in the package and if so process it 
      * @param clazz the clazz to check for @ConcurrencyControl annotation - only its package will be checked
      */
     protected void processConcurrencyAnnotation(Class clazz) {
@@ -417,11 +404,11 @@ public class ClassFileScanner {
     	}
 	}
 
-
+    
     /**
      * Shows if there is SipApplication annotation parsed and thur we dont need to
      * look at sip.xml to seearch descriptor info.
-     *
+     * 
      * @return
      */
 	public boolean isApplicationParsed() {
