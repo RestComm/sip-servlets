@@ -73,6 +73,7 @@ import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.descriptor.web.Injectable;
 import org.apache.tomcat.util.descriptor.web.InjectionTarget;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
+import org.mobicents.javax.servlet.GracefulShutdownStartedEvent;
 import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.annotations.DefaultSipInstanceManager;
@@ -1634,6 +1635,8 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 		Thread.currentThread().setContextClassLoader(oldClassLoader);
 	}
 
+        private long gracefulInterval = 30000;
+        
 	@Override
 	/*
 	 * (non-Javadoc)
@@ -1645,6 +1648,8 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 		if(logger.isInfoEnabled()) {
 			logger.info("Stopping the Context " + getName() + " Gracefully in " + timeToWait + " ms");
 		}
+                GracefulShutdownStartedEvent event = new GracefulShutdownStartedEvent(timeToWait);
+                getListeners().callbackContainerListener(event);               
 		// Guarantees that the application won't be routed any initial requests anymore but will still handle subsequent requests
 		List<String> applicationsUndeployed = new ArrayList<String>();
 		applicationsUndeployed.add(applicationName);
@@ -1660,13 +1665,12 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 				logger.error("The server couldn't be stopped", e);
 			}
 		} else {		
-			long gracefulStopTaskInterval = 30000;
-			if(timeToWait > 0 && timeToWait < gracefulStopTaskInterval) {
+			if(timeToWait > 0 && timeToWait < gracefulInterval) {
 				// if the time to Wait is < to the gracefulStopTaskInterval then we schedule the task directly once to the time to wait
 				gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().schedule(new ContextGracefulStopTask(this, timeToWait), timeToWait, TimeUnit.MILLISECONDS);         
 			} else {
 				// if the time to Wait is > to the gracefulStopTaskInterval or infinite (negative value) then we schedule the task to run every gracefulStopTaskInterval, not needed to be exactly precise on the timeToWait in this case
-				gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().scheduleWithFixedDelay(new ContextGracefulStopTask(this, timeToWait), gracefulStopTaskInterval, gracefulStopTaskInterval, TimeUnit.MILLISECONDS);                      
+				gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().scheduleWithFixedDelay(new ContextGracefulStopTask(this, timeToWait), 0, gracefulInterval, TimeUnit.MILLISECONDS);                      
 			}
 		}
 	}
@@ -1695,4 +1699,14 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 			return 0;
 		}
 	}
+
+    public long getGracefulInterval() {
+        return gracefulInterval;
+    }
+
+    public void setGracefulInterval(long gracefulInterval) {
+        this.gracefulInterval = gracefulInterval;
+    }
+        
+        
 }
