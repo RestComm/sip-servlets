@@ -127,7 +127,7 @@ public class SipStandardService implements SipService {
     protected boolean dialogPendingRequestChecking = false;
     protected int callIdMaxLength;
     protected int tagHashMaxLength;
-    private long gracefulInterval = 30000;    
+    private long gracefulInterval = 30000;
 
     protected boolean httpFollowsSip = false;
     protected String jvmRoute;
@@ -351,7 +351,6 @@ public class SipStandardService implements SipService {
         }
         if (!connectorsStartedExternally) {
             sipApplicationDispatcher.start();
-            sipApplicationDispatcher.putInService();
         }
 
         if (this.getSipMessageQueueSize() <= 0)
@@ -584,7 +583,7 @@ public class SipStandardService implements SipService {
             }
             // Create SipStack object
             sipStack = sipApplicationDispatcher.getSipFactory().getJainSipFactory().createSipStack(sipStackProperties);
-            
+
             LoadBalancerHeartBeatingService loadBalancerHeartBeatingService = null;
             if (sipStack instanceof ClusteredSipStack) {
                 loadBalancerHeartBeatingService = ((ClusteredSipStack) sipStack).getLoadBalancerHeartBeatingService();
@@ -1124,7 +1123,7 @@ public class SipStandardService implements SipService {
     public void setSasTimerServiceImplementationType(String sasTimerServiceImplementationType) {
         this.sasTimerServiceImplementationType = sasTimerServiceImplementationType;
     }
-    
+
     protected void shutdownServer() throws MalformedObjectNameException, NullPointerException, InstanceNotFoundException, MBeanException, ReflectionException, IOException{
 		MBeanServerConnection mbeanServerConnection = ManagementFactory.getPlatformMBeanServer();
 		ObjectName mbeanName = new ObjectName("jboss.as:management-root=server");
@@ -1132,7 +1131,7 @@ public class SipStandardService implements SipService {
 		String[] sigs = {"java.lang.Boolean"};
 		mbeanServerConnection.invoke(mbeanName, "shutdown", args, sigs);
 	}
-    
+
     @Override
 	public void stopGracefully(long timeToWait) {
 		if(logger.isInfoEnabled()) {
@@ -1154,14 +1153,14 @@ public class SipStandardService implements SipService {
 			Iterator<SipContext> sipContexts = sipApplicationDispatcher.findSipApplications();
 			while (sipContexts.hasNext()) {
 				SipContext sipContext = sipContexts.next();
-                                sipContext.setGracefulInterval(gracefulInterval);                                
+                                sipContext.setGracefulInterval(gracefulInterval);
 				sipContext.stopGracefully(timeToWait);
 			}
 			gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().scheduleWithFixedDelay(new ServiceGracefulStopTask(this), gracefulInterval, gracefulInterval, TimeUnit.MILLISECONDS);
 			if(timeToWait > 0) {
 				gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().schedule(
 						new Runnable() {
-							public void run() { 
+							public void run() {
 								gracefulStopFuture.cancel(false);
 								try {
 									stop();
@@ -1173,10 +1172,10 @@ public class SipStandardService implements SipService {
 						}
 	                , timeToWait, TimeUnit.MILLISECONDS);
 			}
-		}		
+		}
 	}
-        
+
     public void setGracefulInterval(long gracefulStopTaskInterval) {
         this.gracefulInterval = gracefulStopTaskInterval;
-    }        
+    }
 }
