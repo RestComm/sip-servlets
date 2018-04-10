@@ -148,6 +148,7 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 	protected boolean dialogPendingRequestChecking = false;
 	protected int callIdMaxLength;
 	protected int tagHashMaxLength;
+        private long gracefulInterval = 30000;
 	
 	protected boolean httpFollowsSip = false;
 	protected String jvmRoute;
@@ -218,8 +219,10 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 	 */
 	protected void registerSipConnector(Connector connector) {
 		try {
-		     
 		    ObjectName objectName = createSipConnectorObjectName(connector, getName(), "SipConnector");
+		    if(logger.isDebugEnabled()) {
+				logger.debug("registering sip connector : " + objectName);
+			}
 		    Registry.getRegistry(null, null)
 		        .registerComponent(connector, objectName, null);
 //TODO		    connector.setController(objectName);
@@ -230,12 +233,34 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 		    logger.debug("Creating name for connector " + getObjectName());
 	}
 	
+	/**
+	 * Register the sip connector under a different name than HTTP Connector and we add the transport to avoid clashing with 2 connectors having the same port and address
+	 * @param connector connector to register
+	 */
+	protected void unregisterSipConnector(Connector connector) {
+		try {
+		     
+		    ObjectName objectName = createSipConnectorObjectName(connector, getName(), "SipConnector");
+		    if(logger.isDebugEnabled()) {
+				logger.debug("unregistering sip connector : " + objectName);
+			}
+		    Registry.getRegistry(null, null)
+		        .unregisterComponent(objectName);
+		} catch (Exception e) {
+		    logger.error( "Error registering connector ", e);
+		}
+		if(logger.isDebugEnabled())
+		    logger.debug("Creating name for connector " + getObjectName());
+	}
+	
 	@Override
 	public void removeConnector(Connector connector) {
 		MobicentsExtendedListeningPoint extendedListeningPoint = null;
-		if (connector.getProtocolHandler() instanceof SipProtocolHandler){
-		extendedListeningPoint = (MobicentsExtendedListeningPoint)
-			((SipProtocolHandler)connector.getProtocolHandler()).getAttribute(ExtendedListeningPoint.class.getSimpleName());}
+		if (connector.getProtocolHandler() instanceof SipProtocolHandler) {
+			extendedListeningPoint = (MobicentsExtendedListeningPoint)
+					((SipProtocolHandler)connector.getProtocolHandler()).getAttribute(ExtendedListeningPoint.class.getSimpleName());
+			unregisterSipConnector(connector);
+		}
 		if(extendedListeningPoint != null) {
 			extendedListeningPoint.getSipProvider().removeSipListener(sipApplicationDispatcher);
 			sipApplicationDispatcher.getSipNetworkInterfaceManager().removeExtendedListeningPoint(extendedListeningPoint);
@@ -1350,15 +1375,16 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 			Iterator<SipContext> sipContexts = sipApplicationDispatcher.findSipApplications();
 			while (sipContexts.hasNext()) {
 				SipContext sipContext = sipContexts.next();
+                                sipContext.setGracefulInterval(gracefulInterval);
 				sipContext.stopGracefully(timeToWait);
 			}
-			long gracefulStopTaskInterval = 30000;
-			if(timeToWait > 0 && timeToWait < gracefulStopTaskInterval) {
+			
+			if(timeToWait > 0 && timeToWait < gracefulInterval) {
 				// if the time to Wait is positive and < to the gracefulStopTaskInterval then we schedule the task directly once to the time to wait
 				gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().schedule(new ServiceGracefulStopTask(this, timeToWait), timeToWait, TimeUnit.MILLISECONDS);         
 			} else {
 				// if the time to Wait is > to the gracefulStopTaskInterval or infinite (negative value) then we schedule the task to run every gracefulStopTaskInterval, not needed to be exactly precise on the timeToWait in this case
-				gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().scheduleWithFixedDelay(new ServiceGracefulStopTask(this, timeToWait), gracefulStopTaskInterval, gracefulStopTaskInterval, TimeUnit.MILLISECONDS);                      
+				gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().scheduleWithFixedDelay(new ServiceGracefulStopTask(this, timeToWait), gracefulInterval, gracefulInterval, TimeUnit.MILLISECONDS);                      
 			}
 //			gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().scheduleWithFixedDelay(new ServiceGracefulStopTask(this), 30000, 30000, TimeUnit.MILLISECONDS);
 //			if(timeToWait > 0) {
@@ -1416,4 +1442,9 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
     public void setSasTimerServiceImplementationType(String sasTimerServiceImplementationType) {
         this.sasTimerServiceImplementationType = sasTimerServiceImplementationType;
     }
+
+    public void setGracefulInterval(long gracefulStopTaskInterval) {
+        this.gracefulInterval = gracefulStopTaskInterval;
+    }
+    
 }
