@@ -62,10 +62,12 @@ public class ApplicationRoutingHeaderComposer {
 		
 			// If there is no AR in the string, generate a uniqueValue for the tag
 			// and it will be stored for later.
-			if(tokens.length > 2) {				
+			if(tokens.length > 2) {
 				// Otherwise extract the uniqueValue from the tag string, it's the first token.
 				final String hashedAppName = tokens[2];
-				if(sipApplicationDispatcher.getApplicationServerIdHash().equalsIgnoreCase(tokens[1])) {
+				// TODO (posfai): Revert to the commented line when the following github issue is resolved: https://github.com/RestComm/sip-servlets/issues/171
+				//if(sipApplicationDispatcher.getApplicationServerIdHash().equalsIgnoreCase(tokens[1])) {
+				if(true) {
 					String appName = sipApplicationDispatcher.getApplicationNameFromHash(hashedAppName);
 					if(appName == null) 
 						throw new IllegalArgumentException("The hash doesn't correspond to any app name: " + hashedAppName);

@@ -35,6 +35,7 @@ import javax.servlet.sip.ProxyBranch;
 import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipServletResponse;
 import javax.sip.Dialog;
+import javax.sip.ListeningPoint;
 import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
@@ -101,6 +102,9 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 	 * {@inheritDoc}
 	 */
 	public void dispatchMessage(final SipProvider sipProvider, SipServletMessageImpl sipServletMessage) throws DispatcherException {
+		if(logger.isDebugEnabled()) {
+			logger.debug("dispatchMessage - sipServletMessage.getAppSessionId()=" + sipServletMessage.getAppSessionId() + ", sipServletMessage.getCallId()=" + sipServletMessage.getCallId());
+		}
 		final MobicentsSipFactory sipFactoryImpl = sipApplicationDispatcher.getSipFactory();
 		final SipServletRequestImpl sipServletRequest = (SipServletRequestImpl) sipServletMessage;
 		if(logger.isDebugEnabled()) {
@@ -108,43 +112,114 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		}	
 				
 		final Request request = (Request) sipServletRequest.getMessage();
-		final Dialog dialog = sipServletRequest.getDialog();		
+		final Dialog dialog = sipServletRequest.getDialog();
+		if(logger.isDebugEnabled()) {
+			logger.debug("dispatchMessage - dialog=" + dialog);
+			if (dialog != null){
+				logger.debug("dispatchMessage - dialog.getDialogId()=" + dialog.getDialogId());
+			}
+		}
 		final RouteHeader poppedRouteHeader = sipServletRequest.getPoppedRouteHeader();
 		final String method = request.getMethod();
 		
 		String applicationName = null; 
-		String applicationId = null;		
+		String applicationId = null;
+		
+		if(logger.isDebugEnabled()) {
+			logger.debug("dispatchMessage - poppedRouteHeader=" + poppedRouteHeader);
+		}
+		
 		if(poppedRouteHeader != null){
 			final Parameters poppedAddress = (Parameters)poppedRouteHeader.getAddress().getURI();
+			if(logger.isDebugEnabled()) {
+				logger.debug("dispatchMessage - poppedAddress=" + poppedAddress);
+			}
 			// Extract information from the Route Header		
 			final String applicationNameHashed = poppedAddress.getParameter(RR_PARAM_APPLICATION_NAME);
+			if(logger.isDebugEnabled()) {
+				logger.debug("dispatchMessage - applicationNameHashed=" + applicationNameHashed);
+			}
 			if(applicationNameHashed != null && applicationNameHashed.length() > 0) {				
 				applicationName = sipApplicationDispatcher.getApplicationNameFromHash(applicationNameHashed);
-				applicationId = poppedAddress.getParameter(APP_ID);				
+				applicationId = poppedAddress.getParameter(APP_ID);
+				
+				if(logger.isDebugEnabled()) {
+					logger.debug("dispatchMessage - based on poppedRouteHeader - applicationName=" + applicationName);
+					logger.debug("dispatchMessage - based on poppedRouteHeader - applicationId=" + applicationId);
+				}
 			}
 		} 
+		
+		if(logger.isDebugEnabled()) {
+			logger.debug("dispatchMessage - applicationId=" + applicationId);
+		}
+		
 		if(applicationId == null) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("dispatchMessage - toHeader applicationId from ToHeader");
+			}
+			
 			final ToHeader toHeader = (ToHeader) request.getHeader(ToHeader.NAME);
 			final String arText = toHeader.getTag();
+			if(logger.isDebugEnabled()) {
+				logger.debug("dispatchMessage - toHeader applicationId from ToHeader - toHeader=" + toHeader);
+				logger.debug("dispatchMessage - toHeader applicationId from ToHeader - arText=" + arText);
+			}
 			try {
 				final String[] tuple = ApplicationRoutingHeaderComposer.getAppNameAndSessionId(sipApplicationDispatcher, arText);				
 				applicationName = tuple[1];
 				applicationId = tuple[2];
+				
+				if(logger.isDebugEnabled()) {
+					logger.debug("dispatchMessage - from toHeader - tuples=" + tuple);
+					if (tuple != null){
+						for (String tmp : tuple){
+							logger.debug("dispatchMessage - from toHeader - tuple=" + tmp);
+						}
+					}
+					logger.debug("dispatchMessage - from toHeader - applicationName=" + applicationName);
+					logger.debug("dispatchMessage - from toHeader - applicationId=" + applicationId);
+				}
+				
 			} catch(IllegalArgumentException e) {
 				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, e);
 			}
 			if(applicationId == null && applicationName == null) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("dispatchMessage - applicationName and applicationId are still null");
+				}
+				
 				//gvag Issue 2337 & 2327
 				javax.sip.address.URI requestURI = request.getRequestURI();
+				if(logger.isDebugEnabled()) {
+					logger.debug("dispatchMessage - requestURI=" + requestURI);
+				}
 				// Issue 2850 :	Use Request-URI custom Mobicents parameters to route request for misbehaving agents, workaround for Cisco-SIPGateway/IOS-12.x user agent
 				if(request.getRequestURI() instanceof javax.sip.address.SipURI) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("dispatchMessage - requestURI is SipURI");
+					}
+					
 					final String applicationNameHashed = ((Parameters)requestURI).getParameter(RR_PARAM_APPLICATION_NAME);
+					if(logger.isDebugEnabled()) {
+						logger.debug("dispatchMessage - applicationNameHashed=" + applicationNameHashed);
+					}
+					
 					if(applicationNameHashed != null && applicationNameHashed.length() > 0) {				
 						applicationName = sipApplicationDispatcher.getApplicationNameFromHash(applicationNameHashed);
 						applicationId = ((Parameters)requestURI).getParameter(APP_ID);
+						
+						if(logger.isDebugEnabled()) {
+							logger.debug("dispatchMessage - applicationName=" + applicationName);
+							logger.debug("dispatchMessage - applicationId=" + applicationId);
+						}
 					}
 				}
 				if(applicationId == null && applicationName == null) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("dispatchMessage - applicationName and applicationId are still null again");
+					}
+					
 					boolean isAnotherDomain = false;
 					
 					if(requestURI.isSipURI()){
@@ -152,6 +227,12 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 						final int port = ((SipURI) requestURI).getPort();
 						final String transport = JainSipUtils.findTransport(request);
 						isAnotherDomain = sipApplicationDispatcher.isExternal(host, port, transport);
+						if(logger.isDebugEnabled()) {
+							logger.debug("dispatchMessage - host=" + host
+									+ ", port=" + port
+									+ ", transport=" + transport
+									+ ", isAnotherDomain=" + isAnotherDomain);
+						}
 					} else {
 						if(logger.isDebugEnabled()) {
 							logger.debug("The Request URI " + requestURI + " is not a SIP URI and the Route Header was null or didn't contain information about an application to call (which would be incorrect) so we assume the request is an ACK for a container generated error response or misrouted");
@@ -160,7 +241,10 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 					
 					// Issue 823 (http://code.google.com/p/mobicents/issues/detail?id=823) : 
 					// Container should proxy statelessly subsequent requests not targeted at itself
-					if(isAnotherDomain) {	
+					if(isAnotherDomain) {
+						if(logger.isDebugEnabled()) {
+							logger.debug("dispatchMessage - isAnotherDomain=" + isAnotherDomain);
+						}
 						if(Request.ACK.equals(method) && sipServletRequest.getTransaction() != null && ((SIPServerTransaction)sipServletRequest.getTransaction()).getLastResponseStatusCode() >= 300) {
 							// Issue 2213 (http://code.google.com/p/mobicents/issues/detail?id=2213) :
 							// ACK for final error response are proxied statelessly for proxy applications
@@ -208,10 +292,16 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		
 		boolean inverted = false;
 		if(dialog != null && !dialog.isServer()) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("dispatchMessage - inverted=" + inverted);
+			}
 			inverted = true;
 		}
 		
 		final SipContext sipContext = sipApplicationDispatcher.findSipApplication(applicationName);
+		if(logger.isDebugEnabled()) {
+			logger.debug("dispatchMessage - sipContext=" + sipContext);
+		}
 		if(sipContext == null) {
 			if(poppedRouteHeader != null) {
 				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot find the application to handle this subsequent request " + request +
@@ -226,8 +316,18 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				applicationId,
 				null);
 	
+		if(logger.isDebugEnabled()) {
+			logger.debug("dispatchMessage - creating sipApplicationSessionKey - applicationName=" + applicationName
+					+ ", applicationId=" + applicationId
+					+ ", sipApplicationSessionKey.getId()=" + sipApplicationSessionKey.getId());
+		}
+		
 		MobicentsSipSession tmpSipSession = null;
 		MobicentsSipApplicationSession sipApplicationSession = sipManager.getSipApplicationSession(sipApplicationSessionKey, false);
+		if(logger.isDebugEnabled()) {
+			logger.debug("dispatchMessage - got sip app session based on the newly created key - sipApplicationSession=" + sipApplicationSession);
+		}
+		
 		if(sipApplicationSession == null) {
 			if(logger.isDebugEnabled()) {
 				sipManager.dumpSipApplicationSessions();
@@ -235,6 +335,12 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			//trying the join or replaces matching sip app sessions
 			final MobicentsSipApplicationSessionKey joinSipApplicationSessionKey = sipContext.getSipSessionsUtil().getCorrespondingSipApplicationSession(sipApplicationSessionKey, JoinHeader.NAME);
 			final MobicentsSipApplicationSessionKey replacesSipApplicationSessionKey = sipContext.getSipSessionsUtil().getCorrespondingSipApplicationSession(sipApplicationSessionKey, ReplacesHeader.NAME);
+			
+			if(logger.isDebugEnabled()) {
+				logger.debug("dispatchMessage - joinSipApplicationSessionKey=" + joinSipApplicationSessionKey);
+				logger.debug("dispatchMessage - replacesSipApplicationSessionKey=" + replacesSipApplicationSessionKey);
+			}
+			
 			if(joinSipApplicationSessionKey != null) {
 				sipApplicationSession = sipManager.getSipApplicationSession(joinSipApplicationSessionKey, false);
 			} else if(replacesSipApplicationSessionKey != null) {
@@ -243,6 +349,10 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		}
 		// Orphaned requests are routed from here
 		boolean routeOrphanRequests = ((SipFactoryExt)sipContext.getSipFactoryFacade()).isRouteOrphanRequests();
+		if(logger.isDebugEnabled()) {
+			logger.debug("dispatchMessage - routeOrphanRequests=" + routeOrphanRequests);
+		}
+		
 		if(sipApplicationSession == null || sipApplicationSession.isOrphan()) {			
 			if(logger.isDebugEnabled()) {
 				logger.debug("routeOrphanRequests = " + routeOrphanRequests + " for context " + sipContext.getApplicationName() + " appSession=" + sipApplicationSession);
@@ -256,14 +366,24 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 							", it may already have been invalidated or timed out");					
 				}
 			} else {
+				if(logger.isDebugEnabled()) {
+					logger.debug("dispatchMessage - calling handleOrphanRequest, applicationId=" + applicationId);
+				}
+				
 				handleOrphanRequest(sipProvider, sipServletRequest, applicationId, sipContext);
 				return;				
 			}
 		}
 
 		if(StaticServiceHolder.sipStandardService.isHttpFollowsSip()) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("dispatchMessage - isHttpFollowsSip true");
+			}
 			String jvmRoute = StaticServiceHolder.sipStandardService.getJvmRoute();
 			if(jvmRoute != null) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("dispatchMessage - jvmRoute=" + jvmRoute);
+				}
 				sipApplicationSession.setJvmRoute(jvmRoute);
 			}
 		}
@@ -274,6 +394,12 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 					" with the following popped route header " + sipServletRequest.getPoppedRoute());
 		}
 		tmpSipSession = sipManager.getSipSession(key, false, sipFactoryImpl, sipApplicationSession);
+		if(logger.isDebugEnabled()) {
+			logger.debug("dispatchMessage - tmpSipSession=" + tmpSipSession);
+			if (tmpSipSession != null){
+				logger.debug("dispatchMessage - tmpSipSession.getId()=" + tmpSipSession.getId());
+			}
+		}
 		
 		// Added by Vladimir because the inversion detection on proxied requests doesn't work
 		if(tmpSipSession == null) {
@@ -283,9 +409,17 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			}
 			key = SessionManagerUtil.getSipSessionKey(sipApplicationSession.getKey().getId(), applicationName, request, !inverted);
 			tmpSipSession = sipManager.getSipSession(key, false, sipFactoryImpl, sipApplicationSession);
+			if (tmpSipSession != null) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("Inverted try worked. sip session found : " + tmpSipSession.getId());
+				}
+			}
 		}
 		
 		if(tmpSipSession == null) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("dispatchMessage - tmpSipSession is still null, calling dumpSipSessions");
+			}
 			sipManager.dumpSipSessions();
 			if(logger.isDebugEnabled()) {
 				logger.debug("routeOrphanRequests = " + routeOrphanRequests + " for context " + sipContext.getApplicationName() + " appSessionId=" + applicationId);
@@ -299,12 +433,11 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 							", it may already have been invalidated or timed out");					
 				}
 			} else {
+				if(logger.isDebugEnabled()) {
+					logger.debug("dispatchMessage - calling handleOrphanRequest, applicationId=" + applicationId);
+				}
 				handleOrphanRequest(sipProvider, sipServletRequest, applicationId, sipContext);
 				return; 
-			}
-		} else {
-			if(logger.isDebugEnabled()) {
-				logger.debug("Inverted try worked. sip session found : " + tmpSipSession.getId());
 			}
 		}			
 		
@@ -313,16 +446,31 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		
 		final SubsequentDispatchTask dispatchTask = new SubsequentDispatchTask(sipServletRequest, sipProvider);
 		// we enter the sip app here, thus acuiring the semaphore on the session (if concurrency control is set) before the jain sip tx semaphore is released and ensuring that
-		// the tx serialization is preserved		
+		// the tx serialization is preserved
 		sipContext.enterSipApp(sipApplicationSession, sipSession, false, true);
+
 		// Issue 2886 : http://code.google.com/p/mobicents/issues/detail?id=2886 ACK is bound out of replication context
 		// we need to enter the serialization here because validateCSeq below can set the CSeq so we need to replicate it
+		if(logger.isDebugEnabled()) {
+			logger.debug("dispatchMessage - calling sipContext.enterSipApp again...");
+		}
 		final boolean batchStarted = sipContext.enterSipAppHa(true);
+		if(logger.isDebugEnabled()) {
+			logger.debug("dispatchMessage - batchStarted=" + batchStarted);
+		}
 		
 		// Issue 1714 && Issue 2886 : moving the requests pending within the serialization block 
 		if(request.getMethod().equals(Request.ACK)) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("dispatchMessage - method is ACK");
+			}
+			
 			sipSession.setRequestsPending(sipSession.getRequestsPending() - 1);
 		} else if(request.getMethod().equals(Request.INVITE)){
+			if(logger.isDebugEnabled()) {
+				logger.debug("dispatchMessage - method is INVITE");
+			}
+			
 			if(logger.isDebugEnabled()) {
 				logger.debug("INVITE requests pending " + sipSession.getRequestsPending());
 			}
@@ -351,9 +499,21 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		// BEGIN validation delegated to the applicationas per JSIP patch for http://code.google.com/p/mobicents/issues/detail?id=766
 		boolean orphan = sipSession.isOrphan() || sipApplicationSession.isOrphan();
 		sipServletRequest.setOrphan(orphan);
+		if(logger.isDebugEnabled()) {
+			logger.debug("dispatchMessage - orphan=" + orphan);
+		}
+		
 		if(sipSession.getProxy() == null && !orphan) {
 			boolean isValid = sipSession.validateCSeq(sipServletRequest);
+			if(logger.isDebugEnabled()) {
+				logger.debug("dispatchMessage - sipSession.getProxy() is null and not orphan, isValid=" + isValid);
+			}
+			
 			if(!isValid) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("dispatchMessage - calling sipContext.exitSipAppHa");
+				}
+				
 				// Issue 2886 : http://code.google.com/p/mobicents/issues/detail?id=2886 ACK is bound out of replication context
 				// we need to exit the serialization here because validateCSeq above can set the CSeq so we need to replicate it
 				sipContext.exitSipAppHa(sipServletRequest, null, batchStarted);
@@ -366,9 +526,17 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		
 		// if the flag is set we bypass the executor. This flag should be made deprecated 
 		if(sipApplicationDispatcher.isBypassRequestExecutor() || ConcurrencyControlMode.Transaction.equals((sipContext.getConcurrencyControlMode()))) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("dispatchMessage - bypassing the executor - batchStarted=" + batchStarted);
+			}
+			
 			dispatchTask.setBatchStarted(batchStarted);
 			dispatchTask.dispatchAndHandleExceptions();
 		} else {
+			if(logger.isDebugEnabled()) {
+				logger.debug("dispatchMessage - finally calling sipContext.exitSipAppHa");
+			}
+			
 			// Issue 2886 : http://code.google.com/p/mobicents/issues/detail?id=2886 ACK is bound out of replication context
 			// we need to exitSipAppHa because a new thread will be started here 
 			sipContext.exitSipAppHa(sipServletRequest, null, batchStarted);
@@ -450,22 +618,51 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		}
 
 		public void dispatch() throws DispatcherException {
+			if(logger.isDebugEnabled()) {
+				logger.debug("SubsequentDispatchTask - dispatch");
+			}
 			final SipServletRequestImpl sipServletRequest = (SipServletRequestImpl)sipServletMessage;
+			if(logger.isDebugEnabled()) {
+				logger.debug("SubsequentDispatchTask - dispatch - sipServletRequest=" + sipServletRequest);
+			}
+			
 			final MobicentsSipSession sipSession = sipServletRequest.getSipSession();
+			if(logger.isDebugEnabled()) {
+				logger.debug("SubsequentDispatchTask - dispatch - sipSession=" + sipSession);
+			}
+			
 			final MobicentsSipApplicationSession appSession = sipSession.getSipApplicationSession();
+			if(logger.isDebugEnabled()) {
+				logger.debug("SubsequentDispatchTask - dispatch - appSession=" + appSession);
+			}
+			
 			final SipContext sipContext = appSession.getSipContext();
+			if(logger.isDebugEnabled()) {
+				logger.debug("SubsequentDispatchTask - dispatch - sipContext=" + sipContext);
+			}
+			
 			final Request request = (Request) sipServletRequest.getMessage();
+			if(logger.isDebugEnabled()) {
+				logger.debug("SubsequentDispatchTask - dispatch - request=" + request);
+			}
+			
 			
 			if(!sipContext.getSipApplicationDispatcher().isBypassRequestExecutor()) {
 				// Issue 2886 : http://code.google.com/p/mobicents/issues/detail?id=2886 ACK is bound out of replication context
 				// we need to enterSipAppHa because was started in another thread so we need to bind to this thread
 				batchStarted = sipContext.enterSipAppHa(true);
+				if(logger.isDebugEnabled()) {
+					logger.debug("SubsequentDispatchTask - dispatch - batchStarted=" + batchStarted);
+				}
 			}		
 			
 			// Issue 2937 : http://code.google.com/p/mobicents/issues/detail?id=2937
 			// Susbequent Requests whose session is invalidated are still routed to the application
 			if(!appSession.isValidInternal()) {
 				if(appSession.isOrphan() || ((SipFactoryExt)sipContext.getSipFactoryFacade()).isRouteOrphanRequests()) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("SubsequentDispatchTask - dispatch - calling handleOrphanRequest");
+					}
 					handleOrphanRequest(sipProvider, sipServletRequest, appSession.getId(), sipContext);
 				} else {
 					throw new DispatcherException(Response.CALL_OR_TRANSACTION_DOES_NOT_EXIST, "The corresponding sip application session to this subsequent request " + request +
@@ -474,6 +671,9 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			}
 			
 			final String requestMethod = sipServletRequest.getMethod();
+			if(logger.isDebugEnabled()) {
+				logger.debug("SubsequentDispatchTask - dispatch - requestMethod=" + requestMethod);
+			}
 			try {
 				if(!Request.ACK.equalsIgnoreCase(requestMethod)) {
 					// Issue 1494 : http://code.google.com/p/mobicents/issues/detail?id=1494
@@ -484,7 +684,15 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 							// https://github.com/Mobicents/sip-servlets/issues/66 include UPDATE as well otherwise
 							// creating the 200 OK response to IVNITE for B2BUA after UPDATE is failing
 							!Request.UPDATE.equalsIgnoreCase(requestMethod)) {
+						
+						if(logger.isDebugEnabled()) {
+							logger.debug("SubsequentDispatchTask - dispatch - calling setSessionCreatingTransactionRequest");
+						}
+
 						sipSession.setSessionCreatingTransactionRequest(sipServletRequest);
+					}
+					if(logger.isDebugEnabled()) {
+						logger.debug("SubsequentDispatchTask - dispatch - calling addOngoingTransaction");
 					}
 					sipSession.addOngoingTransaction(sipServletRequest.getTransaction());
 				}				
@@ -510,6 +718,10 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 					// "Applications are not notified of incoming ACKs for non-2xx final responses to INVITE."
 					boolean callServlet = true;
 					if(Request.ACK.equalsIgnoreCase(requestMethod)) {
+						if(logger.isDebugEnabled()) {
+							logger.debug("SubsequentDispatchTask - dispatch - request is ACK");
+						}
+						
 						final Set<Transaction> ongoingTransactions = sipSession.getOngoingTransactions();
 						// Issue 1837 http://code.google.com/p/mobicents/issues/detail?id=1837
 						// ACK was received by JAIN-SIP but was not routed to application
@@ -565,42 +777,83 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 					// See if the subsequent request should go directly to the proxy
 					final MobicentsProxy proxy = sipSession.getProxy();
 					if(proxy != null) {
+						if(logger.isDebugEnabled()) {
+							logger.debug("SubsequentDispatchTask - dispatch - proxy is not null");
+						}
+						
 						MobicentsProxyBranch finalBranch = proxy.getFinalBranchForSubsequentRequests();
 						
 						boolean isPrack = requestMethod.equalsIgnoreCase(Request.PRACK);
 						boolean isUpdate = requestMethod.equalsIgnoreCase(Request.UPDATE);
 						// https://code.google.com/p/sipservlets/issues/detail?id=275
 						boolean isNotify = requestMethod.equalsIgnoreCase(Request.NOTIFY);
+
+						if(logger.isDebugEnabled()) {
+							logger.debug("SubsequentDispatchTask - dispatch - proxy is not null, isPrack=" + isPrack
+									+ ", isUpdate=" + isUpdate
+									+ ", isNotify=" + isNotify);
+						}
+
 						// JSR 289 Section 6.2.1 :
 						// any state transition caused by the reception of a SIP message, 
 						// the state change must be accomplished by the container before calling 
 						// the service() method of any SipServlet to handle the incoming message.
 						sipSession.updateStateOnSubsequentRequest(sipServletRequest, true);
-						if(finalBranch != null) {								
+						if(finalBranch != null) {			
+							if(logger.isDebugEnabled()) {
+								logger.debug("SubsequentDispatchTask - dispatch - finalBranch is not null");
+							}
 							proxy.setAckReceived(requestMethod.equalsIgnoreCase(Request.ACK));
 							checkRequestURIForNonCompliantAgents(finalBranch, request);							
-							proxy.setOriginalRequest(sipServletRequest);
+                                                        //fixes https://github.com/RestComm/sip-servlets/issues/184
+                                                        //do not save ACK, is not necessary and holds mem
+                                                        if(!sipServletRequest.getMethod().equalsIgnoreCase(Request.ACK) ) {
+                                                            proxy.setOriginalRequest(sipServletRequest);
+                                                        }
 							// if(!isAckRetranmission) { // We should pass the ack retrans (implied by 10.2.4.1 Handling 2xx Responses to INVITE)
 							// emmartins: JSR 289 10.2.8 - ACKs for non-2xx final responses are just dropped 
 							if(callServlet) {
+								if(logger.isDebugEnabled()) {
+									logger.debug("SubsequentDispatchTask - dispatch - calling callServlet");
+								}
 								callServlet(sipServletRequest);
+								
+								if(logger.isDebugEnabled()) {
+									logger.debug("SubsequentDispatchTask - dispatch - calling proxySubsequentRequest");
+								}
 								finalBranch.proxySubsequentRequest(sipServletRequest);
 							}
 						} else if(isPrack || isUpdate
 								// https://code.google.com/p/sipservlets/issues/detail?id=275
 								|| isNotify) {
+							if(logger.isDebugEnabled()) {
+								logger.debug("SubsequentDispatchTask - dispatch - calling callServlet");
+							}
 							callServlet(sipServletRequest);
 							final List<ProxyBranch> branches = proxy.getProxyBranches();
 							for(ProxyBranch pb : branches) {
 								final ProxyBranchImpl proxyBranch = (ProxyBranchImpl) pb;
 								if(proxyBranch.isWaitingForPrack() && isPrack) {
+									if(logger.isDebugEnabled()) {
+										logger.debug("SubsequentDispatchTask - dispatch - calling proxyDialogStateless");
+									}
+									
 									proxyBranch.proxyDialogStateless(sipServletRequest);
 									proxyBranch.setWaitingForPrack(false);
 								} else {
 									//Issue: https://code.google.com/p/mobicents/issues/detail?id=2264
 									String requestToTag = ((RequestExt)request).getToHeader().getTag();
 
+									if(logger.isDebugEnabled()) {
+										logger.debug("SubsequentDispatchTask - dispatch - requestToTag=" + requestToTag);
+									}
+									
 									SipServletResponseImpl proxyResponse = (SipServletResponseImpl)(proxyBranch.getResponse());
+									
+									if(logger.isDebugEnabled()) {
+										logger.debug("SubsequentDispatchTask - dispatch - proxyResponse=" + proxyResponse);
+									}
+									
 									if (isNotify && proxyResponse == null) {
 										// https://code.google.com/p/sipservlets/issues/detail?id=275
 										if(logger.isDebugEnabled()){
@@ -659,12 +912,19 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 					// If it's not for a proxy then it's just an AR, so go to the next application
 					else {	
 						
+						if(logger.isDebugEnabled()) {
+							logger.debug("SubsequentDispatchTask - dispatch - not for proxy - calling updateStateOnSubsequentRequest");
+						}
+						
 						// JSR 289 Section 6.2.1 :
 						// any state transition caused by the reception of a SIP message, 
 						// the state change must be accomplished by the container before calling 
 						// the service() method of any SipServlet to handle the incoming message.
 						sipSession.updateStateOnSubsequentRequest(sipServletRequest, true);
 						if(callServlet) {
+							if(logger.isDebugEnabled()) {
+								logger.debug("SubsequentDispatchTask - dispatch - not for proxy - calling callServlet");
+							}
 							callServlet(sipServletRequest);
 						}
 					}						
@@ -681,6 +941,10 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				// Issue 1481 http://code.google.com/p/mobicents/issues/detail?id=1481
 				// proxy should not add or remove subscription since there is no dialog associated with it
 				if(Request.NOTIFY.equals(requestMethod) && sipSession.getProxy() == null) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("SubsequentDispatchTask - dispatch - NOTIFY, proxy null");
+					}
+					
 					final SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
 						sipServletRequest.getMessage().getHeader(SubscriptionStateHeader.NAME);
 				
@@ -691,8 +955,15 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				}
 				
 				if(Request.ACK.equals(requestMethod)){
+					if(logger.isDebugEnabled()) {
+						logger.debug("SubsequentDispatchTask - dispatch - ACK");
+					}
 					Transaction transaction = sipServletRequest.getTransaction();
 					if(transaction != null) {
+						if(logger.isDebugEnabled()) {
+							logger.debug("SubsequentDispatchTask - transaction not null");
+						}
+
 						final TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
 						final MobicentsProxy proxy = sipSession.getProxy();
 						if(proxy == null && tad != null) {

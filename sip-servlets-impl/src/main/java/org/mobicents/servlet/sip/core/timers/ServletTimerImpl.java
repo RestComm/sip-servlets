@@ -131,6 +131,22 @@ public class ServletTimerImpl implements MobicentsServletTimer, Runnable {
 		this(info, delay, false, 0, listener, appSession);
 		isRepeatingTimer = false;		
 	}
+        
+        /**
+	 * Constructor for non-repeating timer.
+	 * 
+	 * @param info
+	 *            Information about the timer
+	 * @param delay
+	 *            Delay until execution
+	 * @param listener
+	 *            Listener that will get timeout events.
+	 */
+	public ServletTimerImpl(Serializable info, String timerId, long delay,
+			TimerListener listener, MobicentsSipApplicationSession appSession) {
+		this(info, timerId, delay, false, 0, listener, appSession);
+		isRepeatingTimer = false;		
+	}
 
 	/**
 	 * Constructor for repeating times
@@ -149,7 +165,29 @@ public class ServletTimerImpl implements MobicentsServletTimer, Runnable {
 	public ServletTimerImpl(Serializable info, long delay, boolean fixedDelay,
 			long period, TimerListener listener,
 			MobicentsSipApplicationSession appSession) {
-		this.id = UUID.randomUUID().toString();
+            this(info, UUID.randomUUID().toString(), delay, fixedDelay, period, listener, appSession);
+	}
+        
+        /**
+	 * Constructor for repeating times
+	 * 
+	 * @param info
+	 *            Information about the timer
+         * @param timerId
+         *            ID of this timer
+	 * @param delay
+	 *            Delay until first execution
+	 * @param fixedDelay
+	 *            Whether fixed delay mode should be used
+	 * @param period
+	 *            Period between execution
+	 * @param listener
+	 *            Listener that will get timeout events.
+	 */
+	public ServletTimerImpl(Serializable info, String timerId, long delay, boolean fixedDelay,
+			long period, TimerListener listener,
+			MobicentsSipApplicationSession appSession) {
+		this.id = timerId;
 		this.info = info;
 		this.delay = delay;
 		this.scheduledExecutionTime = delay + System.currentTimeMillis();
@@ -218,7 +256,9 @@ public class ServletTimerImpl implements MobicentsServletTimer, Runnable {
 	}
 
 	public MobicentsSipApplicationSession getApplicationSession() {
-
+		if(logger.isDebugEnabled()) {
+			logger.debug("getApplicationSession with appSessionKey=" + appSessionKey);
+		}
 		synchronized (TIMER_LOCK) {
 			return sipManager.getSipApplicationSession(appSessionKey, false);
 		}

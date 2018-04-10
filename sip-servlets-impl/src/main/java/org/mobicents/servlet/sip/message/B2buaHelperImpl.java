@@ -334,6 +334,10 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 	public SipServletRequest createRequest(SipSession session,
 			SipServletRequest origRequest, Map<String, List<String>> headerMap) {
 		
+		if(logger.isDebugEnabled()) {
+			logger.debug("createRequest - session=" + session + ", origRequest=" + origRequest);
+		}
+		
 		if(origRequest == null) {
 			throw new NullPointerException("original request cannot be null");
 		}

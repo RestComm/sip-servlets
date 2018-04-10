@@ -176,20 +176,20 @@ public class DispatcherFSM {
             fireEvent(event);
         }
     }
-    
+
     class RemoveCtxDataByEvent implements Action {
         String dataKey;
 
         public RemoveCtxDataByEvent(String dataKey) {
             this.dataKey = dataKey;
         }
-        
+
         @Override
         public void execute(Context ctx) {
             String ctxDataKey = (String) ctx.lastEvent.data.get(dataKey);
             ctx.data.remove(ctxDataKey);
         }
-        
+
     }
 
     class CancelTimer implements Action {
@@ -241,26 +241,26 @@ public class DispatcherFSM {
         addAppOnNonInit.condition = new IsTypeCondition(EventType.ADD_APP);
         addAppOnNonInit.targetState = DispatcherState.NOT_INIT;
         addAppOnNonInit.actions.add(dispatcher.new AddAppAction());
-        notInitState.transitions.add(addAppOnNonInit);        
-        
+        notInitState.transitions.add(addAppOnNonInit);
+
         Transition initTransition = new Transition();
         initTransition.condition = new IsTypeCondition(EventType.INIT);
         initTransition.targetState = DispatcherState.INITIATED;
         initTransition.actions.add(dispatcher.new InitAction());
         notInitState.transitions.add(initTransition);
         states.put(DispatcherState.NOT_INIT, notInitState);
-        /* Non Initiated state */        
-        
+        /* Non Initiated state */
+
 
         /* Initiated state */
         State initiatedState = new State();
-        
+
         Transition addConnectorOnInitiated = new Transition();
         addConnectorOnInitiated.condition = new IsTypeCondition(EventType.ADD_CONNECTOR);
-        addConnectorOnInitiated.targetState = DispatcherState.STARTED;
+        addConnectorOnInitiated.targetState = DispatcherState.INITIATED;
         addConnectorOnInitiated.actions.add(dispatcher.sipNetworkInterfaceManager.new AddPointAction());
         addConnectorOnInitiated.actions.add(new NotififyConnectorAdded());
-        initiatedState.transitions.add(addConnectorOnInitiated);        
+        initiatedState.transitions.add(addConnectorOnInitiated);
 
         Transition startTransition = new Transition();
         startTransition.condition = new IsTypeCondition(EventType.START);
@@ -338,13 +338,13 @@ public class DispatcherFSM {
         addAppTransition.actions.add(dispatcher.new AddAppAction());
         addAppTransition.actions.add(new NotififyServletInitialized());
         inserviceState.transitions.add(addAppTransition);
-        
+
         Transition removeAppTransition = new Transition();
         removeAppTransition.condition = new IsTypeCondition(EventType.REMOVE_APP);
         removeAppTransition.targetState = DispatcherState.IN_SERVICE;
         removeAppTransition.actions.add(dispatcher.new RemoveApp());
         removeAppTransition.actions.add(new RemoveCtxDataByEvent(SipApplicationDispatcherImpl.APP_NAME));
-        inserviceState.transitions.add(removeAppTransition);        
+        inserviceState.transitions.add(removeAppTransition);
 
         inserviceState.transitions.add(stopTransition);
 

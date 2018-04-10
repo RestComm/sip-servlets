@@ -294,12 +294,16 @@ public class SipNetworkInterfaceManagerImpl implements SipNetworkInterfaceManage
 					if(logger.isTraceEnabled()) {
 						logger.trace("Comparing listening point " + extendedListeningPoint + " with outbound ipaddress " + outboundInterface.getHost() + " and port " + outboundInterface.getPort());
 					}
-					// Fix for http://code.google.com/p/sipservlets/issues/detail?id=159 	Bad choice of connectors when multiple of the same transport are available
-					if(extendedListeningPoint.getIpAddresses().contains(outboundInterface.getHost()) && extendedListeningPoint.getPort() == outboundInterface.getPort()) {
-						if(logger.isTraceEnabled()) {
-							logger.trace("Found listening point " + extendedListeningPoint);
+					String outboundInterfaceHost = extractIPV6Brackets(outboundInterface.getHost());
+					for (String ipAddress : extendedListeningPoint.getIpAddresses()) {
+						// Fix for http://code.google.com/p/sipservlets/issues/detail?id=159 	Bad choice of connectors when multiple of the same transport are available
+						// Ipv6 issue when scope-id is removed out of via header, but the sip-connector is created on ipv6 with scope-id
+						if (ipAddress.contains(outboundInterfaceHost) && extendedListeningPoint.getPort() == outboundInterface.getPort()) {
+							if(logger.isTraceEnabled()) {
+								logger.trace("Found listening point " + extendedListeningPoint);
+							}
+							return extendedListeningPoint;
 						}
-						return extendedListeningPoint;
 					}
 				}
 				throw new RuntimeException("no valid sip connectors could be found to create the sip application session !!!");
@@ -327,7 +331,25 @@ public class SipNetworkInterfaceManagerImpl implements SipNetworkInterfaceManage
 		}	
 		
 		// we check first if a listening point can be found (we only do the host resolving if not found to have better perf )
-		MobicentsExtendedListeningPoint listeningPoint = extendedListeningPointsCacheMap.get(ipAddress + "/" + portChecked + ":" + tmpTransport.toLowerCase());
+		MobicentsExtendedListeningPoint listeningPoint = null;
+		
+		if (ipAddress.indexOf(':') != -1) {
+			String ipAddressTmp = extractIPV6Brackets(ipAddress);
+			// IPv6 here, Jain-Sip stack remove scope zone which is included in the key of listener object
+			for(String key: extendedListeningPointsCacheMap.keySet()){
+				if (logger.isDebugEnabled()) {
+					logger.debug("Find listening point for IPv6: " + key + " compare: " + ipAddressTmp + " port " + portChecked + " transport " + tmpTransport.toLowerCase());
+				}
+				if (key.contains(ipAddressTmp) &&
+						key.contains(String.valueOf(portChecked)+ ":" + tmpTransport.toLowerCase())) {
+					listeningPoint = extendedListeningPointsCacheMap.get(key);
+					break;
+				}
+			}
+		}else {
+			listeningPoint = extendedListeningPointsCacheMap.get(ipAddress + "/" + portChecked + ":" + tmpTransport.toLowerCase());
+		}
+		
 		if(logger.isDebugEnabled()) {
 			logger.debug("Checked Listening Point " + ipAddress + "/" + portChecked + ":" + tmpTransport.toLowerCase() + " against existing listening points, found " + listeningPoint);
 		}
@@ -360,6 +382,27 @@ public class SipNetworkInterfaceManagerImpl implements SipNetworkInterfaceManage
 		return listeningPoint;
 	}		
 	
+	/**
+	 * If the host is Ipv6, get the host without "[" and "]"
+	 * If the host is Ipv4, get the host as normal.
+	 * @param host
+	 * @return host without square brackets
+	 */
+	private String extractIPV6Brackets(String host) {
+		String ret = host;
+		// IPv6 here, remove square brackets
+		if (host.indexOf(':') != -1) {
+			int startPoint = host.indexOf('[');
+			int endPoint = host.indexOf(']');
+			if (endPoint == -1) endPoint = host.length();
+			if (startPoint != -1) {
+				ret = host.substring(startPoint + 1, endPoint);
+			} else {
+				ret = host.substring(0, endPoint);
+			}
+		}
+		return ret;
+	}
 	/**
 	 * Checks if the port is in the UDP-TCP port numbers (0-65355) range 
 	 * otherwise defaulting to 5060 if UDP, TCP or SCTP or to 5061 if TLS

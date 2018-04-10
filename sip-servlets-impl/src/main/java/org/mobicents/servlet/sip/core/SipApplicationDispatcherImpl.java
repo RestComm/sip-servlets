@@ -134,38 +134,44 @@ import org.restcomm.commons.statistics.reporter.RestcommStatsReporter;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 
+import org.mobicents.javax.servlet.CongestionStartedEvent;
+import org.mobicents.javax.servlet.CongestionStoppedEvent;
+import org.mobicents.javax.servlet.ContainerEvent;
+import org.mobicents.javax.servlet.RequestThrottledEvent;
+
+
 /**
  * Implementation of the SipApplicationDispatcher interface.
- * Central point getting the sip messages from the different stacks for a Tomcat Service(Engine), 
- * translating jain sip SIP messages to sip servlets SIP messages, creating a MessageRouter responsible 
- * for choosing which Dispatcher will be used for routing the message and  
+ * Central point getting the sip messages from the different stacks for a Tomcat Service(Engine),
+ * translating jain sip SIP messages to sip servlets SIP messages, creating a MessageRouter responsible
+ * for choosing which Dispatcher will be used for routing the message and
  * dispatches the messages.
- * @author Jean Deruelle 
+ * @author Jean Deruelle
  */
 public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, SipApplicationDispatcherImplMBean, MBeanRegistration, LoadBalancerHeartBeatingListener {
-	
+
 	//list of methods supported by the AR
-	private static final String[] METHODS_SUPPORTED = 
+	private static final String[] METHODS_SUPPORTED =
 		{"REGISTER", "INVITE", "ACK", "BYE", "CANCEL", "MESSAGE", "INFO", "SUBSCRIBE", "NOTIFY", "UPDATE", "PUBLISH", "REFER", "PRACK", "OPTIONS"};
-	
-	// List of sip extensions supported by the container	
-	private static final String[] EXTENSIONS_SUPPORTED = 
+
+	// List of sip extensions supported by the container
+	private static final String[] EXTENSIONS_SUPPORTED =
 		{"MESSAGE", "INFO", "SUBSCRIBE", "NOTIFY", "UPDATE", "PUBLISH", "REFER", "PRACK", "100rel", "STUN", "path", "join", "outbound", "from-change", "gruu"};
 	// List of sip rfcs supported by the container
-	private static final String[] RFC_SUPPORTED = 
+	private static final String[] RFC_SUPPORTED =
 		{"3261", "3428", "2976", "3265", "3311", "3903", "3515", "3262", "3489", "3327", "3911", "5626", "4916", "5627"};
 
-	private static final String[] RESPONSES_PER_CLASS_OF_SC = 
+	private static final String[] RESPONSES_PER_CLASS_OF_SC =
 		{"1XX", "2XX", "3XX", "4XX", "5XX", "6XX", "7XX", "8XX", "9XX"};
-	
+
 	/**
-	 * Timer task that will gather information about congestion control 
+	 * Timer task that will gather information about congestion control
 	 * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
 	 * @deprecated use JAIN SIP Ext Congestion Control innstead
 	 */
 	@Deprecated
-	public class CongestionControlTimerTask implements Runnable {		
-		
+	public class CongestionControlTimerTask implements Runnable {
+
 		public void run() {
 			if(logger.isDebugEnabled()) {
 				logger.debug("CongestionControlTimerTask now running ");
@@ -180,11 +186,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			//TODO wait for JDK 6 new OperatingSystemMXBean
 //			analyzeCPU();
 		}
-	} 
-	
+	}
+
 	//the logger
 	private static final Logger logger = Logger.getLogger(SipApplicationDispatcherImpl.class);
-	
+
 	// app server id
 	private String applicationServerId;
 	private String applicationServerIdHash;
@@ -203,7 +209,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	private Map<String, String> applicationNameToMd = null;
 	//List of host names managed by the container
 	private Set<String> hostNames = null;
-	
+
 	DispatcherFSM fsm;
 
 	protected SipStack sipStack;
@@ -211,9 +217,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	private DNSServerLocator dnsServerLocator;
 	private int dnsTimeout;
 	private DNSResolver dnsResolver;
-	
+
 	// stats
-	RestcommStatsReporter statsReporter = RestcommStatsReporter.getRestcommStatsReporter();
+	RestcommStatsReporter statsReporter = null;
 	MetricRegistry metrics = RestcommStatsReporter.getMetricRegistry();
 	//define metric name
     Counter counterCalls = metrics.counter("calls");
@@ -230,9 +236,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	private final AtomicLong responsesSent= new AtomicLong(0);
 	final Map<String, AtomicLong> requestsSentByMethod = new ConcurrentHashMap<String, AtomicLong>();
 	final Map<String, AtomicLong> responsesSentByStatusCode = new ConcurrentHashMap<String, AtomicLong>();
-        
+
 	// congestion control
-	private boolean memoryToHigh = false;	
+	private boolean memoryToHigh = false;
 	private double maxMemory;
 	private int memoryThreshold;
 	private int backToNormalMemoryThreshold;
@@ -246,17 +252,17 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	@Deprecated
 	private int numberOfMessagesInQueue;
 	@Deprecated
-	private double percentageOfMemoryUsed;	
+	private double percentageOfMemoryUsed;
 	@Deprecated
 	private int queueSize;
 	@Deprecated
 	private int backToNormalQueueSize;
 	//used for graceful stops and congestion control mechanism (which is now deprecated)
 	private ScheduledThreadPoolExecutor asynchronousScheduledThreadPoolExecutor = null;
-	
+
 	// configuration
 	private boolean bypassResponseExecutor = true;
-	private boolean bypassRequestExecutor = true;			
+	private boolean bypassRequestExecutor = true;
 	private int baseTimerInterval = 500; // base timer interval for jain sip tx
 	private int t2Interval = 4000; // t2 timer interval for jain sip tx
 	private int t4Interval = 5000; // t4 timer interval for jain sip tx
@@ -266,19 +272,19 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	private static final int NUMBER_OF_TAG_SEPARATORS = 3;
 	private int tagHashMaxLength = 8;
 	private int callIdMaxLength = -1;
-	
+
 	// This executor is used for async things that don't need to wait on session executors, like CANCEL requests
 	// or when the container is configured to execute every request ASAP without waiting on locks (no concurrency control)
 	private ThreadPoolExecutor asynchronousExecutor = null;
-	
+
 	// fatcory for dispatching SIP messages
 	private MessageDispatcherFactory messageDispatcherFactory;
-	
+
     //the balancers names to send heartbeat to and our health info
-	private Set<SipLoadBalancer> sipLoadBalancers = new CopyOnWriteArraySet<SipLoadBalancer>();	
-	
+	private Set<SipLoadBalancer> sipLoadBalancers = new CopyOnWriteArraySet<SipLoadBalancer>();
+
 	/**
-	 * 
+	 *
 	 */
 	public SipApplicationDispatcherImpl() {
                 resetStatsCounters();
@@ -292,7 +298,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		congestionControlPolicy = CongestionControlPolicy.ErrorResponse;
                 fsm = new DispatcherFSM(this);
 	}
-        
+
         @Override
         public final void resetStatsCounters() {
             requestsProcessed.set(0);
@@ -305,7 +311,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 
             for (String classOfSc : RESPONSES_PER_CLASS_OF_SC) {
                     responsesProcessedByStatusCode.put(classOfSc, new AtomicLong(0));
-            }                
+            }
 
             for (String classOfSc : RESPONSES_PER_CLASS_OF_SC) {
                     responsesSentByStatusCode.put(classOfSc, new AtomicLong(0));
@@ -313,10 +319,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 
             for (String method : METHODS_SUPPORTED) {
                     requestsSentByMethod.put(method, new AtomicLong(0));
-            }    
-                               
+            }
+
         }
-	
+
         class InitAction implements DispatcherFSM.Action {
 
         @Override
@@ -339,12 +345,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 				throw new IllegalArgumentException("Impossible to load the Sip Application Router",e);
 			} catch (ClassCastException e) {
 				throw new IllegalArgumentException("Sip Application Router defined does not implement " + SipApplicationRouterProvider.class.getName(),e);
-			}		
+			}
 		} else {
 			if(logger.isInfoEnabled()) {
 				logger.info("Using the Service Provider Framework to load the application router provider");
 			}
-			//TODO when moving to JDK 6, use the official http://java.sun.com/javase/6/docs/api/java/util/ServiceLoader.html instead			
+			//TODO when moving to JDK 6, use the official http://java.sun.com/javase/6/docs/api/java/util/ServiceLoader.html instead
 			//http://grep.codeconsult.ch/2007/10/31/the-java-service-provider-spec-and-sunmiscservice/
 			Iterator<SipApplicationRouterProvider> providers = ServiceRegistry.lookupProviders(SipApplicationRouterProvider.class);
 			if(providers.hasNext()) {
@@ -361,7 +367,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		}
 		sipApplicationRouter.init();
 		sipApplicationRouter.applicationDeployed(new ArrayList<String>(applicationDeployed.keySet()));
-		
+
 		// set the DNSServerLocator allowing to support RFC 3263 and do DNS lookups to resolve uris
 		if(sipService.getDnsResolverClass() != null && sipService.getDnsResolverClass().trim().length() > 0) {
 			if(logger.isInfoEnabled()) {
@@ -386,11 +392,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 				logger.info("Using default MobicentsDNSResolver since none has been specified.");
 			}
 			dnsResolver = new MobicentsDNSResolver(dnsServerLocator);
-		}	
-		
+		}
+
 		if( oname == null ) {
-			try {				
-                oname=new ObjectName(domain + ":type=SipApplicationDispatcher");                
+			try {
+                oname=new ObjectName(domain + ":type=SipApplicationDispatcher");
                 ((MBeanServer) MBeanServerFactory.findMBeanServer(null).get(0)).registerMBean(SipApplicationDispatcherImpl.this, oname);
                 if(logger.isInfoEnabled()) {
                 	logger.info("Sip Application dispatcher registered under following name " + oname);
@@ -420,33 +426,33 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		}
 		applicationServerId = "" + UUID.randomUUID();
 		applicationServerIdHash = GenericUtils.hashString(applicationServerId, tagHashMaxLength);
-		
+
 		messageDispatcherFactory = new MessageDispatcherFactory(ctx.dispatcher);
 		asynchronousScheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(2, new NamingThreadFactory("sip_servlets_congestion_control"),
 				new ThreadPoolExecutor.CallerRunsPolicy());
-		asynchronousScheduledThreadPoolExecutor.prestartAllCoreThreads();	
-		logger.info("AsynchronousThreadPoolExecutor size is " + sipService.getDispatcherThreadPoolSize());		
+		asynchronousScheduledThreadPoolExecutor.prestartAllCoreThreads();
+		logger.info("AsynchronousThreadPoolExecutor size is " + sipService.getDispatcherThreadPoolSize());
 		asynchronousExecutor = new ThreadPoolExecutor(sipService.getDispatcherThreadPoolSize(), 64, 90, TimeUnit.SECONDS,
 				new LinkedBlockingQueue<Runnable>(), new ThreadFactory() {
 		            private int threadCount = 0;
-		
+
 		            public Thread newThread(Runnable pRunnable) {
 		            	Thread thread = new Thread(pRunnable, String.format("%s-%d",
 		                                "MSS-Executor-Thread", threadCount++));
 		            	thread.setPriority(((SipStackImpl)sipStack).getThreadPriority());
 		            	return thread;
 		            }
-        });		
+        });
 		asynchronousExecutor.setRejectedExecutionHandler(new RejectedExecutionHandler(){
 
 			public void rejectedExecution(Runnable r,
 					ThreadPoolExecutor executor) {
 				logger.warn("Executor job was rejected " + r.toString());
-				
+
 			}
-			
+
 		});
-		
+
                 if (getGatherStatistics()) {
                     statsReporter = new RestcommStatsReporter();
 
@@ -465,26 +471,26 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
                     statsReporter.setProjectName(projectName);
                     statsReporter.setProjectType(projectType);
                     statsReporter.setVersion(projectVersion);
-                }
-            
-        }
-        }
-        @Override
+									}
+
+								}
+							}
+	@Override
 	public void init() throws IllegalArgumentException {
             fsm.fireEvent(fsm.new Event(DispatcherFSM.EventType.INIT));
 	}
-        
-        @Override
+
+	@Override
 	public void putInService() throws IllegalArgumentException {
             fsm.fireEvent(fsm.new Event(DispatcherFSM.EventType.IN_SERVICE));
-	}        
+	}
 
-        
+
         class StartAction implements DispatcherFSM.Action {
         @Override
-        public void execute(DispatcherFSM.Context ctx) {	
+        public void execute(DispatcherFSM.Context ctx) {
 		congestionControlTimerTask = new CongestionControlTimerTask();
-		if(congestionControlTimerFuture == null && congestionControlCheckingInterval > 0) { 
+		if(congestionControlTimerFuture == null && congestionControlCheckingInterval > 0) {
 				congestionControlTimerFuture = asynchronousScheduledThreadPoolExecutor.scheduleWithFixedDelay(congestionControlTimerTask, congestionControlCheckingInterval, congestionControlCheckingInterval, TimeUnit.MILLISECONDS);
 		 	if(logger.isInfoEnabled()) {
 		 		logger.info("Congestion control background task started and checking every " + congestionControlCheckingInterval + " milliseconds.");
@@ -494,77 +500,77 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		 		logger.info("No Congestion control background task started since the checking interval is equals to " + congestionControlCheckingInterval + " milliseconds.");
 		 	}
 		}
-		//define periodicy - default to once a day
-        statsReporter.start(86400, TimeUnit.SECONDS);
+                if (statsReporter != null) {
+                    //define periodicy - default to once a day
+                    statsReporter.start(86400, TimeUnit.SECONDS);
+                }
 
 		Version.printVersion();
 		// outbound interfaces set here and not in sipstandardcontext because
 		// depending on jboss or tomcat context can be started before or after
 		// connectors
 		resetOutboundInterfaces();
-		
+
 		// Starting the SIP Stack right before we notify the apps that the container is ready
-		// to serve and dispatch SIP Messages. 
+		// to serve and dispatch SIP Messages.
 		// In addition, the LB Heartbeat will be started only when apps are ready
 		try {
 			startSipStack();
 		} catch (Exception e) {
 			throw new IllegalStateException("The SIP Stack couldn't be started " , e);
 		}
-		
-		//JSR 289 Section 2.1.1 Step 4.If present invoke SipServletListener.servletInitialized() on each of initialized Servlet's listeners.
-		for (SipContext sipContext : applicationDeployed.values()) {
-			sipContext.notifySipContextListeners(new SipContextEventImpl(SipContextEventType.SERVLET_INITIALIZED, null));
-		}
-		
+
+
 		if(logger.isDebugEnabled()) {
 			logger.debug("SipApplicationDispatcher Started");
-		}	
+		}
         }
-            
+
         }
         @Override
-	public void start() {		
+	public void start() {
             fsm.fireEvent(fsm .new Event(DispatcherFSM.EventType.START));
-	}	
-	
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.core.SipApplicationDispatcher#stopGracefully(long)
 	 */
 	public void stopGracefully(long timeToWait) {
 		sipService.stopGracefully(timeToWait);
-	}
-	
+		}
+
         class StopAction implements DispatcherFSM.Action {
 
         @Override
         public void execute(DispatcherFSM.Context ctx) {
 		asynchronousScheduledThreadPoolExecutor.shutdownNow();
-		asynchronousExecutor.shutdownNow();						
+		asynchronousExecutor.shutdownNow();
 		sipApplicationRouter.destroy();
-		
-		stopSipStack();				
-		
-		statsReporter.stop();
-		
+
+		stopSipStack();
+
+                if (statsReporter != null) {
+                    statsReporter.stop();
+                }
+
 		if(oname != null) {
 			try {
 				((MBeanServer) MBeanServerFactory.findMBeanServer(null).get(0)).unregisterMBean(oname);
 			} catch (Exception e) {
 				logger.error("Impossible to register the Sip Application dispatcher in domain" + domain, e);
 			}
-		}		
+		}
 		if(logger.isDebugEnabled()) {
 			logger.debug("SipApplicationDispatcher Stopped");
 		}        }
-            
+
         }
-                
+
 	public void stop() {
             fsm.fireEvent(fsm .new Event(DispatcherFSM.EventType.STOP));
 	}
-	
+
         class AddAppAction implements DispatcherFSM.Action {
 
 
@@ -572,7 +578,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
         public void execute(DispatcherFSM.Context ctx) {
             SipContext sipApplication = (SipContext)ctx.lastEvent.data.get(CONTEXT_EV_DATA);
             String sipApplicationName = sipApplication.getApplicationName();
-            
+
             if (logger.isDebugEnabled()) {
                 logger.debug("Adding the following sip servlet application " + sipApplicationName + ", SipContext=" + sipApplication);
             }
@@ -629,7 +635,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
         }
 
     }
-        
+
         static final String CONTEXT_EV_DATA = "Context";
 	/**
 	 * {@inheritDoc}
@@ -637,9 +643,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	public void addSipApplication(String sipApplicationName, SipContext sipApplication) {
             DispatcherFSM.Event ev = fsm.new Event(DispatcherFSM.EventType.ADD_APP);
             ev.data.put(CONTEXT_EV_DATA, sipApplication);
-            fsm.fireEvent(ev);            
+            fsm.fireEvent(ev);
 	}
-        
+
     static final String APP_NAME = "AppName";
 
     class RemoveApp implements DispatcherFSM.Action {
@@ -674,8 +680,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
         fsm.fireEvent(ev);
         return (SipContext) ev.data.get(CONTEXT_EV_DATA);
     }
-	
-	
+
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.sip.SipListener#processIOException(javax.sip.IOExceptionEvent)
@@ -683,19 +689,19 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	public void processIOException(IOExceptionEvent event) {
 		if(event instanceof IOExceptionEventExt  && ((IOExceptionEventExt)event).getReason() == gov.nist.javax.sip.IOExceptionEventExt.Reason.KeepAliveTimeout) {
 			IOExceptionEventExt keepAliveTimeout = ((IOExceptionEventExt)event);
-			
+
 			SipConnector connector = findSipConnector(
 	                keepAliveTimeout.getLocalHost(),
 	                keepAliveTimeout.getLocalPort(),
-	                keepAliveTimeout.getTransport());								
-			
+	                keepAliveTimeout.getTransport());
+
 			if(connector != null) {
 		        for (SipContext sipContext : applicationDeployed.values()) {
-		        	final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();	
-		        	sipContext.enterSipContext();	
-					try {	
+		        	final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+		        	sipContext.enterSipContext();
+					try {
 			            for (SipConnectorListener connectorListener : sipContext.getListeners().getSipConnectorListeners()) {
-			            	try {	
+			            	try {
 				                connectorListener.onKeepAliveTimeout(connector,
 				                        keepAliveTimeout.getPeerHost(),
 				                        keepAliveTimeout.getPeerPort());
@@ -703,14 +709,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 								logger.error("SipErrorListener threw exception", t);
 							}
 			            }
-					} finally {				
+					} finally {
 						sipContext.exitSipContext(oldClassLoader);
 					}
 		        }
 //		        return;
 			}
 		}
-		if(dnsServerLocator != null && event.getSource() instanceof ClientTransaction) {			
+		if(dnsServerLocator != null && event.getSource() instanceof ClientTransaction) {
 			ClientTransaction ioExceptionTx = (ClientTransaction) event.getSource();
 			if(ioExceptionTx.getApplicationData() != null) {
 				SipServletMessageImpl sipServletMessageImpl = ((TransactionApplicationData)ioExceptionTx.getApplicationData()).getSipServletMessage();
@@ -723,10 +729,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 					}
 				}
 			}
-		} 
+		}
 		logger.error("An IOException occured on " + event.getHost() + ":" + event.getPort() + "/" + event.getTransport() + " for source " + event.getSource());
 	}
-	
+
 	/*
 	 * Gives the number of pending messages in all queues for all concurrency control modes.
 	 */
@@ -762,10 +768,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 //				}
 //			}
 //		}
-//		
+//
 //		return size;
 	}
-	
+
 	private void analyzeQueueCongestionState() {
 		this.numberOfMessagesInQueue = getNumberOfPendingMessages();
 		if(rejectSipMessages) {
@@ -773,28 +779,28 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 				String message = "Number of pending messages in the queues : " + numberOfMessagesInQueue + " < to the back to normal queue Size : " + backToNormalQueueSize;
 				logger.warn(message + " => stopping to reject requests");
 				rejectSipMessages = false;
-				final CongestionControlEvent congestionControlEvent = new CongestionControlEvent(
-						org.mobicents.javax.servlet.CongestionControlEvent.Reason.Queue, message);		
-				callbackCongestionControlListener(rejectSipMessages, congestionControlEvent);
+				final CongestionControlEvent congestionControlEvent = new CongestionStoppedEvent(
+						org.mobicents.javax.servlet.CongestionControlEvent.Reason.Queue, message);
+				callbackContainerEventListener(congestionControlEvent);
 			}
 		} else {
 			if(numberOfMessagesInQueue > queueSize) {
 				String message = "Number of pending messages in the queues : " + numberOfMessagesInQueue + " > to the queue Size : " + queueSize;
 				logger.warn(message + " => starting to reject requests");
 				rejectSipMessages = true;
-				final CongestionControlEvent congestionControlEvent = new CongestionControlEvent(
-						org.mobicents.javax.servlet.CongestionControlEvent.Reason.Queue, message);		
-				callbackCongestionControlListener(rejectSipMessages, congestionControlEvent);
+				final CongestionControlEvent congestionControlEvent = new CongestionStartedEvent(
+						org.mobicents.javax.servlet.CongestionControlEvent.Reason.Queue, message);
+				callbackContainerEventListener(congestionControlEvent);
 			}
 		}
 	}
-	
+
 	private void analyzeMemory() {
-		Runtime runtime = Runtime.getRuntime();  
-		   
-		double allocatedMemory = runtime.totalMemory() / (double) 1024;  
+		Runtime runtime = Runtime.getRuntime();
+
+		double allocatedMemory = runtime.totalMemory() / (double) 1024;
 		double freeMemory = runtime.freeMemory() / (double) 1024;
-		
+
 		double totalFreeMemory = freeMemory + (maxMemory - allocatedMemory);
 		this.percentageOfMemoryUsed=  (((double)100) - ((totalFreeMemory / maxMemory) * ((double)100)));
 
@@ -802,44 +808,50 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			if(percentageOfMemoryUsed < backToNormalMemoryThreshold) {
 				String message = "Memory used: " + percentageOfMemoryUsed + "% < to the back to normal memory threshold : " + backToNormalMemoryThreshold+ "%";
 				logger.warn(message + " => stopping to reject requests");
-				memoryToHigh = false;		
-				final CongestionControlEvent congestionControlEvent = new CongestionControlEvent(
-						org.mobicents.javax.servlet.CongestionControlEvent.Reason.Memory, message);		
-				callbackCongestionControlListener(memoryToHigh, congestionControlEvent);			
+				memoryToHigh = false;
+				final CongestionControlEvent congestionControlEvent = new CongestionStoppedEvent(
+						org.mobicents.javax.servlet.CongestionControlEvent.Reason.Memory, message);
+				callbackContainerEventListener(congestionControlEvent);
 			}
 		} else {
 			if(percentageOfMemoryUsed > memoryThreshold) {
 				String message = "Memory used: " + percentageOfMemoryUsed + "% > to the memory threshold : " + memoryThreshold+ "%";
 				logger.warn(message + " => starting to reject requests");
 				memoryToHigh = true;
-				final CongestionControlEvent congestionControlEvent = new CongestionControlEvent(
-						org.mobicents.javax.servlet.CongestionControlEvent.Reason.Memory, message);		
-				callbackCongestionControlListener(memoryToHigh, congestionControlEvent);
+				final CongestionControlEvent congestionControlEvent = new CongestionStartedEvent(
+						org.mobicents.javax.servlet.CongestionControlEvent.Reason.Memory, message);
+				callbackContainerEventListener(congestionControlEvent);
 			}
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.sip.SipListener#processRequest(javax.sip.RequestEvent)
 	 */
-	public void processRequest(RequestEvent requestEvent) {			
+	public void processRequest(RequestEvent requestEvent) {
 		final SipProvider sipProvider = (SipProvider)requestEvent.getSource();
 		ServerTransaction requestTransaction =  requestEvent.getServerTransaction();
 		final Dialog dialog = requestEvent.getDialog();
+		if(logger.isDebugEnabled()) {
+			logger.debug("processRequest - dialog=" + dialog);
+			if (dialog != null){
+				logger.debug("processRequest - dialog.getDialogId()=" + dialog.getDialogId());
+			}
+		}
 		final Request request = requestEvent.getRequest();
 		// self routing makes the application data cloned, so we make sure to nullify it
 		((MessageExt)request).setApplicationData(null);
 		final String requestMethod = request.getMethod();
-		
+
 		final RouteHeader routeHeader = (RouteHeader) request
 				.getHeader(RouteHeader.NAME);
-		
-		// congestion control is done here only if we drop messages to avoid generating STX 
+
+		// congestion control is done here only if we drop messages to avoid generating STX
 		if(CongestionControlPolicy.DropMessage.equals(congestionControlPolicy) && controlCongestion(request, null, dialog, routeHeader, sipProvider)) {
 			return;
 		}
-		
+
 		if((rejectSipMessages || memoryToHigh) && CongestionControlPolicy.DropMessage.equals(congestionControlPolicy)) {
 			String method = requestEvent.getRequest().getMethod();
 			boolean goodMethod = method.equals(Request.ACK) || method.equals(Request.PRACK) || method.equals(Request.BYE) || method.equals(Request.CANCEL) || method.equals(Request.UPDATE) || method.equals(Request.INFO);
@@ -847,17 +859,17 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 				logger.debug("congestion control good method " + goodMethod + ", dialog "  + dialog + " routeHeader " + routeHeader);
 			}
 			if(!goodMethod) {
-				if(dialog == null && (routeHeader == null || ((Parameters)routeHeader.getAddress().getURI()).getParameter(MessageDispatcher.RR_PARAM_PROXY_APP) == null)) { 
+				if(dialog == null && (routeHeader == null || ((Parameters)routeHeader.getAddress().getURI()).getParameter(MessageDispatcher.RR_PARAM_PROXY_APP) == null)) {
 					logger.error("dropping request, memory is too high or too many messages present in queues");
 					return;
 				}
 			}
-		}	
-		
+		}
+
 		try {
 			if(logger.isDebugEnabled()) {
 				logger.debug("sipApplicationDispatcher " + this + ", Got a request event "  + request.toString());
-			}			
+			}
 			if (!Request.ACK.equals(requestMethod) && requestTransaction == null ) {
 				try {
 					//folsson fix : Workaround broken Cisco 7940/7912
@@ -865,42 +877,50 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 					    request.setHeader(SipFactoryImpl.headerFactory.createMaxForwardsHeader(70));
 					}
 				    requestTransaction = sipProvider.getNewServerTransaction(request);
-				    JainSipUtils.setTransactionTimers(((TransactionExt)requestTransaction), this);				    
+				    JainSipUtils.setTransactionTimers(((TransactionExt)requestTransaction), this);
 				} catch ( TransactionUnavailableException tae) {
 					logger.error("cannot get a new Server transaction for this request " + request, tae);
-					// Sends a 500 Internal server error and stops processing.				
-					MessageDispatcher.sendErrorResponse(this, Response.SERVER_INTERNAL_ERROR, requestTransaction, request, sipProvider);				
+					// Sends a 500 Internal server error and stops processing.
+					MessageDispatcher.sendErrorResponse(this, Response.SERVER_INTERNAL_ERROR, requestTransaction, request, sipProvider);
 	                return;
 				} catch ( TransactionAlreadyExistsException taex ) {
 					// This is a retransmission so just return.
-					return;				
-				} 
-			} 	
-			final ServerTransaction transaction = requestTransaction;
-			
-			if(logger.isDebugEnabled()) {
-				logger.debug("ServerTx ref "  + transaction);				
-				logger.debug("Dialog ref "  + dialog);				
+					return;
+				}
 			}
-			
+			final ServerTransaction transaction = requestTransaction;
+
+			if(logger.isDebugEnabled()) {
+				logger.debug("ServerTx ref "  + transaction);
+				logger.debug("Dialog ref "  + dialog);
+			}
+
 			final SipServletRequestImpl sipServletRequest = (SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest(
 						request,
 						null,
 						transaction,
 						dialog,
-						JainSipUtils.DIALOG_CREATING_METHODS.contains(requestMethod));			
+						JainSipUtils.DIALOG_CREATING_METHODS.contains(requestMethod));
 			updateRequestsStatistics(request, true);
+
+			if(logger.isDebugEnabled()) {
+				logger.debug("processRequest - routing state=" + sipServletRequest.getRoutingState());
+			}
+
 			// Check if the request is meant for me. If so, strip the topmost
 			// Route header.
-			
+
 			//Popping the router header if it's for the container as
 			//specified in JSR 289 - Section 15.8
 			if(!isRouteExternal(routeHeader)) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("processRequest - not external - =routeHeader" + routeHeader);
+				}
 				request.removeFirst(RouteHeader.NAME);
 				sipServletRequest.setPoppedRoute(routeHeader);
 				final Parameters poppedAddress = (Parameters)routeHeader.getAddress().getURI();
-				if(poppedAddress.getParameter(MessageDispatcher.RR_PARAM_PROXY_APP) != null || 
-						// Issue 2850 :	Use Request-URI custom Mobicents parameters to route request for misbehaving agents, workaround for Cisco-SIPGateway/IOS-12.x user agent 
+				if(poppedAddress.getParameter(MessageDispatcher.RR_PARAM_PROXY_APP) != null ||
+						// Issue 2850 :	Use Request-URI custom Mobicents parameters to route request for misbehaving agents, workaround for Cisco-SIPGateway/IOS-12.x user agent
 						(request.getRequestURI() instanceof javax.sip.address.SipURI && ((Parameters)request.getRequestURI()).getParameter(MessageDispatcher.RR_PARAM_PROXY_APP) != null)) {
 					if(logger.isDebugEnabled()) {
 						logger.debug("the request is for a proxy application, thus it is a subsequent request ");
@@ -908,73 +928,79 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 					sipServletRequest.setRoutingState(RoutingState.SUBSEQUENT);
 				}
 				if(transaction != null) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("processRequest - transaction not null, transaction.getDialog()=" + transaction.getDialog());
+						if (transaction.getDialog() != null){
+							logger.debug("processRequest - transaction dialog not null, transaction.getDialog().getDialogId()=" + transaction.getDialog().getDialogId());
+						}
+					}
 					TransactionApplicationData transactionApplicationData = (TransactionApplicationData)transaction.getApplicationData();
-					if(transactionApplicationData != null && transactionApplicationData.getInitialPoppedRoute() == null) {				
+					if(transactionApplicationData != null && transactionApplicationData.getInitialPoppedRoute() == null) {
+						if (transaction.getDialog() != null){
+							logger.debug("processRequest - setInitialPoppedRoute, routeHeader.getAddress()=" + routeHeader.getAddress());
+						}
 						transactionApplicationData.setInitialPoppedRoute(new AddressImpl(routeHeader.getAddress(), null, ModifiableRule.NotModifiable));
 					}
 				}
-			}							
+			}
 			if(logger.isDebugEnabled()) {
 				logger.debug("Routing State " + sipServletRequest.getRoutingState());
 			}
-			
+
 			try {
 				// congestion control is done here so that the STX is created and a response can be generated back
-				// and that 
+				// and that
 				if(controlCongestion(request, sipServletRequest, dialog, routeHeader, sipProvider)) {
 					return;
 				}
+
+				if(logger.isDebugEnabled()) {
+					logger.debug("processRequest - dispatching request with sipServletRequest.getAppSessionId()=" + sipServletRequest.getAppSessionId());
+				}
+
 				messageDispatcherFactory.getRequestDispatcher(sipServletRequest, this).
 					dispatchMessage(sipProvider, sipServletRequest);
 			} catch (DispatcherException e) {
-				logger.error("Unexpected exception while processing request " + request,e);
-				// Sends an error response if the subsequent request is not an ACK (otherwise it violates RF3261) and stops processing.				
+				// Change log level from Error to debug: https://github.com/RestComm/jain-sip/issues/116
+				if (logger.isDebugEnabled()) {
+					logger.debug("Unexpected exception while processing request " + request,e);
+				}
+				// Sends an error response if the subsequent request is not an ACK (otherwise it violates RF3261) and stops processing.
 				if(!Request.ACK.equalsIgnoreCase(requestMethod)) {
 					MessageDispatcher.sendErrorResponse(this, e.getErrorCode(), sipServletRequest, sipProvider);
 				}
 				return;
 			} catch (Throwable e) {
-				logger.error("Unexpected exception while processing request " + request,e);
-				// Sends a 500 Internal server error if the subsequent request is not an ACK (otherwise it violates RF3261) and stops processing.				
+				// Change log level from Error to debug: https://github.com/RestComm/jain-sip/issues/116
+				if (logger.isDebugEnabled()) {
+					logger.debug("Unexpected exception while processing request " + request,e);
+				}
+				// Sends a 500 Internal server error if the subsequent request is not an ACK (otherwise it violates RF3261) and stops processing.
 				if(!Request.ACK.equalsIgnoreCase(requestMethod)) {
 					MessageDispatcher.sendErrorResponse(this, Response.SERVER_INTERNAL_ERROR, sipServletRequest, sipProvider);
 				}
 				return;
 			}
 		} catch (Throwable e) {
-			logger.error("Unexpected exception while processing request " + request,e);
-			// Sends a 500 Internal server error if the subsequent request is not an ACK (otherwise it violates RF3261) and stops processing.				
+			// Change log level from Error to debug: https://github.com/RestComm/jain-sip/issues/116
+			if (logger.isDebugEnabled()) {
+				logger.debug("Unexpected exception while processing request " + request,e);
+			}
+			// Sends a 500 Internal server error if the subsequent request is not an ACK (otherwise it violates RF3261) and stops processing.
 			if(!Request.ACK.equalsIgnoreCase(request.getMethod())) {
 				MessageDispatcher.sendErrorResponse(this, Response.SERVER_INTERNAL_ERROR, requestTransaction, request, sipProvider);
 			}
 			return;
 		}
 	}
-	
-	private void callbackCongestionControlListener(boolean triggered, CongestionControlEvent congestionControlEvent) {
+
+	private void callbackContainerEventListener(ContainerEvent congestionControlEvent) {
 		for (SipContext sipContext : applicationDeployed.values()) {
-			final ContainerListener containerListener = 
-				sipContext.getListeners().getContainerListener();
-								
-			if(containerListener != null) {
-				final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();						
-				try {				
-					sipContext.enterSipContext();	
-					try {				
-						if(triggered) {
-							containerListener.onCongestionControlStarted(congestionControlEvent);
-						} else {
-							containerListener.onCongestionControlStopped(congestionControlEvent);
-						}
-					} catch (Throwable t) {
-						logger.error("ContainerListener threw exception", t);
-					}
-				} finally {
-					sipContext.exitSipContext(oldClassLoader);
-				}
-			}
+                    sipContext.getListeners().callbackContainerListener(congestionControlEvent);
 		}
 	}
+
+        private static final String THROTTLED_RESPONSE = "org.mobicents.servlet.sip.THROTTLED_RESPONSE";
 
 	private boolean controlCongestion(Request request, SipServletRequestImpl sipServletRequest, Dialog dialog, RouteHeader routeHeader, SipProvider sipProvider) {
 		if(rejectSipMessages || memoryToHigh) {
@@ -996,26 +1022,29 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 					} else if (memoryToHigh) {
 						message = "Memory used: " + percentageOfMemoryUsed + "% > to the memory threshold : " + memoryThreshold + "%";
 					}
-					final CongestionControlEvent congestionControlEvent = new CongestionControlEvent(
+					final RequestThrottledEvent congestionControlEvent = new RequestThrottledEvent(sipServletRequest,
 							org.mobicents.javax.servlet.CongestionControlEvent.Reason.Memory, message);
-					
+
 					for (SipContext sipContext : applicationDeployed.values()) {
-						final ContainerListener containerListener = 
+						final ContainerListener containerListener =
 							sipContext.getListeners().getContainerListener();
-						
+
 						if(containerListener != null) {
-							final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();						
-							try {				
-								sipContext.enterSipContext();							
-								try {				
-									sipServletResponse = containerListener.onRequestThrottled(sipServletRequest, congestionControlEvent);
+							final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+							try {
+								sipContext.enterSipContext();
+								try {
+
+									containerListener.sendEvent(congestionControlEvent, sipContext.getServletContext());
+                                                                        sipServletResponse = (SipServletResponse) sipContext.getServletContext().getAttribute(THROTTLED_RESPONSE);
+                                                                        sipServletRequest.getServletContext().removeAttribute(THROTTLED_RESPONSE);
 								} catch (Throwable t) {
 									logger.error("ContainerListener threw exception", t);
 								}
-							} finally {		
+							} finally {
 								sipContext.exitSipContext(oldClassLoader);
 							}
-							
+
 							if(sipServletResponse != null) {
 								// container listener generated a response, we send it
 								try{
@@ -1032,7 +1061,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 					}
 					// no application implements the container listener or the container listener didn't generate any responses so we send back a generic one.
 					if(sipServletResponse == null) {
-						MessageDispatcher.sendErrorResponse(this, Response.SERVICE_UNAVAILABLE, (ServerTransaction) sipServletRequest.getTransaction(), request, sipProvider);						
+						MessageDispatcher.sendErrorResponse(this, Response.SERVICE_UNAVAILABLE, (ServerTransaction) sipServletRequest.getTransaction(), request, sipProvider);
 						return true;
 					}
 				}
@@ -1040,13 +1069,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		}
 		return false;
 	}
-	
+
 	/**
 	 * @param requestMethod
 	 */
 	public void updateRequestsStatistics(final Request request, final boolean processed) {
 		if(gatherStatistics) {
-			AtomicLong requestsStats = null;			
+			AtomicLong requestsStats = null;
 			if(processed) {
 				requestsStats = requestsProcessed;
 			} else {
@@ -1071,13 +1100,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			}
 		}
 	}
-	
+
 	/**
 	 * @param requestMethod
 	 */
 	public void updateResponseStatistics(final Response response, final boolean processed) {
 		if(gatherStatistics) {
-			AtomicLong responsesStats = null;			
+			AtomicLong responsesStats = null;
 			Map<String, AtomicLong> responsesStatsStatusCode = null;
 			if(processed) {
 				responsesStats = responsesProcessed;
@@ -1086,7 +1115,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 				responsesStats = responsesSent;
 				responsesStatsStatusCode = responsesSentByStatusCode;
 			}
-			responsesStats.incrementAndGet();	
+			responsesStats.incrementAndGet();
 			final int statusCode = response.getStatusCode();
 			int statusCodeDiv = statusCode / 100;
 			switch (statusCodeDiv) {
@@ -1117,10 +1146,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 				case 9:
 					responsesStatsStatusCode.get("9XX").incrementAndGet();
 					break;
-			}			
+			}
 		}
 	}
-	
+
 	@Override
 	public void incCalls() {
 		counterCalls.inc();
@@ -1141,13 +1170,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	 * @see javax.sip.SipListener#processResponse(javax.sip.ResponseEvent)
 	 */
 	public void processResponse(ResponseEvent responseEvent) {
-		final ResponseEventExt responseEventExt = (ResponseEventExt) responseEvent;		
+		final ResponseEventExt responseEventExt = (ResponseEventExt) responseEvent;
 		final Response response = responseEventExt.getResponse();
-		
+
 		if(logger.isDebugEnabled()) {
 			logger.debug("Response " + response.toString());
 		}
-		
+
 		final CSeqHeader cSeqHeader = (CSeqHeader)response.getHeader(CSeqHeader.NAME);
 		//if this is a response to a cancel, the response is dropped
 		if(Request.CANCEL.equalsIgnoreCase(cSeqHeader.getMethod())) {
@@ -1159,9 +1188,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		}
 		// self routing makes the application data cloned, so we make sure to nullify it
 		((MessageExt)response).setApplicationData(null);
-		
+
 		updateResponseStatistics(response, true);
-		ClientTransaction clientTransaction = responseEventExt.getClientTransaction();		
+		ClientTransaction clientTransaction = responseEventExt.getClientTransaction();
 		final Dialog dialog = responseEventExt.getDialog();
 		final boolean isForkedResponse = responseEventExt.isForkedResponse();
 		final boolean isRetransmission = responseEventExt.isRetransmission();
@@ -1176,52 +1205,52 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 				logger.debug("Dialog State " + dialog.getState());
 			}
 		}
-		// Issue 1468 : Handling forking 
+		// Issue 1468 : Handling forking
 		if(isForkedResponse && originalTransaction != null && !responseEventExt.isRetransmission()) {
 			final Dialog defaultDialog = originalTransaction.getDefaultDialog();
 			final Dialog orginalTransactionDialog = originalTransaction.getDialog();
-			if(logger.isDebugEnabled()) {				
+			if(logger.isDebugEnabled()) {
 				logger.debug("Original Transaction Dialog " + orginalTransactionDialog);
 				logger.debug("Original Transaction Default Dialog " + defaultDialog);
 			}
-			clientTransaction = originalTransaction;			
+			clientTransaction = originalTransaction;
 		}
-		
+
 		// Transate the response to SipServletResponse
-		final SipServletResponseImpl sipServletResponse = (SipServletResponseImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletResponse(				
-				response, 
-				clientTransaction, 
-				null, 
+		final SipServletResponseImpl sipServletResponse = (SipServletResponseImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletResponse(
+				response,
+				clientTransaction,
+				null,
 				dialog,
 				true,
 				isRetransmission);
-		try {		
+		try {
 			messageDispatcherFactory.getResponseDispatcher(sipServletResponse, this).
 				dispatchMessage(((SipProvider)responseEvent.getSource()), sipServletResponse);
 		} catch (Throwable e) {
 			logger.error("An unexpected exception happened while routing the response " +  sipServletResponse, e);
 			return;
 		}
-	}	
+	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see javax.sip.SipListener#processDialogTerminated(javax.sip.DialogTerminatedEvent)
 	 */
 	public void processDialogTerminated(final DialogTerminatedEvent dialogTerminatedEvent) {
-		final Dialog dialog = dialogTerminatedEvent.getDialog();		
+		final Dialog dialog = dialogTerminatedEvent.getDialog();
 		if(logger.isDebugEnabled()) {
 			logger.debug("Dialog Terminated => dialog Id : " + dialogTerminatedEvent.getDialog().getDialogId());
 		}
-		
+
 		getAsynchronousExecutor().execute(new Runnable() {
 			// https://github.com/RestComm/sip-servlets/issues/107 guard against NPEon concurrent cleanup
 			final TransactionApplicationData dialogAppData = (TransactionApplicationData) dialog.getApplicationData();
-			public void run() {			
+			public void run() {
 				try {
 					boolean appDataFound = false;
-					TransactionApplicationData txAppData = null; 
-					if(dialogAppData != null) {						
+					TransactionApplicationData txAppData = null;
+					if(dialogAppData != null) {
 						if(dialogAppData.getSipServletMessage() == null) {
 							Transaction transaction = dialogAppData.getTransaction();
 							if(transaction != null && transaction.getApplicationData() != null) {
@@ -1230,12 +1259,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 							}
 						} else {
 							MobicentsSipSessionKey sipSessionKey = dialogAppData.getSipSessionKey();
-							tryToInvalidateSession(sipSessionKey, false);				
+							tryToInvalidateSession(sipSessionKey, false);
 						}
 						dialogAppData.cleanUp();
-						// since the stack doesn't nullify the app data, we need to do it to let go of the refs					
+						// since the stack doesn't nullify the app data, we need to do it to let go of the refs
 						dialog.setApplicationData(null);
-					}		
+					}
 					if(!appDataFound && logger.isDebugEnabled()) {
 						logger.debug("no application data for this dialog " + dialog.getDialogId());
 					}
@@ -1251,6 +1280,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	 * @param sipSessionImpl
 	 */
 	private void tryToInvalidateSession(MobicentsSipSessionKey sipSessionKey, boolean invalidateProxySession) {
+		if (logger.isDebugEnabled()){
+			logger.debug("tryToInvalidateSession - sipSessionKey.getCallId()=" + sipSessionKey.getCallId() + ", sipSessionKey.getFromTag()=" + sipSessionKey.getFromTag() + ", sipSessionKey.getToTag()=" + sipSessionKey.getToTag() + ", sipSessionKey.getApplicationName()=" + sipSessionKey.getApplicationName());
+		}
 		//the key can be null if the application already invalidated the session
 		if(sipSessionKey != null) {
 			SipContext sipContext = findSipApplication(sipSessionKey.getApplicationName());
@@ -1258,13 +1290,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			if(sipContext != null) {
 				final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 				try {
-					sipContext.enterSipContext();	
-					final SipManager sipManager = sipContext.getSipManager();					
+					sipContext.enterSipContext();
+					final SipManager sipManager = sipContext.getSipManager();
 					final SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
-							sipSessionKey.getApplicationName(), 
+							sipSessionKey.getApplicationName(),
 							sipSessionKey.getApplicationSessionId(),
 							null);
-					
+
 					MobicentsSipSession sipSessionImpl = null;
 					MobicentsSipApplicationSession sipApplicationSession = null;
 					if(sipManager instanceof DistributableSipManager) {
@@ -1274,16 +1306,16 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 						// perf optimization and fix for Issue 1688 : MSS HA on AS5 : Version is null Exception occurs sometimes
 						DistributableSipManager distributableSipManager = (DistributableSipManager) sipManager;
 						sipApplicationSession = distributableSipManager.getSipApplicationSession(sipApplicationSessionKey, false, true);
-						sipSessionImpl = distributableSipManager.getSipSession(sipSessionKey, false, sipFactoryImpl, sipApplicationSession, true);						
-					} else {						
+						sipSessionImpl = distributableSipManager.getSipSession(sipSessionKey, false, sipFactoryImpl, sipApplicationSession, true);
+					} else {
 						sipApplicationSession = sipManager.getSipApplicationSession(sipApplicationSessionKey, false);
 						sipSessionImpl = sipManager.getSipSession(sipSessionKey, false, sipFactoryImpl, sipApplicationSession);
-					}									
-															
+					}
+
 					if(sipSessionImpl != null) {
 						final MobicentsProxy proxy = sipSessionImpl.getProxy();
-						if(!invalidateProxySession && 
-								(proxy == null || (proxy != null && 
+						if(!invalidateProxySession &&
+								(proxy == null || (proxy != null &&
 										((proxy.getFinalBranchForSubsequentRequests() != null && (!proxy.getFinalBranchForSubsequentRequests().getRecordRoute()) ||
 										proxy.isTerminationSent())))))  {
 							if(logger.isDebugEnabled()) {
@@ -1301,7 +1333,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 								logger.debug("don't Invalidate Proxy session");
 							}
 							return;
-						} 
+						}
 						boolean batchStarted = false;
 						try {
 							sipContext.enterSipApp(sipApplicationSession, sipSessionImpl, false, true);
@@ -1315,8 +1347,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 							}
 							if(sipSessionImpl.isValidInternal() &&
 									// https://code.google.com/p/sipservlets/issues/detail?id=279
-									sipSessionImpl.isReadyToInvalidateInternal()) {														
-								sipSessionImpl.onTerminatedState();							
+									sipSessionImpl.isReadyToInvalidateInternal()) {
+								sipSessionImpl.onTerminatedState();
 							}
 						} finally {
 							sipContext.exitSipAppHa(null, null, batchStarted);
@@ -1326,8 +1358,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 						if(logger.isDebugEnabled()) {
 							logger.debug("sip session already invalidated" + sipSessionKey);
 						}
-					}															
-					if(sipApplicationSession != null) {												
+					}
+					if(sipApplicationSession != null) {
 						try {
 							sipContext.enterSipApp(sipApplicationSession, null, false, true);
 							if(logger.isDebugEnabled()) {
@@ -1335,13 +1367,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 								if(sipApplicationSession.isValidInternal()) {
 									logger.debug("Sip app session " + sipApplicationSession.getKey() + " is ready to be invalidated ? :" + sipApplicationSession.isReadyToInvalidate());
 								}
-							}												
-							if(sipApplicationSession.isValidInternal() && sipApplicationSession.isReadyToInvalidate()) {								
+							}
+							if(sipApplicationSession.isValidInternal() && sipApplicationSession.isReadyToInvalidate()) {
 								sipApplicationSession.tryToInvalidate();
 							}
 						} finally {
 							sipContext.exitSipApp(sipApplicationSession, null);
-						}							
+						}
 					}
 
 				} finally {
@@ -1350,7 +1382,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			}
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see gov.nist.javax.sip.SipListenerExt#processDialogTimeout(gov.nist.javax.sip.DialogTimeoutEvent)
@@ -1359,7 +1391,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		final Dialog dialog = timeoutEvent.getDialog();
 		if(logger.isDebugEnabled()) {
 			logger.info("dialog timeout " + dialog + " reason => " + timeoutEvent.getReason());
-		}	
+		}
 		if(timeoutEvent.getReason() == Reason.AckNotReceived) {
 			final TransactionApplicationData tad = (TransactionApplicationData) dialog.getApplicationData();
 			if(tad != null && tad.getSipServletMessage() != null) {
@@ -1368,13 +1400,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 				final MobicentsSipSessionKey sipSessionKey = sipServletMessage.getSipSessionKey();
 				final MobicentsSipSession sipSession = sipServletMessage.getSipSession();
 				getAsynchronousExecutor().execute(new Runnable() {
-					public void run() {			
+					public void run() {
 						if(logger.isDebugEnabled()) {
 							logger.info("Running process dialog timeout " + dialog + " reason => " + timeoutEvent.getReason());
-						}	
+						}
 						try {
 							if(sipSession != null) {
-								SipContext sipContext = findSipApplication(sipSessionKey.getApplicationName());					
+								SipContext sipContext = findSipApplication(sipSessionKey.getApplicationName());
 								//the context can be null if the server is being shutdown
 								if(sipContext != null) {
 									MobicentsSipApplicationSession sipApplicationSession = sipSession.getSipApplicationSession();
@@ -1388,8 +1420,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 									// Issue 1822 http://code.google.com/p/mobicents/issues/detail?id=1822
 									// don't delete the dialog so that the app can send the BYE even after the noAckReceived has been called
 									//								dialog.delete();
-									tryToInvalidateSession(sipSessionKey, false);						
-								}					
+									tryToInvalidateSession(sipSessionKey, false);
+								}
 							}
 							tad.cleanUp();
 							tad.cleanUpMessage();
@@ -1413,7 +1445,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
         }
         return null;
     }
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.sip.SipListener#processTimeout(javax.sip.TimeoutEvent)
@@ -1449,7 +1481,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
                             logger.debug("time out happened on sipSession " + sipSession);
                         }
 						if(sipSession != null) {
-							SipContext sipContext = findSipApplication(sipSessionKey.getApplicationName());					
+							SipContext sipContext = findSipApplication(sipSessionKey.getApplicationName());
 							//the context can be null if the server is being shutdown
 							if(sipContext != null) {
 								MobicentsSipApplicationSession sipApplicationSession = sipSession.getSipApplicationSession();
@@ -1470,7 +1502,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 											if(proxyBranchImpl != null) {
 												ProxyImpl proxy = (ProxyImpl) proxyBranchImpl.getProxy();
 												if(proxy.getFinalBranchForSubsequentRequests() != null) {
-													tad.cleanUp();				
+													tad.cleanUp();
 													transaction.setApplicationData(null);
 													return;
 												}
@@ -1512,7 +1544,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 							}
 						}
 						// don't clean up for the same reason we don't invalidate the sip session right above
-						tad.cleanUp();				
+						tad.cleanUp();
 						transaction.setApplicationData(null);
 					} catch (Exception e) {
 						logger.error("Problem handling timeout", e);
@@ -1521,7 +1553,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			});
 		}
 	}
-	
+
 	private boolean checkForAckNotReceived(SipServletMessageImpl sipServletMessage) {
 		//notifying SipErrorListener that no ACK has been received for a UAS only
 		final MobicentsSipSession sipSession = sipServletMessage.getSipSession();
@@ -1530,32 +1562,32 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		final MobicentsProxy proxy = sipSession.getProxy();
 		if(logger.isDebugEnabled()) {
 			logger.debug("checkForAckNotReceived : request " + sipServletMessage + " last Final Response " + lastFinalResponse);
-		}		
+		}
 		boolean notifiedApplication = false;
 		if(sipServletMessage instanceof SipServletRequestImpl && Request.INVITE.equals(sipServletMessage.getMethod()) &&
 				proxy == null &&
 				lastFinalResponse != null) {
 			final SipContext sipContext = sipSession.getSipApplicationSession().getSipContext();
-			final List<SipErrorListener> sipErrorListeners = 
+			final List<SipErrorListener> sipErrorListeners =
 				sipContext.getListeners().getSipErrorListeners();
-									
-			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();						
-			try {				
-				sipContext.enterSipContext();	
-				
+
+			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+			try {
+				sipContext.enterSipContext();
+
 				final SipErrorEvent sipErrorEvent = new SipErrorEvent(
-						(SipServletRequest)sipServletMessage, 
+						(SipServletRequest)sipServletMessage,
 						lastFinalResponse);
-				
+
 				for (SipErrorListener sipErrorListener : sipErrorListeners) {
-					try {				
+					try {
 						notifiedApplication = true;
 						sipErrorListener.noAckReceived(sipErrorEvent);
 					} catch (Throwable t) {
 						logger.error("SipErrorListener threw exception", t);
 					}
 				}
-			} finally {				
+			} finally {
 				sipContext.exitSipContext(oldClassLoader);
 			}
 			final Dialog dialog = sipSession.getSessionCreatingDialog();
@@ -1564,8 +1596,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 					dialog != null && dialog.getState() != null && !dialog.getState().equals(DialogState.TERMINATED)) {
 				// Issue 1822 http://code.google.com/p/mobicents/issues/detail?id=1822
 				// RFC 3261 Section 13.3.1.4 The INVITE is Accepted
-				// "If the server retransmits the 2xx response for 64*T1 seconds without receiving an ACK, 
-				// the dialog is confirmed, but the session SHOULD be terminated.  
+				// "If the server retransmits the 2xx response for 64*T1 seconds without receiving an ACK,
+				// the dialog is confirmed, but the session SHOULD be terminated.
 				// This is accomplished with a BYE, as described in Section 15."
 				SipServletRequest bye = sipSession.createRequest(Request.BYE);
 				if(logger.isDebugEnabled()) {
@@ -1580,7 +1612,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		}
 		return notifiedApplication;
 	}
-	
+
 	private boolean checkForPrackNotReceived(SipServletMessageImpl sipServletMessage) {
 		//notifying SipErrorListener that no ACK has been received for a UAS only
 		final MobicentsSipSession sipSession = sipServletMessage.getSipSession();
@@ -1595,18 +1627,18 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 				proxy == null &&
 				 lastInfoResponse != null) {
 			final SipContext sipContext = sipSession.getSipApplicationSession().getSipContext();
-			final List<SipErrorListener> sipErrorListeners = 
+			final List<SipErrorListener> sipErrorListeners =
 				sipContext.getListeners().getSipErrorListeners();
-			
+
 			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
-			try {				
-				sipContext.enterSipContext();	
+			try {
+				sipContext.enterSipContext();
 
 				final SipErrorEvent sipErrorEvent = new SipErrorEvent(
-						(SipServletRequest)sipServletMessage, 
+						(SipServletRequest)sipServletMessage,
 						lastInfoResponse);
 				for (SipErrorListener sipErrorListener : sipErrorListeners) {
-					try {				
+					try {
 						notifiedApplication = true;
 						sipErrorListener.noPrackReceived(sipErrorEvent);
 					} catch (Throwable t) {
@@ -1615,11 +1647,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 				}
 			} finally {
 				sipContext.exitSipContext(oldClassLoader);
-			}			
+			}
 		}
 		return notifiedApplication;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.sip.SipListener#processTransactionTerminated(javax.sip.TransactionTerminatedEvent)
@@ -1634,8 +1666,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		final Transaction transaction = eventTransaction;
 		if(logger.isDebugEnabled()) {
 			logger.info("transaction " + transaction + " terminated => " + transaction.getRequest());
-		}		
-		
+		}
+
 		final TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
 		final String branchId = transaction.getBranchId();
 		if(tad != null && tad.getSipServletMessage() != null) {
@@ -1648,8 +1680,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 					try {
 						if(logger.isDebugEnabled()) {
 							logger.info("transaction " + transaction + " terminated => " + sipServletMessageImpl);
-						}		
-						
+						}
+
 						MobicentsB2BUAHelper b2buaHelperImpl = null;
 						if(sipSession != null) {
 							b2buaHelperImpl = sipSession.getB2buaHelper();
@@ -1659,9 +1691,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 								logger.debug("no sip session were returned for this key " + sipServletMessageImpl.getSipSessionKey() + " and message " + sipServletMessageImpl);
 							}
 						}
-
-						if(tad.getProxyBranch() != null) {
-							tad.getProxyBranch().removeTransaction(branchId);
+						ProxyBranchImpl proxyBranch = tad.getProxyBranch();
+						if(proxyBranch != null) {
+							proxyBranch.removeTransaction(branchId);
 						}
 
 						// Issue 1333 : B2buaHelper.getPendingMessages(linkedSession, UAMode.UAC) returns empty list
@@ -1669,26 +1701,24 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 						// to create the ACK on second leg for B2BUA apps
 						if(sipSession != null) {
 							boolean removeTx = true;
-							if(b2buaHelperImpl != null && (transaction == null || transaction instanceof ClientTransaction) 
+							if(b2buaHelperImpl != null && (transaction == null || transaction instanceof ClientTransaction)
 									&& Request.INVITE.equals(sipServletMessageImpl.getMethod())) {
 								removeTx = false;
-							}							
-							SipContext sipContext = findSipApplication(sipSessionKey.getApplicationName());					
+							}
+							SipContext sipContext = findSipApplication(sipSessionKey.getApplicationName());
 							//the context can be null if the server is being shutdown
 							if(sipContext != null) {
 								MobicentsSipApplicationSession sipApplicationSession = sipSession.getSipApplicationSession();
 								try {
 									sipContext.enterSipApp(sipApplicationSession, sipSession, false, true);
-									if(b2buaHelperImpl != null && tad.getSipServletMessage() instanceof SipServletRequestImpl) {
-										b2buaHelperImpl.unlinkOriginalRequestInternal((SipServletRequestImpl)tad.getSipServletMessage(), false);
-									}
+
 									if(removeTx) {
 										if(b2buaHelperImpl != null && tad.getSipServletMessage() instanceof SipServletRequestImpl) {
 											b2buaHelperImpl.unlinkOriginalRequestInternal((SipServletRequestImpl)tad.getSipServletMessage(), false);
 										}
 										sipSession.removeOngoingTransaction(transaction);
 										// Issue 1468 : to handle forking, we shouldn't cleanup the app data since it is needed for the forked responses
-										boolean nullifyAppData = true;					
+										boolean nullifyAppData = true;
 										if(((SipStackImpl)((SipProvider)transactionTerminatedEvent.getSource()).getSipStack()).getMaxForkTime() > 0 && Request.INVITE.equals(sipServletMessageImpl.getMethod())) {
 											nullifyAppData = false;
 										}
@@ -1708,9 +1738,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 									sipContext.exitSipApp(sipApplicationSession, sipSession);
 								}
 							}
-							
+
 							// If it is a client transaction, do not kill the proxy session http://code.google.com/p/mobicents/issues/detail?id=1024
-							tryToInvalidateSession(sipSessionKey, transactionTerminatedEvent.isServerTransaction());				
+							tryToInvalidateSession(sipSessionKey, transactionTerminatedEvent.isServerTransaction());
 
 						}
 					} catch (Exception e) {
@@ -1720,38 +1750,38 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			});
 		} else {
 			if(logger.isDebugEnabled()) {
-				logger.debug("TransactionApplicationData not available on the following request " + transaction.getRequest().toString());
+				logger.debug("TransactionApplicationData not available on the following request " + transaction.getRequest());
 			}
 			if(tad != null) {
 				tad.cleanUp();
 			}
 			transaction.setApplicationData(null);
-		}	
+		}
 
 	}
 
 	public String getApplicationNameFromHash(String hash) {
 		return mdToApplicationName.get(hash);
 	}
-	
+
 	public String getHashFromApplicationName(String appName) {
 		return applicationNameToMd.get(appName);
 	}
-	
+
 	@Override
-	public String getApplicationServerId() {		
+	public String getApplicationServerId() {
 		return applicationServerId;
 	}
 	@Override
-	public String getApplicationServerIdHash() {		
+	public String getApplicationServerIdHash() {
 		return applicationServerIdHash;
 	}
-	
+
 	@Override
 	public int getTagHashMaxLength() {
 		return tagHashMaxLength;
 	}
-	
+
 	@Override
 	public CallIdHeader getCallId(
 			MobicentsExtendedListeningPoint extendedListeningPoint, String callId) throws ParseException {
@@ -1764,10 +1794,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		}
 		return SipFactoryImpl.headerFactory.createCallIdHeader(callIdString);
 	}
-	
+
 	/**
 	 * Check if the route is external
-	 * @param routeHeader the route to check 
+	 * @param routeHeader the route to check
 	 * @return true if the route is external, false otherwise
 	 */
 	public final boolean isRouteExternal(RouteHeader routeHeader) {
@@ -1777,24 +1807,24 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			String routeTransport = routeUri.getTransportParam();
 			if(routeTransport == null) {
 				routeTransport = ListeningPoint.UDP;
-			}					
-			return isExternal(routeUri.getHost(), routeUri.getPort(), routeTransport);						
-		}		
+			}
+			return isExternal(routeUri.getHost(), routeUri.getPort(), routeTransport);
+		}
 		return true;
 	}
-	
+
 	/**
 	 * Check if the via header is external
-	 * @param viaHeader the via header to check 
+	 * @param viaHeader the via header to check
 	 * @return true if the via header is external, false otherwise
 	 */
 	public final boolean isViaHeaderExternal(ViaHeader viaHeader) {
-		if (viaHeader != null) {			
+		if (viaHeader != null) {
 			return isExternal(viaHeader.getHost(), viaHeader.getPort(), viaHeader.getTransport());
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Check whether or not the triplet host, port and transport are corresponding to an interface
 	 * @param host can be hostname or ipaddress
@@ -1804,27 +1834,30 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	 * false otherwise
 	 */
 	public final boolean isExternal(String host, int port, String transport) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("isExternal - host=" + host + ", port=" + port + ", transport=" + transport);
+		}
 		boolean isExternal = true;
-		MobicentsExtendedListeningPoint listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(host, port, transport);		
+		MobicentsExtendedListeningPoint listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(host, port, transport);
 		if((hostNames.contains(host) || hostNames.contains(host+":" + port) || listeningPoint != null)) {
 			if(logger.isDebugEnabled()) {
-				logger.debug("hostNames.contains(" + host + ")=" + 
+				logger.debug("hostNames.contains(" + host + ")=" +
 						hostNames.contains(host) +
-						"hostNames.contains(" + host + ":" + port + ")=" + 
+						"hostNames.contains(" + host + ":" + port + ")=" +
 								hostNames.contains(host+":" + port) +
 						" | listeningPoint found = " +
 						listeningPoint);
 			}
 			isExternal = false;
-		}		
+		}
 		if(logger.isDebugEnabled()) {
-			logger.debug("the triplet host/port/transport : " + 
+			logger.debug("the triplet host/port/transport : " +
 					host + "/" +
 					port + "/" +
 					transport + " is external : " + isExternal);
 		}
 		return isExternal;
-	}	
+	}
 
 	/**
 	 * @return the sipApplicationRouter
@@ -1839,7 +1872,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	public void setSipApplicationRouter(SipApplicationRouter sipApplicationRouter) {
 		this.sipApplicationRouter = sipApplicationRouter;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.core.SipApplicationDispatcher#getSipNetworkInterfaceManager()
@@ -1847,7 +1880,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	public SipNetworkInterfaceManager getSipNetworkInterfaceManager() {
 		return this.sipNetworkInterfaceManager;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.core.SipApplicationDispatcher#getSipFactory()
@@ -1862,8 +1895,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	 */
 	public List<SipURI> getOutboundInterfaces() {
 		return sipNetworkInterfaceManager.getOutboundInterfaces();
-	}		
-	
+	}
+
 	/**
 	 * set the outbound interfaces on all servlet context of applications deployed
 	 */
@@ -1871,7 +1904,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		List<SipURI> outboundInterfaces = sipNetworkInterfaceManager.getOutboundInterfaces();
 		for (SipContext sipContext : applicationDeployed.values()) {
 			sipContext.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,
-					outboundInterfaces);				
+					outboundInterfaces);
 		}
 	}
 
@@ -1894,7 +1927,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	 * (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.core.SipApplicationDispatcher#findHostNames()
 	 */
-	public Set<String> findHostNames() {		
+	public Set<String> findHostNames() {
 		return hostNames;
 	}
 
@@ -1913,7 +1946,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public SipApplicationRouterInfo getNextInterestedApplication(
 			MobicentsSipServletRequest sipServletRequest) {
@@ -1924,26 +1957,26 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			stateInfo = sipServletRequest.getSipSession().getStateInfo();
 		}
 		final Request request = (Request) sipServletRequest.getMessage();
-		
+
 		sipServletRequest.setReadOnly(true);
 		SipApplicationRouterInfo applicationRouterInfo = sipApplicationRouter.getNextApplication(
-			sipServletRequest, 
-			routingRegion, 
-			sipServletRequest.getRoutingDirective(), 
+			sipServletRequest,
+			routingRegion,
+			sipServletRequest.getRoutingDirective(),
 			null,
 			stateInfo);
 		sipServletRequest.setReadOnly(false);
 		// 15.4.1 Procedure : point 2
 		final SipRouteModifier sipRouteModifier = applicationRouterInfo.getRouteModifier();
-		final String[] routes = applicationRouterInfo.getRoutes();		
+		final String[] routes = applicationRouterInfo.getRoutes();
 		try {
 			// ROUTE modifier indicates that SipApplicationRouterInfo.getRoute() returns a valid route,
 			// it is up to container to decide whether it is external or internal.
-			if(SipRouteModifier.ROUTE.equals(sipRouteModifier)) {						
+			if(SipRouteModifier.ROUTE.equals(sipRouteModifier)) {
 				final Address routeAddress = SipFactoryImpl.addressFactory.createAddress(routes[0]);
-				final RouteHeader applicationRouterInfoRouteHeader = SipFactoryImpl.headerFactory.createRouteHeader(routeAddress);									
-				if(isRouteExternal(applicationRouterInfoRouteHeader)) {				
-					// push all of the routes on the Route header stack of the request and 
+				final RouteHeader applicationRouterInfoRouteHeader = SipFactoryImpl.headerFactory.createRouteHeader(routeAddress);
+				if(isRouteExternal(applicationRouterInfoRouteHeader)) {
+					// push all of the routes on the Route header stack of the request and
 					// send the request externally
 					for (int i = routes.length-1 ; i >= 0; i--) {
 						RouteHeader routeHeader = (RouteHeader) SipFactoryImpl.headerFactory.createHeader(RouteHeader.NAME, routes[i]);
@@ -1952,7 +1985,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 							((javax.sip.address.SipURI)routeURI).setLrParam();
 						}
 						request.addHeader(routeHeader);
-					}				
+					}
 				}
 			} else if (SipRouteModifier.ROUTE_BACK.equals(sipRouteModifier)) {
 				// Push container Route, pick up the first outbound interface
@@ -1960,7 +1993,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 				sipURI.setParameter("modifier", "route_back");
 				Header routeHeader = SipFactoryImpl.headerFactory.createHeader(RouteHeader.NAME, sipURI.toString());
 				request.addHeader(routeHeader);
-				// push all of the routes on the Route header stack of the request and 
+				// push all of the routes on the Route header stack of the request and
 				// send the request externally
 				for (int i = routes.length-1 ; i >= 0; i--) {
 					routeHeader = SipFactoryImpl.headerFactory.createHeader(RouteHeader.NAME, routes[i]);
@@ -1969,7 +2002,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			}
 		} catch (ParseException e) {
 			logger.error("Impossible to parse the route returned by the application router " +
-					"into a compliant address",e);							
+					"into a compliant address",e);
 		}
 		return applicationRouterInfo;
 	}
@@ -1977,14 +2010,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	public ThreadPoolExecutor getAsynchronousExecutor() {
 		return asynchronousExecutor;
 	}
-	
+
 	public ScheduledThreadPoolExecutor getAsynchronousScheduledExecutor() {
 		return asynchronousScheduledThreadPoolExecutor;
 	}
 
 	/**
-	 * Serialize the state info in memory and deserialize it and return the new object. 
-	 * Since there is no clone method this is the only way to get the same object with a new reference 
+	 * Serialize the state info in memory and deserialize it and return the new object.
+	 * Since there is no clone method this is the only way to get the same object with a new reference
 	 * @param stateInfo the state info to serialize
 	 * @return the state info serialized and deserialized
 	 */
@@ -1993,14 +2026,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 //		ObjectOutputStream out = null;
 //		ByteArrayInputStream bais = null;
 //		ObjectInputStream in = null;
-//		
+//
 //		try{
 //			baos = new ByteArrayOutputStream();
 //			out = new ObjectOutputStream(baos);
-//			out.writeObject(stateInfo);					
+//			out.writeObject(stateInfo);
 //			bais = new ByteArrayInputStream(baos.toByteArray());
 //			in =new ObjectInputStream(bais);
-//			return (Serializable)in.readObject();			
+//			return (Serializable)in.readObject();
 //		} catch (IOException e) {
 //			logger.error("Impossible to serialize the state info", e);
 //			return stateInfo;
@@ -2042,20 +2075,20 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	public SipContext findSipApplication(String applicationName) {
 		return applicationDeployed.get(applicationName);
 	}
-	
-	public DNSResolver getDNSResolver() {		
+
+	public DNSResolver getDNSResolver() {
 		return dnsResolver;
 	}
-	
-	public DNSServerLocator getDNSServerLocator() {		
+
+	public DNSServerLocator getDNSServerLocator() {
 		return dnsServerLocator;
 	}
 
 	public void setDNSServerLocator(DNSServerLocator dnsServerLocator) {
 		this.dnsServerLocator = dnsServerLocator;
 	}
-	
-	public int getDNSTimeout() {		
+
+	public int getDNSTimeout() {
 		return dnsTimeout;
 	}
 
@@ -2067,11 +2100,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		dnsServerLocator.getDnsLookupPerformer().setDNSTimeout(dnsTimeout);
 	}
 
-	
+
 	// -------------------- JMX and Registration  --------------------
     protected String domain;
     protected ObjectName oname;
-    protected MBeanServer mserver;		
+    protected MBeanServer mserver;
 
     public ObjectName getObjectName() {
         return oname;
@@ -2080,11 +2113,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
     public String getDomain() {
         return domain;
     }
-    
+
     public void setDomain(String domain) {
         this.domain = domain;
     }
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.management.MBeanRegistration#postDeregister()
@@ -2114,7 +2147,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
         domain=name.getDomain();
         return name;
 	}
-	
+
 	/* Exposed methods for the management console. Some of these duplicate existing methods, but
 	 * with JMX friendly types.
 	 */
@@ -2129,7 +2162,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		for(int q=0; q<appList.size(); q++) ret[q] = appList.get(q);
 		return ret;
 	}
-	
+
 	public Object retrieveApplicationRouterConfiguration() {
 		if(this.sipApplicationRouter instanceof ManageableApplicationRouter) {
 			ManageableApplicationRouter router = (ManageableApplicationRouter) this.sipApplicationRouter;
@@ -2138,7 +2171,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			throw new RuntimeException("This application router is not manageable");
 		}
 	}
-	
+
 	public Map<String, List<? extends SipApplicationRouterInfo>> getApplicationRouterConfiguration() {
 		if(this.sipApplicationRouter instanceof ManageableApplicationRouter) {
 			ManageableApplicationRouter router = (ManageableApplicationRouter) this.sipApplicationRouter;
@@ -2147,7 +2180,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			throw new RuntimeException("This application router is not manageable");
 		}
 	}
-	
+
 	public void updateApplicationRouterConfiguration(Object configuration) {
 		if(this.sipApplicationRouter instanceof ManageableApplicationRouter) {
 			ManageableApplicationRouter router = (ManageableApplicationRouter) this.sipApplicationRouter;
@@ -2156,7 +2189,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			throw new RuntimeException("This application router is not manageable");
 		}
 	}
-	
+
 	public Serializable retrieveApplicationRouterConfigurationString() {
 		if(this.sipApplicationRouter instanceof ManageableApplicationRouter) {
 			ManageableApplicationRouter router = (ManageableApplicationRouter) this.sipApplicationRouter;
@@ -2165,7 +2198,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			throw new RuntimeException("This application router is not manageable");
 		}
 	}
-	
+
 	public void updateApplicationRouterConfiguration(Serializable configuration) {
 		if(this.sipApplicationRouter instanceof ManageableApplicationRouter) {
 			ManageableApplicationRouter router = (ManageableApplicationRouter) this.sipApplicationRouter;
@@ -2196,40 +2229,40 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			logger.info("Queue Size set to " + queueSize);
 		}
 	}
-	
+
 	public void setConcurrencyControlModeByName(String concurrencyControlMode) {
 		this.concurrencyControlMode = ConcurrencyControlMode.valueOf(concurrencyControlMode);
 		if(logger.isInfoEnabled()) {
 			logger.info("Container wide Concurrency Control set to " + concurrencyControlMode);
 		}
-	}	
-	
+	}
+
 	@Override
 	public String getConcurrencyControlModeByName() {
 		return concurrencyControlMode.toString();
 	}
-	
+
 	/**
 	 * @return the requestsProcessed
 	 */
 	public long getRequestsProcessed() {
 		return requestsProcessed.get();
 	}
-	
+
 	/**
 	 * @return the requestsProcessedByMethod
 	 */
-	public Map<String, AtomicLong> getRequestsProcessedByMethod() {		
+	public Map<String, AtomicLong> getRequestsProcessedByMethod() {
 		return requestsProcessedByMethod;
 	}
 
 	/**
 	 * @return the responsesProcessedByStatusCode
 	 */
-	public Map<String, AtomicLong> getResponsesProcessedByStatusCode() {		
+	public Map<String, AtomicLong> getResponsesProcessedByStatusCode() {
 		return responsesProcessedByStatusCode;
 	}
-	
+
 	/**
 	 * @return the requestsProcessed
 	 */
@@ -2240,7 +2273,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		}
 		return 0;
 	}
-	
+
 	public long getResponsesProcessedByStatusCode(String statusCode) {
 		AtomicLong responsesProcessed = responsesProcessedByStatusCode.get(statusCode);
 		if(responsesProcessed != null) {
@@ -2248,35 +2281,35 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		}
 		return 0;
 	}
-	
+
 	/**
 	 * @return the requestsProcessed
 	 */
 	public long getResponsesProcessed() {
 		return responsesProcessed.get();
 	}
-	
+
 	/**
 	 * @return the requestsProcessed
 	 */
 	public long getRequestsSent() {
 		return requestsSent.get();
 	}
-	
+
 	/**
 	 * @return the requestsProcessedByMethod
 	 */
-	public Map<String, AtomicLong> getRequestsSentByMethod() {		
+	public Map<String, AtomicLong> getRequestsSentByMethod() {
 		return requestsSentByMethod;
 	}
 
 	/**
 	 * @return the responsesProcessedByStatusCode
 	 */
-	public Map<String, AtomicLong> getResponsesSentByStatusCode() {		
+	public Map<String, AtomicLong> getResponsesSentByStatusCode() {
 		return responsesSentByStatusCode;
 	}
-	
+
 	/**
 	 * @return the requestsProcessed
 	 */
@@ -2287,7 +2320,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		}
 		return 0;
 	}
-	
+
 	public long getResponsesSentByStatusCode(String statusCode) {
 		AtomicLong responsesSent = responsesSentByStatusCode.get(statusCode);
 		if(responsesSent != null) {
@@ -2295,7 +2328,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		}
 		return 0;
 	}
-	
+
 	/**
 	 * @return the requestsProcessed
 	 */
@@ -2303,7 +2336,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		return responsesSent.get();
 	}
 
-        static final String INTERVAL_ATT = "Interval";     
+        static final String INTERVAL_ATT = "Interval";
         class SetCongAction implements DispatcherFSM.Action {
             @Override
             public void execute(DispatcherFSM.Context ctx) {
@@ -2319,7 +2352,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
                     logger.info("No Congestion control background task started since the checking interval is equals to " + congestionControlCheckingInterval + " milliseconds.");
                 }
             }
-            
+
         }
 	/**
 	 * @param congestionControlCheckingInterval the congestionControlCheckingInterval to set
@@ -2351,14 +2384,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		}
 	}
 
-	
+
 	public void setCongestionControlPolicyByName(String congestionControlPolicy) {
 		this.congestionControlPolicy = CongestionControlPolicy.valueOf(congestionControlPolicy);
 		if(logger.isInfoEnabled()) {
 			logger.info("Congestion Control policy set to " + this.congestionControlPolicy.toString());
 		}
-	}	
-	
+	}
+
 	/**
 	 * @return the congestionControlPolicy
 	 */
@@ -2389,7 +2422,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	public int getMemoryThreshold() {
 		return memoryThreshold;
 	}
-	
+
 	/**
 	 * @return the numberOfMessagesInQueue
 	 */
@@ -2457,7 +2490,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	public int getBaseTimerInterval() {
 		return baseTimerInterval;
 	}
-	
+
 	/**
 	 * @param t2Interval the t2Interval to set
 	 */
@@ -2545,7 +2578,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	@Override
 	public void loadBalancerRemoved(SipLoadBalancer sipLoadBalancer) {
 		sipLoadBalancers.remove(sipLoadBalancer);
-		if(sipFactoryImpl.getLoadBalancerToUse() != null && 
+		if(sipFactoryImpl.getLoadBalancerToUse() != null &&
 				sipFactoryImpl.getLoadBalancerToUse().equals(sipLoadBalancer)) {
 			if(sipLoadBalancers.size() > 0) {
 				sipFactoryImpl.setLoadBalancerToUse(sipLoadBalancers.iterator().next());
@@ -2553,18 +2586,18 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 				sipFactoryImpl.setLoadBalancerToUse(null);
 			}
 		}
-	}	
-	
+	}
+
 	// https://github.com/RestComm/sip-servlets/issues/172
 	@Override
 	public void pingingloadBalancer(SipLoadBalancer balancerDescription) {
 		SipConnector[] sipConnectors = sipService.findSipConnectors();
 		for (SipConnector sipConnector : sipConnectors) {
 			if(logger.isDebugEnabled()) {
-				logger.debug("Comparing Balancer Address " + balancerDescription.getAddress().getHostAddress() + 
+				logger.debug("Comparing Balancer Address " + balancerDescription.getAddress().getHostAddress() +
 						" to sipconnector balancer address " + sipConnector.getLoadBalancerAddress());
 			}
-			if(balancerDescription.getAddress().getHostAddress().equals(sipConnector.getLoadBalancerAddress()) 
+			if(balancerDescription.getAddress().getHostAddress().equals(sipConnector.getLoadBalancerAddress())
 					&& sipConnector.getLoadBalancerCustomInformation() != null
 					&& !sipConnector.getLoadBalancerCustomInformation().isEmpty()) {
 				balancerDescription.setCustomInfo(sipConnector.getLoadBalancerCustomInformation());
@@ -2576,7 +2609,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	public void pingedloadBalancer(SipLoadBalancer balancerDescription) {
 		// Nothing to do here
 	}
-	
+
 	/**
 	 * @param info
 	 */
@@ -2588,10 +2621,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			return;
 		}
 		for(SipLoadBalancer  sipLoadBalancer : sipLoadBalancers) {
-			sipLoadBalancer.switchover(fromJvmRoute, toJvmRoute);			
-		}		
+			sipLoadBalancer.switchover(fromJvmRoute, toJvmRoute);
+		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.core.SipApplicationDispatcher#setGracefulShutdown(boolean)
@@ -2601,9 +2634,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			logger.debug("sending graceful shutdown to Load Balancers");
 		}
 //		for(SipLoadBalancer  sipLoadBalancer : sipLoadBalancers) {
-//			sipLoadBalancer.setGracefulShutdown(shuttingDownGracefully);			
-//		}		
-	}
+//			sipLoadBalancer.setGracefulShutdown(shuttingDownGracefully);
+//		}
+		}
 
 	/**
 	 * @param gatherStatistics the skipStatistics to set
@@ -2621,7 +2654,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	public boolean isGatherStatistics() {
 		return gatherStatistics;
 	}
-	
+
 	/**
 	 * PRESENT TO ACCOMODATE JOPR. NEED TO FILE A BUG ON THIS
 	 * @return the skipStatistics
@@ -2670,11 +2703,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	}
 
 	public void setSipStack(SipStack sipStack) {
-		this.sipStack = sipStack;		
+		this.sipStack = sipStack;
 	}
-	
+
 	protected void startSipStack() throws SipException {
-		// stopping the sip stack	
+		// stopping the sip stack
 		if(sipStack != null) {
 			sipStack.start();
 			if(logger.isDebugEnabled()) {
@@ -2682,9 +2715,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			}
 		}
 	}
-	
+
 	protected void stopSipStack() {
-		// stopping the sip stack	
+		// stopping the sip stack
 		if(sipStack != null) {
 			sipStack.stop();
 			sipStack = null;

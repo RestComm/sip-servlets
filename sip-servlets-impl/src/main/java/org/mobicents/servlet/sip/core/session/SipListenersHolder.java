@@ -43,6 +43,7 @@ import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.TimerListener;
 
 import org.apache.log4j.Logger;
+import org.mobicents.javax.servlet.ContainerEvent;
 import org.mobicents.javax.servlet.ContainerListener;
 import org.mobicents.javax.servlet.sip.ProxyBranchListener;
 import org.mobicents.servlet.sip.core.MobicentsSipServlet;
@@ -446,4 +447,24 @@ public abstract class SipListenersHolder implements SipListeners {
 		}			 
 		this.containerListener = containerListener;
 	}
+        
+        @Override
+        public void callbackContainerListener(ContainerEvent event) {
+            final ContainerListener containerListener
+                    = ((SipContext) sipContext).getListeners().getContainerListener();
+
+            if (containerListener != null) {
+                final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+                try {
+                    ((SipContext) sipContext).enterSipContext();
+                    try {
+                        containerListener.sendEvent(event, sipContext.getServletContext());
+                    } catch (Throwable t) {
+                        logger.error("ContainerListener threw exception", t);
+                    }
+                } finally {
+                    ((SipContext) sipContext).exitSipContext(oldClassLoader);
+                }
+            }
+        }         
 }

@@ -48,6 +48,10 @@ public class SipSessionAsyncTask implements Runnable {
 	 * @see java.lang.Runnable#run()
 	 */
 	public void run() {
+		if (logger.isDebugEnabled()){
+    		logger.debug("run");
+    	}
+		
 		final SipContext sipContext = sipFactoryImpl.getSipApplicationDispatcher().findSipApplication(key.getApplicationName());
 		if(sipContext != null) {
 			SipManager sipManager = sipContext.getSipManager();

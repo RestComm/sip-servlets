@@ -95,6 +95,9 @@ public class ResponseDispatcher extends MessageDispatcher {
 	 * {@inheritDoc}
 	 */
 	public void dispatchMessage(final SipProvider sipProvider, SipServletMessageImpl sipServletMessage) throws DispatcherException {		
+		if(logger.isDebugEnabled()) {
+			logger.debug("dispatchMessage  - sipServletMessage.getAppSessionId()=" + sipServletMessage.getAppSessionId() + ", sipServletMessage.getCallId()=" + sipServletMessage.getCallId());
+		}
 		final SipFactoryImpl sipFactoryImpl = (SipFactoryImpl) sipApplicationDispatcher.getSipFactory();
 		final SipServletResponseImpl sipServletResponse = (SipServletResponseImpl) sipServletMessage;
 		final Response response = sipServletResponse.getResponse();
@@ -484,7 +487,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 						        //     -  Any 2xx response to an INVITE request
 						        // A stateful proxy MUST NOT immediately forward any other responses
 								if(sipServletResponse.getMethod().equals(Request.INVITE) && sipServletResponse.getRequest() != null 
-										&& sipServletResponse.getRequest().isInitial() && proxy.getBestResponseSent() >= 200 && (status <= 200 || status >= 300)) {
+										&& sipServletResponse.getRequest().isInitial() && proxy.getBestResponseSent() >= 200 && (status < 200 || status >= 300)) {
 									if(logger.isDebugEnabled()) {
 										logger.debug("best final response sent " + proxy.getBestResponseSent() + ", response status " + status + " not forwarding response");
 									}
