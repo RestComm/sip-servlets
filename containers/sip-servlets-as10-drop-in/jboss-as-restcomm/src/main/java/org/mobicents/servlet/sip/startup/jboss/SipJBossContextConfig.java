@@ -365,6 +365,7 @@ public class SipJBossContextConfig {
                 SipServletImpl wrapper = new SipServletImpl(servletInfo, convergedContext.getServletContext());
                 wrapper.setupMultipart(convergedContext.getServletContext().getDelegatedContext());
                 wrapper.setServletName(value.getServletName());
+                wrapper.getServletInfo().setLoadOnStartup(value.getLoadOnStartupInt());
 
                 convergedContext.getDeploymentInfoFacade().addSipServlets(servletInfo);
                 convergedContext.addChild(wrapper);
