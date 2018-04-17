@@ -19,92 +19,114 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.servlet.sip.testsuite.callcontroller;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.sip.message.Response;
+import static junit.framework.Assert.assertTrue;
 
 import org.apache.log4j.Logger;
 import org.cafesip.sipunit.SipCall;
 import org.cafesip.sipunit.SipPhone;
 import org.cafesip.sipunit.SipStack;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipUnitServletTestCase;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
 
 public class CallBlockingTest extends SipUnitServletTestCase {
 
-	private static transient Logger logger = Logger.getLogger(CallBlockingTest.class);
+    private static transient Logger logger = Logger.getLogger(CallBlockingTest.class);
 
-	private SipStack sipStackSender;
-	private SipPhone sipPhoneSender;	
+    private SipStack sipStackSender;
+    private SipPhone sipPhoneSender;
 
-	private static final int TIMEOUT = 20000;	
+    private static final int TIMEOUT = 20000;
 
-	public CallBlockingTest(String name) {
-		super(name);
-	}
+    public CallBlockingTest(String name) {
+        super(name);
+        autoDeployOnStartup = false;
+    }
 
-	@Override
-	public void setUp() throws Exception {
-		super.setUp();
-	}
+    @Override
+    public void setUp() throws Exception {
+        containerPort = NetworkPortAssigner.retrieveNextPort();
+        super.setUp();
+        autoDeployOnStartup = false;
+    }
 
-	@Override
-	public void tearDown() throws Exception {		
-		sipPhoneSender.dispose();		
-		sipStackSender.dispose();		
-		super.tearDown();
-	}
+    @Override
+    public void tearDown() throws Exception {
+        sipPhoneSender.dispose();
+        sipStackSender.dispose();
+        super.tearDown();
+    }
 
-	@Override
-	public void deployApplication() {
-		assertTrue(tomcat.deployContext(
-				projectHome + "/sip-servlets-test-suite/applications/call-blocking-servlet/src/main/sipapp",
-				"sip-test-context", 
-				"sip-test"));
-	}
+    @Override
+    public void deployApplication() {
+        assertTrue(tomcat.deployContext(
+                projectHome + "/sip-servlets-test-suite/applications/call-blocking-servlet/src/main/sipapp",
+                "sip-test-context",
+                "sip-test"));
+    }
 
-	@Override
-	protected String getDarConfigurationFile() {
-		return "file:///"
-				+ projectHome
-				+ "/sip-servlets-test-suite/testsuite/src/test/resources/"
-				+ "org/mobicents/servlet/sip/testsuite/callcontroller/call-blocking-servlet-dar.properties";
-	}
+    private void deployCallBlocking(Map<String, String> params) {
+        SipStandardContext ctx = deployApplication(projectHome
+                + "/sip-servlets-test-suite/applications/call-blocking-servlet/src/main/sipapp",
+                "call-blocking",
+                params,
+                null);
+        assertTrue(ctx.getAvailable());
+    }
 
-	public SipStack makeStack(String transport, int port) throws Exception {
-		Properties properties = new Properties();
-		String peerHostPort1 = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070";
-		properties.setProperty("javax.sip.OUTBOUND_PROXY", peerHostPort1 + "/"
-				+ "udp");
-		properties.setProperty("javax.sip.STACK_NAME", "UAC_" + transport + "_"
-				+ port);
-		properties.setProperty("sipunit.BINDADDR", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
-		properties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
-				"logs/simplesipservlettest_debug_port" + port + ".txt");
-		properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
-				"logs/simplesipservlettest_log_port" + port + ".txt");
-		
-		return new SipStack(transport, port, properties);		
-	}
+    @Override
+    protected String getDarConfigurationFile() {
+        return "file:///"
+                + projectHome
+                + "/sip-servlets-test-suite/testsuite/src/test/resources/"
+                + "org/mobicents/servlet/sip/testsuite/callcontroller/call-blocking-servlet-dar.properties";
+    }
 
-	public void setupPhone() throws Exception {
-			sipStackSender = makeStack(SipStack.PROTOCOL_UDP, 5080);					
-			sipPhoneSender = sipStackSender.createSipPhone("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "",
-					SipStack.PROTOCOL_UDP, 5070, "sip:blocked-sender@sip-servlets.com");		
-	}
+    public SipStack makeStack(String transport, int port) throws Exception {
+        Properties properties = new Properties();
+        String peerHostPort1 = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + containerPort;
+        properties.setProperty("javax.sip.OUTBOUND_PROXY", peerHostPort1 + "/"
+                + "udp");
+        properties.setProperty("javax.sip.STACK_NAME", "UAC_" + transport + "_"
+                + port);
+        properties.setProperty("sipunit.BINDADDR", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
+        properties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
+                "target/logs/simplesipservlettest_debug_port" + port + ".txt");
+        properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
+                "target/logs/simplesipservlettest_log_port" + port + ".txt");
 
-	public void init() throws Exception {
-		setupPhone();
-	}
+        return new SipStack(transport, port, properties);
+    }
 
-	// Check if we receive a FORBIDDEN response for our invite
-	public void testCallBlockingInvite() throws Exception {
-		init();
-		SipCall sender = sipPhoneSender.createSipCall();
-		assertTrue(sender.initiateOutgoingCall("sip:receiver@sip-servlets.com", null));
-		assertTrue(sender.waitOutgoingCallResponse(TIMEOUT));	
-		assertResponseReceived(Response.FORBIDDEN, sender);
-	}
+    public void setupPhone() throws Exception {
+        int senderPort = NetworkPortAssigner.retrieveNextPort();
+        sipStackSender = makeStack(SipStack.PROTOCOL_UDP, senderPort);
+        sipPhoneSender = sipStackSender.createSipPhone("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "",
+                SipStack.PROTOCOL_UDP, containerPort, "sip:blocked-sender@sip-servlets.com");
+        Map<String, String> params = new HashMap();
+        params.put("servletContainerPort", String.valueOf(containerPort));
+        params.put("testPort", String.valueOf(senderPort));
+        params.put("senderPort", String.valueOf(senderPort));
+        deployCallBlocking(params);
+    }
+
+    public void init() throws Exception {
+        setupPhone();
+    }
+
+    // Check if we receive a FORBIDDEN response for our invite
+    public void testCallBlockingInvite() throws Exception {
+        init();
+        SipCall sender = sipPhoneSender.createSipCall();
+        assertTrue(sender.initiateOutgoingCall("sip:receiver@sip-servlets.com", null));
+        assertTrue(sender.waitOutgoingCallResponse(TIMEOUT));
+        assertResponseReceived(Response.FORBIDDEN, sender);
+    }
 }

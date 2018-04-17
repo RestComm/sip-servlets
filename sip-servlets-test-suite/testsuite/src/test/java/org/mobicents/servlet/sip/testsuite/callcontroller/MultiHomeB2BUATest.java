@@ -20,10 +20,13 @@
 
 package org.mobicents.servlet.sip.testsuite.callcontroller;
 
+import java.util.HashMap;
+import java.util.Map;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
@@ -45,6 +48,7 @@ public class MultiHomeB2BUATest extends SipServletTestCase {
 	public MultiHomeB2BUATest(String name) {
 		super(name);
 		this.sipIpAddress = "0.0.0.0";
+                autoDeployOnStartup = false;
 	}
 
 	@Override
@@ -64,7 +68,8 @@ public class MultiHomeB2BUATest extends SipServletTestCase {
 	}
 	
 	@Override
-	protected void setUp() throws Exception {		
+	protected void setUp() throws Exception {	
+                containerPort = NetworkPortAssigner.retrieveNextPort();
 		super.setUp();
 
 		senderProtocolObjects = new ProtocolObjects("forward-sender",
@@ -75,10 +80,12 @@ public class MultiHomeB2BUATest extends SipServletTestCase {
 	}
 	
 	public void testCallForwardingCallerSendBye() throws Exception {
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+                int senderPort = NetworkPortAssigner.retrieveNextPort();
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+                int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
 		SipProvider receiverProvider = receiver.createProvider();
 
 		receiverProvider.addSipListener(receiver);
@@ -86,6 +93,15 @@ public class MultiHomeB2BUATest extends SipServletTestCase {
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
+                
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(receiverPort)); 
+                params.put( "senderPort", String.valueOf(senderPort));                 
+                deployApplication(projectHome + 
+                        "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
+                        params
+                        , null);                
 
 		String fromName = "forward-sender";
 		String fromSipAddress = "sip-servlets.com";
@@ -104,10 +120,12 @@ public class MultiHomeB2BUATest extends SipServletTestCase {
 	}
 
 	public void testCallForwardingCalleeSendBye() throws Exception {
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+                int senderPort = NetworkPortAssigner.retrieveNextPort();
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, false);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, true);
+                int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, true);
 		SipProvider receiverProvider = receiver.createProvider();
 
 		receiverProvider.addSipListener(receiver);
@@ -115,7 +133,16 @@ public class MultiHomeB2BUATest extends SipServletTestCase {
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
-
+                
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(receiverPort)); 
+                params.put( "senderPort", String.valueOf(senderPort));                 
+                deployApplication(projectHome + 
+                        "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
+                        params
+                        , null);  
+                
 		String fromName = "forward-sender";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -136,10 +163,12 @@ public class MultiHomeB2BUATest extends SipServletTestCase {
 	 * https://code.google.com/p/sipservlets/issues/detail?id=267
 	 */
 	public void testCancelCallForwarding() throws Exception {
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+                int senderPort = NetworkPortAssigner.retrieveNextPort();
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, false);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, true);
+                int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, true);
 		SipProvider receiverProvider = receiver.createProvider();
 
 		receiverProvider.addSipListener(receiver);
@@ -147,7 +176,16 @@ public class MultiHomeB2BUATest extends SipServletTestCase {
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
-
+                
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(receiverPort)); 
+                params.put( "senderPort", String.valueOf(senderPort));                 
+                deployApplication(projectHome + 
+                        "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
+                        params
+                        , null);  
+                
 		receiver.setWaitForCancel(true);
 		String fromName = "forward-sender";
 		String fromSipAddress = "sip-servlets.com";

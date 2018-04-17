@@ -25,8 +25,10 @@ package org.mobicents.servlet.sip.testsuite.proxy;
 import gov.nist.javax.sip.message.MessageExt;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
@@ -34,6 +36,7 @@ import javax.sip.address.SipURI;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
@@ -50,10 +53,12 @@ public class ProxyRecordRouteUpdateTest extends SipServletTestCase {
 
 	public ProxyRecordRouteUpdateTest(String name) {
 		super(name);
+                autoDeployOnStartup = false;
 	}
 
 	@Override
 	public void setUp() throws Exception {
+                containerPort = NetworkPortAssigner.retrieveNextPort();
 		super.setUp();				
 	}
 
@@ -263,11 +268,14 @@ public class ProxyRecordRouteUpdateTest extends SipServletTestCase {
 				"gov.nist", transport, AUTODIALOG, null, null, null);
 		receiverProtocolObjects = new ProtocolObjects("proxy-receiver",
 				"gov.nist", transport, AUTODIALOG, null, "3", "true");
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+                
+                int senderPort = NetworkPortAssigner.retrieveNextPort(); 
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, false);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5057, 5070, receiverProtocolObjects, false);
+                int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
 		receiver.setRecordRoutingProxyTesting(true);
 		SipProvider receiverProvider = receiver.createProvider();
 		
@@ -276,6 +284,14 @@ public class ProxyRecordRouteUpdateTest extends SipServletTestCase {
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
+                
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(senderPort)); 
+                params.put( "receiverPort", String.valueOf(receiverPort));               
+                deployApplication(projectHome + 
+                        "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp", 
+                        params, null);                   
 	}
 	
 	@Override

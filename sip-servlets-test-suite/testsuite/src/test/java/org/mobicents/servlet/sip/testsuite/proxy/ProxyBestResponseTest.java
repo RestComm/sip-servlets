@@ -22,21 +22,17 @@
 
 package org.mobicents.servlet.sip.testsuite.proxy;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 import javax.sip.message.Response;
 
-import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.log4j.Logger;
-import org.mobicents.javax.servlet.sip.ResponseType;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
-import org.mobicents.servlet.sip.catalina.SipStandardManager;
-import org.mobicents.servlet.sip.startup.SipContextConfig;
-import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
@@ -63,23 +59,31 @@ public class ProxyBestResponseTest extends SipServletTestCase {
 
 	@Override
 	public void setUp() throws Exception {
+                containerPort = NetworkPortAssigner.retrieveNextPort();
 		super.setUp();
+        }
+        
+        public void setupPhones() throws Exception {
 		senderProtocolObjects = new ProtocolObjects("proxy-sender",
 				"gov.nist", ListeningPoint.UDP, AUTODIALOG, null, null, null);
 		receiverProtocolObjects = new ProtocolObjects("proxy-receiver",
 				"gov.nist", ListeningPoint.UDP, AUTODIALOG, null, null, null);
 		neutralProto = new ProtocolObjects("neutral",
 				"gov.nist", ListeningPoint.UDP, AUTODIALOG, null, null, null);
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+                
+                int senderPort = NetworkPortAssigner.retrieveNextPort();
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, false);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5057, 5070, receiverProtocolObjects, false);
+                int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
 		receiver.setRecordRoutingProxyTesting(true);
 		SipProvider receiverProvider = receiver.createProvider();
 		
                 //use cutme port 5056 to receive second invite in second branch
-		neutral = new TestSipListener(5056, 5070, neutralProto, false);
+                int neutralPort = NetworkPortAssigner.retrieveNextPort();
+		neutral = new TestSipListener(neutralPort, containerPort, neutralProto, false);
 		neutral.setRecordRoutingProxyTesting(true);
 		SipProvider neutralProvider = neutral.createProvider();
 
@@ -90,6 +94,15 @@ public class ProxyBestResponseTest extends SipServletTestCase {
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
 		neutralProto.start();
+                
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(senderPort)); 
+                params.put( "receiverPort", String.valueOf(receiverPort));
+                params.put( "cutmePort", String.valueOf(neutralPort));                
+                deployApplication(projectHome + 
+                        "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp", 
+                        params, null);                 
 	}
 
 
@@ -97,7 +110,7 @@ public class ProxyBestResponseTest extends SipServletTestCase {
          * non-regression test for https://telestax.desk.com/agent/case/1805
 	 */
 	public void testProxyBestRes() throws Exception {
-		deployApplication();
+		setupPhones();
 		String fromName = "sequential";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -119,7 +132,7 @@ public class ProxyBestResponseTest extends SipServletTestCase {
          * non-regression test for https://telestax.desk.com/agent/case/1805
 	 */
 	public void testProxyBestRes6XXwins() throws Exception {
-		deployApplication();
+		setupPhones();
 		String fromName = "sequential";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -157,21 +170,6 @@ public class ProxyBestResponseTest extends SipServletTestCase {
 						"sip-test-context", "sip-test"));
 	}
 	
-	public SipStandardContext deployApplication(String name, String value) {
-		SipStandardContext context = new SipStandardContext();
-		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp");
-		context.setName("sip-test-context");
-		context.setPath("sip-test");
-		context.addLifecycleListener(new SipContextConfig());
-		context.setManager(new SipStandardManager());
-		ApplicationParameter applicationParameter = new ApplicationParameter();
-		applicationParameter.setName(name);
-		applicationParameter.setValue(value);
-		context.addApplicationParameter(applicationParameter);
-		assertTrue(tomcat.deployContext(context));
-		return context;
-	}
-
 	@Override
 	protected String getDarConfigurationFile() {
 		return "file:///"

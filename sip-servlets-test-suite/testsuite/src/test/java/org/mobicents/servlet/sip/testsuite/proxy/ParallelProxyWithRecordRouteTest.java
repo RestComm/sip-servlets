@@ -22,10 +22,13 @@
 
 package org.mobicents.servlet.sip.testsuite.proxy;
 
+import java.util.HashMap;
 import java.util.ListIterator;
+import java.util.Map;
 
 import javax.sip.ListeningPoint;
 import javax.sip.header.RecordRouteHeader;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 
 import org.mobicents.servlet.sip.SipServletTestCase;
 
@@ -52,14 +55,28 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 
 	@Override
 	public void setUp() throws Exception {
+               containerPort = NetworkPortAssigner.retrieveNextPort();
 		super.setUp();
-		tomcat.addSipConnector(serverName, sipIpAddress, 5070, ListeningPoint.TCP);
+                
+                int shootistPort = NetworkPortAssigner.retrieveNextPort();
+		this.shootist = new Shootist(false, shootistPort, String.valueOf(containerPort));
+                shootist.setOutboundProxy(false);
+                int shootmePort = NetworkPortAssigner.retrieveNextPort();
+		this.shootme = new Shootme(shootmePort);
+                int cutmePort = NetworkPortAssigner.retrieveNextPort();
+		this.cutme = new Cutme(cutmePort);
+                
+		tomcat.addSipConnector(serverName, sipIpAddress, containerPort, ListeningPoint.TCP);
 		tomcat.startTomcat();
-		deployApplication();
-		this.shootist = new Shootist(false, null);
-		shootist.setOutboundProxy(false);
-		this.shootme = new Shootme(5057);
-		this.cutme = new Cutme();
+
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(shootistPort)); 
+                params.put( "receiverPort", String.valueOf(shootmePort));
+                params.put( "cutmePort", String.valueOf(cutmePort));                
+                deployApplication(projectHome + 
+                        "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp", 
+                        params, null);                 
 	}
 	
 	public void testProxyCalleeSendsBye() {

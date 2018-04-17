@@ -19,139 +19,168 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.servlet.sip.testsuite.join;
 
+import java.util.HashMap;
+import java.util.Map;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
+import static junit.framework.Assert.assertTrue;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
 /**
- * Test the behavior of Mobicents Sip Servlets with regard to Join (RFC 3911) Support
+ * Test the behavior of Mobicents Sip Servlets with regard to Join (RFC 3911)
+ * Support
+ *
  * @author jean.deruelle@gmail.com
  *
  */
 public class JoinSipServletTest extends SipServletTestCase {
-	
-	private static transient Logger logger = Logger.getLogger(JoinSipServletTest.class);
 
-	private static final String TRANSPORT = "udp";
-	private static final boolean AUTODIALOG = true;
-	private static final int TIMEOUT = 20000;	
+    private static transient Logger logger = Logger.getLogger(JoinSipServletTest.class);
+
+    private static final String TRANSPORT = "udp";
+    private static final boolean AUTODIALOG = true;
+    private static final int TIMEOUT = 20000;
 //	private static final int TIMEOUT = 100000000;
-	
-	TestSipListener sender;
-	TestSipListener receiver;
-	ProtocolObjects senderProtocolObjects;
-	ProtocolObjects	receiverProtocolObjects;
 
-	public JoinSipServletTest(String name) {
-		super(name);
-	}
+    TestSipListener sender;
+    TestSipListener receiver;
+    ProtocolObjects senderProtocolObjects;
+    ProtocolObjects receiverProtocolObjects;
 
-	@Override
-	public void deployApplication() {
-		assertTrue(tomcat.deployContext(
-				projectHome + "/sip-servlets-test-suite/applications/join-sip-servlet/src/main/sipapp",
-				"join-context", 
-				"join-dial"));
-	}
+    public JoinSipServletTest(String name) {
+        super(name);
+        autoDeployOnStartup = false;
+    }
 
-	@Override
-	protected String getDarConfigurationFile() {
-		return "file:///"
-				+ projectHome
-				+ "/sip-servlets-test-suite/testsuite/src/test/resources/"
-				+ "org/mobicents/servlet/sip/testsuite/join/join-dar.properties";
-	}
-	
-	@Override
-	protected void setUp() throws Exception {		
-		super.setUp();
+    @Override
+    public void deployApplication() {
+    }
 
-		senderProtocolObjects = new ProtocolObjects("sender",
-				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
-		receiverProtocolObjects = new ProtocolObjects("receiver",
-				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);			
-	}
-	
-	public void testSipServletSendsJoin() throws Exception {		
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
-		sender.setRecordRoutingProxyTesting(true);
-		SipProvider senderProvider = sender.createProvider();
+    public SipStandardContext deployApplication(Map<String, String> params) {
+        SipStandardContext ctx = deployApplication(
+                projectHome + "/sip-servlets-test-suite/applications/join-sip-servlet/src/main/sipapp",
+                "join-dial",
+                params,
+                null);
+        assertTrue(ctx.getAvailable());
+        return ctx;
+    }
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
-		receiver.setRecordRoutingProxyTesting(true);
-		receiver.setWaitBeforeFinalResponse(2000);
-		SipProvider receiverProvider = receiver.createProvider();
+    @Override
+    protected String getDarConfigurationFile() {
+        return "file:///"
+                + projectHome
+                + "/sip-servlets-test-suite/testsuite/src/test/resources/"
+                + "org/mobicents/servlet/sip/testsuite/join/join-dar.properties";
+    }
 
-		receiverProvider.addSipListener(receiver);
-		senderProvider.addSipListener(sender);
+    @Override
+    protected void setUp() throws Exception {
+        containerPort = NetworkPortAssigner.retrieveNextPort();
+        super.setUp();
 
-		senderProtocolObjects.start();
-		receiverProtocolObjects.start();
+        senderProtocolObjects = new ProtocolObjects("sender",
+                "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+        receiverProtocolObjects = new ProtocolObjects("receiver",
+                "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+    }
 
-		String fromName = "sender";
-		String fromHost = "sip-servlets.com";
-		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
-				fromName, fromHost);
-				
-		String toUser = "join";
-		String toHost = "sip-servlets.com";
-		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
-				toUser, toHost);
-		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
-		Thread.sleep(TIMEOUT);
-		assertTrue(receiver.isJoinRequestReceived());		
-		assertTrue(receiver.getOkToByeReceived());
-		assertTrue(sender.getByeReceived());
-	}
-	
-	public void testSipServletReceivesJoin() throws Exception {		
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
-		sender.setRecordRoutingProxyTesting(true);
-		SipProvider senderProvider = sender.createProvider();
+    public void testSipServletSendsJoin() throws Exception {
+        int senderPort = NetworkPortAssigner.retrieveNextPort();
+        sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, false);
+        sender.setRecordRoutingProxyTesting(true);
+        SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
-		receiver.setRecordRoutingProxyTesting(true);
-		SipProvider receiverProvider = receiver.createProvider();
+        int receiverPort = NetworkPortAssigner.retrieveNextPort();
+        receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
+        receiver.setRecordRoutingProxyTesting(true);
+        receiver.setWaitBeforeFinalResponse(2000);
+        SipProvider receiverProvider = receiver.createProvider();
 
-		receiverProvider.addSipListener(receiver);
-		senderProvider.addSipListener(sender);
+        receiverProvider.addSipListener(receiver);
+        senderProvider.addSipListener(sender);
 
-		senderProtocolObjects.start();
-		receiverProtocolObjects.start();
+        senderProtocolObjects.start();
+        receiverProtocolObjects.start();
+        
+        Map<String, String> params = new HashMap();
+        params.put("servletContainerPort", String.valueOf(containerPort));
+        params.put("testPort", String.valueOf(receiverPort));
+        params.put("senderPort", String.valueOf(senderPort));        
+        deployApplication(params);        
 
-		String fromName = "sender";
-		String fromHost = "sip-servlets.com";
-		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
-				fromName, fromHost);
-				
-		String toUser = "join-receiver";
-		String toHost = "sip-servlets.com";
-		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
-				toUser, toHost);
-		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
-		Thread.sleep(TIMEOUT);
-		assertNotNull(receiver.getLastMessageContent());		
-		assertFalse(receiver.isServerErrorReceived());
-		assertTrue(receiver.getByeReceived());
-		assertTrue(sender.getByeReceived());
-	}
-	
-	@Override
-	protected void tearDown() throws Exception {	
-		senderProtocolObjects.destroy();
-		receiverProtocolObjects.destroy();			
-		logger.info("Test completed");
-		super.tearDown();
-	}
+        String fromName = "sender";
+        String fromHost = "sip-servlets.com";
+        SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+                fromName, fromHost);
 
+        String toUser = "join";
+        String toHost = "sip-servlets.com";
+        SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+                toUser, toHost);
+
+        sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
+        Thread.sleep(TIMEOUT);
+        assertTrue(receiver.isJoinRequestReceived());
+        assertTrue(receiver.getOkToByeReceived());
+        assertTrue(sender.getByeReceived());
+    }
+
+    public void testSipServletReceivesJoin() throws Exception {
+        int senderPort = NetworkPortAssigner.retrieveNextPort();
+        sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, false);
+        sender.setRecordRoutingProxyTesting(true);
+        SipProvider senderProvider = sender.createProvider();
+
+        int receiverPort = NetworkPortAssigner.retrieveNextPort();
+        receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
+        receiver.setRecordRoutingProxyTesting(true);
+        SipProvider receiverProvider = receiver.createProvider();        
+       
+        receiverProvider.addSipListener(receiver);
+        senderProvider.addSipListener(sender);
+
+        senderProtocolObjects.start();
+        receiverProtocolObjects.start();
+        
+        Map<String, String> params = new HashMap();
+        params.put("servletContainerPort", String.valueOf(containerPort));
+        params.put("testPort", String.valueOf(receiverPort));
+        params.put("senderPort", String.valueOf(senderPort));        
+        deployApplication(params);              
+
+        String fromName = "sender";
+        String fromHost = "sip-servlets.com";
+        SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+                fromName, fromHost);
+
+        String toUser = "join-receiver";
+        String toHost = "sip-servlets.com";
+        SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+                toUser, toHost);
+
+        sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
+        Thread.sleep(TIMEOUT);
+        assertNotNull(receiver.getLastMessageContent());
+        assertFalse(receiver.isServerErrorReceived());
+        assertTrue(receiver.getByeReceived());
+        assertTrue(sender.getByeReceived());
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        senderProtocolObjects.destroy();
+        receiverProtocolObjects.destroy();
+        logger.info("Test completed");
+        super.tearDown();
+    }
 
 }

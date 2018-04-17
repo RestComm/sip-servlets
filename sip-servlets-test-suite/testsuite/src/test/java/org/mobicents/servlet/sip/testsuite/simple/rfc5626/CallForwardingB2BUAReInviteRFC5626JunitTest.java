@@ -22,11 +22,14 @@
 
 package org.mobicents.servlet.sip.testsuite.simple.rfc5626;
 
+import java.util.HashMap;
+import java.util.Map;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 import javax.sip.header.MaxForwardsHeader;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.RFC5626UseCase;
@@ -54,15 +57,17 @@ public class CallForwardingB2BUAReInviteRFC5626JunitTest extends SipServletTestC
 	public CallForwardingB2BUAReInviteRFC5626JunitTest(String name) {
 		super(name);
 		listeningPointTransport = TRANSPORT;
+                autoDeployOnStartup = false;
 	}
 
+        
 	@Override
 	public void deployApplication() {
-		assertTrue(tomcat.deployContext(
+		ctx = tomcat.deployAppContext(
 				projectHome + "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
-				"sip-test-context", 
-				"sip-test"));
-	}
+				"sip-test-context", "sip-test");
+                assertTrue(ctx.getAvailable());
+	}          
 
 	@Override
 	protected String getDarConfigurationFile() {
@@ -73,7 +78,8 @@ public class CallForwardingB2BUAReInviteRFC5626JunitTest extends SipServletTestC
 	}
 	
 	@Override
-	protected void setUp() throws Exception {		
+	protected void setUp() throws Exception {
+                containerPort = NetworkPortAssigner.retrieveNextPort();            
 		super.setUp();
 
 		senderProtocolObjects = new ProtocolObjects("forward-sender",
@@ -88,10 +94,13 @@ public class CallForwardingB2BUAReInviteRFC5626JunitTest extends SipServletTestC
 	 * @throws Exception
 	 */
 	public void testCallForwardingCallerSendBye() throws Exception {
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+		int senderPort = NetworkPortAssigner.retrieveNextPort();
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, false);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+                
+		int receiverPort = NetworkPortAssigner.retrieveNextPort();                
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
 		receiver.setSendReinvite(true);
 		SipProvider receiverProvider = receiver.createProvider();
 
@@ -100,6 +109,13 @@ public class CallForwardingB2BUAReInviteRFC5626JunitTest extends SipServletTestC
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
+                
+                Map<String, String> params  = new HashMap();
+                params.put("testPort", String.valueOf(receiverPort));
+                params.put("servletContainerPort", String.valueOf(containerPort));                
+                deployApplication(projectHome + 
+                        "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
+                        params, null);
 
 		String fromName = "forward-tcp-sender";
 		String fromSipAddress = "sip-servlets.com";

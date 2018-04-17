@@ -22,6 +22,8 @@
 
 package org.mobicents.servlet.sip.testsuite.proxy;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.sip.message.Response;
@@ -29,6 +31,7 @@ import javax.sip.message.Response;
 import org.cafesip.sipunit.SipCall;
 import org.cafesip.sipunit.SipPhone;
 import org.cafesip.sipunit.SipStack;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
 
 public class ProxyBranchTimeoutTest extends SipServletTestCase {
@@ -50,11 +53,13 @@ public class ProxyBranchTimeoutTest extends SipServletTestCase {
 
 	public ProxyBranchTimeoutTest(String name) {
 		super(name);
+                autoDeployOnStartup = false;
 	}
 
 	@Override
 	public void setUp() throws Exception {
 		if (firstTime) {
+                        containerPort = NetworkPortAssigner.retrieveNextPort();
 			super.setUp();
 		}
 		firstTime = true;
@@ -98,16 +103,16 @@ public class ProxyBranchTimeoutTest extends SipServletTestCase {
 
 	public SipStack makeStack(String transport, int port) throws Exception {
 		Properties properties = new Properties();
-		String peerHostPort1 = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070";
+		String peerHostPort1 = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + containerPort;
 		properties.setProperty("javax.sip.OUTBOUND_PROXY", peerHostPort1 + "/"
 				+ "udp");
 		properties.setProperty("javax.sip.STACK_NAME", "UAC_" + transport + "_"
 				+ port);
 		properties.setProperty("sipunit.BINDADDR", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
 		properties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
-				"logs/simplesipservlettest_debug_port" + port + ".txt");
+				"target/logs/simplesipservlettest_debug_port" + port + ".txt");
 		properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
-				"logs/simplesipservlettest_log_port" + port + ".txt");
+				"target/logs/simplesipservlettest_log_port" + port + ".txt");
 
 		return new SipStack(transport, port, properties);
 
@@ -117,20 +122,26 @@ public class ProxyBranchTimeoutTest extends SipServletTestCase {
 		sipStackReceivers = new SipStack[receiversCount];
 		sipPhoneReceivers = new SipPhone[receiversCount];
 		
-		sipStackSender = makeStack(SipStack.PROTOCOL_UDP, 5058);
+                int senderPort = NetworkPortAssigner.retrieveNextPort();
+		sipStackSender = makeStack(SipStack.PROTOCOL_UDP, senderPort);
 //		ListeningPoint lp = sipStackSender.getSipProvider()
 //				.getListeningPoint("udp");
 //		String stackIPAddress = lp.getIPAddress();
 		sipPhoneSender = sipStackSender.createSipPhone("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "",
-				SipStack.PROTOCOL_UDP, 5070, "sip:sender@nist.gov");
+				SipStack.PROTOCOL_UDP, containerPort, "sip:sender@nist.gov");
 
-		for (int q = 0; q < receiversCount; q++) {
-			int port = 5058 - 1 - q;
-			sipStackReceivers[q] = makeStack(SipStack.PROTOCOL_UDP, port);
-			sipPhoneReceivers[q] = sipStackReceivers[q].createSipPhone(
-					"" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "", SipStack.PROTOCOL_UDP, 5070,
-					"sip:receiver@nist.gov");
-		}		
+                int port = NetworkPortAssigner.retrieveNextPort();
+                sipStackReceivers[0] = makeStack(SipStack.PROTOCOL_UDP, port);
+                sipPhoneReceivers[0] = sipStackReceivers[0].createSipPhone(
+                                "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "", SipStack.PROTOCOL_UDP, containerPort,
+                                "sip:receiver@nist.gov");
+                
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(senderPort)); 
+                params.put( "receiverPort", String.valueOf(port));
+                deployApplication(projectHome + 
+                        "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp", params, null);                 
 	}
 
 	public void init() throws Exception {

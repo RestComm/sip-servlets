@@ -22,9 +22,12 @@
 
 package org.mobicents.servlet.sip.testsuite.proxy.forking;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.catalina.SipStandardService;
 import org.mobicents.servlet.sip.testsuite.proxy.Shootist;
@@ -54,14 +57,28 @@ public class ForkingProxyDerivedSessions extends SipServletTestCase {
 		super(name);
 
 		this.sipIpAddress="0.0.0.0";
+                autoDeployOnStartup = false;
 	}
 
 	@Override
 	public void setUp() throws Exception {
+                containerPort = NetworkPortAssigner.retrieveNextPort();
 		super.setUp();
-		this.shootist = new Shootist(true, null);
-		this.ua1 = new Shootme(5057);
-		this.ua2 = new Shootme(5056);
+                int shootistPort = NetworkPortAssigner.retrieveNextPort();
+		this.shootist = new Shootist(true, shootistPort,  String.valueOf(containerPort));
+                int shootmePort = NetworkPortAssigner.retrieveNextPort();
+		this.ua1 = new Shootme(shootmePort);
+                int shootme2Port = NetworkPortAssigner.retrieveNextPort();
+		this.ua2 = new Shootme(shootme2Port);
+                
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(shootistPort)); 
+                params.put( "receiverPort", String.valueOf(shootmePort));  
+                params.put( "cutmePort", String.valueOf(shootme2Port));                 
+                deployApplication(projectHome + 
+                        "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp", 
+                        params, null);                
 	}
 
 	public void testProxy() {

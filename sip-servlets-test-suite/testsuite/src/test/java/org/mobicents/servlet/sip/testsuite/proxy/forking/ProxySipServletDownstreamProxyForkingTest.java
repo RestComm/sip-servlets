@@ -23,17 +23,14 @@
 package org.mobicents.servlet.sip.testsuite.proxy.forking;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 
 import javax.sip.SipProvider;
 
-import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
-import org.mobicents.servlet.sip.catalina.SipStandardManager;
 import org.mobicents.servlet.sip.catalina.SipStandardService;
-import org.mobicents.servlet.sip.startup.SipContextConfig;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.proxy.Shootist;
 import org.mobicents.servlet.sip.testsuite.simple.forking.Proxy;
@@ -58,53 +55,6 @@ public class ProxySipServletDownstreamProxyForkingTest extends SipServletTestCas
 				"sip-test-context", "sip-test"));
 	}
 	
-	public SipStandardContext deployApplication(String name, String value) {
-		SipStandardContext context = new SipStandardContext();
-		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp");
-		context.setName("sip-test-context");
-		context.setPath("sip-test");
-		context.addLifecycleListener(new SipContextConfig());
-		context.setManager(new SipStandardManager());
-		ApplicationParameter applicationParameter = new ApplicationParameter();
-		applicationParameter.setName(name);
-		applicationParameter.setValue(value);
-		context.addApplicationParameter(applicationParameter);
-		assertTrue(tomcat.deployContext(context));
-		return context;
-	}
-	
-	public SipStandardContext deployApplication(Map<String, String> params) {
-		SipStandardContext context = new SipStandardContext();
-		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp");
-		context.setName("sip-test-context");
-		context.setPath("sip-test");
-		context.addLifecycleListener(new SipContextConfig());
-		context.setManager(new SipStandardManager());
-		for (Entry<String, String> param : params.entrySet()) {
-			ApplicationParameter applicationParameter = new ApplicationParameter();
-			applicationParameter.setName(param.getKey());
-			applicationParameter.setValue(param.getValue());
-			context.addApplicationParameter(applicationParameter);
-		}
-		assertTrue(tomcat.deployContext(context));
-		return context;
-	}
-	
-	public SipStandardContext deployApplicationServletListenerTest() {
-		SipStandardContext context = new SipStandardContext();
-		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp");
-		context.setName("sip-test-context");
-		context.setPath("sip-test");
-		context.addLifecycleListener(new SipContextConfig());
-		context.setManager(new SipStandardManager());
-		ApplicationParameter applicationParameter = new ApplicationParameter();
-		applicationParameter.setName("testServletListener");
-		applicationParameter.setValue("true");
-		context.addApplicationParameter(applicationParameter);
-		assertTrue(tomcat.deployContext(context));
-		return context;
-	}	
-
 	@Override
 	protected String getDarConfigurationFile() {
 		return "file:///"
@@ -115,33 +65,44 @@ public class ProxySipServletDownstreamProxyForkingTest extends SipServletTestCas
 	
 	@Override
 	protected void setUp() throws Exception {
+                containerPort = NetworkPortAssigner.retrieveNextPort();
 		super.setUp();												
 	}
 	
 	// non regression test for Issue 2390 http://code.google.com/p/mobicents/issues/detail?id=2390
 	// Proxy implementation not forwarding additional 2xx responses from downstream fork
-	public void testDownstreamProxyForking() throws Exception {		
-        Shootme shootme1 = new Shootme(5080, true, 1000);
+	public void testDownstreamProxyForking() throws Exception {
+        int shootme1Port = NetworkPortAssigner.retrieveNextPort();
+        Shootme shootme1 = new Shootme(shootme1Port, true, 1000);
         SipProvider shootmeProvider = shootme1.createProvider();
         shootmeProvider.addSipListener(shootme1);
-        Shootme shootme2 = new Shootme(5081, true, 2500);
+        int shootme2Port = NetworkPortAssigner.retrieveNextPort();
+        Shootme shootme2 = new Shootme(shootme2Port, true, 2500);
         SipProvider shootme2Provider = shootme2.createProvider();
         shootme2Provider.addSipListener(shootme2);
         shootme2.setWaitBeforeFinalResponse(9000);
-		Proxy proxy = new Proxy(5070,2);
+        int proxyPort = NetworkPortAssigner.retrieveNextPort();
+		Proxy proxy = new Proxy(proxyPort,new int[]{shootme1Port, shootme2Port});
 		SipProvider provider = proxy.createSipProvider();
         provider.addSipListener(proxy);
-        Shootist shootist = new Shootist(true, "5060");
+        int shootistPort = NetworkPortAssigner.retrieveNextPort();
+        int cont2Port = NetworkPortAssigner.retrieveNextPort();
+        Shootist shootist = new Shootist(true,shootistPort, String.valueOf(cont2Port));
         shootist.pauseBeforeBye = 20000;
         shootist.setFromHost("sip-servlets.com");
         
-        sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5060, listeningPointTransport);
+        sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, cont2Port, listeningPointTransport);
 		tomcat.startTomcat();
 		Map<String, String> params= new HashMap<String, String>();
-		params.put("route", "sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070");
+		params.put("route", "sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + proxyPort);
 		params.put("timeToWaitForBye", "20000");
 		params.put("dontSetRURI", "true");
-		SipStandardContext sipContext = deployApplication(params);
+                params.put( "servletContainerPort", String.valueOf(cont2Port)); 
+                params.put( "testPort", String.valueOf(shootistPort)); 
+                params.put( "receiverPort", String.valueOf(proxyPort));                 
+		SipStandardContext sipContext = deployApplication(projectHome + 
+                        "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp", 
+                        params, null);
 		shootist.init("forward-sender-downstream-proxy", false, null);
 		Thread.sleep(TIMEOUT);
 		proxy.stop();

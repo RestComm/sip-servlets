@@ -19,222 +19,258 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.servlet.sip.testsuite.composition;
 
+import java.util.HashMap;
+import java.util.Map;
 import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
+import static junit.framework.Assert.assertTrue;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
 public class B2BUACompositionJunitTest extends SipServletTestCase {
-	
-	private static final String TO_NAME = "forward-receiver";
-	private static final String FROM_NAME = "composition";
-	
-	private static final String FROM_DOMAIN = "sip-servlets.com";
-	private String TO_DOMAIN;	
 
-	private static transient Logger logger = Logger.getLogger(B2BUACompositionJunitTest.class);
+    private static final String TO_NAME = "forward-receiver";
+    private static final String FROM_NAME = "composition";
 
-	private static final String TRANSPORT = "udp";
-	private static final boolean AUTODIALOG = true;
-	private static final int TIMEOUT = 10000;	
+    private static final String FROM_DOMAIN = "sip-servlets.com";
+    private String TO_DOMAIN;
+
+    private static transient Logger logger = Logger.getLogger(B2BUACompositionJunitTest.class);
+
+    private static final String TRANSPORT = "udp";
+    private static final boolean AUTODIALOG = true;
+    private static final int TIMEOUT = 10000;
 //	private static final int TIMEOUT = 100000000;
-	
-	TestSipListener sender;
-	TestSipListener receiver;
-	ProtocolObjects senderProtocolObjects;
-	ProtocolObjects	receiverProtocolObjects;
 
-	public B2BUACompositionJunitTest(String name) {
-		super(name);
-		autoDeployOnStartup = false;
-		startTomcatOnStartup = false;
-	}
+    TestSipListener sender;
+    TestSipListener receiver;
+    ProtocolObjects senderProtocolObjects;
+    ProtocolObjects receiverProtocolObjects;
 
-	@Override
-	public void deployApplication() {
-		deployB2BUA();
-		deployCallForwarding();
-	}
+    public B2BUACompositionJunitTest(String name) {
+        super(name);
+        autoDeployOnStartup = false;
+        startTomcatOnStartup = false;
+    }
 
-	private void deployB2BUA() {
-		assertTrue(tomcat.deployContext(
-				projectHome + "/sip-servlets-test-suite/applications/b2bua-sip-servlet/src/main/sipapp",
-				"b2bua-context", 
-				"b2bua"));
-	}
-	
-	private void deployCallForwarding() {
-		assertTrue(tomcat.deployContext(
-				projectHome + "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
-				"call-forwarding-b2bua-context", 
-				"call-forwarding-b2bua"));
-	}
+    @Override
+    public void deployApplication() {
 
-	@Override
-	protected String getDarConfigurationFile() {
-		return "file:///"
-				+ projectHome
-				+ "/sip-servlets-test-suite/testsuite/src/test/resources/"
-				+ "org/mobicents/servlet/sip/testsuite/composition/b2bua-composition-dar.properties";
-	}
-	
-	@Override
-	protected void setUp() throws Exception {		
-		super.setUp();
+    }
 
-		TO_DOMAIN = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090";
-		tomcat.addSipConnector(serverName, sipIpAddress, 5070, ListeningPoint.TCP);
-		tomcat.startTomcat();		
-		
-		senderProtocolObjects = new ProtocolObjects(FROM_NAME,
-				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
-		receiverProtocolObjects = new ProtocolObjects(TO_NAME,
-				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
-			
-	}
-	
-	public void testCallForwardingCallerSendBye() throws Exception {
-		deployB2BUA();
-		deployCallForwarding();
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);		
-		SipProvider senderProvider = sender.createProvider();
+    private void deployB2BUA(Map<String, String> params) {
+        SipStandardContext ctx = deployApplication(projectHome
+                + "/sip-servlets-test-suite/applications/b2bua-sip-servlet/src/main/sipapp",
+                "b2bua",
+                params, null);
+        assertTrue(ctx.getAvailable());
+    }
 
-		receiver = new TestSipListener(5059, 5070, receiverProtocolObjects, false);	
-		SipProvider receiverProvider = receiver.createProvider();
+    private void deployCallForwarding(Map<String, String> params) {
+        SipStandardContext ctx = deployApplication(projectHome
+                + "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
+                "call-forwarding-b2bua",
+                params, null);
+        assertTrue(ctx.getAvailable());        
+    }
 
-		receiverProvider.addSipListener(receiver);
-		senderProvider.addSipListener(sender);
+    @Override
+    protected String getDarConfigurationFile() {
+        return "file:///"
+                + projectHome
+                + "/sip-servlets-test-suite/testsuite/src/test/resources/"
+                + "org/mobicents/servlet/sip/testsuite/composition/b2bua-composition-dar.properties";
+    }
 
-		senderProtocolObjects.start();
-		receiverProtocolObjects.start();
+    @Override
+    protected void setUp() throws Exception {
+        containerPort = NetworkPortAssigner.retrieveNextPort();
+        super.setUp();
 
-		String fromName = FROM_NAME;
-		String fromSipAddress = FROM_DOMAIN;
-		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
-				fromName, fromSipAddress);
-		
-		String toSipAddress = TO_DOMAIN;
-		String toUser = TO_NAME;
-		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
-				toUser, toSipAddress);
-		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
-		Thread.sleep(TIMEOUT);
-		//checking numbers of ACK received see http://forums.java.net/jive/thread.jspa?messageID=277840
-		assertEquals(1,receiver.ackCount);
-		assertTrue(sender.getOkToByeReceived());
-		assertTrue(receiver.getByeReceived());
-	}
+        tomcat.addSipConnector(serverName, sipIpAddress, containerPort, ListeningPoint.TCP);
+        tomcat.startTomcat();
 
-	public void testCallForwardingCalleeSendBye() throws Exception {
-		deployB2BUA();
-		deployCallForwarding();
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
-		SipProvider senderProvider = sender.createProvider();
+        senderProtocolObjects = new ProtocolObjects(FROM_NAME,
+                "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+        receiverProtocolObjects = new ProtocolObjects(TO_NAME,
+                "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 
-		receiver = new TestSipListener(5059, 5070, receiverProtocolObjects, true);
-		SipProvider receiverProvider = receiver.createProvider();
+    }
 
-		receiverProvider.addSipListener(receiver);
-		senderProvider.addSipListener(sender);
+    public void testCallForwardingCallerSendBye() throws Exception {
+        int senderPort = NetworkPortAssigner.retrieveNextPort();
+        sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, true);
+        SipProvider senderProvider = sender.createProvider();
 
-		senderProtocolObjects.start();
-		receiverProtocolObjects.start();
+        int receiverPort = NetworkPortAssigner.retrieveNextPort();
+        receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
+        SipProvider receiverProvider = receiver.createProvider();
 
-		String fromName = FROM_NAME;
-		String fromSipAddress = TO_DOMAIN;
-		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
-				fromName, fromSipAddress);
-		
-		String toSipAddress = FROM_DOMAIN;
-		String toUser = TO_NAME;
-		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
-				toUser, toSipAddress);
-		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
-		Thread.sleep(TIMEOUT);
-		assertTrue(receiver.getOkToByeReceived());
-		assertTrue(sender.getByeReceived());		
-	}
+        receiverProvider.addSipListener(receiver);
+        senderProvider.addSipListener(sender);
 
-	public void testCancelCallForwarding() throws Exception {
-		deployB2BUA();
-		deployCallForwarding();
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
-		SipProvider senderProvider = sender.createProvider();
+        senderProtocolObjects.start();
+        receiverProtocolObjects.start();
 
-		receiver = new TestSipListener(5059, 5070, receiverProtocolObjects, true);
-		SipProvider receiverProvider = receiver.createProvider();
+        TO_DOMAIN = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + receiverPort;        
+        Map<String, String> params = new HashMap();
+        params.put("servletContainerPort", String.valueOf(containerPort));
+        params.put("testPort", String.valueOf(receiverPort));
+        params.put("senderPort", String.valueOf(senderPort));        
+        deployB2BUA(params);
+        deployCallForwarding(params);
 
-		receiverProvider.addSipListener(receiver);
-		senderProvider.addSipListener(sender);
+        String fromName = FROM_NAME;
+        String fromSipAddress = FROM_DOMAIN;
+        SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+                fromName, fromSipAddress);
 
-		senderProtocolObjects.start();
-		receiverProtocolObjects.start();
+        String toSipAddress = TO_DOMAIN;
+        String toUser = TO_NAME;
+        SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+                toUser, toSipAddress);
 
-		String fromName = FROM_NAME;
-		String fromSipAddress = FROM_DOMAIN;
-		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
-				fromName, fromSipAddress);
-		
-		String toSipAddress = TO_DOMAIN;
-		String toUser = TO_NAME;
-		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
-				toUser, toSipAddress);
-		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);
-		Thread.sleep(500);
-		sender.sendCancel();
-		Thread.sleep(TIMEOUT);
-		assertTrue(sender.isCancelOkReceived());
-		assertTrue(sender.isRequestTerminatedReceived());
-		assertTrue(receiver.isCancelReceived());
-	}
-	
-	public void testRegisterComposition() throws Exception {
-		deployB2BUA();
-		deployCallForwarding();
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);		
-		SipProvider senderProvider = sender.createProvider();
+        sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);
+        Thread.sleep(TIMEOUT);
+        //checking numbers of ACK received see http://forums.java.net/jive/thread.jspa?messageID=277840
+        assertEquals(1, receiver.ackCount);
+        assertTrue(sender.getOkToByeReceived());
+        assertTrue(receiver.getByeReceived());
+    }
 
-		receiver = new TestSipListener(5059, 5070, receiverProtocolObjects, false);	
-		SipProvider receiverProvider = receiver.createProvider();
+    public void testCallForwardingCalleeSendBye() throws Exception {
+        int senderPort = NetworkPortAssigner.retrieveNextPort();
+        sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, false);
+        SipProvider senderProvider = sender.createProvider();
 
-		receiverProvider.addSipListener(receiver);
-		senderProvider.addSipListener(sender);
+        int receiverPort = NetworkPortAssigner.retrieveNextPort();
+        receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, true);
+        SipProvider receiverProvider = receiver.createProvider();
 
-		senderProtocolObjects.start();
-		receiverProtocolObjects.start();
+        receiverProvider.addSipListener(receiver);
+        senderProvider.addSipListener(sender);
 
-		String fromName = FROM_NAME;
-		String fromSipAddress = FROM_DOMAIN;
-		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
-				fromName, fromSipAddress);
-		
-		String toSipAddress = TO_DOMAIN;
-		String toUser = TO_NAME;
-		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
-				toUser, toSipAddress);
-		
-		sender.sendSipRequest("REGISTER", fromAddress, fromAddress, null, null, true);		
-		Thread.sleep(TIMEOUT);
-		assertNotNull(receiver.getRegisterReceived());
-	}
-	
-	@Override
-	protected void tearDown() throws Exception {	
-		senderProtocolObjects.destroy();
-		receiverProtocolObjects.destroy();			
-		logger.info("Test completed");
-		super.tearDown();
-	}
+        senderProtocolObjects.start();
+        receiverProtocolObjects.start();
+        
+        TO_DOMAIN = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + receiverPort;
+        Map<String, String> params = new HashMap();
+        params.put("servletContainerPort", String.valueOf(containerPort));
+        params.put("testPort", String.valueOf(receiverPort));
+        params.put("senderPort", String.valueOf(senderPort));        
+        deployB2BUA(params);
+        deployCallForwarding(params);        
 
+        String fromName = FROM_NAME;
+        String fromSipAddress = TO_DOMAIN;
+        SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+                fromName, fromSipAddress);
+
+        String toSipAddress = FROM_DOMAIN;
+        String toUser = TO_NAME;
+        SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+                toUser, toSipAddress);
+
+        sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
+        Thread.sleep(TIMEOUT);
+        assertTrue(receiver.getOkToByeReceived());
+        assertTrue(sender.getByeReceived());
+    }
+
+    public void testCancelCallForwarding() throws Exception {
+        int senderPort = NetworkPortAssigner.retrieveNextPort();
+        sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, false);
+        SipProvider senderProvider = sender.createProvider();
+
+        int receiverPort = NetworkPortAssigner.retrieveNextPort();
+        receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, true);
+        SipProvider receiverProvider = receiver.createProvider();
+
+        receiverProvider.addSipListener(receiver);
+        senderProvider.addSipListener(sender);
+
+        senderProtocolObjects.start();
+        receiverProtocolObjects.start();
+        
+        TO_DOMAIN = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + receiverPort;
+        Map<String, String> params = new HashMap();
+        params.put("servletContainerPort", String.valueOf(containerPort));
+        params.put("testPort", String.valueOf(receiverPort));
+        params.put("senderPort", String.valueOf(senderPort));        
+        deployB2BUA(params);
+        deployCallForwarding(params);        
+
+        String fromName = FROM_NAME;
+        String fromSipAddress = FROM_DOMAIN;
+        SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+                fromName, fromSipAddress);
+
+        String toSipAddress = TO_DOMAIN;
+        String toUser = TO_NAME;
+        SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+                toUser, toSipAddress);
+
+        sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);
+        Thread.sleep(500);
+        sender.sendCancel();
+        Thread.sleep(TIMEOUT);
+        assertTrue(sender.isCancelOkReceived());
+        assertTrue(sender.isRequestTerminatedReceived());
+        assertTrue(receiver.isCancelReceived());
+    }
+
+    public void testRegisterComposition() throws Exception {
+        int senderPort = NetworkPortAssigner.retrieveNextPort();
+        sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, true);
+        SipProvider senderProvider = sender.createProvider();
+
+        int receiverPort = NetworkPortAssigner.retrieveNextPort();
+        receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
+        SipProvider receiverProvider = receiver.createProvider();
+
+        receiverProvider.addSipListener(receiver);
+        senderProvider.addSipListener(sender);
+
+        senderProtocolObjects.start();
+        receiverProtocolObjects.start();
+        
+        TO_DOMAIN = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + receiverPort;
+        Map<String, String> params = new HashMap();
+        params.put("servletContainerPort", String.valueOf(containerPort));
+        params.put("testPort", String.valueOf(receiverPort));
+        params.put("senderPort", String.valueOf(senderPort));        
+        deployB2BUA(params);
+        deployCallForwarding(params);        
+
+        String fromName = FROM_NAME;
+        String fromSipAddress = FROM_DOMAIN;
+        SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+                fromName, fromSipAddress);
+
+        String toSipAddress = TO_DOMAIN;
+        String toUser = TO_NAME;
+        SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+                toUser, toSipAddress);
+
+        sender.sendSipRequest("REGISTER", fromAddress, fromAddress, null, null, true);
+        Thread.sleep(TIMEOUT);
+        assertNotNull(receiver.getRegisterReceived());
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        senderProtocolObjects.destroy();
+        receiverProtocolObjects.destroy();
+        logger.info("Test completed");
+        super.tearDown();
+    }
 
 }

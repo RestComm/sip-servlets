@@ -19,11 +19,14 @@
 
 package org.mobicents.servlet.sip.testsuite.proxy;
 
+import java.util.HashMap;
+import java.util.Map;
 import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
@@ -53,6 +56,7 @@ public class ProxyPrackTest extends SipServletTestCase {
 
 	@Override
 	public void setUp() throws Exception {
+                containerPort = NetworkPortAssigner.retrieveNextPort();            
 		super.setUp();
 		senderProtocolObjects = new ProtocolObjects("proxy-sender",
 				"gov.nist", ListeningPoint.UDP, AUTODIALOG, null, null, null);
@@ -60,15 +64,19 @@ public class ProxyPrackTest extends SipServletTestCase {
 				"gov.nist", ListeningPoint.UDP, AUTODIALOG, null, null, null);
 		neutralProto = new ProtocolObjects("neutral",
 				"gov.nist", ListeningPoint.UDP, AUTODIALOG, null, null, null);
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+                
+                int senderPort = NetworkPortAssigner.retrieveNextPort(); 
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, false);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5057, 5070, receiverProtocolObjects, false);
+                int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
 		receiver.setRecordRoutingProxyTesting(true);
 		SipProvider receiverProvider = receiver.createProvider();
 		
-		neutral = new TestSipListener(5058, 5070, neutralProto, false);
+                int neutralPort = NetworkPortAssigner.retrieveNextPort();
+		neutral = new TestSipListener(neutralPort, containerPort, neutralProto, false);
 		neutral.setRecordRoutingProxyTesting(true);
 		SipProvider neutralProvider = neutral.createProvider();
 
@@ -79,10 +87,17 @@ public class ProxyPrackTest extends SipServletTestCase {
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
 		neutralProto.start();
+                
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(senderPort)); 
+                params.put( "receiverPort", String.valueOf(receiverPort));
+                params.put( "neutralPort", String.valueOf(neutralPort));
+                deployApplication(projectHome + 
+                        "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp", params, null);                
 	}
 
 	public void testPrackProxying() throws Exception {
-		deployApplication();
 		String fromName = "prack-useHostName";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -110,7 +125,6 @@ public class ProxyPrackTest extends SipServletTestCase {
 	 * Non Regression test for https://code.google.com/p/sipservlets/issues/detail?id=253
 	 */
 	public void testCancelPrackProxying() throws Exception {
-		deployApplication();
 		String fromName = "prack-useHostName";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
