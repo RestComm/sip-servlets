@@ -22,22 +22,18 @@
 
 package org.mobicents.servlet.sip.testsuite;
 
-import gov.nist.core.ServerLogger;
-import gov.nist.javax.sip.message.SIPMessage;
-import gov.nist.javax.sip.stack.RawMessageChannel;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.annotation.Resource;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -45,6 +41,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.sip.ConvergedHttpSession;
 import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipApplicationSession;
+import javax.servlet.sip.SipApplicationSession.Protocol;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
@@ -52,7 +49,6 @@ import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipSessionsUtil;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
-import javax.servlet.sip.SipApplicationSession.Protocol;
 
 import org.apache.log4j.Logger;
 import org.mobicents.javax.servlet.sip.SipApplicationSessionAsynchronousWork;
@@ -70,11 +66,14 @@ public class SimpleWebServlet extends HttpServlet {
 	private SipFactory sipFactory;
 	@Resource
 	private SipSessionsUtil sipSessionsUtil;
+        
+        static ServletContext ctx;        
 	
 	@Override
 	public void init(ServletConfig config) throws ServletException {		
 		super.init(config);
 		logger.info("the SimpleWebServlet has been started");
+                ctx = config.getServletContext();                   
 		try { 			
 			SipFactory contextFactory = (SipFactory) config.getServletContext().getAttribute(SipServlet.SIP_FACTORY);
 			if(contextFactory == null) {
@@ -123,6 +122,7 @@ public class SimpleWebServlet extends HttpServlet {
         String invalidateHttpSession = request.getParameter("invalidateHttpSession");
         String asyncWorkMode = request.getParameter("asyncWorkMode");
         String asyncWorkSasId = request.getParameter("asyncWorkSasId");
+        String notification = request.getParameter("notification");
         if(asyncWorkMode != null && asyncWorkSasId != null) {
         	doAsyncWork(asyncWorkMode, asyncWorkSasId, response);
         	return;
@@ -134,6 +134,7 @@ public class SimpleWebServlet extends HttpServlet {
         // Create app session and request
         SipApplicationSession appSession = 
         	((ConvergedHttpSession)request.getSession()).getApplicationSession();
+        
 //        SipApplicationSession appSession = 
 //        	sipFactory.createApplicationSession();
         if(!appSession.getSessions("HTTP").hasNext()) {
@@ -141,6 +142,12 @@ public class SimpleWebServlet extends HttpServlet {
         	return;
         }
         SipServletRequest req = sipFactory.createRequest(appSession, "INVITE", from, to);   
+
+//        if (notification != null) {
+//            req.getApplicationSession().setAttribute("notification", notification);
+//        }
+//        req.getApplicationSession().setInvalidateWhenReady(true);
+//        logger.info("sip application session created " +  req.getApplicationSession() + " notification " + notification);
         // Set some attribute
         req.getSession().setAttribute("SecondPartyAddress", sipFactory.createAddress(fromAddr));
         if(invalidateHttpSession != null) {
@@ -249,7 +256,7 @@ public class SimpleWebServlet extends HttpServlet {
 					"MESSAGE", 
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
-			SipURI sipUri=storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+			SipURI sipUri=storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
 			sipServletRequest.setRequestURI(sipUri);
 			sipServletRequest.setContentLength(content.length());
 			sipServletRequest.setContent(content, CONTENT_TYPE);
@@ -260,4 +267,24 @@ public class SimpleWebServlet extends HttpServlet {
 			logger.error("Exception occured while sending the request",e);			
 		}
 	}
+        
+        public static Integer getTestPort(ServletContext ctx) {
+            String tPort = ctx.getInitParameter("testPort");
+            logger.info("TestPort at:" + tPort);
+            if (tPort != null) {
+                return Integer.valueOf(tPort);
+            } else {
+                return 5080;
+            }
+        }
+        
+        public static Integer getServletContainerPort(ServletContext ctx) {
+            String cPort = ctx.getInitParameter("servletContainerPort");
+            logger.info("TestPort at:" + cPort);            
+            if (cPort != null) {
+                return Integer.valueOf(cPort);
+            } else {
+                return 5070;
+            }            
+        }        
 }

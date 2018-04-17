@@ -30,6 +30,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Proxy;
 import javax.servlet.sip.SipApplicationSession;
@@ -47,6 +48,8 @@ public class ReplacesSenderSipServlet extends SipServlet {
 	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(ReplacesSenderSipServlet.class);
 	Map<String, List<URI>> registeredUsers = null;
+        
+        static ServletContext ctx;         
 	
 	@Resource
 	private SipFactory sipFactory;
@@ -59,12 +62,13 @@ public class ReplacesSenderSipServlet extends SipServlet {
 	public void init(ServletConfig servletConfig) throws ServletException {
 		logger.info("the join sip servlet has been started");
 		super.init(servletConfig);
+                ctx = servletConfig.getServletContext();                 
 		SipFactory sipFactory = (SipFactory)getServletContext().getAttribute(SIP_FACTORY);
 		registeredUsers = new HashMap<String, List<URI>>();
 		List<URI> uriList  = new ArrayList<URI>();		
-		uriList.add(sipFactory.createURI("sip:replaces@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"));
+		uriList.add(sipFactory.createURI("sip:replaces@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx)));
 		registeredUsers.put("sip:replaces@sip-servlets.com", uriList);
-		registeredUsers.put("sip:replaces@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070;transport=udp", uriList);
+		registeredUsers.put("sip:replaces@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getServletContainerPort(ctx) + ";transport=udp", uriList);
 	}
 
 	/**
@@ -79,7 +83,7 @@ public class ReplacesSenderSipServlet extends SipServlet {
 		
 		SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
 		SipURI fromURI = sipFactory.createSipURI("replacer", "sip-servlets.com");
-		SipURI requestURI = sipFactory.createSipURI("replacer", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090");
+		SipURI requestURI = sipFactory.createSipURI("replacer", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
 		SipServletRequest sipServletRequest = sipFactory.createRequest(sipApplicationSession, "INVITE", fromURI, request.getFrom().getURI());
 		sipServletRequest.addHeader("Replaces", ((String)request.getContent()).substring("Replaces : ".length()));
 		sipServletRequest.setRequestURI(requestURI);
@@ -130,4 +134,34 @@ public class ReplacesSenderSipServlet extends SipServlet {
 			sipServletResponse.send();
 		}
 	}	
+        
+        public static Integer getTestPort(ServletContext ctx) {
+            String tPort = ctx.getInitParameter("testPort");
+            logger.info("TestPort at:" + tPort);
+            if (tPort != null) {
+                return Integer.valueOf(tPort);
+            } else {
+                return 5090;
+            }
+        }
+        
+        public static Integer getSenderPort(ServletContext ctx) {
+            String tPort = ctx.getInitParameter("senderPort");
+            logger.info("senderPort at:" + tPort);
+            if (tPort != null) {
+                return Integer.valueOf(tPort);
+            } else {
+                return 5080;
+            }
+        }        
+        
+        public static Integer getServletContainerPort(ServletContext ctx) {
+            String cPort = ctx.getInitParameter("servletContainerPort");
+            logger.info("TestPort at:" + cPort);            
+            if (cPort != null) {
+                return Integer.valueOf(cPort);
+            } else {
+                return 5070;
+            }            
+        }        
 }

@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 
 import javax.servlet.ServletException;
 import javax.servlet.sip.B2buaHelper;
@@ -58,7 +60,7 @@ public class B2BUASipServlet extends SipServlet {
 		
 		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
 				SIP_FACTORY);				
-		SipURI sipUri = (SipURI) sipFactory.createURI("sip:aa@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5059");	
+		SipURI sipUri = (SipURI) sipFactory.createURI("sip:aa@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));	
 		forkedRequest.setRequestURI(sipUri);
 		
 		if (logger.isDebugEnabled()) {
@@ -90,7 +92,7 @@ public class B2BUASipServlet extends SipServlet {
 		
 		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
 				SIP_FACTORY);				
-		SipURI sipUri = (SipURI) sipFactory.createURI("sip:aa@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5059");	
+		SipURI sipUri = (SipURI) sipFactory.createURI("sip:aa@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));	
 		if(request.getTo().toString().contains("cancel-no-response")) {
 			sipUri = (SipURI) sipFactory.createURI("sip:cancel-no-respo-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":9368");
 		}
@@ -186,5 +188,44 @@ public class B2BUASipServlet extends SipServlet {
 		logger.info("forkedRequest = " + cancelRequest);			
 		cancelRequest.send();
 	}
+        
+        static ServletContext ctx;        
+	
+	@Override
+	public void init(ServletConfig servletConfig) throws ServletException {
+		logger.info("the call forwarding B2BUA sip servlet has been started");
+		super.init(servletConfig);
+                ctx = servletConfig.getServletContext();  
+	}        
+        
+        public static Integer getTestPort(ServletContext ctx) {
+            String tPort = ctx.getInitParameter("testPort");
+            logger.info("TestPort at:" + tPort);
+            if (tPort != null) {
+                return Integer.valueOf(tPort);
+            } else {
+                return 5059;
+            }
+        }
+        
+        public static Integer getSenderPort(ServletContext ctx) {
+            String tPort = ctx.getInitParameter("senderPort");
+            logger.info("SenderPort at:" + tPort);
+            if (tPort != null) {
+                return Integer.valueOf(tPort);
+            } else {
+                return 5080;
+            }
+        }        
+        
+        public static Integer getServletContainerPort(ServletContext ctx) {
+            String cPort = ctx.getInitParameter("servletContainerPort");
+            logger.info("TestPort at:" + cPort);            
+            if (cPort != null) {
+                return Integer.valueOf(cPort);
+            } else {
+                return 5070;
+            }            
+        }          
 
 }

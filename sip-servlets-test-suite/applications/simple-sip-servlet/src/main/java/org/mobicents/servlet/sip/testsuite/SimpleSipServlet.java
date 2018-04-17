@@ -31,6 +31,7 @@ import java.util.Iterator;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.AuthInfo;
@@ -110,6 +111,7 @@ public class SimpleSipServlet
 	TimerService timerService;
 	SipSession registerSipSession;
 	SipSession inviteSipSession;
+        static ServletContext ctx;
 		
 	int timeout = 15000;
 	
@@ -131,6 +133,7 @@ public class SimpleSipServlet
 		logger.info("the simple sip servlet has been started");
 		new File("expirationFailure.tmp").delete();
 		super.init(servletConfig);
+                ctx = servletConfig.getServletContext();
 	}
 
 	/**
@@ -537,7 +540,7 @@ public class SimpleSipServlet
 			sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 			if(fromString.contains(TEST_FLAG_PARAM)) {
 				try {
-					sipServletResponse.setHeader("Contact", "sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070");
+					sipServletResponse.setHeader("Contact", "sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getServletContainerPort(ctx));
 					logger.error("an IllegalArgumentException should be thrown when trying to set the Contact Header on a 2xx response");
 					sipServletResponse = request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR);
 					sipServletResponse.send();
@@ -564,7 +567,7 @@ public class SimpleSipServlet
 					sipServletResponse.send();
 					return;
 				}
-				contact = sipFactory.createParameterable("sip:user@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080;flagparam");
+				contact = sipFactory.createParameterable("sip:user@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx) + ";flagparam");
 				contactStringified = contact.toString().trim();
 				logger.info("Contact Header with flag param " + contactStringified);
 				if(contactStringified.endsWith("flagparam=")) {
@@ -751,7 +754,7 @@ public class SimpleSipServlet
 					"MESSAGE", 
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
-			SipURI sipUri=sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+			SipURI sipUri=sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
 			sipServletRequest.setRequestURI(sipUri);
 			sipServletRequest.setContentLength(CANCEL_RECEIVED.length());
 			sipServletRequest.setContent(CANCEL_RECEIVED, CONTENT_TYPE);
@@ -770,7 +773,7 @@ public class SimpleSipServlet
 		contact.setExpires(3600);
 		logger.info("REGISTER Contact Address.toString = " + contact.toString());
 		int response = SipServletResponse.SC_OK;
-		if(!("<sip:sender@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080;transport=udp;lr>;expires=3600").equals(contact.toString())) {
+		if(!("<sip:sender@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx) + ";transport=udp;lr>;expires=3600").equals(contact.toString())) {
 			response = SipServletResponse.SC_SERVER_INTERNAL_ERROR;
 		}
 		SipServletResponse resp = req.createResponse(response);
@@ -828,7 +831,9 @@ public class SimpleSipServlet
 	 */
 	public void noAckReceived(SipErrorEvent ee) {
 		logger.error("noAckReceived.");
-		sendMessage(ee.getRequest().getApplicationSession(), sipFactory, "noAckReceived", null);
+                //create new session, since event one is expired
+                SipApplicationSession createApplicationSession = sipFactory.createApplicationSession();
+		sendMessage(createApplicationSession, sipFactory, "noAckReceived", null);
 	}
 
 	/**
@@ -891,7 +896,7 @@ public class SimpleSipServlet
 			String port = (String)info;
 			SipConnector[] sipConnectors = (SipConnector[]) getServletContext().getAttribute("org.mobicents.servlet.sip.SIP_CONNECTORS");
 			for (SipConnector sipConnector : sipConnectors) {
-				if(sipConnector.getIpAddress().equals(System.getProperty("org.mobicents.testsuite.testhostaddr")) && sipConnector.getPort() == 5070 && sipConnector.getTransport().equalsIgnoreCase("TCP")) {
+				if(sipConnector.getIpAddress().equals(System.getProperty("org.mobicents.testsuite.testhostaddr")) && sipConnector.getPort() == getServletContainerPort(ctx) && sipConnector.getTransport().equalsIgnoreCase("TCP")) {
 					try {
 						boolean changed = sipConnector.setKeepAliveTimeout(System.getProperty("org.mobicents.testsuite.testhostaddr"), Integer.valueOf(port), Long.valueOf(getServletContext().getInitParameter("changeKeepAliveTimeout")));
 						logger.info("SipConnector timeoutvalue changed " + getServletContext().getInitParameter("changeKeepAliveTimeout") + " changed " + changed + "for " + System.getProperty("org.mobicents.testsuite.testhostaddr") +":"+ Integer.valueOf(port));
@@ -912,7 +917,7 @@ public class SimpleSipServlet
 			register = registerSipSession.createRequest("REGISTER");			
 		} else {
 			SipApplicationSession app = sipFactory.createApplicationSession();
-			register = sipFactory.createRequest(app, "REGISTER", "sip:testRegisterSavedSession@simple-servlet.com", "sip:you@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5058");
+			register = sipFactory.createRequest(app, "REGISTER", "sip:testRegisterSavedSession@simple-servlet.com", "sip:you@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getRegisterPort(ctx));
 			Parameterable contact = sipFactory.createParameterable("sip:john@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":6090;expires=900");
 			register.addParameterableHeader("Contact", contact, true);
 			registerSipSession = register.getSession();
@@ -931,7 +936,7 @@ public class SimpleSipServlet
 			register = sipSession.createRequest("REGISTER");
 		} else {
 			SipApplicationSession app = sipFactory.createApplicationSession();
-			register = sipFactory.createRequest(app, "REGISTER", "sip:testRegisterCSeq@simple-servlet.com", "sip:you@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5058");
+			register = sipFactory.createRequest(app, "REGISTER", "sip:testRegisterCSeq@simple-servlet.com", "sip:you@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getRegisterPort(ctx));
 			Parameterable contact = sipFactory.createParameterable("sip:john@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":6090;expires=900");
 			register.addParameterableHeader("Contact", contact, true);			
 		}
@@ -977,10 +982,10 @@ public class SimpleSipServlet
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
 			sipServletRequest.addHeader("Ext", "Test 1, 2 ,3");
-			SipURI sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+			SipURI sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
 			if(transport != null) {
 				if(transport.equalsIgnoreCase(ListeningPoint.TCP)) {
-					sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5081");
+					sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
 				}
 				sipUri.setTransportParam(transport);
 			}
@@ -988,6 +993,10 @@ public class SimpleSipServlet
 			sipServletRequest.setContentLength(content.length());
 			sipServletRequest.setContent(content, CONTENT_TYPE);
 			sipServletRequest.send();
+                        SipApplicationSession applicationSession = sipServletRequest.getApplicationSession(false);
+                        if (applicationSession!= null) {
+                            applicationSession.invalidate();
+                        }
 		} catch (ServletParseException e) {
 			logger.error("Exception occured while parsing the addresses",e);
 		} catch (IOException e) {
@@ -1110,4 +1119,35 @@ public class SimpleSipServlet
 			}
 		}
 	}
+        
+        
+        public static Integer getRegisterPort(ServletContext ctx) {
+            String rPort = ctx.getInitParameter("registerPort");
+            logger.info("registerPort at:" + rPort);
+            if (rPort != null) {
+                return Integer.valueOf(rPort);
+            } else {
+                return 5058;
+            }
+        }        
+        
+        public static Integer getTestPort(ServletContext ctx) {
+            String tPort = ctx.getInitParameter("testPort");
+            logger.info("TestPort at:" + tPort);
+            if (tPort != null) {
+                return Integer.valueOf(tPort);
+            } else {
+                return 5080;
+            }
+        }
+        
+        public static Integer getServletContainerPort(ServletContext ctx) {
+            String cPort = ctx.getInitParameter("servletContainerPort");
+            logger.info("TestPort at:" + cPort);            
+            if (cPort != null) {
+                return Integer.valueOf(cPort);
+            } else {
+                return 5070;
+            }            
+        } 
 }

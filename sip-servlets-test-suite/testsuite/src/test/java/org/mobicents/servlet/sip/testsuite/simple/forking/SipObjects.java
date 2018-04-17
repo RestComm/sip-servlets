@@ -65,8 +65,8 @@ public class SipObjects {
         // Your code will limp at 32 but it is best for debugging.
 
         properties.setProperty("gov.nist.javax.sip.TRACE_LEVEL", "32");
-        String logFile = "logs/" + stackname + ".txt";
-        String msgLogFile = "logs/msg-" + stackname + ".xml";
+        String logFile = "target/logs/" + stackname + ".txt";
+        String msgLogFile = "target/logs/msg-" + stackname + ".xml";
         properties.setProperty("gov.nist.javax.sip.MAX_FORK_TIME_SECONDS", "32");
 
         properties.setProperty("gov.nist.javax.sip.DEBUG_LOG", logFile);
@@ -81,7 +81,7 @@ public class SipObjects {
         try {
             // Create SipStack object
             sipStack = sipFactory.createSipStack(properties);
-            String logFileDirectory = "logs/";
+            String logFileDirectory = "target/logs/";
 
             /* SipFoundryAppender sfa = new SipFoundryAppender(new SipFoundryLayout(),
                     logFileDirectory + "sip" + stackname + ".log");

@@ -19,95 +19,107 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.servlet.sip.testsuite.simple;
 
 import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.sip.InvalidArgumentException;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 import javax.sip.address.TelURL;
+import static junit.framework.Assert.assertTrue;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
-
 public class ShootmeTelURLSipServletTest extends SipServletTestCase {
-	
-	private static transient Logger logger = Logger.getLogger(ShootmeTelURLSipServletTest.class);
 
-	private static final String TRANSPORT = "udp";
-	private static final boolean AUTODIALOG = true;
-	private static final int TIMEOUT = 5000;	
+    private static transient Logger logger = Logger.getLogger(ShootmeTelURLSipServletTest.class);
+
+    private static final String TRANSPORT = "udp";
+    private static final boolean AUTODIALOG = true;
+    private static final int TIMEOUT = 5000;
 //	private static final int TIMEOUT = 100000000;
-	
-	TestSipListener sender;
-	
-	ProtocolObjects senderProtocolObjects;	
 
-	
-	public ShootmeTelURLSipServletTest(String name) {
-		super(name);
-	}
+    TestSipListener sender;
 
-	@Override
-	public void deployApplication() {
-		assertTrue(tomcat.deployContext(
-				projectHome + "/sip-servlets-test-suite/applications/simple-sip-servlet/src/main/sipapp",
-				"sip-test-context", "sip-test"));
-	}
+    ProtocolObjects senderProtocolObjects;
 
-	@Override
-	protected String getDarConfigurationFile() {
-		return "file:///" + projectHome + "/sip-servlets-test-suite/testsuite/src/test/resources/" +
-				"org/mobicents/servlet/sip/testsuite/simple/simple-sip-servlet-dar.properties";
-	}
-	
-	@Override
-	protected void setUp() {
-		try {
-			super.setUp();						
-			
-			senderProtocolObjects =new ProtocolObjects(
-					"sender", "gov.nist", TRANSPORT, AUTODIALOG, "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070", null, null);
-						
-			sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
-			SipProvider senderProvider = sender.createProvider();			
-			
-			senderProvider.addSipListener(sender);
-			
-			senderProtocolObjects.start();			
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			fail("unexpected exception ");
-		}
-	}
-	
-	public void testShootme() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
-		String fromName = "sender";
-		String fromSipAddress = "sip-servlets.com";
-		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
-				fromName, fromSipAddress);
-		
-		TelURL toAddress = senderProtocolObjects.addressFactory.createTelURL("+358-555-1234567");
-		
-		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
-		Thread.sleep(TIMEOUT);
-		assertTrue(sender.isAckSent());
-		assertTrue(sender.getOkToByeReceived());		
-	}
+    public ShootmeTelURLSipServletTest(String name) {
+        super(name);
+        autoDeployOnStartup = false;
+    }
 
-	@Override
-	protected void tearDown() throws Exception {					
-		senderProtocolObjects.destroy();			
-		logger.info("Test completed");
-		super.tearDown();
-	}
+    @Override
+    public void deployApplication() {
+    }
+    
+    public void deployApplication(Map<String, String> params) {
+        SipStandardContext context = deployApplication(projectHome
+                + "/sip-servlets-test-suite/applications/simple-sip-servlet/src/main/sipapp",
+                "sip-test",
+                params,
+                null);
+        assertTrue(context.getAvailable());
+    }      
 
+    @Override
+    protected String getDarConfigurationFile() {
+        return "file:///" + projectHome + "/sip-servlets-test-suite/testsuite/src/test/resources/"
+                + "org/mobicents/servlet/sip/testsuite/simple/simple-sip-servlet-dar.properties";
+    }
+
+    @Override
+    protected void setUp() {
+        try {
+            containerPort = NetworkPortAssigner.retrieveNextPort();
+            super.setUp();
+
+            senderProtocolObjects = new ProtocolObjects(
+                    "sender", "gov.nist", TRANSPORT, AUTODIALOG, "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + containerPort, null, null);
+
+            int myPort = NetworkPortAssigner.retrieveNextPort();
+            sender = new TestSipListener(myPort, containerPort, senderProtocolObjects, true);
+            SipProvider senderProvider = sender.createProvider();
+            senderProvider.addSipListener(sender);
+            senderProtocolObjects.start();
+            
+            Map<String, String> params = new HashMap();
+            params.put("servletContainerPort", String.valueOf(containerPort));
+            params.put("testPort", String.valueOf(myPort));
+            deployApplication(params);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            fail("unexpected exception ");
+        }
+    }
+
+    public void testShootme() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+        String fromName = "sender";
+        String fromSipAddress = "sip-servlets.com";
+        SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+                fromName, fromSipAddress);
+
+        TelURL toAddress = senderProtocolObjects.addressFactory.createTelURL("+358-555-1234567");
+
+        sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);
+        Thread.sleep(TIMEOUT);
+        assertTrue(sender.isAckSent());
+        assertTrue(sender.getOkToByeReceived());
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        senderProtocolObjects.destroy();
+        logger.info("Test completed");
+        super.tearDown();
+    }
 
 }

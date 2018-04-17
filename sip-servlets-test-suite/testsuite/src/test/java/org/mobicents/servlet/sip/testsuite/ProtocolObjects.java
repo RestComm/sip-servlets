@@ -54,7 +54,7 @@ public class ProtocolObjects implements Closeable {
 
 	private int logLevel = 32;
 
-	String logFileDirectory = "logs/";
+	String logFileDirectory = "target/logs/";
 
 	public final String transport;
 

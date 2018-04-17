@@ -23,6 +23,8 @@
 package org.mobicents.servlet.sip.testsuite.b2bua.prack;
 
 import gov.nist.javax.sip.message.RequestExt;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
@@ -30,7 +32,9 @@ import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
@@ -71,7 +75,8 @@ public class CallForwardingB2BUAPrackTest extends SipServletTestCase {
 	}
 	
 	@Override
-	protected void setUp() throws Exception {		
+	protected void setUp() throws Exception {
+                containerPort = NetworkPortAssigner.retrieveNextPort();
 		super.setUp();
 
 		senderProtocolObjects = new ProtocolObjects("forward-sender",
@@ -83,12 +88,13 @@ public class CallForwardingB2BUAPrackTest extends SipServletTestCase {
 	
 	public void testCallForwardingCallerSendBye() throws Exception {
 		tomcat.startTomcat();
-		deployApplication();
 		
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+                int senderPort = NetworkPortAssigner.retrieveNextPort();
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+                int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
 		SipProvider receiverProvider = receiver.createProvider();
 
 		receiverProvider.addSipListener(receiver);
@@ -96,6 +102,16 @@ public class CallForwardingB2BUAPrackTest extends SipServletTestCase {
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
+                
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(receiverPort)); 
+                params.put( "senderPort", String.valueOf(senderPort));                 
+            SipStandardContext deployApplication = deployApplication(projectHome + 
+                    "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
+                    params
+                    , null);
+                
 
 		String fromName = "forward-sender";
 		String fromSipAddress = "sip-servlets.com";
@@ -119,19 +135,29 @@ public class CallForwardingB2BUAPrackTest extends SipServletTestCase {
 	// non regression test for https://github.com/Mobicents/sip-servlets/issues/66
 	public void testCallForwardingCallerPrackUpdateSendBye() throws Exception {
 		tomcat.startTomcat();
-		deployApplication();
 		
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+               int senderPort = NetworkPortAssigner.retrieveNextPort();
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+                int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
 		SipProvider receiverProvider = receiver.createProvider();
-
+                
 		receiverProvider.addSipListener(receiver);
 		senderProvider.addSipListener(sender);
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
+                
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(receiverPort)); 
+                params.put( "senderPort", String.valueOf(senderPort));                 
+            SipStandardContext deployApplication = deployApplication(projectHome + 
+                    "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
+                    params
+                    , null);                
 
 		String fromName = "forward-sender";
 		String fromSipAddress = "sip-servlets.com";
@@ -161,13 +187,14 @@ public class CallForwardingB2BUAPrackTest extends SipServletTestCase {
 
 	public void testCallForwardingCalleeSendBye() throws Exception {
 		tomcat.startTomcat();
-		deployApplication();
 		
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+               int senderPort = NetworkPortAssigner.retrieveNextPort();
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, false);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, true);
-		receiver.setTimeToWaitBetweenProvisionnalResponse(1000);
+                int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, true);
+                receiver.setTimeToWaitBetweenProvisionnalResponse(1000);
 		SipProvider receiverProvider = receiver.createProvider();
 
 		receiverProvider.addSipListener(receiver);
@@ -175,6 +202,15 @@ public class CallForwardingB2BUAPrackTest extends SipServletTestCase {
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
+                
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(receiverPort)); 
+                params.put( "senderPort", String.valueOf(senderPort));                 
+            SipStandardContext deployApplication = deployApplication(projectHome + 
+                    "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
+                    params
+                    , null);                
 
 		String fromName = "forward-sender";
 		String fromSipAddress = "sip-servlets.com";
@@ -204,21 +240,31 @@ public class CallForwardingB2BUAPrackTest extends SipServletTestCase {
 	public void testCallForwardingCallerSendByeAnyLocalAddress() throws Exception {
 		tomcat.removeConnector(sipConnector);
 		sipIpAddress = "0.0.0.0";
-		tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport);
+		tomcat.addSipConnector(serverName, sipIpAddress, containerPort, listeningPointTransport);
 		tomcat.startTomcat();
-		deployApplication();
 		
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+               int senderPort = NetworkPortAssigner.retrieveNextPort();
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+                int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
 		SipProvider receiverProvider = receiver.createProvider();
-
+                
 		receiverProvider.addSipListener(receiver);
 		senderProvider.addSipListener(sender);
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
+                
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(receiverPort)); 
+                params.put( "senderPort", String.valueOf(senderPort));                 
+            SipStandardContext deployApplication = deployApplication(projectHome + 
+                    "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
+                    params
+                    , null);                
 
 		String fromName = "forward-sender";
 		String fromSipAddress = "sip-servlets.com";

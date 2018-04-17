@@ -10,7 +10,10 @@
 			CallForwardingB2BUASipServlet
 		</main-servlet>
 	</servlet-selection>
-
+	<context-param>
+                        <param-name>org.restcomm.servlets.sip.REQUEST_TERMINATED_REASON</param-name>
+                        <param-value>487 request terminated reason</param-value>
+        </context-param>
 	<servlet>
 		<servlet-name>CallForwardingB2BUASipServlet</servlet-name>
 		<display-name>CallForwardingB2BUASipServlet</display-name>

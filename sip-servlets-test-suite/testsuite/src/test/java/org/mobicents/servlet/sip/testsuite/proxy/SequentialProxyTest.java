@@ -22,6 +22,9 @@
 
 package org.mobicents.servlet.sip.testsuite.proxy;
 
+import java.util.HashMap;
+import java.util.Map;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.catalina.SipStandardService;
 
@@ -39,15 +42,29 @@ public class SequentialProxyTest extends SipServletTestCase {
 		super(name);
 
 		this.sipIpAddress="0.0.0.0";
+                autoDeployOnStartup = false;                
 	}
 
 	@Override
 	public void setUp() throws Exception {
+                containerPort = NetworkPortAssigner.retrieveNextPort();
 		super.setUp();
-		this.shootist = new Shootist(false, null);
+                int shootistPort = NetworkPortAssigner.retrieveNextPort();
+		this.shootist = new Shootist(false, shootistPort, String.valueOf(containerPort));
 		shootist.setOutboundProxy(false);
-		this.shootme = new Shootme(5057);
-		this.cutme = new Cutme();
+                int shootmePort = NetworkPortAssigner.retrieveNextPort();
+		this.shootme = new Shootme(shootmePort);
+                int cutmePort = NetworkPortAssigner.retrieveNextPort();
+		this.cutme = new Cutme(cutmePort);
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(shootistPort)); 
+                params.put( "receiverPort", String.valueOf(shootmePort));
+                params.put( "cutmePort", String.valueOf(cutmePort));
+                sipService = tomcat.getSipService();
+                deployApplication(projectHome + 
+                        "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp", 
+                        params, null);                
 	}
 	
 	public void testTreePhonesSecondAnswer() {
@@ -161,7 +178,7 @@ public class SequentialProxyTest extends SipServletTestCase {
 	// Test for http://code.google.com/p/mobicents/issues/detail?id=2740
 	public void testOutboundProxySetting() {
 
-		sipService.setOutboundProxy("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5057");
+		sipService.setOutboundProxy("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + shootme.getMyPort());
 		this.shootme.init("stackName", null);
 		this.cutme.init(null);
 		this.shootist.init("sequential-reverse", false, null);
@@ -253,14 +270,14 @@ public class SequentialProxyTest extends SipServletTestCase {
 	}
 
 	SipStandardService sipService;
+        
 	@Override
 	public void deployApplication() {
 		sipService = tomcat.getSipService();
-		assertTrue(tomcat
-				.deployContext(
-						projectHome
-								+ "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp",
-						"sip-test-context", "sip-test"));
+		ctx = tomcat.deployAppContext(
+				projectHome + "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp",
+				"sip-test-context", "sip-test");
+                assertTrue(ctx.getAvailable());                
 	}
 
 	@Override

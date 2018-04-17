@@ -5,7 +5,7 @@
 
 <scenario name="Proxy UAC">
 
-  <send retrans="1000">
+  <send retrans="1000" start_rtd="1">
     <![CDATA[
       INVITE sip:perf-receiver@sip-servlets.com SIP/2.0
       Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
@@ -35,7 +35,7 @@
   <recv response="180" optional="true">
   </recv>
 
-  <recv response="200" rtd="true" rrs="true">
+  <recv response="200" rtd="1" rrs="true">
   </recv>
 
   <pause milliseconds="300"/>
@@ -56,8 +56,7 @@
     ]]>
   </send>
 
-<pause milliseconds="59000" /> 
- <recv request="BYE" timeout="30000"/>
+ <recv request="BYE" timeout="600000"/>
 <send retrans="2000">
 
 <![CDATA[
@@ -76,4 +75,5 @@
 
   <!--pause milliseconds="30000" /-->
 
+    <ResponseTimeRepartition value="10, 20, 30, 40, 50, 100, 150, 200"/>
 </scenario>

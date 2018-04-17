@@ -403,9 +403,9 @@ public class Shootme implements SipListener {
 		// Your code will limp at 32 but it is best for debugging.
 		properties.setProperty("gov.nist.javax.sip.TRACE_LEVEL", "32");
 		properties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
-				"logs/debug"+stackName+".txt");
+				"target/logs/debug"+stackName+".txt");
 		properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
-				"logs/" + stackName + ".xml");
+				"target/logs/" + stackName + ".xml");
 
 		try {
 			// Create SipStack object
@@ -550,4 +550,10 @@ public class Shootme implements SipListener {
 	public void setInviteRequest(Request inviteRequest) {
 		this.inviteRequest = inviteRequest;
 	}
+
+    public int getMyPort() {
+        return myPort;
+    }
+        
+        
 }

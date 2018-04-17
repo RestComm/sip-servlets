@@ -30,6 +30,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Proxy;
 import javax.servlet.sip.SipApplicationSession;
@@ -50,21 +51,25 @@ public class JoinSenderSipServlet extends SipServlet {
 	
 	@Resource
 	private SipFactory sipFactory;
-	
+        
+    
 	/** Creates a new instance of JoinSenderSipServlet */
 	public JoinSenderSipServlet() {
 	}
 
+        static ServletContext ctx;        
+        
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {
 		logger.info("the join sip servlet has been started");
 		super.init(servletConfig);
+                ctx = servletConfig.getServletContext();                 
 		SipFactory sipFactory = (SipFactory)getServletContext().getAttribute(SIP_FACTORY);
 		registeredUsers = new HashMap<String, List<URI>>();
 		List<URI> uriList  = new ArrayList<URI>();		
-		uriList.add(sipFactory.createURI("sip:join@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"));
+		uriList.add(sipFactory.createURI("sip:join@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx)));
 		registeredUsers.put("sip:join@sip-servlets.com", uriList);
-		registeredUsers.put("sip:join@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070;transport=udp", uriList);
+		registeredUsers.put("sip:join@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getServletContainerPort(ctx) +";transport=udp", uriList);
 	}
 
 	/**
@@ -79,7 +84,7 @@ public class JoinSenderSipServlet extends SipServlet {
 		
 		SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
 		SipURI fromURI = sipFactory.createSipURI("joiner", "sip-servlets.com");
-		SipURI requestURI = sipFactory.createSipURI("joiner", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090");
+		SipURI requestURI = sipFactory.createSipURI("joiner", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
 		SipServletRequest sipServletRequest = sipFactory.createRequest(sipApplicationSession, "INVITE", fromURI, request.getFrom().getURI());
 		sipServletRequest.addHeader("Join", ((String)request.getContent()).substring("Join : ".length()));
 		sipServletRequest.setRequestURI(requestURI);
@@ -130,4 +135,34 @@ public class JoinSenderSipServlet extends SipServlet {
 			sipServletResponse.send();
 		}
 	}	
+        
+        public static Integer getTestPort(ServletContext ctx) {
+            String tPort = ctx.getInitParameter("testPort");
+            logger.info("TestPort at:" + tPort);
+            if (tPort != null) {
+                return Integer.valueOf(tPort);
+            } else {
+                return 5090;
+            }
+        }
+        
+        public static Integer getSenderPort(ServletContext ctx) {
+            String tPort = ctx.getInitParameter("senderPort");
+            logger.info("SenderPort at:" + tPort);
+            if (tPort != null) {
+                return Integer.valueOf(tPort);
+            } else {
+                return 5080;
+            }
+        }        
+        
+        public static Integer getServletContainerPort(ServletContext ctx) {
+            String cPort = ctx.getInitParameter("servletContainerPort");
+            logger.info("TestPort at:" + cPort);            
+            if (cPort != null) {
+                return Integer.valueOf(cPort);
+            } else {
+                return 5070;
+            }            
+        }           
 }

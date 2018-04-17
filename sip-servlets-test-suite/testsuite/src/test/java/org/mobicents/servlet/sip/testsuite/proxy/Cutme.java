@@ -58,7 +58,7 @@ public class Cutme implements SipListener {
 
 	private SipStack sipStack;
 
-	private static final int myPort = 5056;
+	private static int myPort;
 
 	protected ServerTransaction inviteTid;
 	
@@ -75,6 +75,12 @@ public class Cutme implements SipListener {
 	public boolean canceled = false;
 	
 	private long timeToWaitBeforeAnswer = -1;
+        
+        public Cutme(Integer port) {
+            if (port != null) {
+                this.myPort = port;
+            }
+        }
 
 	class MyTimerTask extends TimerTask {
 		Cutme shootme;
@@ -282,9 +288,9 @@ public class Cutme implements SipListener {
 		// Your code will limp at 32 but it is best for debugging.
 		properties.setProperty("gov.nist.javax.sip.TRACE_LEVEL", "32");
 		properties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
-				"logs/cutmedebug.txt");
+				"target/logs/cutmedebug.txt");
 		properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
-				"logs/cutmelog.xml");
+				"target/logs/cutmelog.xml");
 
 		try {
 			// Create SipStack object

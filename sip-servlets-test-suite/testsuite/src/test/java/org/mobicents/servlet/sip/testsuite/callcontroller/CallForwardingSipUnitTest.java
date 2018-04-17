@@ -22,6 +22,8 @@
 
 package org.mobicents.servlet.sip.testsuite.callcontroller;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.sip.message.Response;
@@ -30,6 +32,7 @@ import org.apache.log4j.Logger;
 import org.cafesip.sipunit.SipCall;
 import org.cafesip.sipunit.SipPhone;
 import org.cafesip.sipunit.SipStack;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
 
 public class CallForwardingSipUnitTest extends SipServletTestCase {
@@ -47,10 +50,12 @@ public class CallForwardingSipUnitTest extends SipServletTestCase {
 
 	public CallForwardingSipUnitTest(String name) {
 		super(name);
+                autoDeployOnStartup = false;
 	}
 
 	@Override
 	public void setUp() throws Exception {
+                containerPort = NetworkPortAssigner.retrieveNextPort();
 		super.setUp();
 		SipStack.setTraceEnabled(true);
 	}
@@ -82,16 +87,16 @@ public class CallForwardingSipUnitTest extends SipServletTestCase {
 
 	public SipStack makeStack(String transport, int port) throws Exception {
 		Properties properties = new Properties();
-		String peerHostPort1 = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070";
+		String peerHostPort1 = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + containerPort;
 		properties.setProperty("javax.sip.OUTBOUND_PROXY", peerHostPort1 + "/"
 				+ "udp");
 		properties.setProperty("javax.sip.STACK_NAME", "UAC_" + transport + "_"
 				+ port);
 		properties.setProperty("sipunit.BINDADDR", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
 		properties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
-				"logs/callforwarding_debug_" + port + ".txt");
+				"target/logs/callforwarding_debug_" + port + ".txt");
 		properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
-				"logs/callforwarding_server_" + port + ".txt");
+				"target/logs/callforwarding_server_" + port + ".txt");
 		properties.setProperty("gov.nist.javax.sip.TRACE_LEVEL",
 				"32");
 		
@@ -99,12 +104,22 @@ public class CallForwardingSipUnitTest extends SipServletTestCase {
 	}
 
 	public void setupPhone() throws Exception {
-			sipStackSender = makeStack(SipStack.PROTOCOL_UDP, 5080);					
+                        int senderPort = NetworkPortAssigner.retrieveNextPort();
+			sipStackSender = makeStack(SipStack.PROTOCOL_UDP, senderPort);					
 			sipPhoneSender = sipStackSender.createSipPhone("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "",
-					SipStack.PROTOCOL_UDP, 5070, "sip:forward-sender@sip-servlets.com");		
-			sipStackReceiver = makeStack(SipStack.PROTOCOL_UDP, 5090);					
+					SipStack.PROTOCOL_UDP, containerPort, "sip:forward-sender@sip-servlets.com");		
+                        int receiverPort = NetworkPortAssigner.retrieveNextPort();
+			sipStackReceiver = makeStack(SipStack.PROTOCOL_UDP, receiverPort);					
 			sipPhoneReceiver = sipStackReceiver.createSipPhone("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "",
-					SipStack.PROTOCOL_UDP, 5070, "sip:forward-receiver@sip-servlets.com");
+					SipStack.PROTOCOL_UDP, containerPort, "sip:forward-receiver@sip-servlets.com");
+                        
+            Map<String, String> params = new HashMap();
+            params.put("servletContainerPort", String.valueOf(containerPort));
+            params.put("testPort", String.valueOf(receiverPort));
+            params.put("senderPort", String.valueOf(senderPort));
+            deployApplication(projectHome
+                    + "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
+                    params, null);                         
 	}
 
 	public void init() throws Exception {

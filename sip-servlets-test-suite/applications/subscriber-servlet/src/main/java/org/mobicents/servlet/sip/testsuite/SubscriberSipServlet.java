@@ -32,6 +32,7 @@ import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.internet.MimeMultipart;
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Parameterable;
 import javax.servlet.sip.ServletTimer;
@@ -68,6 +69,8 @@ public class SubscriberSipServlet
 	
 	@Resource
 	SipFactory sipFactory;
+        
+        static ServletContext ctx;         
 	
 	/** Creates a new instance of SubscriberSipServlet */
 	public SubscriberSipServlet() {
@@ -77,6 +80,7 @@ public class SubscriberSipServlet
 	public void init(ServletConfig servletConfig) throws ServletException {
 		logger.info("the Subscriber sip servlet has been started");
 		super.init(servletConfig);
+                ctx = servletConfig.getServletContext();                 
 	}		
 	
 	/**
@@ -167,7 +171,7 @@ public class SubscriberSipServlet
 						
 		if("Active".equalsIgnoreCase(state)) {
 			SipServletRequest subscriberRequest = request.getSession().createRequest("SUBSCRIBE");
-			SipURI requestURI = ((SipFactory)getServletContext().getAttribute(SIP_FACTORY)).createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+			SipURI requestURI = ((SipFactory)getServletContext().getAttribute(SIP_FACTORY)).createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
 			subscriberRequest.setRequestURI(requestURI);
 			subscriberRequest.setHeader("Expires", "0");
 			subscriberRequest.setHeader("Event", request.getHeader("Event"));
@@ -182,7 +186,7 @@ public class SubscriberSipServlet
 				request.getSession().createRequest("BYE").send();
 				SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
 				SipURI fromURI = sipFactory.createSipURI("receiver", "sip-servlets.com");
-				SipURI requestURI = sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+				SipURI requestURI = sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
 				SipServletRequest sipServletRequest = sipFactory.createRequest(sipApplicationSession, "MESSAGE", fromURI, request.getFrom().getURI());
 				String messageContent = "dialogCompleted";
 				sipServletRequest.setContentLength(messageContent.length());
@@ -276,7 +280,9 @@ public class SubscriberSipServlet
 			}
 			SipServletRequest infoRequest = request.getSession().createRequest("INFO");
 			infoRequest.setContentLength(request.getContentLength());
-			infoRequest.setContent(multipart, multipart.getContentType());
+			if(multipart != null) {
+				infoRequest.setContent(multipart, multipart.getContentType());
+			}
 			infoRequest.setRequestURI(request.getAddressHeader("Contact").getURI());
 			infoRequest.send();
 		}
@@ -326,7 +332,7 @@ public class SubscriberSipServlet
 		SipURI toURI = sipFactory.createSipURI("LittleGuy", "there.com");
 		SipServletRequest sipServletRequest = 
 			sipFactory.createRequest(sipApplicationSession, "SUBSCRIBE", fromURI, toURI);
-		SipURI requestURI = sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");		
+		SipURI requestURI = sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));		
 		sipServletRequest.setRequestURI(requestURI);
 		sipServletRequest.setHeader("Expires", "200");
 		sipServletRequest.setHeader("Event", "reg; id=2");
@@ -374,7 +380,7 @@ public class SubscriberSipServlet
 					"MESSAGE", 
 					sipSession.getLocalParty(), 
 					sipSession.getRemoteParty());
-			SipURI sipUri=sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+			SipURI sipUri=sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
 			sipServletRequest.setRequestURI(sipUri);
 			sipServletRequest.setContentLength(body.length());
 			sipServletRequest.setContent(body, CONTENT_TYPE);
@@ -383,4 +389,24 @@ public class SubscriberSipServlet
 			logger.error("Exception occured while sending the request",e);			
 		}
 	}
+        
+        public static Integer getTestPort(ServletContext ctx) {
+            String tPort = ctx.getInitParameter("testPort");
+            logger.info("TestPort at:" + tPort);
+            if (tPort != null) {
+                return Integer.valueOf(tPort);
+            } else {
+                return 5080;
+            }
+        }
+        
+        public static Integer getServletContainerPort(ServletContext ctx) {
+            String cPort = ctx.getInitParameter("servletContainerPort");
+            logger.info("TestPort at:" + cPort);            
+            if (cPort != null) {
+                return Integer.valueOf(cPort);
+            } else {
+                return 5070;
+            }            
+        }       
 }

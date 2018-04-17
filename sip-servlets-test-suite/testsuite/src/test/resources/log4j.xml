@@ -3,7 +3,7 @@
 
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
   <appender name="rolling-file" class="org.apache.log4j.RollingFileAppender"> 
-    <param name="file" value="logs/sip-server.log"/>
+    <param name="file" value="target/logs/sip-server.log"/>
     <param name="MaxFileSize" value="2000KB"/>
     <!-- Keep one backup file -->
     <param name="MaxBackupIndex" value="20"/>
@@ -19,11 +19,11 @@
     </layout> 
   </appender>    
   
-  <category name="org.mobicents">
+  	<category name="org.mobicents">
       <priority value="TRACE"/>
-   </category>
+   	</category>
    
-   <category name="org.mobicents.tools.sip.balancer">
+   	<category name="org.mobicents.tools.sip.balancer">
       <priority value="INFO"/>
    </category>
   <root> 

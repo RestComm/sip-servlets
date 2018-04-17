@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>    
+	<app-name>DistributableServletTestApplication</app-name>
+	
+	<distributable/>
+	
+	<servlet>
+		<servlet-name>DistributableSipServlet</servlet-name>
+		<display-name>DistributableSipServlet</display-name>
+		<description>Distributable SIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.testsuite.DistributableSipServlet
+		</servlet-class>		
+	</servlet>
+</sip-app>

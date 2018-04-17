@@ -22,17 +22,16 @@
 
 package org.mobicents.servlet.sip.testsuite.proxy;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 
-import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
-import org.mobicents.servlet.sip.catalina.SipStandardManager;
-import org.mobicents.servlet.sip.startup.SipContextConfig;
-import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
@@ -62,21 +61,7 @@ public class SpeedDialJunitTest extends SipServletTestCase {
 	public void deployApplication() {
 
 	}
-
-	public void deploySpeedDial(String name, String value) {
-		SipStandardContext context = new SipStandardContext();
-		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/speed-dial-servlet/src/main/sipapp");
-		context.setName("speed-dial-context");
-		context.setPath("speed-dial");
-		context.addLifecycleListener(new SipContextConfig());
-		context.setManager(new SipStandardManager());
-		ApplicationParameter applicationParameter = new ApplicationParameter();
-		applicationParameter.setName(name);
-		applicationParameter.setValue(value);
-		context.addApplicationParameter(applicationParameter);
-		assertTrue(tomcat.deployContext(context));
-	}		
-	
+        
 	@Override
 	protected String getDarConfigurationFile() {
 		return "file:///"
@@ -86,11 +71,13 @@ public class SpeedDialJunitTest extends SipServletTestCase {
 	}
 	
 	@Override
-	protected void setUp() throws Exception {		
+	protected void setUp() throws Exception {
+                containerPort = NetworkPortAssigner.retrieveNextPort();            
 		super.setUp();
 
 		senderProtocolObjects = new ProtocolObjects("sender",
-				"gov.nist", TRANSPORT, AUTODIALOG, "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070", null, null);
+				"gov.nist", TRANSPORT, AUTODIALOG, "" + 
+                                        System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + containerPort, null, null);
 		receiverProtocolObjects = new ProtocolObjects("receiver",
 				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);			
 		receiver2ProtocolObjects = new ProtocolObjects("receiver2",
@@ -98,13 +85,14 @@ public class SpeedDialJunitTest extends SipServletTestCase {
 	}
 	
 	public void testSpeedDialCallerSendBye() throws Exception {
-		deploySpeedDial("record_route", "false");
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+                int senderPort = NetworkPortAssigner.retrieveNextPort();
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, true);
 		sender.setSendSubsequentRequestsThroughSipProvider(true);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+                int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
 		receiver.setRecordRoutingProxyTesting(true);
 		SipProvider receiverProvider = receiver.createProvider();
 
@@ -113,6 +101,14 @@ public class SpeedDialJunitTest extends SipServletTestCase {
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
+                
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(senderPort)); 
+                params.put( "receiverPort", String.valueOf(receiverPort));      
+                params.put("record_route", "false");
+		deployApplication(projectHome + "/sip-servlets-test-suite/applications/speed-dial-servlet/src/main/sipapp"
+                , params, null);                
 
 		String fromName = "sender";
 		String fromHost = "sip-servlets.com";
@@ -131,13 +127,14 @@ public class SpeedDialJunitTest extends SipServletTestCase {
 	}
 	
 	public void testSpeedDialErrorResponse() throws Exception {	
-		deploySpeedDial("record_route", "false");
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+                int senderPort = NetworkPortAssigner.retrieveNextPort();
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, true);
 		sender.setSendSubsequentRequestsThroughSipProvider(true);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+                int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
 		receiver.setRecordRoutingProxyTesting(true);
 		SipProvider receiverProvider = receiver.createProvider();
 
@@ -146,6 +143,14 @@ public class SpeedDialJunitTest extends SipServletTestCase {
 		receiver.setRespondWithError(408);
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
+                
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(senderPort)); 
+                params.put( "receiverPort", String.valueOf(receiverPort));      
+                params.put("record_route", "false");
+		deployApplication(projectHome + "/sip-servlets-test-suite/applications/speed-dial-servlet/src/main/sipapp"
+                , params, null);                  
 
 		String fromName = "sender-expect-408";
 		String fromHost = "sip-servlets.com";
@@ -166,28 +171,38 @@ public class SpeedDialJunitTest extends SipServletTestCase {
 	 * Issue 2474 and 2475
 	 */
 	public void testDoBranchResponseAndDoResponseCallBacks() throws Exception {	
-		deploySpeedDial("record_route", "true");
-		
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+                int senderPort = NetworkPortAssigner.retrieveNextPort();
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, true);
 		sender.setSendSubsequentRequestsThroughSipProvider(true);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 		senderProvider.addSipListener(sender);
 		senderProtocolObjects.start();
 		
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+                int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
 		receiver.setRecordRoutingProxyTesting(true);
 		SipProvider receiverProvider = receiver.createProvider();
 		receiverProvider.addSipListener(receiver);		
 		receiver.setRespondWithError(408);		
 		receiverProtocolObjects.start();
 		
-		receiver2 = new TestSipListener(5091, 5070, receiver2ProtocolObjects, false);
+                int receiver2Port = NetworkPortAssigner.retrieveNextPort();
+		receiver2 = new TestSipListener(receiver2Port, containerPort, receiver2ProtocolObjects, false);
 		receiver2.setRecordRoutingProxyTesting(true);
 		SipProvider receiver2Provider = receiver2.createProvider();
 		receiver2Provider.addSipListener(receiver2);						
 		receiver2ProtocolObjects.start();
 		receiver2.setWaitBeforeFinalResponse(1000);
+                
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(senderPort)); 
+                params.put( "receiverPort", String.valueOf(receiverPort));  
+                params.put( "cutmePort", String.valueOf(receiver2Port)); 
+                params.put("record_route", "false");
+		deployApplication(projectHome + "/sip-servlets-test-suite/applications/speed-dial-servlet/src/main/sipapp"
+                , params, null);                 
 
 		String fromName = "sender-expect-408";
 		String fromHost = "sip-servlets.com";
@@ -212,13 +227,14 @@ public class SpeedDialJunitTest extends SipServletTestCase {
 	}
 	
 	public void testSpeedDialDeclineErrorResponse() throws Exception {	
-		deploySpeedDial("record_route", "false");
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+                int senderPort = NetworkPortAssigner.retrieveNextPort();
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, true);
 		sender.setSendSubsequentRequestsThroughSipProvider(true);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
 		receiver.setRecordRoutingProxyTesting(true);
 		SipProvider receiverProvider = receiver.createProvider();
 
@@ -227,6 +243,14 @@ public class SpeedDialJunitTest extends SipServletTestCase {
 		receiver.setRespondWithError(603);
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
+                
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(senderPort)); 
+                params.put( "receiverPort", String.valueOf(receiverPort));      
+                params.put("record_route", "false");
+		deployApplication(projectHome + "/sip-servlets-test-suite/applications/speed-dial-servlet/src/main/sipapp"
+                , params, null);                 
 
 		String fromName = "sender-expect-603";
 		String fromHost = "sip-servlets.com";
@@ -244,13 +268,14 @@ public class SpeedDialJunitTest extends SipServletTestCase {
 	}
 
 	public void testSpeedDialCalleeSendBye() throws Exception {
-		deploySpeedDial("record_route", "false");
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+                int senderPort = NetworkPortAssigner.retrieveNextPort();
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, false);
 		sender.setSendSubsequentRequestsThroughSipProvider(true);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, true);
+                int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, true);
 		receiver.setRecordRoutingProxyTesting(true);
 		SipProvider receiverProvider = receiver.createProvider();
 
@@ -259,6 +284,14 @@ public class SpeedDialJunitTest extends SipServletTestCase {
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
+                
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(senderPort)); 
+                params.put( "receiverPort", String.valueOf(receiverPort));      
+                params.put("record_route", "false");
+		deployApplication(projectHome + "/sip-servlets-test-suite/applications/speed-dial-servlet/src/main/sipapp"
+                , params, null);                 
 
 		String fromName = "sender";
 		String fromHost = "sip-servlets.com";
@@ -277,13 +310,14 @@ public class SpeedDialJunitTest extends SipServletTestCase {
 	}
 
 	public void testCancelSpeedDial() throws Exception {
-		deploySpeedDial("record_route", "false");
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+                int senderPort = NetworkPortAssigner.retrieveNextPort();
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, false);
 		sender.setSendSubsequentRequestsThroughSipProvider(true);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, true);
+                int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, true);
 		receiver.setRecordRoutingProxyTesting(true);
 		receiver.setWaitForCancel(true);
 		SipProvider receiverProvider = receiver.createProvider();
@@ -293,6 +327,14 @@ public class SpeedDialJunitTest extends SipServletTestCase {
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
+                
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(senderPort)); 
+                params.put( "receiverPort", String.valueOf(receiverPort));      
+                params.put("record_route", "false");
+		deployApplication(projectHome + "/sip-servlets-test-suite/applications/speed-dial-servlet/src/main/sipapp"
+                , params, null);                 
 
 		String fromName = "sender";
 		String fromHost = "sip-servlets.com";

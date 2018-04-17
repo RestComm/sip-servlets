@@ -1,8 +1,6 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * TeleStax, Open Source Cloud Communications.
+ * Copyright 2012 and individual contributors by the @authors tag. 
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -193,7 +191,7 @@ public class SipEmbedded {
 			sipService.setTagHashMaxLength(tagSize);
 		}
 		if(isHA) {
-			sipService.setSipPathName("org.mobicents.ha");
+			sipService.setSipPathName("org.mobicents.ha.balancing.only");
 			sipService.setBalancers("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
 		}
 //		sipService.setBypassRequestExecutor(true);
@@ -274,6 +272,22 @@ public class SipEmbedded {
 		sipService.addConnector(udpSipConnector);
 		return udpSipConnector;
 	}
+	
+	public Connector addSipConnectorForLB(String connectorName, String ipAddress, int port, String transport, String lbAddress, int lbRmiPort) throws Exception {
+		Connector udpSipConnector = new Connector(
+				SipProtocolHandler.class.getName());
+		SipProtocolHandler udpProtocolHandler = (SipProtocolHandler) udpSipConnector
+				.getProtocolHandler();
+		udpProtocolHandler.setPort(port);
+		udpProtocolHandler.setIpAddress(ipAddress);
+		udpProtocolHandler.setSignalingTransport(transport);
+		udpProtocolHandler.setLoadBalancerAddress(lbAddress);
+		udpProtocolHandler.setLoadBalancerRmiPort(lbRmiPort);
+		udpProtocolHandler.setUseLoadBalancer(true);
+
+		sipService.addConnector(udpSipConnector);
+		return udpSipConnector;
+	}
 
 	/**
 	 * 
@@ -311,7 +325,7 @@ public class SipEmbedded {
 				try {
 					connector.stop();
 					connector.destroy();
-				} catch (LifecycleException e) {
+				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}				
@@ -329,6 +343,10 @@ public class SipEmbedded {
 	 * @param contextPath the context Path of the context to deploy
 	 */
 	public boolean deployContext(String docBase, String name, String path) {
+		return deployAppContext(docBase, name, path).getAvailable();			
+	}
+        
+	public SipStandardContext deployAppContext(String docBase, String name, String path) {
 		SipStandardContext context = new SipStandardContext();
 		context.setDocBase(docBase);
 		context.setName(name);
@@ -338,9 +356,12 @@ public class SipEmbedded {
 		context.addLifecycleListener(new SipContextConfig());
 		context.setManager(new SipStandardManager());
 		host.addChild(context);
-		return context.getAvailable();			
-	}
-	public boolean deployContext(String docBase, String name, String path, int appSessionTimeout) {
+		return context;			
+	}        
+        boolean deployContext(String docBase, String name, String path, int appSessionTimeout) {
+         return deployAppContext(docBase, name, path, 0).getAvailable();
+        }
+	public SipStandardContext deployAppContext(String docBase, String name, String path, int appSessionTimeout) {
 		SipStandardContext context = new SipStandardContext();
 		context.setDocBase(docBase);
 		context.setName(name);
@@ -351,7 +372,7 @@ public class SipEmbedded {
 		context.addLifecycleListener(new SipContextConfig());
 		context.setManager(new SipStandardManager());
 		host.addChild(context);
-		return context.getAvailable();			
+		return context;			
 	}
 	
 	public boolean deployContext(SipStandardContext context) {

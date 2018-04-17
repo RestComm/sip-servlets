@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
+import javax.servlet.ServletContext;
 
 import javax.sip.DialogTerminatedEvent;
 import javax.sip.IOExceptionEvent;

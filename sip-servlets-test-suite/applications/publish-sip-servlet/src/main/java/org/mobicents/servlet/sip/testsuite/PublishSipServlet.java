@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Random;
 
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
@@ -56,6 +57,7 @@ public class PublishSipServlet extends SipServlet implements SipServletListener,
 	private static final String PUBLISH_SIP_ETAGS = "publishSIP-ETag_s";
 	private static transient Logger logger = Logger.getLogger(PublishSipServlet.class);
 	
+        static ServletContext ctx;            
 	
 	/** Creates a new instance of PublishSipServlet */
 	public PublishSipServlet() {
@@ -65,6 +67,7 @@ public class PublishSipServlet extends SipServlet implements SipServletListener,
 	public void init(ServletConfig servletConfig) throws ServletException {
 		logger.info("the publish sip servlet has been started");
 		super.init(servletConfig);
+                ctx = servletConfig.getServletContext();                 
 		getServletContext().setAttribute(SUBSCRIBER_SESSIONS, new HashMap<URI, SipSession>());
 		getServletContext().setAttribute(PUBLISH_SIP_ETAGS, new HashMap<URI, String>());
 	}
@@ -79,7 +82,7 @@ public class PublishSipServlet extends SipServlet implements SipServletListener,
 			SipURI toURI = sipFactory.createSipURI("presentity", "example.com");
 			SipServletRequest sipServletRequest = 
 				sipFactory.createRequest(sipApplicationSession, "PUBLISH", fromURI, toURI);
-			SipURI requestURI = sipFactory.createSipURI("presentity", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+			SipURI requestURI = sipFactory.createSipURI("presentity", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
 			sipServletRequest.setRequestURI(requestURI);
 			sipServletRequest.setExpires(3600);
 			sipServletRequest.setHeader("Event", "presence");
@@ -189,7 +192,7 @@ public class PublishSipServlet extends SipServlet implements SipServletListener,
 		SipURI toURI = sipFactory.createSipURI("presentity", "example.com");
 		SipServletRequest sipServletRequest = 
 			sipFactory.createRequest(timer.getApplicationSession(), "PUBLISH", fromURI, toURI);
-		SipURI requestURI = sipFactory.createSipURI("presentity", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+		SipURI requestURI = sipFactory.createSipURI("presentity", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
 		sipServletRequest.setRequestURI(requestURI);
 		sipServletRequest.setExpires(3600);
 		sipServletRequest.setHeader("Event", "presence");
@@ -201,4 +204,24 @@ public class PublishSipServlet extends SipServlet implements SipServletListener,
 			logger.error(e);
 		}
 	}
+        
+        public static Integer getTestPort(ServletContext ctx) {
+            String tPort = ctx.getInitParameter("testPort");
+            logger.info("TestPort at:" + tPort);
+            if (tPort != null) {
+                return Integer.valueOf(tPort);
+            } else {
+                return 5080;
+            }
+        }
+        
+        public static Integer getServletContainerPort(ServletContext ctx) {
+            String cPort = ctx.getInitParameter("servletContainerPort");
+            logger.info("TestPort at:" + cPort);            
+            if (cPort != null) {
+                return Integer.valueOf(cPort);
+            } else {
+                return 5070;
+            }            
+        }         
 }

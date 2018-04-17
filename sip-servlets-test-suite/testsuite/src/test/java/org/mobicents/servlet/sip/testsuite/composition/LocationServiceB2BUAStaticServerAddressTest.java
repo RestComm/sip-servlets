@@ -19,198 +19,207 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.servlet.sip.testsuite.composition;
 
 import gov.nist.javax.sip.header.Contact;
 import gov.nist.javax.sip.header.Via;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
+import static junit.framework.Assert.assertTrue;
 
 import org.apache.catalina.connector.Connector;
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.UDPPacketForwarder;
 import org.mobicents.servlet.sip.catalina.SipProtocolHandler;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
 public class LocationServiceB2BUAStaticServerAddressTest extends SipServletTestCase {
-	
-	private String HOST;
 
-	private static final int MSS_PORT = 5070;
+    private String HOST;
 
-	private static final int IP_LOAD_BALANCER_PORT = 5005;
+    private static int IP_LOAD_BALANCER_PORT = 5005;
 
-	private static transient Logger logger = Logger.getLogger(LocationServiceB2BUAStaticServerAddressTest.class);
+    private static transient Logger logger = Logger.getLogger(LocationServiceB2BUAStaticServerAddressTest.class);
 
-	private static final String TRANSPORT = "udp";
-	private static final boolean AUTODIALOG = true;
-	private static final int TIMEOUT = 20000;	
+    private static final String TRANSPORT = "udp";
+    private static final boolean AUTODIALOG = true;
+    private static final int TIMEOUT = 20000;
 //	private static final int TIMEOUT = 100000000;
-	 
-	TestSipListener sender;
-	TestSipListener receiver;
-	ProtocolObjects senderProtocolObjects;
-	ProtocolObjects	receiverProtocolObjects;
-	UDPPacketForwarder ipBalancer;
 
-	public LocationServiceB2BUAStaticServerAddressTest(String name) {
-		super(name);
-		startTomcatOnStartup = false;
-		addSipConnectorOnStartup =  false;
-		autoDeployOnStartup = false;
-	}
+    TestSipListener sender;
+    TestSipListener receiver;
+    ProtocolObjects senderProtocolObjects;
+    ProtocolObjects receiverProtocolObjects;
+    UDPPacketForwarder ipBalancer;
 
-	@Override
-	public void deployApplication() {
-		deployCallForwarding();
-		deployLocationService();
-	}
+    public LocationServiceB2BUAStaticServerAddressTest(String name) {
+        super(name);
+        startTomcatOnStartup = false;
+        addSipConnectorOnStartup = false;
+        autoDeployOnStartup = false;
+    }
 
-	private void deployCallForwarding() {
-		assertTrue(tomcat.deployContext(
-				projectHome + "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
-				"call-forwarding-b2bua-context", 
-				"call-forwarding-b2bua"));
-	}
-	
-	private void deployLocationService() {
-		assertTrue(tomcat.deployContext(
-				projectHome + "/sip-servlets-test-suite/applications/location-service-servlet/src/main/sipapp",
-				"location-service-context", 
-				"location-service"));
-	}
-	
-	@Override
-	protected String getDarConfigurationFile() {
-		return "file:///"
-				+ projectHome
-				+ "/sip-servlets-test-suite/testsuite/src/test/resources/"
-				+ "org/mobicents/servlet/sip/testsuite/composition/location-b2bua-dar.properties";
-	}
-	
-	@Override
-	protected void setUp() throws Exception {		
-		super.setUp();
-		
-		HOST = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
-		
-		Connector udpSipConnector = null;
-		try {
-			udpSipConnector = new Connector(
-					SipProtocolHandler.class.getName());
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
-		SipProtocolHandler udpProtocolHandler = (SipProtocolHandler) udpSipConnector
-				.getProtocolHandler();
-		try {
-			udpProtocolHandler.setPort(MSS_PORT);
-			udpProtocolHandler.setIpAddress(HOST);
+    @Override
+    public void deployApplication() {
+    }
 
-			udpProtocolHandler.setSignalingTransport("udp");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		tomcat.getSipService().setSipStackProperties(null);
-		udpProtocolHandler.setUseStaticAddress(true);
-		udpProtocolHandler.setStaticServerAddress(HOST);
-		udpProtocolHandler.setStaticServerPort(IP_LOAD_BALANCER_PORT);
-		tomcat.getSipService().addConnector(udpSipConnector);
-		try {
-			tomcat.startTomcat();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}		
-		
-		deployApplication();
-		senderProtocolObjects = new ProtocolObjects("sender",
-				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
-		receiverProtocolObjects = new ProtocolObjects("receiver",
-				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);			
-	}
-	
-	public void testLocationServiceCallForwardingCallerSendBye() throws Exception {	
-		try {
-			new File("proxy-b2bua.failure.flag").delete();
-			new File("proxy-b2bua.case.flag").delete();
-			new File("proxy-b2bua.case.flag").createNewFile();
-			assertFalse(new File("proxy-b2bua.failure.flag").exists());
+    private void deployCallForwarding(Map<String, String> params) {
+        SipStandardContext ctx = deployApplication(projectHome
+                + "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
+                "call-forwarding-b2bua",
+                params, null);
+        assertTrue(ctx.getAvailable());
+    }
 
-			sender = new TestSipListener(5080, IP_LOAD_BALANCER_PORT, senderProtocolObjects, true);
-			sender.setRecordRoutingProxyTesting(true);
-			SipProvider senderProvider = sender.createProvider();
+    private void deployLocationService(Map<String, String> params) {
+        SipStandardContext ctx = deployApplication(projectHome
+                + "/sip-servlets-test-suite/applications/location-service-servlet/src/main/sipapp",
+                "location-servicea",
+                params, null);
+        assertTrue(ctx.getAvailable());        
+    }
 
-			receiver = new TestSipListener(5090, IP_LOAD_BALANCER_PORT, receiverProtocolObjects, false);
-			receiver.setRecordRoutingProxyTesting(true);
-			receiver.setWaitBeforeFinalResponse(2000);
-			SipProvider receiverProvider = receiver.createProvider();
+    @Override
+    protected String getDarConfigurationFile() {
+        return "file:///"
+                + projectHome
+                + "/sip-servlets-test-suite/testsuite/src/test/resources/"
+                + "org/mobicents/servlet/sip/testsuite/composition/location-b2bua-dar.properties";
+    }
 
-			ipBalancer = new UDPPacketForwarder(IP_LOAD_BALANCER_PORT, MSS_PORT, HOST);
-			ipBalancer.start();
+    @Override
+    protected void setUp() throws Exception {
+        containerPort = NetworkPortAssigner.retrieveNextPort();
+        IP_LOAD_BALANCER_PORT = NetworkPortAssigner.retrieveNextPort();
+        super.setUp();
 
-			receiverProvider.addSipListener(receiver);
-			senderProvider.addSipListener(sender);
+        HOST = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
 
-			senderProtocolObjects.start();
-			receiverProtocolObjects.start();
+        Connector udpSipConnector = null;
+        try {
+            udpSipConnector = new Connector(
+                    SipProtocolHandler.class.getName());
+        } catch (Exception e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
 
-			String fromName = "forward-sender";
-			String fromHost = "sip-servlets.com";
-			SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
-					fromName, fromHost);
+        SipProtocolHandler udpProtocolHandler = (SipProtocolHandler) udpSipConnector
+                .getProtocolHandler();
+        try {
+            udpProtocolHandler.setPort(containerPort);
+            udpProtocolHandler.setIpAddress(HOST);
 
-			String toUser = "proxy-b2bua";
-			String toHost = HOST+":"+MSS_PORT;
-			SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
-					toUser, toHost);
+            udpProtocolHandler.setSignalingTransport("udp");
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        tomcat.getSipService().setSipStackProperties(null);
+        udpProtocolHandler.setUseStaticAddress(true);
+        udpProtocolHandler.setStaticServerAddress(HOST);
+        udpProtocolHandler.setStaticServerPort(IP_LOAD_BALANCER_PORT);
+        tomcat.getSipService().addConnector(udpSipConnector);
+        try {
+            tomcat.startTomcat();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
-			sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
-			Thread.sleep(TIMEOUT);
-			int byes = 0;
-			
-			assertTrue(
-					receiver.getByeRequestReceived().getHeader(Via.NAME).toString().contains(":"+IP_LOAD_BALANCER_PORT));
-		
-			for(String message:ipBalancer.sipMessageWithoutRetrans) {
-				if(message.contains("BYE ")) {
-					byes++;
-				}
-			}
-			assertEquals(1, byes);
-			
-			assertTrue(sender.getOkToByeReceived());
-			assertTrue(receiver.getByeReceived());
-			Contact contact = (Contact) sender.getInviteOkResponse().getHeader(Contact.NAME);
-			SipURI sipURI = (SipURI) contact.getAddress().getURI();
-			assertTrue(sipURI.getPort() == IP_LOAD_BALANCER_PORT);
-			assertFalse(new File("proxy-b2bua.failure.flag").exists());
-			
-			
-		} finally {
-			new File("proxy-b2bua.case.flag").delete();
-			new File("proxy-b2bua.failure.flag").delete();
-		}
-	}
+        senderProtocolObjects = new ProtocolObjects("sender",
+                "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+        receiverProtocolObjects = new ProtocolObjects("receiver",
+                "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+    }
 
-	
-	@Override
-	protected void tearDown() throws Exception {	
-		senderProtocolObjects.destroy();
-		receiverProtocolObjects.destroy();	
-		ipBalancer.stop();
-		logger.info("Test completed");
-		super.tearDown();
-	}
+    public void testLocationServiceCallForwardingCallerSendBye() throws Exception {
+        try {
+            new File("proxy-b2bua.failure.flag").delete();
+            new File("proxy-b2bua.case.flag").delete();
+            new File("proxy-b2bua.case.flag").createNewFile();
+            assertFalse(new File("proxy-b2bua.failure.flag").exists());
 
+            int senderPort = NetworkPortAssigner.retrieveNextPort();
+            sender = new TestSipListener(senderPort, IP_LOAD_BALANCER_PORT, senderProtocolObjects, true);
+            sender.setRecordRoutingProxyTesting(true);
+            SipProvider senderProvider = sender.createProvider();
+
+            int receiverPort = NetworkPortAssigner.retrieveNextPort();
+            receiver = new TestSipListener(receiverPort, IP_LOAD_BALANCER_PORT, receiverProtocolObjects, false);
+            receiver.setRecordRoutingProxyTesting(true);
+            receiver.setWaitBeforeFinalResponse(2000);
+            SipProvider receiverProvider = receiver.createProvider();
+
+            ipBalancer = new UDPPacketForwarder(IP_LOAD_BALANCER_PORT, containerPort, HOST);
+            ipBalancer.start();
+
+            receiverProvider.addSipListener(receiver);
+            senderProvider.addSipListener(sender);
+
+            senderProtocolObjects.start();
+            receiverProtocolObjects.start();
+
+            Map<String, String> params = new HashMap();
+            params.put("servletContainerPort", String.valueOf(containerPort));
+            params.put("testPort", String.valueOf(receiverPort));
+            params.put("senderPort", String.valueOf(senderPort));
+            deployCallForwarding(params);
+            deployLocationService(params);
+
+            String fromName = "forward-sender";
+            String fromHost = "sip-servlets.com";
+            SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+                    fromName, fromHost);
+
+            String toUser = "proxy-b2bua";
+            String toHost = HOST + ":" + containerPort;
+            SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+                    toUser, toHost);
+
+            sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);
+            Thread.sleep(TIMEOUT);
+            int byes = 0;
+
+            assertTrue(
+                    receiver.getByeRequestReceived().getHeader(Via.NAME).toString().contains(":" + IP_LOAD_BALANCER_PORT));
+
+            for (String message : ipBalancer.sipMessageWithoutRetrans) {
+                if (message.contains("BYE ")) {
+                    byes++;
+                }
+            }
+            assertEquals(1, byes);
+
+            assertTrue(sender.getOkToByeReceived());
+            assertTrue(receiver.getByeReceived());
+            Contact contact = (Contact) sender.getInviteOkResponse().getHeader(Contact.NAME);
+            SipURI sipURI = (SipURI) contact.getAddress().getURI();
+            assertTrue(sipURI.getPort() == IP_LOAD_BALANCER_PORT);
+            assertFalse(new File("proxy-b2bua.failure.flag").exists());
+
+        } finally {
+            new File("proxy-b2bua.case.flag").delete();
+            new File("proxy-b2bua.failure.flag").delete();
+        }
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        senderProtocolObjects.destroy();
+        receiverProtocolObjects.destroy();
+        ipBalancer.stop();
+        logger.info("Test completed");
+        super.tearDown();
+    }
 
 }

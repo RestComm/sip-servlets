@@ -26,6 +26,7 @@ import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
@@ -80,10 +81,12 @@ public class NoApplicationDeployedTest extends SipServletTestCase {
 	}
 	
 	public void testNoAppDeployed404() throws Exception {
-		tomcat.addSipConnector(serverName, sipIpAddress, 5060, listeningPointTransport);
+		int myPort = NetworkPortAssigner.retrieveNextPort();
+                containerPort = NetworkPortAssigner.retrieveNextPort();            
+		tomcat.addSipConnector(serverName, sipIpAddress, containerPort, listeningPointTransport);
 		super.tomcat.startTomcat();		
 		
-		sender = new TestSipListener(5080, 5060, senderProtocolObjects, true);
+		sender = new TestSipListener(myPort, containerPort, senderProtocolObjects, true);
 		SipProvider senderProvider = sender.createProvider();
 
 		senderProvider.addSipListener(sender);
@@ -96,7 +99,7 @@ public class NoApplicationDeployedTest extends SipServletTestCase {
 				fromName, fromHost);
 				
 		String toUser = "container";
-		String toHost = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
+		String toHost = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + containerPort;
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toHost);
 				

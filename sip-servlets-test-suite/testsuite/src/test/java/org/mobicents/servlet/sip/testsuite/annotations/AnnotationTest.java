@@ -23,7 +23,9 @@
 package org.mobicents.servlet.sip.testsuite.annotations;
 
 import java.util.EventObject;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 
 import javax.sip.DialogTerminatedEvent;
 import javax.sip.IOExceptionEvent;
@@ -35,7 +37,9 @@ import javax.sip.TimeoutEvent;
 import javax.sip.TransactionTerminatedEvent;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
 
 public class AnnotationTest extends SipServletTestCase implements SipListener {
 
@@ -47,17 +51,23 @@ public class AnnotationTest extends SipServletTestCase implements SipListener {
 
 	public AnnotationTest(String name) {
 		super(name);
+                autoDeployOnStartup = false;
 	}
 
 	@Override
 	public void setUp() throws Exception {
 		//init();
 		tracker = new Tracker();
+                containerPort = NetworkPortAssigner.retrieveNextPort();
 		super.setUp();
 	}
 
 	public void testSecurity() {
 		tracker.init();
+                Map<String, String> params = new HashMap();
+                params.put("testPort", String.valueOf(tracker.getMyPort()));
+                params.put("servletContainerPort", String.valueOf(containerPort));                 
+                deployApplication(params);                
 		try {
 			for(int q=0; q<10; q++)
 			{
@@ -84,6 +94,12 @@ public class AnnotationTest extends SipServletTestCase implements SipListener {
 				projectHome + "/sip-servlets-test-suite/applications/annotated-servlet/src/main/sipapp",
 				"sip-test-context", "sip-test"));
 	}
+        
+	public void deployApplication(Map<String,String> params) {
+		SipStandardContext ctx = deployApplication(projectHome + "/sip-servlets-test-suite/applications/annotated-servlet/src/main/sipapp", 
+                                  params, null);
+                assertTrue(ctx.getAvailable());
+	}        
 
 	@Override
 	protected String getDarConfigurationFile() {

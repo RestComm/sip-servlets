@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.sip.AuthInfo;
 import javax.servlet.sip.Parameterable;
@@ -72,6 +73,8 @@ public class ShootistSipServletAuth
 		      "m=audio 51372 RTP/AVP 97 101" +
 		      "a=rtpmap:97 iLBC/8000" +
 		      "a=rtpmap:101 telephone-event/8000";
+        
+        static ServletContext ctx;        
 	
 	/** Creates a new instance of ShootistSipServletAuth */
 	public ShootistSipServletAuth() {
@@ -81,6 +84,7 @@ public class ShootistSipServletAuth
 	public void init(ServletConfig servletConfig) throws ServletException {
 		logger.info("the shootist has been started");
 		super.init(servletConfig);
+                ctx = servletConfig.getServletContext();                  
 	}		
 	
 	@Override
@@ -228,7 +232,7 @@ public class ShootistSipServletAuth
 		SipServletRequest sipServletRequest = 
 			sipFactory.createRequest(sipApplicationSession, method, fromURI, toURI);
 		sipApplicationSession.setAttribute("nbSubsequentReq", numberOfSubsequentRequests);
-		SipURI requestURI = sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+		SipURI requestURI = sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") +  ":" + getTestPort(ctx));
 		sipServletRequest.setRequestURI(requestURI);
 		if(method.equalsIgnoreCase("INVITE")) {
 			try {
@@ -273,7 +277,7 @@ public class ShootistSipServletAuth
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
 			sipServletRequest.addHeader("Ext", "Test 1, 2 ,3");
-			SipURI sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+			SipURI sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") +  ":" + getTestPort(ctx));
 			if(transport != null) {
 				if(transport.equalsIgnoreCase(ListeningPoint.TCP)) {
 					sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5081");
@@ -300,4 +304,24 @@ public class ShootistSipServletAuth
 		// TODO Auto-generated method stub
 		
 	}
+        
+        public static Integer getTestPort(ServletContext ctx) {
+            String tPort = ctx.getInitParameter("testPort");
+            logger.info("TestPort at:" + tPort);
+            if (tPort != null) {
+                return Integer.valueOf(tPort);
+            } else {
+                return 5080;
+            }
+        }
+        
+        public static Integer getServletContainerPort(ServletContext ctx) {
+            String cPort = ctx.getInitParameter("servletContainerPort");
+            logger.info("TestPort at:" + cPort);            
+            if (cPort != null) {
+                return Integer.valueOf(cPort);
+            } else {
+                return 5070;
+            }            
+        }         
 }
