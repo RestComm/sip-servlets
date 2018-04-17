@@ -30,6 +30,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
@@ -57,6 +58,7 @@ public class AnnotatedServlet extends SipServlet implements SipServletListener {
 	SipSessionsUtil sipSessionsUtil;
 	@Resource
 	TimerService timerService;
+        static ServletContext ctx;        
 	
 	private static transient Logger logger = Logger.getLogger(AnnotatedServlet.class);
 
@@ -64,6 +66,7 @@ public class AnnotatedServlet extends SipServlet implements SipServletListener {
 	public void init(ServletConfig servletConfig) throws ServletException {		
 		super.init(servletConfig);
 		logger.info("the simple sip servlet has been started");
+                ctx = servletConfig.getServletContext();                
 		logger.info("SipFactory injected resource " + sipFactory);
 		logger.info("SipSessionsUtil injected resource " + sipSessionsUtil);
 		logger.info("TimerService injected resource " + timerService);
@@ -114,7 +117,7 @@ public class AnnotatedServlet extends SipServlet implements SipServletListener {
 			SipApplicationSession appSession = 
         	sipFactory.createApplicationSession(); // Injected factory
         	SipServletRequest req = sipFactory.createRequest(appSession,
-        		"INVITE", "sip:from@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070", "sip:to@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5058");
+        		"INVITE", "sip:from@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getServletContainerPort(ctx), "sip:to@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
         	req.send();
         } catch (Exception e) {
         	e.printStackTrace();
@@ -146,7 +149,7 @@ public class AnnotatedServlet extends SipServlet implements SipServletListener {
 			SipApplicationSession appSession = 
         	sipFactory.createApplicationSession();
         	SipServletRequest req = sipFactory.createRequest(appSession,
-        		"INVITE", "sip:from@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070", "sip:to@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070");
+        		"INVITE", "sip:from@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getServletContainerPort(ctx), "sip:to@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getServletContainerPort(ctx));
         	req.send();
         } catch (Exception e) {
         	e.printStackTrace();
@@ -164,4 +167,24 @@ public class AnnotatedServlet extends SipServlet implements SipServletListener {
 	public static String key(SipServletRequest request) {
 		return "working";
 	}
+        
+        public static Integer getTestPort(ServletContext ctx) {
+            String tPort = ctx.getInitParameter("testPort");
+            logger.info("TestPort at:" + tPort);
+            if (tPort != null) {
+                return Integer.valueOf(tPort);
+            } else {
+                return 5080;
+            }
+        }
+        
+        public static Integer getServletContainerPort(ServletContext ctx) {
+            String cPort = ctx.getInitParameter("servletContainerPort");
+            logger.info("TestPort at:" + cPort);            
+            if (cPort != null) {
+                return Integer.valueOf(cPort);
+            } else {
+                return 5070;
+            }            
+        }        
 }

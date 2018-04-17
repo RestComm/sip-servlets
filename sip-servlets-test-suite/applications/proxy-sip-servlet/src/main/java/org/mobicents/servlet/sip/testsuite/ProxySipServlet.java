@@ -32,6 +32,7 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.Proxy;
@@ -86,11 +87,14 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 
 	@Resource TimerService timerService;
+        
+        static ServletContext ctx;         
 	
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {
 		logger.info("the proxy sip servlet has been started");
 		super.init(servletConfig);
+                ctx = servletConfig.getServletContext();                 
 	}
 
 	@Override
@@ -98,7 +102,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			IOException {
 		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 		req.getProxy().setAddToPath(true);
-		URI uri1 = sipFactory.createAddress("sip:receiver@" + host + ":5057").getURI();
+		URI uri1 = sipFactory.createAddress("sip:receiver@" + host + ":" + getReceiverPort(ctx)).getURI();
 		((ProxyExt)req.getProxy()).setSipOutboundSupport(true);
 		req.getProxy().proxyTo(uri1);
 	}
@@ -136,14 +140,14 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			sipFactoryExt.setRouteOrphanRequests(true);
 			Object o = getServletContext().getAttribute(javax.servlet.sip.SipServlet. OUTBOUND_INTERFACES);
 			request.getProxy().setRecordRoute(true);
-			request.getProxy().proxyTo(sipFactory.createURI("sip:a@127.0.0.1:5090;transport=udp"));
+			request.getProxy().proxyTo(sipFactory.createURI("sip:a@127.0.0.1:" +  getReceiverPort(ctx) + ";transport=udp"));
 			return;
 		}
 		if(request.getFrom().toString().contains("proxy-tcp")) {
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 			Object o = getServletContext().getAttribute(javax.servlet.sip.SipServlet. OUTBOUND_INTERFACES);
 			request.getProxy().setRecordRoute(true);
-			request.getProxy().proxyTo(sipFactory.createURI("sip:a@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090;transport=tcp"));
+			request.getProxy().proxyTo(sipFactory.createURI("sip:a@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" +  getReceiverPort(ctx) + ";transport=tcp"));
 			return;
 		}
 		
@@ -151,7 +155,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 			Object o = getServletContext().getAttribute(javax.servlet.sip.SipServlet. OUTBOUND_INTERFACES);
 			request.getProxy().setRecordRoute(true);
-			request.getProxy().proxyTo(sipFactory.createURI("sip:a@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090;transport=udp"));
+			request.getProxy().proxyTo(sipFactory.createURI("sip:a@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" +  getReceiverPort(ctx) + ";transport=udp"));
 			return;
 		}
 		
@@ -159,7 +163,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 			Object o = getServletContext().getAttribute(javax.servlet.sip.SipServlet. OUTBOUND_INTERFACES);
 			request.getProxy().setRecordRoute(true);
-			request.getProxy().proxyTo(sipFactory.createURI("sip:a@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"));
+			request.getProxy().proxyTo(sipFactory.createURI("sip:a@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" +  getReceiverPort(ctx)));
 			return;
 		}
 				
@@ -167,7 +171,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 			Object o = getServletContext().getAttribute(javax.servlet.sip.SipServlet. OUTBOUND_INTERFACES);
 			request.getProxy().setRecordRoute(true);
-			request.getProxy().proxyTo(sipFactory.createURI("sips:a@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090;transport=tls"));
+			request.getProxy().proxyTo(sipFactory.createURI("sips:a@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" +  getReceiverPort(ctx) + ";transport=tls"));
 			return;
 		}
 		String error = (String) request.getApplicationSession().getAttribute(ERROR);
@@ -211,8 +215,8 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			logger.info("using Host Name for proxy test");
 		}
 
-		URI uri1 = sipFactory.createAddress("sip:receiver@" + host + ":5057").getURI();		
-		URI uri2 = sipFactory.createAddress("sip:cutme@" + host + ":5056").getURI();
+		URI uri1 = sipFactory.createAddress("sip:receiver@" + host + ":" + getReceiverPort(ctx)).getURI();		
+		URI uri2 = sipFactory.createAddress("sip:cutme@" + host + ":" + getCutmePort(ctx)).getURI();
 		URI uri3 = sipFactory.createAddress("sip:nonexist@" + host + ":5856").getURI();
 		String via = request.getHeader("Via");
 		String transport = "udp";
@@ -230,7 +234,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		}
 		
 		if(from.contains("forward-sender-downstream-proxy")) {
-			URI uri = sipFactory.createAddress("sip:receiver@" + host + ":5070").getURI();
+			URI uri = sipFactory.createAddress("sip:receiver@" + host + ":" + getReceiverPort(ctx)).getURI();
 			Proxy proxy = request.getProxy();
 			proxy.setParallel(false);
 			proxy.setRecordRoute(true);
@@ -249,9 +253,9 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			if(from.contains("push-route-app-server")) {
 				logger.info("Max Forwards " + request.getHeader("Max-Forwards"));
 				if(request.getHeader("Max-Forwards").equalsIgnoreCase("70")) {
-					logger.info("proxying to downstream app server on port 5069");
+					logger.info("proxying to downstream app server on port " + getDownstreamContainerPort(ctx));
 					// only the first hop proxy to the second server or the second server will endlessly route to itself
-					URI uriAppServer = sipFactory.createAddress("sip:receiver@" + host + ":5069").getURI();	
+					URI uriAppServer = sipFactory.createAddress("sip:receiver@" + host + ":" + getDownstreamContainerPort(ctx)).getURI();	
 					request.pushRoute((SipURI)uriAppServer);
 					proxy.proxyTo(request.getRequestURI());
 					return;
@@ -320,7 +324,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 				((ProxyExt)proxy).setSipOutboundSupport(true);
 				uris.clear();
 				SipURI sipURI = sipFactory.createSipURI("receiver", host );
-				sipURI.setPort(5080);
+				sipURI.setPort(getTestPort(ctx));
 				if(via.contains("TCP") || via.contains("tcp")) {					
 					sipURI.setTransportParam("tcp");
 					uris.add(sipURI);
@@ -361,7 +365,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 				((ProxyExt)proxy).storeTerminationInformation(true);
 				logger.info("testing termination");
 			}
-			//proxy.setOutboundInterface((SipURI)sipFactory.createAddress("sip:proxy@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070").getURI());
+			//proxy.setOutboundInterface((SipURI)sipFactory.createAddress("sip:proxy@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" ":" + getServletContainerPort(ctx)).getURI());
 			proxy.setRecordRoute(recordRoute);
 			proxy.setSupervised(true);
 			if(recordRoute) {
@@ -376,7 +380,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			}		
 			proxy.setParallel(true);
 			if(CHECK_URI.equals(fromURI.getUser())) {
-				Address routeAddress = sipFactory.createAddress("sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5057");
+				Address routeAddress = sipFactory.createAddress("sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getReceiverPort(ctx));
 				request.pushRoute(routeAddress);
 				Address ra = request.getAddressHeader("Route");
 				logger.info("doInvite: ra = " + ra);
@@ -424,7 +428,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		}
 		if(from.contains("unique-location-urn-route")) {
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
-			URI uri1 = sipFactory.createAddress("sip:receiver@" + host + ":5057").getURI();
+			URI uri1 = sipFactory.createAddress("sip:receiver@" + host + ":" + getReceiverPort(ctx)).getURI();
 			if(from.contains("tcp")) {
 				((SipURI)uri1).setTransportParam("tcp");
 			}
@@ -432,7 +436,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		}
 		
 		if(from.contains("unique-location-ack-seen-by-app") && request.getHeader("CSeq").contains("2")) {
-			sendMessage("ack-seen-by-app", 5080, "udp");
+			sendMessage("ack-seen-by-app", getTestPort(ctx), "udp");
 		}
 		
 		if(from.contains(TEST_TERMINATION)) {
@@ -456,7 +460,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		if(sipServletRequestExt.isOrphan()) return;
 		if(from.contains("unique-location-urn-route")) {
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
-			URI uri1 = sipFactory.createAddress("sip:receiver@" + host + ":5057").getURI();
+			URI uri1 = sipFactory.createAddress("sip:receiver@" + host + ":" + getReceiverPort(ctx)).getURI();
 			if(from.contains("tcp")) {
 				((SipURI)uri1).setTransportParam("tcp");
 			}
@@ -581,14 +585,14 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		logger.info("doBranchResponse callback was called " + response);		
 		response.getApplicationSession().setAttribute("branchResponseReceived", "true");	
 		if(response.getStatus() == 408) {
-			sendMessage("doBranchTimeoutReceived", 5080, "udp");
+			sendMessage("doBranchTimeoutReceived", getTestPort(ctx), "udp");
 		}
 		if(response.getStatus() == 480) {
 			// https://code.google.com/p/sipservlets/issues/detail?id=266
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 			ArrayList<URI> uris = new ArrayList<URI>();
 			// This URi completes and need to be canceled before answering
-			uris.add(sipFactory.createAddress("sip:neutral@" + host + ":5058").getURI());
+			uris.add(sipFactory.createAddress("sip:neutral@" + host + ":" + getNeutralPort(ctx)).getURI());
 			List<ProxyBranch> branches = response.getProxy().createProxyBranches(uris);
 			for (ProxyBranch proxyBranch : branches) {
 			    if(response.getFrom().getURI().toString().contains("change-to-user")) {
@@ -623,7 +627,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
     {
     	if(req.isInitial()) {
 	        SipURI uri = (SipURI)req.getRequestURI().clone();
-	        uri.setPort(5057);
+	        uri.setPort(getReceiverPort(ctx));
 	        req.pushRoute(uri);
 	        Proxy proxy = req.getProxy(true);
 	        final String from = req.getFrom().getURI().toString();
@@ -638,7 +642,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
     protected void doPublish(SipServletRequest req) throws ServletException, IOException 
     {
         SipURI uri = (SipURI)req.getRequestURI().clone();
-        uri.setPort(5057);
+        uri.setPort(getReceiverPort(ctx));
         req.pushRoute(uri);
         req.getProxy(true).proxyTo(req.getRequestURI());
     }
@@ -656,7 +660,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			ProxyBranch proxyBranch) {
 		logger.info("onProxyBranchResponseTimeout callback was called. responseType = " + responseType + " , branch = " + proxyBranch + ", request " + proxyBranch.getRequest() + ", response " + proxyBranch.getResponse());
 		if(proxyBranch.getRequest() != null && (proxyBranch.getRequest().getFrom().getURI().toString().contains("ResponseTimeout") || proxyBranch.getRequest().getFrom().getURI().toString().contains("unique-location"))) {
-			sendMessage(responseType.toString(), 5080, "udp");
+			sendMessage(responseType.toString(), getTestPort(ctx), "udp");
 		}
 	}
 
@@ -759,4 +763,64 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			e.printStackTrace();
 		}
 	}
+        
+        public static Integer getTestPort(ServletContext ctx) {
+            String tPort = ctx.getInitParameter("testPort");
+            logger.info("TestPort at:" + tPort);
+            if (tPort != null) {
+                return Integer.valueOf(tPort);
+            } else {
+                return 5080;
+            }
+        }
+        
+        public static Integer getReceiverPort(ServletContext ctx) {
+            String tPort = ctx.getInitParameter("receiverPort");
+            logger.info("ReceiverPort at:" + tPort);
+            if (tPort != null) {
+                return Integer.valueOf(tPort);
+            } else {
+                return 5057;
+            }
+        }
+
+        public static Integer getNeutralPort(ServletContext ctx) {
+            String tPort = ctx.getInitParameter("neutralPort");
+            logger.info("NeutralPort at:" + tPort);
+            if (tPort != null) {
+                return Integer.valueOf(tPort);
+            } else {
+                return 5058;
+            }
+        }
+        
+        public static Integer getCutmePort(ServletContext ctx) {
+            String tPort = ctx.getInitParameter("cutmePort");
+            logger.info("CutmePort at:" + tPort);
+            if (tPort != null) {
+                return Integer.valueOf(tPort);
+            } else {
+                return 5056;
+            }
+        }        
+        
+        public static Integer getServletContainerPort(ServletContext ctx) {
+            String cPort = ctx.getInitParameter("servletContainerPort");
+            logger.info("TestPort at:" + cPort);            
+            if (cPort != null) {
+                return Integer.valueOf(cPort);
+            } else {
+                return 5070;
+            }            
+        }  
+        
+        public static Integer getDownstreamContainerPort(ServletContext ctx) {
+            String cPort = ctx.getInitParameter("downstreamContainerPort");
+            logger.info("DownstramContainerPort at:" + cPort);            
+            if (cPort != null) {
+                return Integer.valueOf(cPort);
+            } else {
+                return 5069;
+            }            
+        }         
 }

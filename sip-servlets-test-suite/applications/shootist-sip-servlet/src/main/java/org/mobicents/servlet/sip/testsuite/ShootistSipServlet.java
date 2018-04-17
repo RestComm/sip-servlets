@@ -22,11 +22,15 @@ package org.mobicents.servlet.sip.testsuite;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.Parameterable;
@@ -52,7 +56,6 @@ import javax.servlet.sip.URI;
 import javax.sip.ListeningPoint;
 
 import org.apache.log4j.Logger;
-import org.mobicents.javax.servlet.sip.SipServletRequestExt;
 import org.mobicents.javax.servlet.sip.SipSessionExt;
 import org.mobicents.javax.servlet.sip.dns.DNSResolver;
 import org.mobicents.servlet.sip.SipConnector;
@@ -79,6 +82,8 @@ public class ShootistSipServlet
 	SipFactory sipFactory;
 	
 	ServletTimer keepAlivetimer;
+        
+        static ServletContext ctx;        
 	
 	/** Creates a new instance of ShootistSipServlet */
 	public ShootistSipServlet() {
@@ -88,6 +93,7 @@ public class ShootistSipServlet
 	public void init(ServletConfig servletConfig) throws ServletException {
 		logger.info("the shootist has been started");
 		super.init(servletConfig);
+                ctx = servletConfig.getServletContext();                 
 	}		
 	
 	@Override
@@ -100,7 +106,7 @@ public class ShootistSipServlet
 			if(resp.getHeader("require") != null) {
 				SipServletRequest prack = resp.createPrack();
 				SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
-				SipURI requestURI = sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+				SipURI requestURI = sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
 				prack.setRequestURI(requestURI);
 				prack.send();
 			}
@@ -144,7 +150,9 @@ public class ShootistSipServlet
 			if (status == SipServletResponse.SC_OK && "INVITE".equalsIgnoreCase(sipServletResponse.getMethod())) {
 				SipServletRequest ackRequest = sipServletResponse.createAck();
 				ackRequest.send();
-				if(System.currentTimeMillis() - sipServletResponse.getSession().getLastAccessedTime() > 500) {
+                                long elapsed = System.currentTimeMillis() - sipServletResponse.getSession().getLastAccessedTime();
+                                //increased to 1 second,500 ms was amking some tests fail
+				if(elapsed > 1000) {
 					logger.error("lastAccessedTime was not updated => lastAccessedTime " + sipServletResponse.getSession().getLastAccessedTime() + " current Time  " + System.currentTimeMillis());
 					return;
 				}
@@ -170,7 +178,7 @@ public class ShootistSipServlet
 			if(getServletContext().getInitParameter("closeReliableChannel")!= null) {
 				timerService.createTimer(sipFactory.createApplicationSession(), Long.valueOf(getServletContext().getInitParameter("timeout")), false, "" + sipServletResponse.getInitialRemotePort());
 			}
-			if(getServletContext().getInitParameter("testKeepAlive") != null && sipServletResponse.getInitialRemotePort() != 5081) {
+			if(getServletContext().getInitParameter("testKeepAlive") != null && sipServletResponse.getInitialRemotePort() != getTestPort(ctx)) {
 				SipConnector[] sipConnectors = (SipConnector[]) getServletContext().getAttribute("org.mobicents.servlet.sip.SIP_CONNECTORS");
 				for (SipConnector sipConnector : sipConnectors) {
 					if(sipConnector.getIpAddress().equals(sipServletResponse.getLocalAddr()) && sipConnector.getPort() == sipServletResponse.getLocalPort() && sipConnector.getTransport().equals(sipServletResponse.getTransport())) {
@@ -255,9 +263,11 @@ public class ShootistSipServlet
 			}
 			if(	getServletContext().getInitParameter("cancel") != null) {
 				long now = System.currentTimeMillis(); 
-				long timeSent = (Long) sipServletResponse.getApplicationSession().getAttribute("timeSent");
-				if(now - timeSent > 30000) {
-					sendMessage(sipFactory.createApplicationSession(), sipFactory, "30 sec passed");
+				if(sipServletResponse.getApplicationSession().getAttribute("timeSent") != null) {
+					long timeSent = (Long) sipServletResponse.getApplicationSession().getAttribute("timeSent");
+					if(now - timeSent > 30000) {
+						sendMessage(sipFactory.createApplicationSession(), sipFactory, "30 sec passed");
+					}
 				}
 			}
 			if(sipServletResponse.getStatus() == 408) {			
@@ -345,13 +355,13 @@ public class ShootistSipServlet
 					}
 				} else if(ce.getServletContext().getInitParameter("urlType").equalsIgnoreCase("telAsSip")) {
 					try {
-						toURI = sipFactory.createURI("sip:+34666777888@192.168.0.20:5080");
+						toURI = sipFactory.createURI("sip:+34666777888@192.168.0.20:" + getTestPort(ctx));
 					} catch (ServletParseException e) {
 						logger.error("Impossible to create the tel URL as SIP", e);
 					}
 					
 					try {
-						toURI = sipFactory.createAddress("<sip:+34666777888@192.168.0.20:5080>").getURI();
+						toURI = sipFactory.createAddress("<sip:+34666777888@192.168.0.20:" + getTestPort(ctx) + ">").getURI();
 					} catch (ServletParseException e) {
 						logger.error("Impossible to create the tel URL as SIP", e);
 					}
@@ -438,6 +448,7 @@ public class ShootistSipServlet
 				}
 				addr.setParameter("headerparam1", "headervalue1");
 				addr.setParameter("param5", "ffff");
+				addr.setParameter("+sip.instance", "\"<urn:uuid:00000000-0000-1000-8000-000A95A0E128>\"");
 				addr.getURI().setParameter("uriparam", "urivalue");
 				if (ce.getServletContext().getInitParameter("testContactHeader") != null){
 					addr.setParameter("param0", "value0");
@@ -448,7 +459,7 @@ public class ShootistSipServlet
 			}
 			String dontSetRURI = ce.getServletContext().getInitParameter("dontSetRURI");
 			if(dontSetRURI == null) {
-				String host = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080";
+				String host = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx);
 				if(ce.getServletContext().getInitParameter("testIOException") != null) {
 					host = ce.getServletContext().getInitParameter("testIOException");
 				}
@@ -464,7 +475,7 @@ public class ShootistSipServlet
 				if(ce.getServletContext().getInitParameter("transportRURI") != null) {
 					requestURI.setTransportParam(ce.getServletContext().getInitParameter("transportRURI"));
 					if(method.equalsIgnoreCase("REGISTER")) {
-						sipServletRequest.addHeader("Contact", "sips:LittleGuy@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+						sipServletRequest.addHeader("Contact", "sips:LittleGuy@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
 					}
 				}
 				// http://code.google.com/p/sipservlets/issues/detail?id=156 and http://code.google.com/p/sipservlets/issues/detail?id=172 
@@ -634,7 +645,7 @@ public class ShootistSipServlet
 				if(ce.getServletContext().getInitParameter("testIOException") != null) {
 					logger.info("expected exception thrown" + e);
 					((SipURI)sipServletRequest.getRequestURI()).setHost("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
-					((SipURI)sipServletRequest.getRequestURI()).setPort(5080);
+					((SipURI)sipServletRequest.getRequestURI()).setPort(getTestPort(ctx));
 					((SipURI)sipServletRequest.getRequestURI()).setTransportParam("udp");
 					try {
 						sipServletRequest.send();
@@ -778,7 +789,7 @@ public class ShootistSipServlet
 					"MESSAGE", 
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
-			SipURI sipUri=storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+			SipURI sipUri=storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
 			sipServletRequest.setRequestURI(sipUri);
 			if(content != null) {
 				sipServletRequest.setContentLength(content.length());
@@ -844,10 +855,10 @@ public class ShootistSipServlet
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
 			sipServletRequest.addHeader("Ext", "Test 1, 2 ,3");
-			SipURI sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+			SipURI sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
 			if(transport != null) {
 				if(transport.equalsIgnoreCase(ListeningPoint.TCP)) {
-					sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5081");
+					sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
 				}
 				sipUri.setTransportParam(transport);
 			}
@@ -883,4 +894,24 @@ public class ShootistSipServlet
 		keepAlivetimer.cancel();
 		sendMessage(sipFactory.createApplicationSession(), sipFactory, "shootist onKeepAliveTimeout", "tcp");		
 	}
+        
+        public static Integer getTestPort(ServletContext ctx) {
+            String tPort = ctx.getInitParameter("testPort");
+            logger.info("TestPort at:" + tPort);
+            if (tPort != null) {
+                return Integer.valueOf(tPort);
+            } else {
+                return 5080;
+            }
+        }
+        
+        public static Integer getServletContainerPort(ServletContext ctx) {
+            String cPort = ctx.getInitParameter("servletContainerPort");
+            logger.info("TestPort at:" + cPort);            
+            if (cPort != null) {
+                return Integer.valueOf(cPort);
+            } else {
+                return 5070;
+            }            
+        }          
 }

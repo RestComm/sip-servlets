@@ -26,6 +26,7 @@ import java.io.IOException;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
@@ -49,6 +50,8 @@ public class AppKeySipServlet
 	SipFactory sipFactory;
 	@Resource
 	SipSessionsUtil sipSessionsUtil;
+        
+        static ServletContext ctx;        
 	
 	public AppKeySipServlet() {
 	}
@@ -57,13 +60,14 @@ public class AppKeySipServlet
 	public void init(ServletConfig servletConfig) throws ServletException {
 		logger.info("the appkey sip servlet has been started");
 		super.init(servletConfig);
+                ctx = servletConfig.getServletContext();  
 	}		
 	
 	@Override
 	protected void doSuccessResponse(SipServletResponse sipServletResponse)
 			throws ServletException, IOException {
 		logger.info("Got : " + sipServletResponse.getStatus() + " "
-				+ sipServletResponse.getMethod());
+				+ sipServletResponse.getMethod());                 
 		int status = sipServletResponse.getStatus();
 		if (status == SipServletResponse.SC_OK && "INVITE".equalsIgnoreCase(sipServletResponse.getMethod())) {
 			SipServletRequest ackRequest = sipServletResponse.createAck();
@@ -82,7 +86,7 @@ public class AppKeySipServlet
 			URI toURI = sipFactory.createSipURI("LittleGuy", "there.com");
 			SipServletRequest sipServletRequest = 
 				sipFactory.createRequest(sipServletResponse.getApplicationSession(), "INVITE", fromURI, toURI);
-			SipURI requestURI = sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+			SipURI requestURI = sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
 			sipServletRequest.setRequestURI(requestURI);
 			String inviteCallId = sipServletRequest.getHeader("Call-ID");
 			String registerCallId = (String) sipServletResponse.getApplicationSession().getAttribute("CallId");
@@ -124,7 +128,7 @@ public class AppKeySipServlet
 		URI toURI = sipFactory.createSipURI("BigGuy", "there.com");
 		SipServletRequest sipServletRequest = 
 			sipFactory.createRequest(sipApplicationSession, "REGISTER", fromURI, toURI);
-		SipURI requestURI = sipFactory.createSipURI("BigGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+		SipURI requestURI = sipFactory.createSipURI("BigGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
 		sipServletRequest.setRequestURI(requestURI);
 		//Storing the Call id for future comparison
 		sipApplicationSession.setAttribute("CallId", sipServletRequest.getHeader("Call-ID"));
@@ -134,4 +138,25 @@ public class AppKeySipServlet
 			logger.error(e);
 		}		
 	}
+        
+        public static Integer getTestPort(ServletContext ctx) {
+            String tPort = ctx.getInitParameter("testPort");
+            logger.info("TestPort at:" + tPort);
+            if (tPort != null) {
+                return Integer.valueOf(tPort);
+            } else {
+                return 5059;
+            }
+        }
+     
+        
+        public static Integer getServletContainerPort(ServletContext ctx) {
+            String cPort = ctx.getInitParameter("servletContainerPort");
+            logger.info("TestPort at:" + cPort);            
+            if (cPort != null) {
+                return Integer.valueOf(cPort);
+            } else {
+                return 5070;
+            }            
+        }          
 }

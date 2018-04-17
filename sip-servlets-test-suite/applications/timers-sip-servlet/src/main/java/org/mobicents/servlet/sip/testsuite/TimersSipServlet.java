@@ -29,6 +29,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.ServletTimer;
@@ -70,6 +71,8 @@ public class TimersSipServlet
 	private static final String RECURRING_TIMER_EXPIRED = "recurringTimerExpired";
 	
 	private SipFactory sipFactory;	
+        
+        static ServletContext ctx;         
 	
 	
 	/** Creates a new instance of TimersSipServlet */
@@ -80,6 +83,7 @@ public class TimersSipServlet
 	public void init(ServletConfig servletConfig) throws ServletException {		
 		super.init(servletConfig);
 		logger.info("the timers test sip servlet has been started");
+                ctx = servletConfig.getServletContext();                   
 		try { 			
 			// Getting the Sip factory from the JNDI Context
 			Properties jndiProps = new Properties();			
@@ -184,7 +188,7 @@ public class TimersSipServlet
 						"MESSAGE", 
 						"sip:sender@sip-servlets.com", 
 						"sip:receiver@sip-servlets.com");
-				SipURI sipUri=storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+				SipURI sipUri=storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
 				sipServletRequest.setRequestURI(sipUri);
 				sipServletRequest.setContentLength(SIP_APP_SESSION_EXPIRED.length());
 				sipServletRequest.setContent(SIP_APP_SESSION_EXPIRED, CONTENT_TYPE);
@@ -256,7 +260,7 @@ public class TimersSipServlet
 					"MESSAGE", 
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
-			SipURI sipUri=storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+			SipURI sipUri=storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
 			sipServletRequest.setRequestURI(sipUri);
 			sipServletRequest.setContentLength(content.length());
 			sipServletRequest.setContent(content, CONTENT_TYPE);
@@ -285,7 +289,7 @@ public class TimersSipServlet
 						"MESSAGE", 
 						"sip:sender@sip-servlets.com", 
 						"sip:receiver@sip-servlets.com");
-				SipURI sipUri=storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+				SipURI sipUri=storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
 				sipServletRequest.setRequestURI(sipUri);
 				sipServletRequest.setContentLength(SIP_APP_SESSION_READY_TO_BE_INVALIDATED.length());
 				sipServletRequest.setContent(SIP_APP_SESSION_READY_TO_BE_INVALIDATED, CONTENT_TYPE);
@@ -297,5 +301,25 @@ public class TimersSipServlet
 			}
 		}
 	}
+        
+        public static Integer getTestPort(ServletContext ctx) {
+            String tPort = ctx.getInitParameter("testPort");
+            logger.info("TestPort at:" + tPort);
+            if (tPort != null) {
+                return Integer.valueOf(tPort);
+            } else {
+                return 5080;
+            }
+        }
+        
+        public static Integer getServletContainerPort(ServletContext ctx) {
+            String cPort = ctx.getInitParameter("servletContainerPort");
+            logger.info("TestPort at:" + cPort);            
+            if (cPort != null) {
+                return Integer.valueOf(cPort);
+            } else {
+                return 5070;
+            }            
+        }        
 
 }

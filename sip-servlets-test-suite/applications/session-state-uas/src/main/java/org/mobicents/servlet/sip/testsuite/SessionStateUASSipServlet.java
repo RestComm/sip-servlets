@@ -29,6 +29,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipApplicationSession;
@@ -58,6 +59,8 @@ public class SessionStateUASSipServlet
 	private static final int TIMEOUT = 10000;
 	
 	private SipFactory sipFactory;	
+        
+        static ServletContext ctx;              
 		
 	
 	/** Creates a new instance of SessionStateUASSipServlet */
@@ -68,6 +71,7 @@ public class SessionStateUASSipServlet
 	public void init(ServletConfig servletConfig) throws ServletException {		
 		super.init(servletConfig);
 		logger.info("the session state UAS test sip servlet has been started");
+                ctx = servletConfig.getServletContext();                  
 		try { 			
 			// Getting the Sip factory from the JNDI Context
 			Properties jndiProps = new Properties();			
@@ -204,7 +208,7 @@ public class SessionStateUASSipServlet
 					"MESSAGE", 
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
-			SipURI sipUri = sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+			SipURI sipUri = sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
 			sipServletRequest.setRequestURI(sipUri);
 			sipServletRequest.setContentLength(messageContent.length());
 			sipServletRequest.setContent(messageContent, CONTENT_TYPE);
@@ -215,5 +219,25 @@ public class SessionStateUASSipServlet
 			logger.error("Exception occured while sending the request",e);			
 		}
 	}
+        
+        public static Integer getTestPort(ServletContext ctx) {
+            String tPort = ctx.getInitParameter("testPort");
+            logger.info("TestPort at:" + tPort);
+            if (tPort != null) {
+                return Integer.valueOf(tPort);
+            } else {
+                return 5080;
+            }
+        }
+        
+        public static Integer getServletContainerPort(ServletContext ctx) {
+            String cPort = ctx.getInitParameter("servletContainerPort");
+            logger.info("TestPort at:" + cPort);            
+            if (cPort != null) {
+                return Integer.valueOf(cPort);
+            } else {
+                return 5070;
+            }            
+        }         
 
 }
