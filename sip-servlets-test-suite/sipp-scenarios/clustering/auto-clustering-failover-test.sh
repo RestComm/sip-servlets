@@ -1,11 +1,16 @@
+#!/bin/bash
 export EXAMPLES_HOME=../../../sip-servlets-examples
 
-export config1="all"
-export config2="port-1"
+export config1="node1"
+export config2="node2"
+
+export deployments_dir1="deployments"
+export deployments_dir2="deployments-node2"
+
 export KILL_PARAMS="-9"
 export FULLSTARTSLEEP=200
 export HALFSTARTSLEEP=200
-export CALLS=5
+export CALLS=1
 
 if [ "x$1" != "x" ]; then
     export FULLSTARTSLEEP=$1
@@ -27,15 +32,36 @@ export EXIT_CODE=0;
 
 rm -rf result.txt
 
+echo "killing all sipp processes"
+killall sipp
+
+echo "killing all jboss processes"
+ps -aef | grep jboss
+JBPIDS=$(pgrep -d" " -f "jboss");
+echo "Currently running jboss processes $JBPIDS"
+
+if [[ -z "$JBPIDS" ]]; then
+	echo "no running jboss processes"
+else
+	for i in "${$JBPIDS[@]}"
+	do
+		echo "killing JBoss process $i"
+		kill -9 $i
+	done
+fi
+
+ps -aef | grep jboss
+ps -aef | grep sipp
+
 # Start SIP LB
-sed 's/load-balancer-TEMPLATE/load-balancer-normal/g' ./lb-logging.properties >lb-logging.properties.normal
+#sed 's/load-balancer-TEMPLATE/load-balancer-normal/g' ./lb-logging.properties >lb-logging.properties.normal
 echo "#!/bin/sh" > auto-startlb.sh
-echo "java -Djava.util.logging.config.file=lb-logging.properties.normal -server -Xms1536m -Xmx1536m -XX:PermSize=128M -XX:MaxPermSize=256M -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -jar $JBOSS_HOME/sip-balancer/sip-balancer-jar-with-dependencies.jar -mobicents-balancer-config=$JBOSS_HOME/sip-balancer/lb-configuration.properties" >> auto-startlb.sh
+echo "java -Djava.util.logging.config.file=lb-log4j.xml -server -Xms1536m -Xmx1536m -XX:PermSize=128M -XX:MaxPermSize=256M -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -jar $JBOSS_HOME/sip-balancer/sip-balancer-jar-2.1.0-SNAPSHOT-jar-with-dependencies.jar -mobicents-balancer-config=$JBOSS_HOME/sip-balancer/lb-configuration.properties" >> auto-startlb.sh
 chmod +x auto-startlb.sh
 
-sed 's/load-balancer-TEMPLATE/load-balancer-worst/g' ./lb-logging.properties >lb-logging.properties.worst
+#sed 's/load-balancer-TEMPLATE/load-balancer-worst/g' ./lb-logging.properties >lb-logging.properties.worst
 echo "#!/bin/sh" > auto-startlb-worst.sh
-echo "java -Djava.util.logging.config.file=lb-logging.properties.worst -server -Xms1536m -Xmx1536m -XX:PermSize=128M -XX:MaxPermSize=256M -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -jar $JBOSS_HOME/sip-balancer/sip-balancer-jar-with-dependencies.jar -mobicents-balancer-config=ar/worstcase-affinity-lb-configuration.properties" >> auto-startlb-worst.sh
+echo "java -Djava.util.logging.config.file=lb-log4j.xml -server -Xms1536m -Xmx1536m -XX:PermSize=128M -XX:MaxPermSize=256M -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -jar $JBOSS_HOME/sip-balancer/sip-balancer-jar-2.1.0-SNAPSHOT-jar-with-dependencies.jar -mobicents-balancer-config=ar/worstcase-affinity-lb-configuration.properties" >> auto-startlb-worst.sh
 chmod +x auto-startlb-worst.sh
 
 # Uncomment this if you want to keep the original affinity testing.
@@ -44,6 +70,25 @@ chmod +x auto-startlb-worst.sh
 #echo "java -server -Xms1536m -Xmx1536m -XX:PermSize=128M -XX:MaxPermSize=256M -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -jar $JBOSS_HOME/sip-balancer/sip-balancer-jar-with-dependencies.jar -mobicents-balancer-config=ar/worstcase-affinity-lb-configuration.properties" >> auto-startlb.sh
 #chmod +x auto-startlb.sh
 
+rm -rf $JBOSS_HOME/standalone/$deployments_dir1
+rm -rf $JBOSS_HOME/standalone/$deployments_dir2
+
+rm -f $JBOSS_HOME/standalone/log/*
+
+mkdir -p $JBOSS_HOME/standalone/$deployments_dir1
+mkdir -p $JBOSS_HOME/standalone/$deployments_dir2
+
+cp -fv $JBOSS_HOME/standalone/configuration/standalone-sip-ha.xml $JBOSS_HOME/standalone/configuration/standalone-sip-ha-$config1.xml 
+cp -fv $JBOSS_HOME/standalone/configuration/standalone-sip-ha.xml $JBOSS_HOME/standalone/configuration/standalone-sip-ha-$config2.xml 
+
+sed -i "s|path=\"server.*\"|path=\"server-$config1.log\"|" $JBOSS_HOME/standalone/configuration/standalone-sip-ha-$config1.xml 
+sed -i "s|path=\"deployments\"|path=\"$deployments_dir1\"|" $JBOSS_HOME/standalone/configuration/standalone-sip-ha-$config1.xml 
+
+sed -i "s|path=\"server.*\"|path=\"server-$config2.log\"|" $JBOSS_HOME/standalone/configuration/standalone-sip-ha-$config2.xml 
+sed -i "s|path=\"deployments\"|path=\"$deployments_dir2\"|" $JBOSS_HOME/standalone/configuration/standalone-sip-ha-$config2.xml 
+
+sed -i "s|<level name=\"INFO\"\/>|<level name=\"DEBUG\"\/>|" $JBOSS_HOME/standalone/configuration/standalone-sip-ha-$config1.xml
+sed -i "s|<level name=\"INFO\"\/>|<level name=\"DEBUG\"\/>|" $JBOSS_HOME/standalone/configuration/standalone-sip-ha-$config2.xml
 
 ./auto-startlb.sh > siplb.out &
 export SIPLB=$!
@@ -54,8 +99,8 @@ echo "SIP LB $SIPLB"
 ##################################
 echo "Test Custom B2BUA"
 echo "================================"
-./auto-prepare-example.sh custom-b2bua $config1
-./auto-prepare-example.sh custom-b2bua $config2
+./auto-prepare-example.sh custom-b2bua $deployments_dir1
+./auto-prepare-example.sh custom-b2bua $deployments_dir2
 
 ./auto-start-jboss-server.sh $config2 config2.pid 1 custom-b2bua
 
@@ -96,8 +141,8 @@ sleep 10
 ##################################
 echo "Test b2bua"
 echo "================================"
-./auto-prepare-example.sh b2bua $config1
-./auto-prepare-example.sh b2bua $config2
+./auto-prepare-example.sh b2bua $deployments_dir1
+./auto-prepare-example.sh b2bua $deployments_dir2
 
 ./auto-start-jboss-server.sh $config2 config2.pid 1 b2bua
 
@@ -143,8 +188,8 @@ sleep 10
 ##################################
 echo "Test proxy"
 echo "================================"
-./auto-prepare-example.sh proxy $config1
-./auto-prepare-example.sh proxy $config2
+./auto-prepare-example.sh proxy $deployments_dir1
+./auto-prepare-example.sh proxy $deployments_dir2
 
 ./auto-start-jboss-server.sh $config2 config2.pid 1 proxy
 
@@ -190,8 +235,8 @@ sleep 10
 ##################################
 echo "Test UAS"
 echo "================================"
-./auto-prepare-example.sh uas $config1
-./auto-prepare-example.sh uas $config2
+./auto-prepare-example.sh uas $deployments_dir1
+./auto-prepare-example.sh uas $deployments_dir2
 
 ./auto-start-jboss-server.sh $config2 config2.pid 1 uas
 
@@ -234,8 +279,6 @@ sleep $HALFSTARTSLEEP
 
 ./auto-run-test.sh uas-reinvite result.txt $CALLS
 
-#if [ "x$3" == "xjboss-5" ]; then
-
 #The test killed server 1, so we start it again
 ./auto-start-jboss-server.sh $config1 config1.pid 0 uas-timer
 
@@ -271,8 +314,8 @@ sleep 10
 ##################################
 echo "Test UAS with servers bound to 0.0.0.0"
 echo "================================"
-./auto-prepare-example.sh uas $config1
-./auto-prepare-example.sh uas $config2
+./auto-prepare-example.sh uas $deployments_dir1
+./auto-prepare-example.sh uas $deployments_dir2
 
 ./auto-start-jboss-server-0.0.0.0.sh $config2 config2.pid $ports2 2 uas-0.0.0.0
 ./auto-start-jboss-server-0.0.0.0.sh $config1 config1.pid $ports1 1 uas-0.0.0.0
@@ -293,257 +336,257 @@ sleep 10
 ##################################
 # Test UAS reinvite passivation
 ##################################
-echo "Test UAS Reinvite Passivation"
-echo "================================"
-./auto-prepare-example.sh uas-passivation $config1
-./auto-prepare-example.sh uas-passivation $config2
+#echo "Test UAS Reinvite Passivation"
+#echo "================================"
+#./auto-prepare-example.sh uas-passivation $config1
+#./auto-prepare-example.sh uas-passivation $config2
 
-./auto-start-jboss-server.sh $config2 config2.pid 1 uas-reinvite-passivation
-
-#Wait to boot
-sleep $HALFSTARTSLEEP
-
-./auto-start-jboss-server.sh $config1 config1.pid 0 uas-reinvite-passivation
+#./auto-start-jboss-server.sh $config2 config2.pid 1 uas-reinvite-passivation
 
 #Wait to boot
-sleep $HALFSTARTSLEEP
+#sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh uas-reinvite-passivation result.txt $CALLS
+#./auto-start-jboss-server.sh $config1 config1.pid 0 uas-reinvite-passivation
+
+#Wait to boot
+#sleep $HALFSTARTSLEEP
+
+#./auto-run-test.sh uas-reinvite-passivation result.txt $CALLS
 
 #Kill the app servers
-./auto-kill-process-tree.sh `cat config1.pid` $config1
-./auto-kill-process-tree.sh `cat config2.pid` $config2
+#./auto-kill-process-tree.sh `cat config1.pid` $config1
+#./auto-kill-process-tree.sh `cat config2.pid` $config2
 
-sleep 10
+#sleep 10
 
 ##################################
 # Test UAS SAS Expiration Timer passivation
 ##################################
-echo "Test UAS SAS Expiration Timer Passivation"
-echo "================================"
-./auto-prepare-example.sh uas-passivation $config1
-./auto-prepare-example.sh uas-passivation $config2
+#echo "Test UAS SAS Expiration Timer Passivation"
+#echo "================================"
+#./auto-prepare-example.sh uas-passivation $config1
+#./auto-prepare-example.sh uas-passivation $config2
 
-./auto-start-jboss-server.sh $config2 config2.pid 1 uas-sas-timer-passivation
-
-#Wait to boot
-sleep $HALFSTARTSLEEP
-
-./auto-start-jboss-server.sh $config1 config1.pid 0 uas-sas-timer-passivation
+#./auto-start-jboss-server.sh $config2 config2.pid 1 uas-sas-timer-passivation
 
 #Wait to boot
-sleep $HALFSTARTSLEEP
+#sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh uas-sas-timer-passivation result.txt $CALLS
+#./auto-start-jboss-server.sh $config1 config1.pid 0 uas-sas-timer-passivation
+
+#Wait to boot
+#sleep $HALFSTARTSLEEP
+
+#./auto-run-test.sh uas-sas-timer-passivation result.txt $CALLS
 
 #Kill the app servers
-./auto-kill-process-tree.sh `cat config1.pid` $config1
-./auto-kill-process-tree.sh `cat config2.pid` $config2
+#./auto-kill-process-tree.sh `cat config1.pid` $config1
+#./auto-kill-process-tree.sh `cat config2.pid` $config2
 
-sleep 10
+#sleep 10
 
 ##################################
 # Test UAS Servlet Timer passivation
 ##################################
-echo "Test UAS Servlet Timer Passivation"
-echo "================================"
-./auto-prepare-example.sh uas-passivation $config1
-./auto-prepare-example.sh uas-passivation $config2
+#echo "Test UAS Servlet Timer Passivation"
+#echo "================================"
+#./auto-prepare-example.sh uas-passivation $config1
+#./auto-prepare-example.sh uas-passivation $config2
 
-./auto-start-jboss-server.sh $config2 config2.pid 1 uas-timer-passivation
-
-#Wait to boot
-sleep $HALFSTARTSLEEP
-
-./auto-start-jboss-server.sh $config1 config1.pid 0 uas-timer-passivation
+#./auto-start-jboss-server.sh $config2 config2.pid 1 uas-timer-passivation
 
 #Wait to boot
-sleep $HALFSTARTSLEEP
+#sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh uas-timer-passivation result.txt $CALLS
+#./auto-start-jboss-server.sh $config1 config1.pid 0 uas-timer-passivation
+
+#Wait to boot
+#sleep $HALFSTARTSLEEP
+
+#./auto-run-test.sh uas-timer-passivation result.txt $CALLS
 
 #Kill the app servers
-./auto-kill-process-tree.sh `cat config1.pid` $config1
-./auto-kill-process-tree.sh `cat config2.pid` $config2
+#./auto-kill-process-tree.sh `cat config1.pid` $config1
+#./auto-kill-process-tree.sh `cat config2.pid` $config2
 
-sleep 10
+#sleep 10
 
 ##################################
 # Test proxy early failover
 ##################################
-echo "Test proxy early failover"
-echo "================================"
-./auto-prepare-example.sh proxy-early $config1
-./auto-prepare-example.sh proxy-early $config2
+#echo "Test proxy early failover"
+#echo "================================"
+#./auto-prepare-example.sh proxy-early $config1
+#./auto-prepare-example.sh proxy-early $config2
 
-./auto-start-jboss-server.sh $config2 config2.pid 1 proxy-early
-
-#Wait to boot
-sleep $HALFSTARTSLEEP
-
-./auto-start-jboss-server.sh $config1 config1.pid 0 proxy-early
+#./auto-start-jboss-server.sh $config2 config2.pid 1 proxy-early
 
 #Wait to boot
-sleep $HALFSTARTSLEEP
+#sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh proxy-early result.txt $CALLS
+#./auto-start-jboss-server.sh $config1 config1.pid 0 proxy-early
+
+#Wait to boot
+#sleep $HALFSTARTSLEEP
+
+#./auto-run-test.sh proxy-early result.txt $CALLS
 
 #Kill the app servers
-./auto-kill-process-tree.sh `cat config1.pid` $config1
-./auto-kill-process-tree.sh `cat config2.pid` $config2
+#./auto-kill-process-tree.sh `cat config1.pid` $config1
+#./auto-kill-process-tree.sh `cat config2.pid` $config2
 
-sleep 10
+#sleep 10
 
 ##################################
 # Test Custom B2BUA Early Dialog Failover
 ##################################
-echo "Test Custom B2BUA Early Dialog Failover"
-echo "================================"
-./auto-prepare-example.sh custom-b2bua-early $config1
-./auto-prepare-example.sh custom-b2bua-early $config2
+#echo "Test Custom B2BUA Early Dialog Failover"
+#echo "================================"
+#./auto-prepare-example.sh custom-b2bua-early $config1
+#./auto-prepare-example.sh custom-b2bua-early $config2
 
-./auto-start-jboss-server.sh $config2 config2.pid 1 custom-b2bua-early
-
-#Wait to boot
-sleep $HALFSTARTSLEEP
-
-./auto-start-jboss-server.sh $config1 config1.pid 0 custom-b2bua-early
+#./auto-start-jboss-server.sh $config2 config2.pid 1 custom-b2bua-early
 
 #Wait to boot
-sleep $HALFSTARTSLEEP
+#sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh custom-b2bua-early result.txt $CALLS
+#./auto-start-jboss-server.sh $config1 config1.pid 0 custom-b2bua-early
+
+#Wait to boot
+#sleep $HALFSTARTSLEEP
+
+#./auto-run-test.sh custom-b2bua-early result.txt $CALLS
 
 #Kill the app servers
-./auto-kill-process-tree.sh `cat config1.pid` $config1
-./auto-kill-process-tree.sh `cat config2.pid` $config2
+#./auto-kill-process-tree.sh `cat config1.pid` $config1
+#./auto-kill-process-tree.sh `cat config2.pid` $config2
 
-sleep 10
+#sleep 10
 
 ##################################
 # Test b2bua Early Dialog Failover
 ##################################
-echo "Test b2bua early dialog failover"
-echo "================================"
-./auto-prepare-example.sh b2bua-early $config1
-./auto-prepare-example.sh b2bua-early $config2
+#echo "Test b2bua early dialog failover"
+#echo "================================"
+#./auto-prepare-example.sh b2bua-early $config1
+#./auto-prepare-example.sh b2bua-early $config2
 
-./auto-start-jboss-server.sh $config2 config2.pid 1 b2bua-early
-
-#Wait to boot
-sleep $HALFSTARTSLEEP
-
-./auto-start-jboss-server.sh $config1 config1.pid 0 b2bua-early
+#./auto-start-jboss-server.sh $config2 config2.pid 1 b2bua-early
 
 #Wait to boot
-sleep $HALFSTARTSLEEP
+#sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh b2bua-early result.txt $CALLS
+#./auto-start-jboss-server.sh $config1 config1.pid 0 b2bua-early
+
+#Wait to boot
+#sleep $HALFSTARTSLEEP
+
+#./auto-run-test.sh b2bua-early result.txt $CALLS
 
 #Kill the app servers
-./auto-kill-process-tree.sh `cat config1.pid` $config1
-./auto-kill-process-tree.sh `cat config2.pid` $config2
+#./auto-kill-process-tree.sh `cat config1.pid` $config1
+#./auto-kill-process-tree.sh `cat config2.pid` $config2
 
-sleep 10
+#sleep 10
 
 ##################################
 # Test b2bua Linked Requests Early Dialog Failover
 ##################################
-echo "Test b2bua early linked requests dialog failover"
-echo "================================"
-./auto-prepare-example.sh b2bua-early $config1
-./auto-prepare-example.sh b2bua-early $config2
+#echo "Test b2bua early linked requests dialog failover"
+#echo "================================"
+#./auto-prepare-example.sh b2bua-early $config1
+#./auto-prepare-example.sh b2bua-early $config2
 
-./auto-start-jboss-server.sh $config2 config2.pid 1 b2bua-early-linked
-
-#Wait to boot
-sleep $HALFSTARTSLEEP
-
-./auto-start-jboss-server.sh $config1 config1.pid 0 b2bua-early-linked
+#./auto-start-jboss-server.sh $config2 config2.pid 1 b2bua-early-linked
 
 #Wait to boot
-sleep $HALFSTARTSLEEP
+#sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh b2bua-early-linked result.txt $CALLS
+#./auto-start-jboss-server.sh $config1 config1.pid 0 b2bua-early-linked
+
+#Wait to boot
+#sleep $HALFSTARTSLEEP
+
+#./auto-run-test.sh b2bua-early-linked result.txt $CALLS
 
 #Kill the app servers
-./auto-kill-process-tree.sh `cat config1.pid` $config1
-./auto-kill-process-tree.sh `cat config2.pid` $config2
+#./auto-kill-process-tree.sh `cat config1.pid` $config1
+#./auto-kill-process-tree.sh `cat config2.pid` $config2
 
-sleep 10
+#sleep 10
 
 ##################################
 # Test b2bua Forward Ack Early Dialog Failover
 ##################################
-echo "Test b2bua early dialog failover Forward Ack"
-echo "================================"
+#echo "Test b2bua early dialog failover Forward Ack"
+#echo "================================"
 
-./auto-start-jboss-server.sh $config2 config2.pid 1 b2bua-early-fwd-ack
-
-#Wait to boot
-sleep $HALFSTARTSLEEP
-
-./auto-start-jboss-server.sh $config1 config1.pid 0 b2bua-early-fwd-ack
+#./auto-start-jboss-server.sh $config2 config2.pid 1 b2bua-early-fwd-ack
 
 #Wait to boot
-sleep $HALFSTARTSLEEP
+#sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh b2bua-early-fwd-ack result.txt $CALLS
+#./auto-start-jboss-server.sh $config1 config1.pid 0 b2bua-early-fwd-ack
+
+#Wait to boot
+#sleep $HALFSTARTSLEEP
+
+#./auto-run-test.sh b2bua-early-fwd-ack result.txt $CALLS
 
 #Kill the app servers
-./auto-kill-process-tree.sh `cat config1.pid` $config1
-./auto-kill-process-tree.sh `cat config2.pid` $config2
+#./auto-kill-process-tree.sh `cat config1.pid` $config1
+#./auto-kill-process-tree.sh `cat config2.pid` $config2
 
-sleep 10
+#sleep 10
 
 ##################################
 # Test AR
 ##################################
-echo "Test Proxy-B2bua AR"
-echo "================================"
+#echo "Test Proxy-B2bua AR"
+#echo "================================"
 
 #We must kill the LB here and make it use worstcase affinity
-./auto-kill-process-tree.sh $SIPLB siplb
-./auto-startlb-worst.sh > siplb.out &
-export SIPLB=$!
-echo "SIP LB $SIPLB"
+#./auto-kill-process-tree.sh $SIPLB siplb
+#./auto-startlb-worst.sh > siplb.out &
+#export SIPLB=$!
+#echo "SIP LB $SIPLB"
 
-./auto-prepare-example.sh proxy-b2bua-ar $config1
-./auto-prepare-example.sh proxy-b2bua-ar $config2
+#./auto-prepare-example.sh proxy-b2bua-ar $config1
+#./auto-prepare-example.sh proxy-b2bua-ar $config2
 
-./auto-start-jboss-server.sh $config2 config2.pid 1 proxy-b2bua-ar
+#./auto-start-jboss-server.sh $config2 config2.pid 1 proxy-b2bua-ar
 
 #Wait to boot
-sleep $HALFSTARTSLEEP
+#sleep $HALFSTARTSLEEP
 
-./auto-start-jboss-server.sh $config1 config1.pid 0 proxy-b2bua-ar
+#./auto-start-jboss-server.sh $config1 config1.pid 0 proxy-b2bua-ar
 
 # SIPp should be running by the time JBoss finishes the startup, hence we use half start time here.
 
 #cleanup flag files for this test
-rm -rf *.flag
+#rm -rf *.flag
 
-sleep $HALFSTARTSLEEP
-./auto-run-test.sh proxy-b2bua-ar result.txt $CALLS
+#sleep $HALFSTARTSLEEP
+#./auto-run-test.sh proxy-b2bua-ar result.txt $CALLS
 
-sleep 20
-if [ -f lssdestryed.flag -a -f cb2buadestryed.flag ]; then
+#sleep 20
+#if [ -f lssdestryed.flag -a -f cb2buadestryed.flag ]; then
     #success if both flags are present
-    echo "proxy-b2bua-ar-invalidation 0" >> result.txt
-else
+#    echo "proxy-b2bua-ar-invalidation 0" >> result.txt
+#else
     #failure is one of the flags is missing
-    echo "proxy-b2bua-ar-invalidation 1" >> result.txt
-fi
+#    echo "proxy-b2bua-ar-invalidation 1" >> result.txt
+#fi
 
 #some debug info
-cat result.txt
-ls
+#cat result.txt
+#ls
 
 #Kill the app servers
-./auto-kill-process-tree.sh `cat config1.pid` $config1
-./auto-kill-process-tree.sh `cat config2.pid` $config2
+#./auto-kill-process-tree.sh `cat config1.pid` $config1
+#./auto-kill-process-tree.sh `cat config2.pid` $config2
 
-sleep 10
+#sleep 10
 
 
 ##################################
@@ -551,8 +594,11 @@ sleep 10
 ##################################
 echo "Test UAC"
 echo "================================"
-./auto-prepare-example.sh uac $config1 -Dsend.on.init=true
-./auto-prepare-example.sh uac $config2 -Dsend.on.init=false
+ORIG_MAVEN_OPTS=$MAVEN_OPTS
+export MAVEN_CMD_OPTS="$ORIG_MAVEN_OPTS -Dsend.on.init=true"
+./auto-prepare-example.sh uac $deployments_dir1
+export MAVEN_CMD_OPTS="$ORIG_MAVEN_OPTS -Dsend.on.init=false"
+./auto-prepare-example.sh uac $deployments_dir2
 
 ./auto-start-jboss-server.sh $config2 config2.pid 1 uac
 
@@ -577,8 +623,8 @@ sleep 10
 ##################################
 echo "Test UAC REGISTER"
 echo "================================"
-./auto-prepare-example.sh uac-register $config1 -Dsend.on.init=true
-./auto-prepare-example.sh uac-register $config2 -Dsend.on.init=false
+./auto-prepare-example.sh uac-register $deployments_dir1 -Dsend.on.init=true
+./auto-prepare-example.sh uac-register $deployments_dir2 -Dsend.on.init=false
 
 ./auto-start-jboss-server.sh $config2 config2.pid 1 uac-register
 

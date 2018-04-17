@@ -5,7 +5,7 @@
 
 <scenario name="UAC for SIP-Servlets Tests">
 
-  <send retrans="500">
+  <send retrans="500" start_rtd="1">
     <![CDATA[
     
       INVITE sip:[service]@sip-servlets.com SIP/2.0
@@ -35,7 +35,7 @@
 
   <recv response="180" optional="true" />
 
-  <recv response="200" rtd="true" rrs="true">
+  <recv response="200" rtd="1" rrs="true">
   </recv>
 
   <send>
@@ -56,9 +56,9 @@
     ]]>
   </send>
 
-  <pause milliseconds="178000"/>
+  <pause/>
 
-  <send retrans="500">
+  <send retrans="500" start_rtd="2">
     <![CDATA[
     
       BYE [next_url] SIP/2.0
@@ -76,9 +76,10 @@
     ]]>
   </send>
 
-  <recv response="200" optional="false"/>
+  <recv response="200" optional="false" rtd="2"/>
 
   <pause milliseconds="10000" />
   
+  <ResponseTimeRepartition value="10, 20, 30, 40, 50, 100, 150, 200"/>
 </scenario>
 
