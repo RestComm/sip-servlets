@@ -1328,10 +1328,13 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
                 clientAddress, clientPort);
     }
 
+    private long gracefulInterval = 30000;
+        
     /*
 	 * (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.core.SipService#stopGracefully(long)
 	 */
+        @Override
 	public void stopGracefully(long timeToWait) {
 		if(logger.isInfoEnabled()) {
 			logger.info("Stopping the Server Gracefully in " + timeToWait + " ms");
@@ -1350,9 +1353,10 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 			Iterator<SipContext> sipContexts = sipApplicationDispatcher.findSipApplications();
 			while (sipContexts.hasNext()) {
 				SipContext sipContext = sipContexts.next();
+                                sipContext.setGracefulInterval(gracefulInterval);
 				sipContext.stopGracefully(timeToWait);
 			}
-			gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().scheduleWithFixedDelay(new ServiceGracefulStopTask(this), 30000, 30000, TimeUnit.MILLISECONDS);
+			gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().scheduleWithFixedDelay(new ServiceGracefulStopTask(this), gracefulInterval, gracefulInterval, TimeUnit.MILLISECONDS);
 			if(timeToWait > 0) {
 				gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().schedule(
 						new Runnable() {
@@ -1399,4 +1403,10 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
     public void setSasTimerServiceImplementationType(String sasTimerServiceImplementationType) {
         this.sasTimerServiceImplementationType = sasTimerServiceImplementationType;
     }
+
+    public void setGracefulInterval(long gracefulInterval) {
+        this.gracefulInterval = gracefulInterval;
+    }
+    
+    
 }
