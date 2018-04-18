@@ -1490,7 +1490,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 									MobicentsB2BUAHelper b2buaHelperImpl = sipSession.getB2buaHelper();
 
 									if(b2buaHelperImpl != null && tad.getSipServletMessage() instanceof SipServletRequestImpl) {
-										b2buaHelperImpl.unlinkOriginalRequestInternal((SipServletRequestImpl)tad.getSipServletMessage(), false);
+										b2buaHelperImpl.unlinkRequestInternal((SipServletRequestImpl)tad.getSipServletMessage(), false);
 									}
 									// naoki : Fix for Issue 1618 http://code.google.com/p/mobicents/issues/detail?id=1618 on Timeout don't do the 408 processing for Server Transactions
 									if(logger.isDebugEnabled()) {
@@ -1714,7 +1714,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 
 									if(removeTx) {
 										if(b2buaHelperImpl != null && tad.getSipServletMessage() instanceof SipServletRequestImpl) {
-											b2buaHelperImpl.unlinkOriginalRequestInternal((SipServletRequestImpl)tad.getSipServletMessage(), false);
+											b2buaHelperImpl.unlinkRequestInternal((SipServletRequestImpl)tad.getSipServletMessage(), false);
 										}
 										sipSession.removeOngoingTransaction(transaction);
 										// Issue 1468 : to handle forking, we shouldn't cleanup the app data since it is needed for the forked responses
