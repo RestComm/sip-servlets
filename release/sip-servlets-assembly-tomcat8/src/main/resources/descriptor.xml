@@ -74,6 +74,7 @@
         <file>
             <source>${project.build.directory}/dependency/jolokia/jolokia-war-${assembly.jolokia.version}.war</source>
             <outputDirectory>/webapps</outputDirectory>
+            <destName>jolokia.war</destName>
         </file>
     </files>
 </assembly>
