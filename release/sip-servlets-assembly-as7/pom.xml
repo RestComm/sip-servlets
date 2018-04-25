@@ -12,69 +12,47 @@
 	<build>
 		<plugins>
 			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.8</version>
-				<executions>
-					<execution>
-						<id>getWebDependencies</id>
-						<phase>prepare-package</phase>
-						<configuration>
-							<target>
-								<echo>Creating dependency directory</echo>
-								<mkdir dir="${project.build.directory}/dependency" />
-								<echo>Downloading web dependencies</echo>
-								<get
-									dest="${project.build.directory}/dependency/jboss-as-${assembly.as7.version}.zip"
-									src="${assembly.as7.download.url}" />
-								<get
-									dest="${project.build.directory}/dependency/${assembly.mms.version}.zip"
-									src="${assembly.mms.download.url}" />
-								<echo>Extracting dependencies</echo>
-								<unzip
-									src="${project.build.directory}/dependency/jboss-as-${assembly.as7.version}.zip"
-									dest="${project.build.directory}/dependency/" />
-								<unzip
-									src="${project.build.directory}/dependency/${assembly.mms.version}.zip"
-									dest="${project.build.directory}/dependency/mms" />
-								<echo>Removing zip files</echo>
-								<delete
-									file="${project.build.directory}/dependency/jboss-as-${assembly.as7.version}.zip"
-									failonerror="false" />
-								<delete
-									file="${project.build.directory}/dependency/${assembly.mms.version}.zip"
-									failonerror="false" />
-							</target>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>prepareComponentsToBePatched</id>
-						<phase>package</phase>
-						<configuration>
-							<target>
-								<copy
-									todir="${project.build.directory}/dependency/jboss-as-${assembly.as7.version}/modules/system/layers/base/org/mobicents">
-									<fileset
-										dir="${project.build.directory}/dependency/sip-servlets-as7-drop-in-${project.version}/modules/system/layers/base/org/mobicents" />
-								</copy>
-								<copy
-									file="${project.build.directory}/dependency/jboss-as-${assembly.as7.version}/standalone/configuration/standalone.xml"
-									tofile="${project.build.directory}/dependency/jboss-as-${assembly.as7.version}/standalone/configuration/standalone-sip.xml" />
-							</target>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<version>3.0.1</version>
 				<executions>
+					<execution>
+						<id>extractAS7</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.jboss.as</groupId>
+									<artifactId>jboss-as</artifactId>
+									<version>${assembly.as7.version}</version>
+									<type>zip</type>
+									<classifier>assembly</classifier>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+					<execution>
+						<id>extractMMS</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.mobicents.media</groupId>
+									<artifactId>mobicents-media-server</artifactId>
+									<version>${assembly.mms.version}</version>
+									<type>zip</type>
+									<classifier>assembly</classifier>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>${project.build.directory}/dependency/mms</outputDirectory>
+						</configuration>
+					</execution>
 					<execution>
 						<id>extractAS7DropIn</id>
 						<phase>prepare-package</phase>
@@ -179,6 +157,47 @@
 								</artifactItem>
 							</artifactItems>
 							<outputDirectory>${project.build.directory}/dependency/jolokia</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.0.2</version>
+				<executions>
+					<execution>
+						<id>copyAS7DropInResources</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/dependency/jboss-as-${assembly.as7.version}/modules/system/layers/base/org/mobicents</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.build.directory}/dependency/sip-servlets-as7-drop-in-${project.version}/modules/system/layers/base/org/mobicents</directory>
+									<filtering>true</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copyAS7StandaloneSIP</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/dependency/jboss-as-${assembly.as7.version}/standalone/configuration/</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.basedir}/src/main/resources/assembly-resources/</directory>
+									<filtering>true</filtering>
+									<includes>
+										<include>standalone-sip.xml</include>
+									</includes>
+								</resource>
+							</resources>
 						</configuration>
 					</execution>
 				</executions>

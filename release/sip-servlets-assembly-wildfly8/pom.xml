@@ -12,50 +12,46 @@
 	<build>
 		<plugins>
 			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.8</version>
-				<executions>
-					<execution>
-						<id>getWebDependencies</id>
-						<phase>prepare-package</phase>
-						<configuration>
-							<target>
-								<echo>Creating dependency directory</echo>
-								<mkdir dir="${project.build.directory}/dependency" />
-								<echo>Downloading web dependencies</echo>
-								<get
-									dest="${project.build.directory}/dependency/wildfly-${assembly.wf8.version}.zip"
-									src="${assembly.wf8.download.url}" />
-								<get
-									dest="${project.build.directory}/dependency/${assembly.mms.version}.zip"
-									src="${assembly.mms.download.url}" />
-								<echo>Extracting dependencies</echo>
-								<unzip
-									src="${project.build.directory}/dependency/wildfly-${assembly.wf8.version}.zip"
-									dest="${project.build.directory}/dependency/" />
-								<unzip
-									src="${project.build.directory}/dependency/${assembly.mms.version}.zip"
-									dest="${project.build.directory}/dependency/mms" />
-								<echo>Removing zip files</echo>
-								<delete
-									file="${project.build.directory}/dependency/wildfly-${assembly.wf8.version}.zip"
-									failonerror="false" />
-								<delete
-									file="${project.build.directory}/dependency/${assembly.mms.version}.zip"
-									failonerror="false" />
-							</target>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<version>3.0.1</version>
 				<executions>
+					<execution>
+						<id>extractWF8</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.wildfly</groupId>
+									<artifactId>wildfly-dist</artifactId>
+									<version>${assembly.wf8.version}</version>
+									<type>zip</type>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+					<execution>
+						<id>extractMMS</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.mobicents.media</groupId>
+									<artifactId>mobicents-media-server</artifactId>
+									<version>${assembly.mms.version}</version>
+									<type>zip</type>
+									<classifier>assembly</classifier>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>${project.build.directory}/dependency/mms</outputDirectory>
+						</configuration>
+					</execution>
 					<execution>
 						<id>extractAS8DropIn</id>
 						<phase>prepare-package</phase>
