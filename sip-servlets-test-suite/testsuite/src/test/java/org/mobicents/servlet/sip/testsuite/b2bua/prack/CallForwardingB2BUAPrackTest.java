@@ -186,7 +186,7 @@ public class CallForwardingB2BUAPrackTest extends SipServletTestCase {
 	}
 
 	// non regression test for https://github.com/RestComm/sip-servlets/issues/362
-	public void testCallForwardingCallerPrackUpdateFromByeSendBye() throws Exception {
+	public void testCallForwardingCallerPrackUpdateFromBPartySendBye() throws Exception {
 		tomcat.startTomcat();
 
                int senderPort = NetworkPortAssigner.retrieveNextPort();
