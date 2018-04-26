@@ -68,6 +68,55 @@ public class B2BUASipServletForkingTest extends SipServletTestCase {
         super.setUp();
     }
 
+    // non regression test for Issue https://telestax.atlassian.net/browse/RES-4
+    public void testB2BUAForkingCrossed180() throws Exception {
+        int shootme1Port = NetworkPortAssigner.retrieveNextPort();
+        //force ringing to come after shootme2,but 200ok before shootme 2
+        Shootme shootme1 = new Shootme(shootme1Port, true, 1000,1500);
+        SipProvider shootmeProvider = shootme1.createProvider();
+        shootmeProvider.addSipListener(shootme1);
+        int shootme2Port = NetworkPortAssigner.retrieveNextPort();
+        //send 180 inmediately,but 200 ok after shootme1
+        Shootme shootme2 = new Shootme(shootme2Port, true, 2500);
+        SipProvider shootme2Provider = shootme2.createProvider();
+        shootme2Provider.addSipListener(shootme2);
+        int proxyPort = NetworkPortAssigner.retrieveNextPort();
+        Proxy proxy = new Proxy(proxyPort, new int[]{shootme1Port, shootme2Port});
+        SipProvider provider = proxy.createSipProvider();
+        provider.addSipListener(proxy);
+        int shootistPort = NetworkPortAssigner.retrieveNextPort();
+        int listeningPort = NetworkPortAssigner.retrieveNextPort();
+        Shootist shootist = new Shootist(true, shootistPort, String.valueOf(listeningPort));
+        shootist.pauseBeforeBye = 20000;
+        shootist.setFromHost("sip-servlets.com");
+
+        sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, listeningPort, listeningPointTransport);
+        tomcat.startTomcat();
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("timeToWaitForBye", "20000");
+        params.put("dontSetRURI", "true");
+        params.put("servletContainerPort", String.valueOf(proxyPort));
+        params.put("testPort", String.valueOf(shootme1Port));
+        params.put("senderPort", String.valueOf(shootistPort));
+        SipStandardContext sipContext = deployApplication(projectHome
+                + "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
+                params, null);
+
+        shootist.init("forward-sender-forking-pending", false, null);
+        Thread.sleep(TIMEOUT);
+        proxy.stop();
+        shootme1.stop();
+        shootme2.stop();
+        shootist.stop();
+        assertTrue(shootme1.isAckSeen());
+        assertTrue(shootme1.checkBye());
+        assertTrue(shootme2.isAckSeen());
+        assertTrue(shootme2.checkBye());
+        assertEquals(0, sipContext.getSipManager().getActiveSipSessions());
+        assertEquals(0, sipContext.getSipManager().getActiveSipApplicationSessions());
+
+    }
+
     // non regression test for Issue 2354 http://code.google.com/p/mobicents/issues/detail?id=2354
     public void testB2BUAForking() throws Exception {
         int shootme1Port = NetworkPortAssigner.retrieveNextPort();
@@ -153,10 +202,10 @@ public class B2BUASipServletForkingTest extends SipServletTestCase {
         shootme1.stop();
         shootme2.stop();
         shootist.stop();
-//		assertTrue(shootme1.isAckSeen());		
+//		assertTrue(shootme1.isAckSeen());
         assertTrue(shootme1.checkBye());
 //		assertTrue(shootme2.isAckSeen());
-//		assertTrue(shootme2.checkBye());	
+//		assertTrue(shootme2.checkBye());
         assertEquals(0, sipContext.getSipManager().getActiveSipSessions());
         assertEquals(0, sipContext.getSipManager().getActiveSipApplicationSessions());
 
