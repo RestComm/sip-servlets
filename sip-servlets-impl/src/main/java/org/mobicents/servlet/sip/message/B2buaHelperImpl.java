@@ -316,7 +316,6 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 			}
 			session.setB2buaHelper(this);
 			originalSession.setB2buaHelper(this);
-			setOriginalRequest(session,newSipServletRequest);
                         session.setSessionCreatingTransactionRequest(newSipServletRequest);
 
 			return newSipServletRequest;
@@ -610,7 +609,6 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 			throw new IllegalArgumentException("sip session " + sipSession.getId() + " is invalid !");
 		}
 		final MobicentsSipServletMessage sipServletMessageImpl = getOriginalRequest(sipSession);
-                //final MobicentsSipServletMessage sipServletMessageImpl = sipSession.getSessionCreatingTransactionRequest();
 		if(!(sipServletMessageImpl instanceof SipServletRequestImpl)) {
 			throw new IllegalStateException("session creating transaction message is not a request !");
 		}
@@ -667,8 +665,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 			// Issue 2354 handling of forking
 			String linkedDerivedSessionId = derivedSessionMap.get(mobicentsSipSession.getId());
 			if(linkedDerivedSessionId == null) {
-				SipServletRequestImpl originalSipServletRequestImpl = (SipServletRequestImpl) getOriginalRequest(linkedSession);
-                                //SipServletRequestImpl originalSipServletRequestImpl = (SipServletRequestImpl) linkedSession.getSessionCreatingTransactionRequest();
+                                SipServletRequestImpl originalSipServletRequestImpl = (SipServletRequestImpl) linkedSession.getSessionCreatingTransactionRequest();
 				String newToTag = ApplicationRoutingHeaderComposer.getHash(sipFactoryImpl.getSipApplicationDispatcher(),sipSessionKey.getApplicationName(), sipSessionKey.getApplicationSessionId());
 				if(logger.isDebugEnabled()) {
 					logger.debug("derived session " + mobicentsSipSession + " has no linked forked session yet, lazily creating one with new ToTag " + newToTag);
@@ -680,7 +677,6 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 				SipServletRequestImpl clonedOriginalRequest = (SipServletRequestImpl)originalSipServletRequestImpl.clone();
 				clonedOriginalRequest.setSipSession(linkedSession);
 				linkedSession.setSessionCreatingDialog(null);
-				setOriginalRequest(linkedSession, clonedOriginalRequest);
                                 linkedSession.setSessionCreatingTransactionRequest(clonedOriginalRequest);
 
 				derivedSessionMap.put(mobicentsSipSession.getId(), linkedSession.getId());
