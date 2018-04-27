@@ -140,6 +140,13 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 
 	private transient SipManager sipManager;
 
+        /**
+         * holds a ref to the latest invoked session on getLinkedSession, so
+         * if a subsequent invocation to createResponseToOrigReq is done, and this
+         * results in dericedSession, we can do the proper linking
+         */
+        private MobicentsSipSession lastSessionQueried = null;
+
 	public B2buaHelperImpl() {
 		sessionMap = new ConcurrentHashMap<MobicentsSipSessionKey, MobicentsSipSessionKey>();
 		derivedSessionMap = new ConcurrentHashMap<String, String>();
@@ -317,6 +324,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 			session.setB2buaHelper(this);
 			originalSession.setB2buaHelper(this);
                         session.setSessionCreatingTransactionRequest(newSipServletRequest);
+                        setOriginalRequest(session, newSipServletRequest);
 
 			return newSipServletRequest;
 		} catch (ParseException ex) {
@@ -620,7 +628,19 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 		if(logger.isDebugEnabled()) {
 			logger.debug("creating response to original request " + sipServletRequestImpl + " on session " + session);
 		}
-		return sipServletRequestImpl.createResponse(status, reasonPhrase);
+		SipServletResponse response =  sipServletRequestImpl.createResponse(status, reasonPhrase);
+
+		if(!session.getId().equals(response.getSession().getId())) {
+                    //a new session has been created, this means we have forked responses creating
+                    //new early dialog. We need to track the new session so next responses are
+                    //linked to proper derived session.
+                    logger.debug("SessionID=" + session.getId() + "Response Session ID=" +  response.getSession().getId());
+                    linkDerivedSipSessions(lastSessionQueried, session);
+                    //save original request in new derived session
+                    setOriginalRequest(response.getSession(), sipServletRequestImpl);
+
+		}
+                return response;
 	}
 
 	/*
@@ -639,6 +659,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 		if(checkSession && !mobicentsSipSession.isValidInternal()) {
 			throw new IllegalArgumentException("the session " + mobicentsSipSession + " is invalid");
 		}
+                lastSessionQueried = mobicentsSipSession;
 		MobicentsSipSessionKey sipSessionKey = this.sessionMap.get(mobicentsSipSession.getKey());
 		if(sipSessionKey == null) {
 			dumpLinkedSessions();
@@ -780,6 +801,34 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 			}
 		}
 		return retval;
+	}
+
+        /**
+         * links derived sessionf if they are valid nad in proper state
+         * @param session1
+         * @param session2
+         */
+	private void linkDerivedSipSessions(SipSession session1, SipSession session2) {
+		if ( session1 == null) {
+			throw new NullPointerException("First argument is null");
+		}
+		if ( session2 == null) {
+			throw new NullPointerException("Second argument is null");
+		}
+
+		if(!((MobicentsSipSession)session1).isValidInternal() || !((MobicentsSipSession)session2).isValidInternal() ||
+				State.TERMINATED.equals(((MobicentsSipSession)session1).getState()) ||
+				State.TERMINATED.equals(((MobicentsSipSession)session2).getState()) ||
+				!session1.getApplicationSession().equals(session2.getApplicationSession()) ||
+				(derivedSessionMap.get(session1.getId()) != null && !derivedSessionMap.get(session1.getId()).equals(session2.getId()))  ||
+				(derivedSessionMap.get(session2.getId()) != null && !derivedSessionMap.get(session2.getId()).equals(session1.getId())) ) {
+			throw new IllegalArgumentException("either of the specified sessions has been terminated " +
+					"or the sessions do not belong to the same application session or " +
+					"one or both the sessions are already linked with some other session(s)");
+		}
+		this.derivedSessionMap.put(session1.getId(), session2.getId());
+		this.derivedSessionMap.put(session2.getId(), session1.getId());
+		dumpLinkedSessions();
 	}
 
 	/*
@@ -1016,7 +1065,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 
 		session.setB2buaHelper(this);
 		originalSession.setB2buaHelper(this);
-
+                setOriginalRequest(session, newSipServletRequest);
 		return newSipServletRequest;
 	}
 
