@@ -30,6 +30,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpSession;
 import javax.servlet.sip.Address;
@@ -54,14 +55,18 @@ public class Click2DialSipServlet extends SipServlet implements SipApplicationSe
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 	@Resource
 	private SipFactory sipFactory;	
+	private boolean notification = true;
 	
 	public Click2DialSipServlet() {
 	}
+        
+        static ServletContext ctx;
 	
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {		
 		super.init(servletConfig);
 		logger.info("the click to dial servlet has been started");
+                ctx = servletConfig.getServletContext();                  
 		SipFactory contextFactory = (SipFactory) servletConfig.getServletContext().getAttribute(SipServlet.SIP_FACTORY);
 		if(contextFactory == null) {
 			throw new IllegalStateException("The Sip Factory should be available in init method");
@@ -266,9 +271,9 @@ public class Click2DialSipServlet extends SipServlet implements SipApplicationSe
 	}
 
 	public void sessionDestroyed(SipApplicationSessionEvent ev) {
-		logger.info("sip application session destroyed " +  ev.getApplicationSession());
+		logger.info("sip application session destroyed " +  ev.getApplicationSession() + " notification " + notification);
 //		SipFactory storedFactory = (SipFactory)ev.getApplicationSession().getAttribute("sipFactory");
-		if(sipFactory != null) {
+		if(sipFactory != null && notification) {
 			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
 			try {
 				SipServletRequest sipServletRequest = sipFactory .createRequest(
@@ -276,7 +281,7 @@ public class Click2DialSipServlet extends SipServlet implements SipApplicationSe
 						"MESSAGE", 
 						"sip:sender@sip-servlets.com", 
 						"sip:receiver@sip-servlets.com");
-				SipURI sipUri=sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5057");
+				SipURI sipUri=sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
 				sipServletRequest.setRequestURI(sipUri);
 				sipServletRequest.setContentLength(SIP_APP_SESSION_DESTROYED.length());
 				sipServletRequest.setContent(SIP_APP_SESSION_DESTROYED, CONTENT_TYPE);
@@ -290,12 +295,17 @@ public class Click2DialSipServlet extends SipServlet implements SipApplicationSe
 	}
 
 	public void sessionExpired(SipApplicationSessionEvent ev) {
-		// TODO Auto-generated method stub
-		
+		logger.info("sip application session about to be destroyed " +  ev.getApplicationSession() + " notification " + ev.getApplicationSession().getAttribute("notification"));
+		if(ev.getApplicationSession().getAttribute("notification") != null) {
+			notification = false;
+		}
 	}
 
 	public void sessionReadyToInvalidate(SipApplicationSessionEvent ev) {
-		
+		logger.info("sip application session about to be destroyed " +  ev.getApplicationSession() + " notification " + ev.getApplicationSession().getAttribute("notification"));
+		if(ev.getApplicationSession().getAttribute("notification") != null) {
+			notification = false;
+		}
 	}
 
 	/**
@@ -310,7 +320,7 @@ public class Click2DialSipServlet extends SipServlet implements SipApplicationSe
 					"MESSAGE", 
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
-			SipURI sipUri=storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+			SipURI sipUri=storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
 			sipServletRequest.setRequestURI(sipUri);
 			sipServletRequest.setContentLength(content.length());
 			sipServletRequest.setContent(content, CONTENT_TYPE);
@@ -320,5 +330,26 @@ public class Click2DialSipServlet extends SipServlet implements SipApplicationSe
 		} catch (IOException e) {
 			logger.error("Exception occured while sending the request",e);			
 		}
-	}
+	}                
+                
+        public static Integer getTestPort(ServletContext ctx) {
+            String tPort = ctx.getInitParameter("testPort");
+            logger.info("TestPort at:" + tPort);
+            if (tPort != null) {
+                return Integer.valueOf(tPort);
+            } else {
+                return 5080;
+            }
+        }
+        
+        public static Integer getServletContainerPort(ServletContext ctx) {
+            String cPort = ctx.getInitParameter("servletContainerPort");
+            logger.info("TestPort at:" + cPort);            
+            if (cPort != null) {
+                return Integer.valueOf(cPort);
+            } else {
+                return 5070;
+            }            
+        }                   
+
 }

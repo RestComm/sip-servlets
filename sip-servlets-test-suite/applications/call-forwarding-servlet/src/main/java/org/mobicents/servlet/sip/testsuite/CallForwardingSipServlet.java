@@ -26,6 +26,7 @@ import java.io.IOException;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.sip.SipErrorEvent;
 import javax.servlet.sip.SipErrorListener;
@@ -47,10 +48,13 @@ public class CallForwardingSipServlet extends SipServlet implements SipErrorList
 	public CallForwardingSipServlet() {
 	}
 
+                static ServletContext ctx;    
+                
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {
 		logger.info("the call forwarding sip servlet has been started");
 		super.init(servletConfig);
+                ctx = servletConfig.getServletContext(); 
 	}
 	
 	@Override
@@ -69,7 +73,7 @@ public class CallForwardingSipServlet extends SipServlet implements SipErrorList
 		if(request.getFrom().getURI().toString().indexOf("sip:forward-sender@sip-servlets.com") != -1) {
 			SipFactory sipFactory = (SipFactory)getServletContext().getAttribute(SIP_FACTORY);
 			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_MOVED_TEMPORARILY);
-			SipURI sipUri= sipFactory.createSipURI("forward-receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090");		
+			SipURI sipUri= sipFactory.createSipURI("forward-receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));		
 			sipServletResponse.addHeader("Contact", sipUri.toString());		
 			sipServletResponse.send();
 		}
@@ -89,5 +93,35 @@ public class CallForwardingSipServlet extends SipServlet implements SipErrorList
 	public void noPrackReceived(SipErrorEvent ee) {
 		logger.error("noPrackReceived.");
 	}
+        
+        public static Integer getTestPort(ServletContext ctx) {
+            String tPort = ctx.getInitParameter("testPort");
+            logger.info("TestPort at:" + tPort);
+            if (tPort != null) {
+                return Integer.valueOf(tPort);
+            } else {
+                return 5090;
+            }
+        }
+        
+        public static Integer getSenderPort(ServletContext ctx) {
+            String tPort = ctx.getInitParameter("senderPort");
+            logger.info("SenderPort at:" + tPort);
+            if (tPort != null) {
+                return Integer.valueOf(tPort);
+            } else {
+                return 5080;
+            }
+        }        
+        
+        public static Integer getServletContainerPort(ServletContext ctx) {
+            String cPort = ctx.getInitParameter("servletContainerPort");
+            logger.info("TestPort at:" + cPort);            
+            if (cPort != null) {
+                return Integer.valueOf(cPort);
+            } else {
+                return 5070;
+            }            
+        }          
 
 }

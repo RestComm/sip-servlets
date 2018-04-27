@@ -22,7 +22,6 @@
 package org.mobicents.servlet.sip.testsuite;
 
 import gov.nist.javax.sip.DialogExt;
-import gov.nist.javax.sip.SipStackImpl;
 import gov.nist.javax.sip.address.SipUri;
 import gov.nist.javax.sip.header.HeaderExt;
 import gov.nist.javax.sip.header.HeaderFactoryExt;
@@ -34,6 +33,7 @@ import gov.nist.javax.sip.header.extensions.JoinHeader;
 import gov.nist.javax.sip.header.extensions.ReplacesHeader;
 import gov.nist.javax.sip.header.ims.PathHeader;
 import gov.nist.javax.sip.message.MessageExt;
+
 import gov.nist.javax.sip.stack.SIPTransactionStack;
 import gov.nist.javax.sip.message.SIPResponse;
 import gov.nist.javax.sip.stack.SIPDialog;
@@ -362,7 +362,7 @@ public class TestSipListener implements SipListener {
 	private boolean sendProvisionalResponseBeforeChallenge = false;
 
 	private boolean checkSDPNullOnChallengeRequests;
-	
+
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
 		private EventHeader eventHeader;
@@ -1690,7 +1690,9 @@ public class TestSipListener implements SipListener {
 		}		
 		Response response = (Response) responseReceivedEvent.getResponse();
 		allResponses.add(response);
-		if(response.getStatusCode() == 491) numberOf491s++;
+		if(response.getStatusCode() == 491){
+                    numberOf491s++;
+                }
 		RecordRouteHeader recordRouteHeader = (RecordRouteHeader)response.getHeader(RecordRouteHeader.NAME);
 		if(!recordRoutingProxyTesting && recordRouteHeader != null) {
 			abortProcessing = true;
@@ -2080,6 +2082,9 @@ public class TestSipListener implements SipListener {
 		Thread th = new Thread(){
 			public void run() {
 				try {
+					if(getFinalResponseStatus() >= 500 && getFinalResponseStatus() < 600) {
+						logger.info("Not Sending BYE as last response final status was " + getFinalResponseStatus());
+					}
 					if(sendByeInNewThread) Thread.sleep(600);
 					Request byeRequest = dialog.createRequest(Request.BYE);
 					URI uri = ((FromHeader)byeRequest.getHeader(FromHeader.NAME)).getAddress().getURI();

@@ -22,6 +22,8 @@
 
 package org.mobicents.servlet.sip.testsuite.proxy;
 
+import java.util.HashMap;
+import java.util.Map;
 import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
@@ -31,7 +33,9 @@ import javax.sip.message.Request;
 import javax.sip.header.Header;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
@@ -81,14 +85,12 @@ public class ProxyUdpTcpTest extends SipServletTestCase {
 	}	
 	
 	@Override
-	protected void setUp() throws Exception {		
+	protected void setUp() throws Exception {
+                containerPort = NetworkPortAssigner.retrieveNextPort();            
 		super.setUp();
 
-		tomcat.addSipConnector(serverName, sipIpAddress, 5070, ListeningPoint.TCP);
+		tomcat.addSipConnector(serverName, sipIpAddress, containerPort, ListeningPoint.TCP);
 		tomcat.startTomcat();
-		deployApplication();
-
-			
 	}
 	
 	public void testCallForwardingCallerSendBye() throws Exception {
@@ -97,11 +99,13 @@ public class ProxyUdpTcpTest extends SipServletTestCase {
 				"gov.nist", TRANSPORT_UDP, AUTODIALOG, null, listeningPointTransport, listeningPointTransport);
 		receiverProtocolObjects = new ProtocolObjects("forward-tcp-receiver",
 				"gov.nist", TRANSPORT_TCP, AUTODIALOG, null, listeningPointTransport, listeningPointTransport);
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+                int senderPort = NetworkPortAssigner.retrieveNextPort();
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, true);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+                int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
 		SipProvider receiverProvider = receiver.createProvider();
 
 		receiverProvider.addSipListener(receiver);
@@ -109,6 +113,13 @@ public class ProxyUdpTcpTest extends SipServletTestCase {
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
+                
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(senderPort)); 
+                params.put( "receiverPort", String.valueOf(receiverPort));
+                deployApplication(projectHome + 
+                        "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp", params, null);
 
 		String fromName = "proxy-tcp";
 		String fromSipAddress = "sip-servlets.com";
@@ -138,11 +149,13 @@ public class ProxyUdpTcpTest extends SipServletTestCase {
 				"gov.nist", TRANSPORT_TCP, AUTODIALOG, null, listeningPointTransport, listeningPointTransport);
 		receiverProtocolObjects = new ProtocolObjects("forward-tcp-receiver",
 				"gov.nist", TRANSPORT_UDP, AUTODIALOG, null, listeningPointTransport, listeningPointTransport);
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);		
+                int senderPort = NetworkPortAssigner.retrieveNextPort();
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, true);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+                int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
 //		receiver.setTransport(false);
 		SipProvider receiverProvider = receiver.createProvider();
 
@@ -151,6 +164,13 @@ public class ProxyUdpTcpTest extends SipServletTestCase {
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
+                
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(senderPort)); 
+                params.put( "receiverPort", String.valueOf(receiverPort));
+                deployApplication(projectHome + 
+                        "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp", params, null);                
 
 		String fromName = "proxy-udp";
 		String fromSipAddress = "sip-servlets.com";
@@ -177,11 +197,13 @@ public class ProxyUdpTcpTest extends SipServletTestCase {
 				"gov.nist", TRANSPORT_TCP, AUTODIALOG, null, listeningPointTransport, listeningPointTransport);
 		receiverProtocolObjects = new ProtocolObjects("forward-tcp-receiver",
 				"gov.nist", TRANSPORT_UDP, AUTODIALOG, null, listeningPointTransport, listeningPointTransport);
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);		
+                int senderPort = NetworkPortAssigner.retrieveNextPort();
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, true);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+                int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
 //		receiver.setTransport(false);
 		SipProvider receiverProvider = receiver.createProvider();
 
@@ -190,6 +212,13 @@ public class ProxyUdpTcpTest extends SipServletTestCase {
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
+                
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(senderPort)); 
+                params.put( "receiverPort", String.valueOf(receiverPort));
+                deployApplication(projectHome + 
+                        "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp", params, null);                
 
 		String fromName = "proxy-udp";
 		String fromSipAddress = "sip-servlets.com";
@@ -202,7 +231,7 @@ public class ProxyUdpTcpTest extends SipServletTestCase {
 				toUser, toSipAddress);
 		
 		SipURI route = senderProtocolObjects.addressFactory.createSipURI(
-				toUser, "127.0.0.1:5070");
+				toUser, "127.0.0.1:" + containerPort);
 		
 		sender.extraRoute = true;
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, route, false);		
@@ -226,11 +255,13 @@ public class ProxyUdpTcpTest extends SipServletTestCase {
 				"gov.nist", TRANSPORT_TCP, AUTODIALOG, null, listeningPointTransport, listeningPointTransport);
 		receiverProtocolObjects = new ProtocolObjects("forward-tcp-receiver",
 				"gov.nist", TRANSPORT_UDP, AUTODIALOG, null, listeningPointTransport, listeningPointTransport);
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);		
+                int senderPort = NetworkPortAssigner.retrieveNextPort();
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, true);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+                int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
 //		receiver.setTransport(false);
 		SipProvider receiverProvider = receiver.createProvider();
 
@@ -239,6 +270,13 @@ public class ProxyUdpTcpTest extends SipServletTestCase {
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
+                
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(senderPort)); 
+                params.put( "receiverPort", String.valueOf(receiverPort));
+                deployApplication(projectHome + 
+                        "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp", params, null);                
 
 		String fromName = "proxy-unspecified";
 		String fromSipAddress = "sip-servlets.com";
@@ -266,11 +304,13 @@ public class ProxyUdpTcpTest extends SipServletTestCase {
 				"gov.nist", TRANSPORT_UDP, AUTODIALOG, null, listeningPointTransport, listeningPointTransport);
 		receiverProtocolObjects = new ProtocolObjects("forward-udp-receiver",
 				"gov.nist", TRANSPORT_UDP, AUTODIALOG, null, listeningPointTransport, listeningPointTransport);
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+                int senderPort = NetworkPortAssigner.retrieveNextPort();
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, true);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+                int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
 		SipProvider receiverProvider = receiver.createProvider();
 
 		receiverProvider.addSipListener(receiver);
@@ -278,6 +318,13 @@ public class ProxyUdpTcpTest extends SipServletTestCase {
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
+                
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(senderPort)); 
+                params.put( "receiverPort", String.valueOf(receiverPort));
+                deployApplication(projectHome + 
+                        "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp", params, null);                
 
 		String fromName = "proxy-orphan";
 		String fromSipAddress = "sip-servlets.com";
@@ -307,11 +354,14 @@ public class ProxyUdpTcpTest extends SipServletTestCase {
 				"gov.nist", TRANSPORT_UDP, AUTODIALOG, null, listeningPointTransport, listeningPointTransport);
 		receiverProtocolObjects = new ProtocolObjects("forward-udp-receiver",
 				"gov.nist", TRANSPORT_UDP, AUTODIALOG, null, listeningPointTransport, listeningPointTransport);
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+                int senderPort = NetworkPortAssigner.retrieveNextPort();
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, true);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
-		sender.setSendBye(false);
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+                sender.setSendBye(false);
+
+                int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
 		SipProvider receiverProvider = receiver.createProvider();
 
 		receiverProvider.addSipListener(receiver);
@@ -319,6 +369,13 @@ public class ProxyUdpTcpTest extends SipServletTestCase {
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
+                
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(senderPort)); 
+                params.put( "receiverPort", String.valueOf(receiverPort));
+                deployApplication(projectHome + 
+                        "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp", params, null);                
 
 		String fromName = "proxy-orphan";
 		String fromSipAddress = "sip-servlets.com";
@@ -362,11 +419,13 @@ public class ProxyUdpTcpTest extends SipServletTestCase {
 				"gov.nist", TRANSPORT_TCP, AUTODIALOG, null, listeningPointTransport, listeningPointTransport);
 		receiverProtocolObjects = new ProtocolObjects("forward-tcp-receiver",
 				"gov.nist", TRANSPORT_TCP, AUTODIALOG, null, listeningPointTransport, listeningPointTransport);
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);		
+                int senderPort = NetworkPortAssigner.retrieveNextPort();
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, true);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+                int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
 //		receiver.setTransport(false);
 		SipProvider receiverProvider = receiver.createProvider();
 
@@ -375,6 +434,13 @@ public class ProxyUdpTcpTest extends SipServletTestCase {
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
+                
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(senderPort)); 
+                params.put( "receiverPort", String.valueOf(receiverPort));
+                deployApplication(projectHome + 
+                        "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp", params, null);                
 
 		String fromName = "proxy-tcp";
 		String fromSipAddress = "sip-servlets.com";
@@ -402,10 +468,13 @@ public class ProxyUdpTcpTest extends SipServletTestCase {
 				"gov.nist", TRANSPORT_UDP, AUTODIALOG, null, listeningPointTransport, listeningPointTransport);
 		receiverProtocolObjects = new ProtocolObjects("forward-tcp-receiver",
 				"gov.nist", TRANSPORT_TCP, AUTODIALOG, null, listeningPointTransport, listeningPointTransport);
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
-		SipProvider senderProvider = sender.createProvider();
+                int senderPort = NetworkPortAssigner.retrieveNextPort();
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, true);
 		sender.setRecordRoutingProxyTesting(true);
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, true);
+		SipProvider senderProvider = sender.createProvider();
+
+                int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
 		SipProvider receiverProvider = receiver.createProvider();
 
 		receiverProvider.addSipListener(receiver);
@@ -413,6 +482,13 @@ public class ProxyUdpTcpTest extends SipServletTestCase {
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
+                
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(senderPort)); 
+                params.put( "receiverPort", String.valueOf(receiverPort));
+                deployApplication(projectHome + 
+                        "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp", params, null);                
 
 		String fromName = "proxy-tcp";
 		String fromSipAddress = "sip-servlets.com";

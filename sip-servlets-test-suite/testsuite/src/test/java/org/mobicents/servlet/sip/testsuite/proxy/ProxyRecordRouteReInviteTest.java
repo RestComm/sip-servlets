@@ -23,9 +23,11 @@ import gov.nist.javax.sip.header.HeaderExt;
 import gov.nist.javax.sip.message.MessageExt;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
@@ -35,6 +37,7 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
@@ -52,10 +55,12 @@ public class ProxyRecordRouteReInviteTest extends SipServletTestCase {
 
 	public ProxyRecordRouteReInviteTest(String name) {
 		super(name);
+                autoDeployOnStartup = false;
 	}
 
 	@Override
 	public void setUp() throws Exception {
+                containerPort = NetworkPortAssigner.retrieveNextPort();
 		super.setUp();				
 	}
 
@@ -230,7 +235,7 @@ public class ProxyRecordRouteReInviteTest extends SipServletTestCase {
 	 * Non regression test for Issue 1792
 	 */
 	public void testProxyCancelTCP() throws Exception {
-		tomcat.addSipConnector(serverName, sipIpAddress, 5070, ListeningPoint.TCP);
+		tomcat.addSipConnector(serverName, sipIpAddress, containerPort, ListeningPoint.TCP);
 		setupPhones(ListeningPoint.TCP);
 		String fromName = "unique-location";
 		String fromSipAddress = "sip-servlets.com";
@@ -271,7 +276,7 @@ public class ProxyRecordRouteReInviteTest extends SipServletTestCase {
 				toUser, toSipAddress);
 		
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
-		Header rh = senderProtocolObjects.headerFactory.createHeader("Route", "sip:extra-route@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5057;lr");
+		Header rh = senderProtocolObjects.headerFactory.createHeader("Route", "sip:extra-route@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + ctx.getServletContext().getInitParameter("receiverPort") + ";lr");
 		LinkedList<Header> hh = new LinkedList<Header>();
 		hh.add(rh);
 		Thread.sleep(TIMEOUT/4);
@@ -418,11 +423,14 @@ public class ProxyRecordRouteReInviteTest extends SipServletTestCase {
 				"gov.nist", transport, AUTODIALOG, null, null, null);
 		receiverProtocolObjects = new ProtocolObjects("proxy-receiver",
 				"gov.nist", transport, AUTODIALOG, null, null, null);
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+                
+                int senderPort = NetworkPortAssigner.retrieveNextPort(); 
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, false);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5057, 5070, receiverProtocolObjects, false);
+                int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
 		receiver.setRecordRoutingProxyTesting(true);
 		SipProvider receiverProvider = receiver.createProvider();
 
@@ -431,6 +439,14 @@ public class ProxyRecordRouteReInviteTest extends SipServletTestCase {
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
+                
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(senderPort)); 
+                params.put( "receiverPort", String.valueOf(receiverPort));               
+                deployApplication(projectHome + 
+                        "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp", 
+                        params, null);                      
 	}
 	
 	@Override

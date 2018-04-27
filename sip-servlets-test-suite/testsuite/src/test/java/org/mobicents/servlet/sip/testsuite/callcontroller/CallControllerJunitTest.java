@@ -22,11 +22,16 @@
 
 package org.mobicents.servlet.sip.testsuite.callcontroller;
 
+import java.util.HashMap;
+import java.util.Map;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
+import static junit.framework.Assert.assertTrue;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
@@ -52,27 +57,30 @@ public class CallControllerJunitTest extends SipServletTestCase {
 
 	public CallControllerJunitTest(String name) {
 		super(name);
+                autoDeployOnStartup = false;
 	}
 
 	@Override
 	public void deployApplication() {
-		deployCallBlocking();
-		deployCallForwarding();
 	}
 
-	private void deployCallBlocking() {
-		assertTrue(tomcat.deployContext(
-				projectHome + "/sip-servlets-test-suite/applications/call-blocking-servlet/src/main/sipapp",
-				"call-blocking-context", 
-				"call-blocking"));
-	}
-	
-	private void deployCallForwarding() {
-		assertTrue(tomcat.deployContext(
-				projectHome + "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
-				"call-forwarding-b2bua-context", 
-				"call-forwarding-b2bua"));
-	}
+    private void deployCallBlocking(Map<String, String> params) {
+        SipStandardContext ctx = deployApplication(projectHome
+                + "/sip-servlets-test-suite/applications/call-blocking-servlet/src/main/sipapp",
+                "call-blocking", 
+                params,
+                null);
+        assertTrue(ctx.getAvailable());
+    }
+
+    private void deployCallForwarding(Map<String, String> params) {
+        SipStandardContext ctx = deployApplication(projectHome
+                + "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
+                "call-forwarding-b2bua",
+                params,
+                null);
+        assertTrue(ctx.getAvailable());        
+    }
 
 	@Override
 	protected String getDarConfigurationFile() {
@@ -85,8 +93,9 @@ public class CallControllerJunitTest extends SipServletTestCase {
 	@Override
 	protected void setUp() throws Exception {
 		autoDeployOnStartup = false;
+                containerPort = NetworkPortAssigner.retrieveNextPort();
 		super.setUp();
-		toDomain = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090";
+		
 		senderProtocolObjects = new ProtocolObjects(FROM_NAME,
 				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 		receiverProtocolObjects = new ProtocolObjects(TO_NAME,
@@ -95,21 +104,30 @@ public class CallControllerJunitTest extends SipServletTestCase {
 	}
 	
 	public void testCallForwardingCallerSendBye() throws Exception {
-		deployCallBlocking();
-		deployCallForwarding();
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+                int senderPort = NetworkPortAssigner.retrieveNextPort();
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, true);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+                int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
 		receiver.setRecordRoutingProxyTesting(true);
 		SipProvider receiverProvider = receiver.createProvider();
+                
+                toDomain = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + receiverPort;
 
 		receiverProvider.addSipListener(receiver);
 		senderProvider.addSipListener(sender);
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
+                
+                Map<String, String> params = new HashMap();
+                params.put("servletContainerPort", String.valueOf(containerPort));
+                params.put("testPort", String.valueOf(receiverPort));
+                params.put("senderPort", String.valueOf(senderPort));                
+		deployCallBlocking(params);
+		deployCallForwarding(params);                
 
 		String fromName = FROM_NAME;
 		String fromSipAddress = FROM_DOMAIN;
@@ -130,21 +148,29 @@ public class CallControllerJunitTest extends SipServletTestCase {
 	}
 
 	public void testCallForwardingCalleeSendBye() throws Exception {
-		deployCallBlocking();
-		deployCallForwarding();
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+                int senderPort = NetworkPortAssigner.retrieveNextPort();
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, false);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, true);
+                int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, true);
 		receiver.setRecordRoutingProxyTesting(true);
 		SipProvider receiverProvider = receiver.createProvider();
+                toDomain = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + receiverPort;                
 
 		receiverProvider.addSipListener(receiver);
 		senderProvider.addSipListener(sender);
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
+                
+                Map<String, String> params = new HashMap();
+                params.put("servletContainerPort", String.valueOf(containerPort));
+                params.put("testPort", String.valueOf(receiverPort));
+                params.put("senderPort", String.valueOf(senderPort));                
+		deployCallBlocking(params);
+		deployCallForwarding(params);                 
 
 		String fromName = FROM_NAME;
 		String fromSipAddress = toDomain;
@@ -163,21 +189,29 @@ public class CallControllerJunitTest extends SipServletTestCase {
 	}
 
 	public void testCancelCallForwarding() throws Exception {
-		deployCallBlocking();
-		deployCallForwarding();
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+                int senderPort = NetworkPortAssigner.retrieveNextPort();
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, false);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, true);
+                int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, true);
 		receiver.setRecordRoutingProxyTesting(true);
 		SipProvider receiverProvider = receiver.createProvider();
+                toDomain = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + receiverPort;                
 
 		receiverProvider.addSipListener(receiver);
 		senderProvider.addSipListener(sender);
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
+                
+                Map<String, String> params = new HashMap();
+                params.put("servletContainerPort", String.valueOf(containerPort));
+                params.put("testPort", String.valueOf(receiverPort));
+                params.put("senderPort", String.valueOf(senderPort));                
+		deployCallBlocking(params);
+		deployCallForwarding(params);                
 
 		String fromName = FROM_NAME;
 		String fromSipAddress = FROM_DOMAIN;

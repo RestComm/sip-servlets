@@ -19,11 +19,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.servlet.sip.testsuite.proxy;
 
 import java.util.EventObject;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 
 import javax.sip.DialogTerminatedEvent;
 import javax.sip.IOExceptionEvent;
@@ -35,124 +36,144 @@ import javax.sip.TimeoutEvent;
 import javax.sip.TransactionTerminatedEvent;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
 
 public class ParallelProxyTelURLWithRecordRouteTest extends SipServletTestCase implements SipListener {
 
-	private static transient Logger logger = Logger.getLogger(ParallelProxyTelURLWithRecordRouteTest.class);
+    private static transient Logger logger = Logger.getLogger(ParallelProxyTelURLWithRecordRouteTest.class);
 
-	protected Shootist shootist;
+    protected Shootist shootist;
 
-	protected Shootme shootme;
-	
-	protected Cutme cutme;
+    protected Shootme shootme;
 
-	protected Hashtable providerTable = new Hashtable();
+    protected Cutme cutme;
 
-	private static final int TIMEOUT = 15000;
+    protected Hashtable providerTable = new Hashtable();
 
-	private static final int receiversCount = 1;
+    private static final int TIMEOUT = 15000;
 
-	public ParallelProxyTelURLWithRecordRouteTest(String name) {
-		super(name);
+    private static final int receiversCount = 1;
 
-		this.sipIpAddress="0.0.0.0";
-	}
+    public ParallelProxyTelURLWithRecordRouteTest(String name) {
+        super(name);
+        autoDeployOnStartup = false;
+        this.sipIpAddress = "0.0.0.0";
+    }
 
-	@Override
-	public void setUp() throws Exception {
-		super.setUp();
-		this.shootist = new Shootist(false, null);
-		this.shootme = new Shootme(5057);
-		this.cutme = new Cutme();
-	}
+    @Override
+    public void setUp() throws Exception {
+        containerPort = NetworkPortAssigner.retrieveNextPort();
+        super.setUp();
 
-	public void testProxy() {
-		this.shootme.init("stackName", null);
-		this.cutme.init(null);
-		this.shootist.init("useHostName", true, null);
-		for (int q = 0; q < 20; q++) {
-			if (shootist.ended == false && cutme.canceled == false)
-				try {
-					Thread.sleep(TIMEOUT);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-		}
-		if (shootist.ended == false)
-			fail("Conversation not complete!");
-		if (cutme.canceled == false)
-			fail("The party that was supposed to be cancelled didn't cancel.");
-	}
+        int shootistPort = NetworkPortAssigner.retrieveNextPort();
+        this.shootist = new Shootist(false, shootistPort, String.valueOf(containerPort));
+        shootist.setOutboundProxy(false);
+        int shootmePort = NetworkPortAssigner.retrieveNextPort();
+        this.shootme = new Shootme(shootmePort);
+        int cutmePort = NetworkPortAssigner.retrieveNextPort();
+        this.cutme = new Cutme(cutmePort);
 
-	@Override
-	public void tearDown() throws Exception {
-		shootist.destroy();
-		shootme.destroy();
-		cutme.destroy();
-		super.tearDown();
-	}
+        Map<String, String> params = new HashMap();
+        params.put("servletContainerPort", String.valueOf(containerPort));
+        params.put("testPort", String.valueOf(shootistPort));
+        params.put("receiverPort", String.valueOf(shootmePort));
+        params.put("cutmePort", String.valueOf(cutmePort));
+        deployApplication(projectHome
+                + "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp",
+                params, null);
+    }
 
-	@Override
-	public void deployApplication() {
-		assertTrue(tomcat
-				.deployContext(
-						projectHome
-								+ "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp",
-						"sip-test-context", "sip-test"));
-	}
+    public void testProxy() {
+        this.shootme.init("stackName", null);
+        this.cutme.init(null);
+        this.shootist.init("useHostName", true, null);
+        for (int q = 0; q < 20; q++) {
+            if (shootist.ended == false && cutme.canceled == false) {
+                try {
+                    Thread.sleep(TIMEOUT);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
+        if (shootist.ended == false) {
+            fail("Conversation not complete!");
+        }
+        if (cutme.canceled == false) {
+            fail("The party that was supposed to be cancelled didn't cancel.");
+        }
+    }
 
-	@Override
-	protected String getDarConfigurationFile() {
-		return "file:///"
-				+ projectHome
-				+ "/sip-servlets-test-suite/testsuite/src/test/resources/"
-				+ "org/mobicents/servlet/sip/testsuite/proxy/simple-sip-servlet-dar.properties";
-	}
+    @Override
+    public void tearDown() throws Exception {
+        shootist.destroy();
+        shootme.destroy();
+        cutme.destroy();
+        super.tearDown();
+    }
 
-	public void init() {
-		// setupPhones();
-	}
+    @Override
+    public void deployApplication() {
+        assertTrue(tomcat
+                .deployContext(
+                        projectHome
+                        + "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp",
+                        "sip-test-context", "sip-test"));
+    }
 
-	private SipListener getSipListener(EventObject sipEvent) {
-		SipProvider source = (SipProvider) sipEvent.getSource();
-		SipListener listener = (SipListener) providerTable.get(source);
-		if (listener == null)
-			throw new RuntimeException("Unexpected null listener");
-		return listener;
-	}
+    @Override
+    protected String getDarConfigurationFile() {
+        return "file:///"
+                + projectHome
+                + "/sip-servlets-test-suite/testsuite/src/test/resources/"
+                + "org/mobicents/servlet/sip/testsuite/proxy/simple-sip-servlet-dar.properties";
+    }
 
-	public void processRequest(RequestEvent requestEvent) {
-		getSipListener(requestEvent).processRequest(requestEvent);
+    public void init() {
+        // setupPhones();
+    }
 
-	}
+    private SipListener getSipListener(EventObject sipEvent) {
+        SipProvider source = (SipProvider) sipEvent.getSource();
+        SipListener listener = (SipListener) providerTable.get(source);
+        if (listener == null) {
+            throw new RuntimeException("Unexpected null listener");
+        }
+        return listener;
+    }
 
-	public void processResponse(ResponseEvent responseEvent) {
-		getSipListener(responseEvent).processResponse(responseEvent);
+    public void processRequest(RequestEvent requestEvent) {
+        getSipListener(requestEvent).processRequest(requestEvent);
 
-	}
+    }
 
-	public void processTimeout(TimeoutEvent timeoutEvent) {
-		getSipListener(timeoutEvent).processTimeout(timeoutEvent);
-	}
+    public void processResponse(ResponseEvent responseEvent) {
+        getSipListener(responseEvent).processResponse(responseEvent);
 
-	public void processIOException(IOExceptionEvent exceptionEvent) {
-		fail("unexpected exception");
+    }
 
-	}
+    public void processTimeout(TimeoutEvent timeoutEvent) {
+        getSipListener(timeoutEvent).processTimeout(timeoutEvent);
+    }
 
-	public void processTransactionTerminated(
-			TransactionTerminatedEvent transactionTerminatedEvent) {
-		getSipListener(transactionTerminatedEvent)
-				.processTransactionTerminated(transactionTerminatedEvent);
+    public void processIOException(IOExceptionEvent exceptionEvent) {
+        fail("unexpected exception");
 
-	}
+    }
 
-	public void processDialogTerminated(
-			DialogTerminatedEvent dialogTerminatedEvent) {
-		getSipListener(dialogTerminatedEvent).processDialogTerminated(
-				dialogTerminatedEvent);
+    public void processTransactionTerminated(
+            TransactionTerminatedEvent transactionTerminatedEvent) {
+        getSipListener(transactionTerminatedEvent)
+                .processTransactionTerminated(transactionTerminatedEvent);
 
-	}
+    }
+
+    public void processDialogTerminated(
+            DialogTerminatedEvent dialogTerminatedEvent) {
+        getSipListener(dialogTerminatedEvent).processDialogTerminated(
+                dialogTerminatedEvent);
+
+    }
 }

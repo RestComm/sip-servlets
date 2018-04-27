@@ -19,7 +19,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.servlet.sip.testsuite.subsnotify;
 
 import gov.nist.javax.sip.header.SubscriptionState;
@@ -33,6 +32,7 @@ import javax.sip.message.Request;
 
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.catalina.SipStandardManager;
 import org.mobicents.servlet.sip.startup.SipContextConfig;
@@ -41,101 +41,95 @@ import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
 public class NotifierSipServletTest extends SipServletTestCase {
-	
-	private static transient Logger logger = Logger.getLogger(NotifierSipServletTest.class);
 
-	private static final String TRANSPORT = "udp";
-	private static final boolean AUTODIALOG = true;
-	private static final int TIMEOUT = 10000;	
+    private static transient Logger logger = Logger.getLogger(NotifierSipServletTest.class);
+
+    private static final String TRANSPORT = "udp";
+    private static final boolean AUTODIALOG = true;
+    private static final int TIMEOUT = 10000;
 //	private static final int TIMEOUT = 100000000;
-	
-	private static final String[] SUBSCRIPTION_STATES = new String[]{
-		SubscriptionState.PENDING.toLowerCase(), SubscriptionState.ACTIVE.toLowerCase(), SubscriptionState.TERMINATED.toLowerCase() 
-	};
-	
-	private static final String SESSION_INVALIDATED = new String("sipSessionReadyToBeInvalidated");	
-	
-	TestSipListener sender;
-	
-	ProtocolObjects senderProtocolObjects;	
 
-	
-	public NotifierSipServletTest(String name) {
-		super(name);
-		autoDeployOnStartup = false;
-	}
+    private static final String[] SUBSCRIPTION_STATES = new String[]{
+        SubscriptionState.PENDING.toLowerCase(), SubscriptionState.ACTIVE.toLowerCase(), SubscriptionState.TERMINATED.toLowerCase()
+    };
 
-	@Override
-	public void deployApplication() {
-		assertTrue(tomcat.deployContext(
-				projectHome + "/sip-servlets-test-suite/applications/notifier-servlet/src/main/sipapp",
-				"sip-test-context", "sip-test"));
-	}
-	
-	public SipStandardContext deployApplication(String name, String value) {
-		SipStandardContext context = new SipStandardContext();
-		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/notifier-servlet/src/main/sipapp");
-		context.setName("sip-test-context");
-		context.setPath("sip-test");
-		context.addLifecycleListener(new SipContextConfig());
-		context.setManager(new SipStandardManager());
-		ApplicationParameter applicationParameter = new ApplicationParameter();
-		applicationParameter.setName(name);
-		applicationParameter.setValue(value);
-		context.addApplicationParameter(applicationParameter);
-		assertTrue(tomcat.deployContext(context));
-		return context;
-	}
+    private static final String SESSION_INVALIDATED = new String("sipSessionReadyToBeInvalidated");
 
-	@Override
-	protected String getDarConfigurationFile() {
-		return "file:///" + projectHome + "/sip-servlets-test-suite/testsuite/src/test/resources/" +
-				"org/mobicents/servlet/sip/testsuite/subsnotify/notifier-sip-servlet-dar.properties";
-	}
-	
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();							
-	}
-	
-	/*
+    TestSipListener sender;
+
+    ProtocolObjects senderProtocolObjects;
+
+    public NotifierSipServletTest(String name) {
+        super(name);
+        autoDeployOnStartup = false;
+    }
+
+    @Override
+    public void deployApplication() {
+    }
+
+    public SipStandardContext deployApplication(Map<String, String> params) {
+        SipStandardContext ctx = deployApplication(
+                projectHome + "/sip-servlets-test-suite/applications/notifier-servlet/src/main/sipapp",
+                "sip-test",
+                params,
+                null);
+        assertTrue(ctx.getAvailable());
+        return ctx;
+    }
+
+    @Override
+    protected String getDarConfigurationFile() {
+        return "file:///" + projectHome + "/sip-servlets-test-suite/testsuite/src/test/resources/"
+                + "org/mobicents/servlet/sip/testsuite/subsnotify/notifier-sip-servlet-dar.properties";
+    }
+
+    @Override
+    protected void setUp() throws Exception {
+        containerPort = NetworkPortAssigner.retrieveNextPort();
+        super.setUp();
+    }
+
+    /*
 	 * Test the fact that a sip servlet receive SUBSCRIBEs and sends NOTIFYs in response. 
 	 * Check that everything works correctly included the Sip Session Termination upon sending a NOTIFY
 	 * containing Subscription State of Terminated.
-	 */
-	public void testNotify() throws Exception {
-		senderProtocolObjects =new ProtocolObjects(
-				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
-					
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
-		SipProvider senderProvider = sender.createProvider();			
-		
-		senderProvider.addSipListener(sender);
-		
-		senderProtocolObjects.start();
-		
-		deployApplication();
-		String fromName = "sender";
-		String fromSipAddress = "sip-servlets.com";
-		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
-				fromName, fromSipAddress);
-				
-		String toUser = "receiver";
-		String toSipAddress = "sip-servlets.com";
-		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
-				toUser, toSipAddress);
-		
-		sender.sendSipRequest(Request.SUBSCRIBE, fromAddress, toAddress, null, null, false);		
-		Thread.sleep(TIMEOUT);
-		assertEquals(3, sender.getAllSubscriptionState().size());
-		for (String subscriptionState : SUBSCRIPTION_STATES) {
-			assertTrue(subscriptionState + " not present",sender.getAllSubscriptionState().contains(subscriptionState));	
-		}				
-		Thread.sleep(TIMEOUT);
-		assertTrue(sender.getAllMessagesContent().size() >= 1);
-		assertTrue("session not invalidated after receiving Terminated Subscription State", sender.getAllMessagesContent().contains(SESSION_INVALIDATED));		
-	}
-	
+     */
+    public void testNotify() throws Exception {
+        senderProtocolObjects = new ProtocolObjects(
+                "sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+        int senderPort = NetworkPortAssigner.retrieveNextPort();
+        sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, true);
+        SipProvider senderProvider = sender.createProvider();
+        senderProvider.addSipListener(sender);
+        senderProtocolObjects.start();
+
+        Map<String, String> params = new HashMap();
+        params.put("servletContainerPort", String.valueOf(containerPort));
+        params.put("testPort", String.valueOf(senderPort));
+        deployApplication(params);
+
+        String fromName = "sender";
+        String fromSipAddress = "sip-servlets.com";
+        SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+                fromName, fromSipAddress);
+
+        String toUser = "receiver";
+        String toSipAddress = "sip-servlets.com";
+        SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+                toUser, toSipAddress);
+
+        sender.sendSipRequest(Request.SUBSCRIBE, fromAddress, toAddress, null, null, false);
+        Thread.sleep(TIMEOUT);
+        assertEquals(3, sender.getAllSubscriptionState().size());
+        for (String subscriptionState : SUBSCRIPTION_STATES) {
+            assertTrue(subscriptionState + " not present", sender.getAllSubscriptionState().contains(subscriptionState));
+        }
+        Thread.sleep(TIMEOUT);
+        assertTrue(sender.getAllMessagesContent().size() >= 1);
+        assertTrue("session not invalidated after receiving Terminated Subscription State", sender.getAllMessagesContent().contains(SESSION_INVALIDATED));
+    }
+
 //	/*
 //	 * Test the fact that a sip servlet receive SUBSCRIBEs and sends NOTIFYs in response. 
 //	 * Check that everything works correctly included the Sip Session Termination upon sending a NOTIFY
@@ -173,34 +167,35 @@ public class NotifierSipServletTest extends SipServletTestCase {
 //		assertTrue(sender.getAllMessagesContent().size() >= 1);
 //		assertTrue("session not invalidated after receiving Terminated Subscription State", sender.getAllMessagesContent().contains(SESSION_INVALIDATED));		
 //	}
-	
-	/*
+    /*
 	 * Test the fact that a sip servlet send an unsollicited NOTIFY 
-	 */
-	public void testSendUnsollicitedNotify() throws Exception {
-		Map<String, String> properties = new HashMap<String, String>();
-		properties.put("gov.nist.javax.sip.DELIVER_UNSOLICITED_NOTIFY", "true");
-		senderProtocolObjects =new ProtocolObjects(
-				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null, properties);
-					
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
-		SipProvider senderProvider = sender.createProvider();			
-		
-		senderProvider.addSipListener(sender);
-		
-		senderProtocolObjects.start();
-		
-		deployApplication("sendUnsollictedNotify", "true");
-		Thread.sleep(TIMEOUT);
-		assertTrue(sender.allRequests.size() >= 1);			
-	}
+     */
+    public void testSendUnsollicitedNotify() throws Exception {
+        Map<String, String> properties = new HashMap<String, String>();
+        properties.put("gov.nist.javax.sip.DELIVER_UNSOLICITED_NOTIFY", "true");
 
-	@Override
-	protected void tearDown() throws Exception {					
-		senderProtocolObjects.destroy();			
-		logger.info("Test completed");
-		super.tearDown();
-	}
+        senderProtocolObjects = new ProtocolObjects(
+                "sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null, properties);
+        int senderPort = NetworkPortAssigner.retrieveNextPort();
+        sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, false);
+        SipProvider senderProvider = sender.createProvider();
+        senderProvider.addSipListener(sender);
+        senderProtocolObjects.start();
 
+        Map<String, String> params = new HashMap();
+        params.put("servletContainerPort", String.valueOf(containerPort));
+        params.put("testPort", String.valueOf(senderPort));
+        params.put("sendUnsollictedNotify", "true");
+        deployApplication(params);
+        Thread.sleep(TIMEOUT);
+        assertTrue(sender.allRequests.size() >= 1);
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        senderProtocolObjects.destroy();
+        logger.info("Test completed");
+        super.tearDown();
+    }
 
 }

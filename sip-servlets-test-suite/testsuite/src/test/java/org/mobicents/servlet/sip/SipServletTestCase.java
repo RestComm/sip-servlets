@@ -23,15 +23,24 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.sip.ListeningPoint;
+import static junit.framework.Assert.assertTrue;
 
 import junit.framework.TestCase;
+import org.apache.catalina.Realm;
 
 import org.apache.catalina.connector.Connector;
+import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
+import org.mobicents.servlet.sip.catalina.SipStandardManager;
+import org.mobicents.servlet.sip.startup.SipContextConfig;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
 
 /**
  * This class is responsible for reading up the properties configuration file
@@ -55,9 +64,13 @@ public abstract class SipServletTestCase extends TestCase {
 	protected boolean startTomcatOnStartup = true;
 	protected boolean addSipConnectorOnStartup = true;
 	protected Connector sipConnector;
+        protected int httpContainerPort = 8080;
+        protected int containerPort = 5070;
+        protected SipStandardContext ctx;
 		
 	public SipServletTestCase(String name) {
 		super(name);
+                httpContainerPort = NetworkPortAssigner.retrieveNextPort();
 	}
         
         protected List<Closeable> testResources;
@@ -70,8 +83,9 @@ public abstract class SipServletTestCase extends TestCase {
 
                 }
             }
-        }         
-	
+        } 
+        
+ 
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -111,8 +125,8 @@ public abstract class SipServletTestCase extends TestCase {
 		//starting tomcat
 		if(createTomcatOnStartup) {
 			createTomcat();
-		}
-	}
+		}            
+        }
 	
 	protected void createTomcat() throws Exception {
 		tomcat = new SipEmbedded(serverName, serviceFullClassName);
@@ -128,7 +142,7 @@ public abstract class SipServletTestCase extends TestCase {
 		if(initTomcatOnStartup) {
 			Properties sipStackProperties = getSipStackProperties(); 
 			tomcat.initTomcat(tomcatBasePath, sipStackProperties);
-			tomcat.addHttpConnector(httpIpAddress, 8080);
+			tomcat.addHttpConnector(httpIpAddress, httpContainerPort);
 			/*
 			 * <Connector debugLog="../logs/debuglog.txt" ipAddress="0.0.0.0"
 			 * logLevel="DEBUG" port="5070"
@@ -137,7 +151,7 @@ public abstract class SipServletTestCase extends TestCase {
 			 * sipPathName="gov.nist" sipStackName="SIP-Servlet-Tomcat-Server"/>
 			 */
 			if(addSipConnectorOnStartup) {
-				sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport);
+				sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, containerPort, listeningPointTransport);
 			}
 		}		
 		if(startTomcatOnStartup) {
@@ -155,8 +169,13 @@ public abstract class SipServletTestCase extends TestCase {
 	@Override
 	protected void tearDown() throws Exception {
                 closeResources();
-		if(createTomcatOnStartup)
-			tomcat.stopTomcat();
+                //close tomcat even if not started automatically,since most test
+                //cases are not explicitly stopping tomcat
+                Connector[] conns = tomcat.findConnectors();
+                for (Connector cAux: conns) {
+                    tomcat.removeConnector(cAux);
+                }
+		tomcat.stopTomcat();
 		super.tearDown();
 	}
 
@@ -170,4 +189,52 @@ public abstract class SipServletTestCase extends TestCase {
 	 * configuration file to use to the test case
 	 */
 	protected abstract String getDarConfigurationFile();
+        
+
+	protected SipStandardContext deployShootist(Map<String, String> params,ConcurrencyControlMode concurrencyControlMode) {
+            return deployApplication(projectHome + "/sip-servlets-test-suite/applications/shootist-sip-servlet/src/main/sipapp",
+                    params, concurrencyControlMode);
+        }
+        
+        
+	protected SipStandardContext deployApplication(String docBase, Map<String, String> params,ConcurrencyControlMode concurrencyControlMode) {
+            return deployApplication(docBase, "sip-test-context", params, concurrencyControlMode);
+        }
+        
+	protected SipStandardContext deployApplication(String docBase, String name, Map<String, String> params,ConcurrencyControlMode concurrencyControlMode) {
+            return deployApplication(docBase, name, params, concurrencyControlMode, null, null);
+        }
+        
+	protected SipStandardContext deployApplication(String docBase, String name, Map<String, String> params,ConcurrencyControlMode concurrencyControlMode, Realm realm) {
+            return deployApplication(docBase, name, params, concurrencyControlMode, null, realm);
+        }        
+        protected SipStandardContext deployApplication(String docBase, String name, Map<String, String> params,
+                ConcurrencyControlMode concurrencyControlMode, Integer sessionTimeout, Realm realm) {
+		SipStandardContext context = new SipStandardContext();
+		context.setDocBase(docBase);
+		context.setName(name);
+		context.setPath("/" + name);
+		context.addLifecycleListener(new SipContextConfig());
+		context.setManager(new SipStandardManager());
+		if(concurrencyControlMode != null) {
+			context.setConcurrencyControlMode(concurrencyControlMode);
+		}
+                if (sessionTimeout != null) {
+                    context.setSipApplicationSessionTimeout(sessionTimeout);
+                }
+                if (realm != null) {
+                    context.setRealm(realm);
+                }
+                if (params != null) {
+                    for (Map.Entry<String, String> param : params.entrySet()) {
+                            ApplicationParameter applicationParameter = new ApplicationParameter();
+                            applicationParameter.setName(param.getKey());
+                            applicationParameter.setValue(param.getValue());
+                            context.addApplicationParameter(applicationParameter);
+                    }
+                }
+                ctx = context;
+		assertTrue(tomcat.deployContext(context));
+		return context;
+	}        
 }

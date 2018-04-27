@@ -69,7 +69,7 @@ public class Proxy implements SipListener {
 
     private static String host = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
 
-    private int port = 5070;
+    private int port;
 
     private SipProvider sipProvider;
 
@@ -88,6 +88,7 @@ public class Proxy implements SipListener {
     private SipStack sipStack;
 
     private int ntargets;
+    private int[] targetPorts;
     
     
     private void sendTo(ServerTransaction st, Request request, int targetPort) throws Exception {
@@ -105,7 +106,7 @@ public class Proxy implements SipListener {
         ClientTransaction ct1 = sipProvider.getNewClientTransaction(newRequest);
         sipUri = addressFactory.createSipURI("proxy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
         address = addressFactory.createAddress("proxy", sipUri);
-        sipUri.setPort(5070);
+        sipUri.setPort(port);
         sipUri.setLrParam();
         RecordRouteHeader recordRoute = headerFactory.createRecordRouteHeader(address);
         newRequest.addHeader(recordRoute);
@@ -132,14 +133,15 @@ public class Proxy implements SipListener {
                 }
                 
                 for ( int i = 0; i < ntargets; i++ ) {
-                    this.sendTo(st,request,5080 + i);
+                    this.sendTo(st,request, targetPorts[i]);
                 }
 
              
                
 
             } else if (request.getMethod().equals(Request.CANCEL)) {
-            	ClientTransaction clientTransaction = ((ClientTransaction)clientTxTable.get(new Integer(5081)));
+                //assuming 2 targets, take last port
+            	ClientTransaction clientTransaction = ((ClientTransaction)clientTxTable.get(targetPorts[1]));
             	Request cancelRequest = clientTransaction.createCancel();
             	sipProvider.sendRequest(cancelRequest);
             	
@@ -246,9 +248,10 @@ public class Proxy implements SipListener {
         TestCase.fail("unexpected event");
     }
 
-    public Proxy(int myPort, int ntargets) {
+    public Proxy(int myPort, int[] shootmePorts) {
         this.port = myPort;
-        this.ntargets = ntargets;
+        this.ntargets = shootmePorts.length;
+        targetPorts = shootmePorts;
         SipObjects sipObjects = new SipObjects(myPort, "proxy","off", true);
         addressFactory = sipObjects.addressFactory;
         messageFactory = sipObjects.messageFactory;

@@ -23,6 +23,7 @@
 package org.mobicents.servlet.sip.testsuite.address;
 
 import javax.servlet.sip.Address;
+import javax.servlet.sip.URI;
 
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 
@@ -69,5 +70,21 @@ public class AddressTest extends junit.framework.TestCase {
 			assertFalse(uri1 + " is the same as " + uri2, uri1.equals(uri2));
 			assertFalse(uri2 + " is the same as " + uri1, uri2.equals(uri1));
 		}
+	}
+	
+	// test for https://telestax.zendesk.com/tickets/31631
+	public void testParameter() throws Exception {
+		Address address = address("<sip:%61lice@bea.com;transport=TCP;lr>");
+//		address.setParameter("webrtc", "yes");
+//		System.out.println(address.toString());
+//		assertEquals("<sip:%61lice@bea.com;transport=TCP;lr>;webrtc=yes", address.toString());
+		address.getURI().setParameter("webrtc", "yes"); 
+//		uri.setParameter("webrtc", "yes");
+//		address.setURI(uri);
+//		assertEquals("<sip:%61lice@bea.com;transport=TCP;lr;webrtc=yes>;webrtc=yes", address.toString());
+		assertEquals("<sip:%61lice@bea.com;transport=TCP;lr;webrtc=yes>", address.toString());
+		System.out.println(address.toString());
+		System.out.println(address.getURI().toString());
+		
 	}
 }

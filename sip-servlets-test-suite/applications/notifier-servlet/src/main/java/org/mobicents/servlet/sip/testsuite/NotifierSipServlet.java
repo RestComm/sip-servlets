@@ -26,6 +26,7 @@ import java.io.IOException;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
@@ -54,6 +55,8 @@ public class NotifierSipServlet extends SipServlet implements SipSessionListener
 	
 	@Resource
 	SipFactory sipFactory;
+        
+        static ServletContext ctx;         
 	
 	/** Creates a new instance of SimpleProxyServlet */
 	public NotifierSipServlet() {
@@ -63,6 +66,7 @@ public class NotifierSipServlet extends SipServlet implements SipSessionListener
 	public void init(ServletConfig servletConfig) throws ServletException {
 		logger.info("the notifier sip servlet has been started");
 		super.init(servletConfig);
+                ctx = servletConfig.getServletContext();                  
 	}
 
 	/**
@@ -159,7 +163,7 @@ public class NotifierSipServlet extends SipServlet implements SipSessionListener
 						"MESSAGE", 
 						se.getSession().getLocalParty(), 
 						se.getSession().getRemoteParty());
-				SipURI sipUri=sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+				SipURI sipUri=sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
 				sipServletRequest.setRequestURI(sipUri);
 				sipServletRequest.setContentLength(SIP_SESSION_READY_TO_BE_INVALIDATED.length());
 				sipServletRequest.setContent(SIP_SESSION_READY_TO_BE_INVALIDATED, CONTENT_TYPE);
@@ -179,7 +183,7 @@ public class NotifierSipServlet extends SipServlet implements SipSessionListener
 			URI toURI =  sipFactory.createSipURI("LittleGuy", "there.com");
 			SipServletRequest sipServletRequest = 
 				sipFactory.createRequest(sipApplicationSession, "NOTIFY", fromURI, toURI);
-			SipURI requestURI = sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+			SipURI requestURI = sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
 			sipServletRequest.addHeader("Event", "aastra-xml");
 			sipServletRequest.addHeader("Subscription-State", "pending");
 			try {	
@@ -193,4 +197,24 @@ public class NotifierSipServlet extends SipServlet implements SipSessionListener
 			}					
 		}
 	}
+        
+        public static Integer getTestPort(ServletContext ctx) {
+            String tPort = ctx.getInitParameter("testPort");
+            logger.info("TestPort at:" + tPort);
+            if (tPort != null) {
+                return Integer.valueOf(tPort);
+            } else {
+                return 5080;
+            }
+        }
+        
+        public static Integer getServletContainerPort(ServletContext ctx) {
+            String cPort = ctx.getInitParameter("servletContainerPort");
+            logger.info("TestPort at:" + cPort);            
+            if (cPort != null) {
+                return Integer.valueOf(cPort);
+            } else {
+                return 5070;
+            }            
+        }            
 }

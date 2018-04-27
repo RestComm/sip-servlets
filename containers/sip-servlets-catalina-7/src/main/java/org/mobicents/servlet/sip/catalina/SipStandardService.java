@@ -142,6 +142,7 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 	protected boolean dialogPendingRequestChecking = false;
 	protected int callIdMaxLength;
 	protected int tagHashMaxLength;
+        private long gracefulInterval = 30000;        
 	
 	protected boolean httpFollowsSip = false;
 	protected String jvmRoute;
@@ -1354,6 +1355,7 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 			Iterator<SipContext> sipContexts = sipApplicationDispatcher.findSipApplications();
 			while (sipContexts.hasNext()) {
 				SipContext sipContext = sipContexts.next();
+                                sipContext.setGracefulInterval(gracefulInterval);
 				sipContext.stopGracefully(timeToWait);
 			}
 			gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().scheduleWithFixedDelay(new ServiceGracefulStopTask(this), 30000, 30000, TimeUnit.MILLISECONDS);
@@ -1403,4 +1405,8 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
     public void setSasTimerServiceImplementationType(String sasTimerServiceImplementationType) {
         this.sasTimerServiceImplementationType = sasTimerServiceImplementationType;
     }
+    
+    public void setGracefulInterval(long gracefulStopTaskInterval) {
+        this.gracefulInterval = gracefulStopTaskInterval;
+    }    
 }

@@ -23,15 +23,19 @@ package org.mobicents.servlet.sip.testsuite.click2call;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.sip.message.Response;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.deploy.ApplicationParameter;
 
 import org.apache.log4j.Logger;
 import org.cafesip.sipunit.SipCall;
 import org.cafesip.sipunit.SipPhone;
 import org.cafesip.sipunit.SipStack;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.catalina.SipStandardManager;
 import org.mobicents.servlet.sip.startup.SipContextConfig;
@@ -61,16 +65,17 @@ public class Click2CallBasicTest extends SipServletTestCase {
 
     public Click2CallBasicTest(String name) {
         super(name);
+        autoDeployOnStartup = false;
     }
 
     @Override
     public void setUp() throws Exception {
         if (firstTime) {
+            containerPort = NetworkPortAssigner.retrieveNextPort();
             super.setUp();
-            CLICK2DIAL_URL = "http://" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":8080/click2call/call";
-            RESOURCE_LEAK_URL = "http://" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":8080/click2call/index.html";
+            CLICK2DIAL_URL = "http://" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + httpContainerPort + "/click2call/call";
+            RESOURCE_LEAK_URL = "http://" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + httpContainerPort+"/click2call/index.html";
             EXPIRATION_TIME_PARAMS = "?expirationTime";
-            CLICK2DIAL_PARAMS = "?from=sip:from@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5056&to=sip:to@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5057";
         }
         firstTime = true;
     }
@@ -98,12 +103,22 @@ public class Click2CallBasicTest extends SipServletTestCase {
 
     @Override
     public void deployApplication() {
-
+    }
+    
+    public SipStandardContext deployApplication(Map<String,String> params) {
         context = new SipStandardContext();
         context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/click-to-call-servlet/src/main/sipapp");
         context.setName("click2call-context");
         context.setPath("/click2call");
         context.addLifecycleListener(new SipContextConfig());
+        if (params != null) {
+            for (Map.Entry<String, String> param : params.entrySet()) {
+                    ApplicationParameter applicationParameter = new ApplicationParameter();
+                    applicationParameter.setName(param.getKey());
+                    applicationParameter.setValue(param.getValue());
+                    context.addApplicationParameter(applicationParameter);
+            }
+        }        
         manager = new SipStandardManager();
         context.setManager(manager);
         
@@ -118,6 +133,8 @@ public class Click2CallBasicTest extends SipServletTestCase {
         context.addServletMapping("/", "default");        
         
         assertTrue(tomcat.deployContext(context));
+        
+        return context;
     }
 
     @Override
@@ -130,16 +147,16 @@ public class Click2CallBasicTest extends SipServletTestCase {
 
     public SipStack makeStack(String transport, int port) throws Exception {
         Properties properties = new Properties();
-        String peerHostPort1 = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070";
+        String peerHostPort1 = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + containerPort;
         properties.setProperty("javax.sip.OUTBOUND_PROXY", peerHostPort1 + "/"
                 + "udp");
         properties.setProperty("javax.sip.STACK_NAME", "UAC_" + transport + "_"
                 + port);
         properties.setProperty("sipunit.BINDADDR", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
         properties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
-                "logs/simplesipservlettest_debug_port" + port + ".txt");
+                "target/logs/simplesipservlettest_debug_port" + port + ".txt");
         properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
-                "logs/simplesipservlettest_log_port" + port + ".xml");
+                "target/logs/simplesipservlettest_log_port" + port + ".xml");
         properties.setProperty("gov.nist.javax.sip.TRACE_LEVEL",
                 "32");
         return new SipStack(transport, port, properties);
@@ -149,13 +166,22 @@ public class Click2CallBasicTest extends SipServletTestCase {
         sipStackReceivers = new SipStack[receiversCount];
         sipPhoneReceivers = new SipPhone[receiversCount];
 
-        sipStackReceivers[0] = makeStack(SipStack.PROTOCOL_UDP, 5057);
+        int receiverPort = NetworkPortAssigner.retrieveNextPort();
+        sipStackReceivers[0] = makeStack(SipStack.PROTOCOL_UDP, receiverPort);
         sipPhoneReceivers[0] = sipStackReceivers[0].createSipPhone("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "",
-                SipStack.PROTOCOL_UDP, 5070, "sip:to@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
+                SipStack.PROTOCOL_UDP, containerPort, "sip:to@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
 
-        sipStackReceivers[1] = makeStack(SipStack.PROTOCOL_UDP, 5056);
+        int receiver2Port = NetworkPortAssigner.retrieveNextPort();
+        sipStackReceivers[1] = makeStack(SipStack.PROTOCOL_UDP, receiver2Port);
         sipPhoneReceivers[1] = sipStackReceivers[1].createSipPhone("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "",
-                SipStack.PROTOCOL_UDP, 5070, "sip:from@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
+                SipStack.PROTOCOL_UDP, containerPort, "sip:from@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
+        
+        CLICK2DIAL_PARAMS = "?from=sip:from@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + receiver2Port + "&to=sip:to@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + receiverPort;
+        Map<String, String> params = new HashMap();
+        params.put("servletContainerPort", String.valueOf(containerPort));
+        params.put("testPort", String.valueOf(receiverPort));
+        params.put("senderPort", String.valueOf(receiver2Port));        
+        deployApplication(params);
     }
 
     public void init() throws Exception {
@@ -216,7 +242,7 @@ public class Click2CallBasicTest extends SipServletTestCase {
      */
     public void testClickToCallHttpSessionLeak()
             throws Exception {
-
+        deployApplication(new HashMap());
         final int sessionsNumber = manager.getActiveSessions();
 
         logger.info("Trying to reach url : " + RESOURCE_LEAK_URL);
@@ -241,7 +267,7 @@ public class Click2CallBasicTest extends SipServletTestCase {
      */
     public void testClickToCallExpirationTime()
             throws Exception {
-
+        deployApplication(new HashMap());
         logger.info("Trying to reach url : " + CLICK2DIAL_URL + EXPIRATION_TIME_PARAMS);
 
         URL url = new URL(CLICK2DIAL_URL + EXPIRATION_TIME_PARAMS);

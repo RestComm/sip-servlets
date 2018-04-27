@@ -23,8 +23,13 @@
 package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import javax.annotation.Resource;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
@@ -34,8 +39,10 @@ import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipSessionsUtil;
 import javax.servlet.sip.SipURI;
+import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
+import static org.mobicents.servlet.sip.testsuite.ReplacesSenderSipServlet.ctx;
 
 
 public class ReplacesReceiverSipServlet extends SipServlet {
@@ -85,7 +92,7 @@ public class ReplacesReceiverSipServlet extends SipServlet {
 			
 			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
 			SipURI fromURI = sipFactory.createSipURI("receiver", "sip-servlets.com");
-			SipURI requestURI = sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090");
+			SipURI requestURI = sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
 			SipServletRequest sipServletRequest = sipFactory.createRequest(sipApplicationSession, "MESSAGE", fromURI, request.getFrom().getURI());
 			sipServletRequest.setContentLength(messageContent.length());
 			sipServletRequest.setContent(messageContent, CONTENT_TYPE);
@@ -119,5 +126,44 @@ public class ReplacesReceiverSipServlet extends SipServlet {
 			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 			sipServletResponse.send();
 		}
-	}	
+	}
+        
+        static ServletContext ctx; 
+
+        	@Override
+	public void init(ServletConfig servletConfig) throws ServletException {
+		logger.info("the sip servlet has been started");
+		super.init(servletConfig);
+                ctx = servletConfig.getServletContext();                 
+	}
+        
+        public static Integer getTestPort(ServletContext ctx) {
+            String tPort = ctx.getInitParameter("testPort");
+            logger.info("TestPort at:" + tPort);
+            if (tPort != null) {
+                return Integer.valueOf(tPort);
+            } else {
+                return 5090;
+            }
+        }
+        
+        public static Integer getSenderPort(ServletContext ctx) {
+            String tPort = ctx.getInitParameter("senderPort");
+            logger.info("senderPort at:" + tPort);
+            if (tPort != null) {
+                return Integer.valueOf(tPort);
+            } else {
+                return 5080;
+            }
+        }        
+        
+        public static Integer getServletContainerPort(ServletContext ctx) {
+            String cPort = ctx.getInitParameter("servletContainerPort");
+            logger.info("TestPort at:" + cPort);            
+            if (cPort != null) {
+                return Integer.valueOf(cPort);
+            } else {
+                return 5070;
+            }            
+        }        
 }

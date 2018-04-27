@@ -30,6 +30,7 @@ import java.util.StringTokenizer;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Proxy;
 import javax.servlet.sip.ServletParseException;
@@ -54,16 +55,12 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener,
 	private static transient Logger logger = Logger.getLogger(SpeedDialSipServlet.class);
 	
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";	
-	private static final String REMOTE_TRANSPORT = "udp";
-	private static final int REMOTE_PORT = 5080;
 	private static final String REMOTE_LOCALHOST_ADDR = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
 	
 	private static final String INITIAL_REMOTE_TRANSPORT = "udp";
-	private static final int INITIAL_REMOTE_PORT = 5090;
 	private static final String INITIAL_REMOTE_LOCALHOST_ADDR = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
 	
 	private static final String LOCAL_TRANSPORT = "udp";
-	private static final int LOCAL_PORT = 5070;
 	private static final String LOCAL_LOCALHOST_ADDR = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
 	
 	private static final String TEST_USER_REMOTE = "remote";
@@ -74,6 +71,8 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener,
 	
 	@Resource
 	SipFactory sipFactory;
+        
+        static ServletContext ctx;         
 
 	/** Creates a new instance of SpeedDialSipServlet */
 	public SpeedDialSipServlet() {}
@@ -82,6 +81,7 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener,
 	public void init(ServletConfig servletConfig) throws ServletException {
 		logger.info("the speed dial sip servlet has been started");
 		super.init(servletConfig);
+                ctx = servletConfig.getServletContext();                    
 		dialNumberToSipUriMapping = new HashMap<String, String>();
 		dialNumberToSipUriMapping.put("1", "sip:receiver@sip-servlets.com");
 		dialNumberToSipUriMapping.put("2", "sip:mranga@sip-servlets.com");
@@ -93,10 +93,11 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener,
 		dialNumberToSipUriMapping.put("7", "sip:receiver-prack@sip-servlets.com");
 		dialNumberToSipUriMapping.put("8", "sip:cancel-receiver@sip-servlets.com");
 		dialNumberToSipUriMapping.put("b2bua", "sip:fromProxy@sip-servlets.com");
-		dialNumberToSipUriMapping.put("9", "sip:receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090");
-		dialNumberToSipUriMapping.put("test-callResponseBacks", "sip:receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090,sip:receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5091");
-		dialNumberToSipUriMapping.put("forward-pending-sender", "sip:forward-pending-sender@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
-		dialNumberToSipUriMapping.put("factory-sender", "sip:factory-sender@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");		
+		dialNumberToSipUriMapping.put("9", "sip:receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getReceiverPort(ctx));
+		dialNumberToSipUriMapping.put("test-callResponseBacks", "sip:receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getReceiverPort(ctx)+ ",sip:receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getCutmePort(ctx));
+		dialNumberToSipUriMapping.put("forward-pending-sender", "sip:forward-pending-sender@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
+		dialNumberToSipUriMapping.put("forward-pending-changeFromTo-sender", "sip:forward-pending-changeFromTo-sender@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
+		dialNumberToSipUriMapping.put("factory-sender", "sip:factory-sender@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));		
 		String initParam = servletConfig.getServletContext().getInitParameter("record_route");
 		if(initParam != null && initParam.equals("false")) {
 			isRecordRoute = false;
@@ -150,6 +151,15 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener,
 					sipServletResponse.send();			
 				}
 			}						
+		} else {
+			if(request.getFrom().getURI().toString().contains("forward-pending-changeFromTo-sender") || 
+					request.getFrom().getURI().toString().contains("forward-pending-changeFromTo-sender")) {
+				logger.info("Got subsequent request:\n" + request.toString());
+				request.getFrom().setDisplayName("From changed");
+				request.getFrom().setURI(sipFactory.createURI("sip:fromchanged@sip-servlets.com"));
+				request.getTo().setDisplayName("To changed");
+				request.getTo().setURI(sipFactory.createURI("sip:tochanged@sip-servlets.com"));
+			}
 		}
 	}
 	
@@ -160,7 +170,7 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener,
 				logger.info("remote tcp information is correct");
 				isCorrect =true;
 			} else {
-				if(request.getRemotePort() == REMOTE_PORT){
+				if(request.getRemotePort() == getTestPort(ctx)){
 					logger.info("remote udp information is correct");
 				}
 				isCorrect =true;
@@ -185,7 +195,7 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener,
 				logger.info("initial remote tcp information is correct");
 				isCorrect =true;
 			} else {
-				if(request.getInitialRemotePort() == REMOTE_PORT){
+				if(request.getInitialRemotePort() == getTestPort(ctx)){
 					logger.info("initial remote udp information is correct");
 				}
 				isCorrect =true;
@@ -210,7 +220,7 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener,
 				logger.info("local tcp information is correct");
 				isCorrect =true;
 			} else {
-				if(request.getLocalPort() == LOCAL_PORT){
+				if(request.getLocalPort() == getServletContainerPort(ctx)){
 					logger.info("local udp information is correct");
 				}
 				isCorrect =true;
@@ -268,10 +278,11 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener,
 			resp.getApplicationSession().setAttribute("doSuccessResponseReceivedAtAppLevel", "true");
 		}
 		if(((SipURI)resp.getFrom().getURI()).getUser().equalsIgnoreCase(TEST_USER_REMOTE)) {
-			if(resp.getRemoteAddr().equals(LOCAL_LOCALHOST_ADDR) && resp.getRemotePort() == LOCAL_PORT && resp.getTransport().equalsIgnoreCase(LOCAL_TRANSPORT)) {			
+			if(resp.getRemoteAddr().equals(LOCAL_LOCALHOST_ADDR) && resp.getRemotePort() == getServletContainerPort(ctx)
+                                && resp.getTransport().equalsIgnoreCase(LOCAL_TRANSPORT)) {			
 				logger.info("remote information is correct");
 			} else {
-				if(resp.getRemotePort()!=5090){ // 5090 is the remote client
+				if(resp.getRemotePort()!=getReceiverPort(ctx)){ // 5090 is the remote client
 					logger.error("remote information is incorrect");
 					logger.error("remote addr " + resp.getRemoteAddr());
 					logger.error("remote port " + resp.getRemotePort());
@@ -279,7 +290,9 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener,
 					throw new IllegalArgumentException("remote information is incorrect");
 				}
 			}
-			if(resp.getInitialRemoteAddr().equals(INITIAL_REMOTE_LOCALHOST_ADDR) && resp.getInitialRemotePort() == INITIAL_REMOTE_PORT && resp.getInitialTransport().equalsIgnoreCase(INITIAL_REMOTE_TRANSPORT)) {			
+			if(resp.getInitialRemoteAddr().equals(INITIAL_REMOTE_LOCALHOST_ADDR) 
+                                && resp.getInitialRemotePort() == getReceiverPort(ctx) 
+                                && resp.getInitialTransport().equalsIgnoreCase(INITIAL_REMOTE_TRANSPORT)) {			
 				logger.info("Initial remote information is correct");
 			} else {
 				logger.error("Initial remote information is incorrect");
@@ -288,7 +301,8 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener,
 				logger.error("Initial remote transport " + resp.getInitialTransport());
 				throw new IllegalArgumentException("initial remote information is incorrect");
 			}
-			if(resp.getLocalAddr().equals(LOCAL_LOCALHOST_ADDR) && resp.getLocalPort() == LOCAL_PORT && resp.getTransport().equalsIgnoreCase(LOCAL_TRANSPORT)) {			
+			if(resp.getLocalAddr().equals(LOCAL_LOCALHOST_ADDR) && resp.getLocalPort() == getServletContainerPort(ctx)
+                                && resp.getTransport().equalsIgnoreCase(LOCAL_TRANSPORT)) {			
 				logger.info("local information is correct");
 			} else {
 				logger.error("local information is incorrect");
@@ -336,7 +350,7 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener,
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
 			sipServletRequest.addHeader("Ext", "Test 1, 2 ,3");
-			SipURI sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+			SipURI sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
 			if(transport != null) {
 				if(transport.equalsIgnoreCase(ListeningPoint.TCP)) {
 					sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5081");
@@ -373,4 +387,44 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener,
 			sendMessage(sipFactory.createApplicationSession(), sipFactory, "allResponsesReceivedCorrectlyOnEachCallBack", null);
 		}
 	}
+        
+        public static Integer getTestPort(ServletContext ctx) {
+            String tPort = ctx.getInitParameter("testPort");
+            logger.info("TestPort at:" + tPort);
+            if (tPort != null) {
+                return Integer.valueOf(tPort);
+            } else {
+                return 5080;
+            }
+        }
+        
+        public static Integer getReceiverPort(ServletContext ctx) {
+            String tPort = ctx.getInitParameter("receiverPort");
+            logger.info("ReceiverPort at:" + tPort);
+            if (tPort != null) {
+                return Integer.valueOf(tPort);
+            } else {
+                return 5090;
+            }
+        } 
+        
+        public static Integer getCutmePort(ServletContext ctx) {
+            String tPort = ctx.getInitParameter("cutmePort");
+            logger.info("CutmePort at:" + tPort);
+            if (tPort != null) {
+                return Integer.valueOf(tPort);
+            } else {
+                return 5091;
+            }
+        }          
+        
+        public static Integer getServletContainerPort(ServletContext ctx) {
+            String cPort = ctx.getInitParameter("servletContainerPort");
+            logger.info("TestPort at:" + cPort);            
+            if (cPort != null) {
+                return Integer.valueOf(cPort);
+            } else {
+                return 5070;
+            }            
+        }         
 }

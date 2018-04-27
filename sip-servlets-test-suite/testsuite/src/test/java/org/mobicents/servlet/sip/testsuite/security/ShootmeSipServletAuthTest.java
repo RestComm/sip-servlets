@@ -19,19 +19,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.servlet.sip.testsuite.security;
 
 import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.sip.InvalidArgumentException;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
+import static junit.framework.Assert.assertTrue;
 
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.catalina.realm.MemoryRealm;
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.catalina.SipStandardManager;
 import org.mobicents.servlet.sip.startup.SipContextConfig;
@@ -41,141 +44,145 @@ import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
 public class ShootmeSipServletAuthTest extends SipServletTestCase {
 
-	private static transient Logger logger = Logger.getLogger(ShootmeSipServletAuthTest.class);
+    private static transient Logger logger = Logger.getLogger(ShootmeSipServletAuthTest.class);
 
-	private static final String TRANSPORT = "udp";
-	private static final boolean AUTODIALOG = true;
-	private static final int TIMEOUT = 5000;
+    private static final String TRANSPORT = "udp";
+    private static final boolean AUTODIALOG = true;
+    private static final int TIMEOUT = 5000;
 //	 private static final int TIMEOUT = 100000000;
 
-	TestSipListener sender;
+    TestSipListener sender;
 
-	ProtocolObjects senderProtocolObjects;
+    ProtocolObjects senderProtocolObjects;
 
-	public ShootmeSipServletAuthTest(String name) {
-		super(name);
-	}
+    public ShootmeSipServletAuthTest(String name) {
+        super(name);
+        autoDeployOnStartup = false;
+    }
 
-	@Override
-	public void deployApplication() {
-		SipStandardContext context = new SipStandardContext();
-		context
-				.setDocBase(projectHome
-						+ "/sip-servlets-test-suite/applications/shootme-sip-servlet-auth/src/main/sipapp");
-		context.setName("sip-test-context");
-		context.setPath("sip-test");
-		context.addLifecycleListener(new SipContextConfig());
-		context.setManager(new SipStandardManager());
-		ApplicationParameter applicationParameter = new ApplicationParameter();
-		applicationParameter.setName("testContextApplicationParameter");
-		applicationParameter.setValue("OK");
-		context.addApplicationParameter(applicationParameter);
-		MemoryRealm realm = new MemoryRealm();
-		realm
-				.setPathname(projectHome
-						+ "/sip-servlets-test-suite/testsuite/src/test/resources/"
-						+ "org/mobicents/servlet/sip/testsuite/security/tomcat-users.xml");
-		context.setRealm(realm);
-		assertTrue(tomcat.deployContext(context));
-	}
+    @Override
+    public void deployApplication() {
+    }
 
-	@Override
-	protected String getDarConfigurationFile() {
-		return "file:///"
-				+ projectHome
-				+ "/sip-servlets-test-suite/testsuite/src/test/resources/"
-				+ "org/mobicents/servlet/sip/testsuite/security/shootme-sip-servlet-auth-dar.properties";
-	}
+    public SipStandardContext deployApplication(Map<String, String> params) {
 
-	@Override
-	protected void setUp() {
-		try {
-			super.setUp();
+        MemoryRealm realm = new MemoryRealm();
+        realm
+                .setPathname(projectHome
+                        + "/sip-servlets-test-suite/testsuite/src/test/resources/"
+                        + "org/mobicents/servlet/sip/testsuite/security/tomcat-users.xml");
+        SipStandardContext ctx = deployApplication(
+                projectHome + "/sip-servlets-test-suite/applications/shootme-sip-servlet-auth/src/main/sipapp",
+                "sip-test",
+                params,
+                null,
+                realm);
+        assertTrue(ctx.getAvailable());
+        return ctx;
+    }
 
-			senderProtocolObjects = new ProtocolObjects("sender", "gov.nist",
-					TRANSPORT, AUTODIALOG, null, null, null);
+    @Override
+    protected String getDarConfigurationFile() {
+        return "file:///"
+                + projectHome
+                + "/sip-servlets-test-suite/testsuite/src/test/resources/"
+                + "org/mobicents/servlet/sip/testsuite/security/shootme-sip-servlet-auth-dar.properties";
+    }
 
-			sender = new TestSipListener(5080, 5070, senderProtocolObjects,
-					true);
-			SipProvider senderProvider = sender.createProvider();
+    @Override
+    protected void setUp() {
+        try {
+            containerPort = NetworkPortAssigner.retrieveNextPort();
+            super.setUp();
 
-			senderProvider.addSipListener(sender);
+            senderProtocolObjects = new ProtocolObjects("sender", "gov.nist",
+                    TRANSPORT, AUTODIALOG, null, null, null);
+            int senderPort = NetworkPortAssigner.retrieveNextPort();
+            sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects,
+                    true);
+            SipProvider senderProvider = sender.createProvider();
+            senderProvider.addSipListener(sender);
+            senderProtocolObjects.start();
 
-			senderProtocolObjects.start();
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			fail("unexpected exception ");
-		}
-	}
+            Map<String, String> params = new HashMap();
+            params.put("servletContainerPort", String.valueOf(containerPort));
+            params.put("testPort", String.valueOf(senderPort));
+            params.put("testContextApplicationParameter", "OK");
+            deployApplication(params);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            fail("unexpected exception ");
+        }
+    }
 
-	public void testShootme() throws InterruptedException, SipException,
-			ParseException, InvalidArgumentException {
-		String fromName = "sender";
-		String fromSipAddress = "sip-servlets.com";
-		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
-				fromName, fromSipAddress);
+    public void testShootme() throws InterruptedException, SipException,
+            ParseException, InvalidArgumentException {
+        String fromName = "sender";
+        String fromSipAddress = "sip-servlets.com";
+        SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+                fromName, fromSipAddress);
 
-		String toUser = "receiver";
-		String toSipAddress = "sip-servlets.com";
-		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
-				toUser, toSipAddress);
+        String toUser = "receiver";
+        String toSipAddress = "sip-servlets.com";
+        SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+                toUser, toSipAddress);
 
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null,
-				false);
-		Thread.sleep(TIMEOUT);
-		assertTrue(sender.isAckSent());
-		assertTrue(sender.getOkToByeReceived());
-	}
-	
-	// non regression test for http://code.google.com/p/sipservlets/issues/detail?id=88
-	public void testShootmeBadUser() throws InterruptedException, SipException,
-			ParseException, InvalidArgumentException {
-		String fromName = "sender";
-		String fromSipAddress = "sip-servlets.com";
-		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
-				fromName, fromSipAddress);
-		
-		String toUser = "receiver";
-		String toSipAddress = "sip-servlets.com";
-		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
-				toUser, toSipAddress);
-		
-		sender.setSecurityUser("baduser");
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null,
-				false);
-		Thread.sleep(TIMEOUT);
-		assertFalse(sender.isAckSent());
-		assertFalse(sender.getOkToByeReceived());
-		assertEquals(401, sender.getFinalResponseStatus());
-	}
-	
-	// Testing bad pwd making sure it returns 401
-	public void testShootmeBadPassword() throws InterruptedException, SipException,
-			ParseException, InvalidArgumentException {
-		String fromName = "sender";
-		String fromSipAddress = "sip-servlets.com";
-		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
-				fromName, fromSipAddress);
-		
-		String toUser = "receiver";
-		String toSipAddress = "sip-servlets.com";
-		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
-				toUser, toSipAddress);
-		
-		sender.setSecurityPwd("badpwd");
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null,
-				false);
-		Thread.sleep(TIMEOUT);
-		assertFalse(sender.isAckSent());
-		assertFalse(sender.getOkToByeReceived());
-		assertEquals(401, sender.getFinalResponseStatus());
-	}
+        sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null,
+                false);
+        Thread.sleep(TIMEOUT);
+        assertTrue(sender.isAckSent());
+        assertTrue(sender.getOkToByeReceived());
+    }
 
-	@Override
-	protected void tearDown() throws Exception {
-		senderProtocolObjects.destroy();
-		logger.info("Test completed");
-		super.tearDown();
-	}
+    // non regression test for http://code.google.com/p/sipservlets/issues/detail?id=88
+    public void testShootmeBadUser() throws InterruptedException, SipException,
+            ParseException, InvalidArgumentException {
+        String fromName = "sender";
+        String fromSipAddress = "sip-servlets.com";
+        SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+                fromName, fromSipAddress);
+
+        String toUser = "receiver";
+        String toSipAddress = "sip-servlets.com";
+        SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+                toUser, toSipAddress);
+
+        sender.setSecurityUser("baduser");
+        sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null,
+                false);
+        Thread.sleep(TIMEOUT);
+        assertFalse(sender.isAckSent());
+        assertFalse(sender.getOkToByeReceived());
+        assertEquals(401, sender.getFinalResponseStatus());
+    }
+
+    // Testing bad pwd making sure it returns 401
+    public void testShootmeBadPassword() throws InterruptedException, SipException,
+            ParseException, InvalidArgumentException {
+        String fromName = "sender";
+        String fromSipAddress = "sip-servlets.com";
+        SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+                fromName, fromSipAddress);
+
+        String toUser = "receiver";
+        String toSipAddress = "sip-servlets.com";
+        SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+                toUser, toSipAddress);
+
+        sender.setSecurityPwd("badpwd");
+        sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null,
+                false);
+        Thread.sleep(TIMEOUT);
+        assertFalse(sender.isAckSent());
+        assertFalse(sender.getOkToByeReceived());
+        assertEquals(401, sender.getFinalResponseStatus());
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        senderProtocolObjects.destroy();
+        logger.info("Test completed");
+        super.tearDown();
+    }
 
 }

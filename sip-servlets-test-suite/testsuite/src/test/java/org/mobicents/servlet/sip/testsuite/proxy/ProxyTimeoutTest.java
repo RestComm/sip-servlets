@@ -20,19 +20,18 @@
 package org.mobicents.servlet.sip.testsuite.proxy;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 
-import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.log4j.Logger;
 import org.mobicents.javax.servlet.sip.ResponseType;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
-import org.mobicents.servlet.sip.catalina.SipStandardManager;
-import org.mobicents.servlet.sip.startup.SipContextConfig;
-import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
@@ -59,6 +58,10 @@ public class ProxyTimeoutTest extends SipServletTestCase {
 
 	@Override
 	public void setUp() throws Exception {
+	}
+        
+        public void setupPhones(Map<String,String> params) throws Exception{
+                containerPort = NetworkPortAssigner.retrieveNextPort();             
 		super.setUp();
 		senderProtocolObjects = new ProtocolObjects("proxy-sender",
 				"gov.nist", ListeningPoint.UDP, AUTODIALOG, null, null, null);
@@ -66,15 +69,18 @@ public class ProxyTimeoutTest extends SipServletTestCase {
 				"gov.nist", ListeningPoint.UDP, AUTODIALOG, null, null, null);
 		neutralProto = new ProtocolObjects("neutral",
 				"gov.nist", ListeningPoint.UDP, AUTODIALOG, null, null, null);
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+                int senderPort = NetworkPortAssigner.retrieveNextPort();
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, false);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5057, 5070, receiverProtocolObjects, false);
+                int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
 		receiver.setRecordRoutingProxyTesting(true);
 		SipProvider receiverProvider = receiver.createProvider();
 		
-		neutral = new TestSipListener(5058, 5070, neutralProto, false);
+                int neutralPort = NetworkPortAssigner.retrieveNextPort();
+		neutral = new TestSipListener(neutralPort, containerPort, neutralProto, false);
 		neutral.setRecordRoutingProxyTesting(true);
 		SipProvider neutralProvider = neutral.createProvider();
 
@@ -85,7 +91,14 @@ public class ProxyTimeoutTest extends SipServletTestCase {
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
 		neutralProto.start();
-	}
+
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(senderPort)); 
+                params.put( "receiverPort", String.valueOf(receiverPort));                
+                deployApplication(projectHome + 
+                        "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp", 
+                        params, null);
+        }
 
 	/**
 	 * It will proxy to 2 locations, one will send a trying that will stop the 1xx timer but the final response timer should fire
@@ -93,7 +106,7 @@ public class ProxyTimeoutTest extends SipServletTestCase {
 	 * @throws Exception
 	 */
 	public void testProxy1xxResponseTimeout() throws Exception {
-		deployApplication();
+		setupPhones(new HashMap());
 		String fromName = "sequential-1xxResponseTimeout";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -127,7 +140,7 @@ public class ProxyTimeoutTest extends SipServletTestCase {
 	 * @throws Exception
 	 */
 	public void testProxyNoTimeout() throws Exception {
-		deployApplication();
+		setupPhones(new HashMap());
 		String fromName = "sequential-reverse-NoResponseTimeout";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -150,7 +163,9 @@ public class ProxyTimeoutTest extends SipServletTestCase {
 	 * Test Issue 1676 : SipApplicationSession.getExpirationTime() is incorrect
 	 */
 	public void testProxySipApplicationSessionTimeout() throws Exception {
-		deployApplication("sipApplicationSessionTimeout", "1");
+                Map<String,String> map = new HashMap();
+                map.put("sipApplicationSessionTimeout", "1");
+                setupPhones(map);
 		String fromName = "sipApplicationSessionTimeout";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -179,7 +194,7 @@ public class ProxyTimeoutTest extends SipServletTestCase {
 	}	
 	
 	public void testNonExistLegTimeout() throws Exception {
-		deployApplication();
+		setupPhones(new HashMap());;
 		String fromName = "sequential-nonexist";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -200,7 +215,7 @@ public class ProxyTimeoutTest extends SipServletTestCase {
 	 * Non regression test for https://code.google.com/p/sipservlets/issues/detail?id=263
 	 */
 	public void testNonExistLeg1xxTimeout() throws Exception {
-		deployApplication();
+                setupPhones(new HashMap());
 		String fromName = "sequential-nonexist-1xx";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -238,21 +253,6 @@ public class ProxyTimeoutTest extends SipServletTestCase {
 						"sip-test-context", "sip-test"));
 	}
 	
-	public SipStandardContext deployApplication(String name, String value) {
-		SipStandardContext context = new SipStandardContext();
-		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp");
-		context.setName("sip-test-context");
-		context.setPath("sip-test");
-		context.addLifecycleListener(new SipContextConfig());
-		context.setManager(new SipStandardManager());
-		ApplicationParameter applicationParameter = new ApplicationParameter();
-		applicationParameter.setName(name);
-		applicationParameter.setValue(value);
-		context.addApplicationParameter(applicationParameter);
-		assertTrue(tomcat.deployContext(context));
-		return context;
-	}
-
 	@Override
 	protected String getDarConfigurationFile() {
 		return "file:///"

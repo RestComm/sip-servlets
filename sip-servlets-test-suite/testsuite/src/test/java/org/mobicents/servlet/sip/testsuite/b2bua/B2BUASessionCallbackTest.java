@@ -23,7 +23,9 @@
 package org.mobicents.servlet.sip.testsuite.b2bua;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.ListIterator;
+import java.util.Map;
 
 import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
@@ -34,6 +36,7 @@ import javax.sip.header.Header;
 import javax.sip.header.UserAgentHeader;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
@@ -82,12 +85,12 @@ public class B2BUASessionCallbackTest extends SipServletTestCase {
 	}
 	
 	@Override
-	protected void setUp() throws Exception {		
+	protected void setUp() throws Exception {
+                containerPort = NetworkPortAssigner.retrieveNextPort();
 		super.setUp();
 
-		tomcat.addSipConnector(serverName, sipIpAddress, 5070, ListeningPoint.TCP);
+		tomcat.addSipConnector(serverName, sipIpAddress, containerPort, ListeningPoint.TCP);
 		tomcat.startTomcat();
-		deployApplication();
 		
 		senderProtocolObjects = new ProtocolObjects("forward-udp-sender",
 				"gov.nist", TRANSPORT_UDP, AUTODIALOG, null, null, null);
@@ -99,10 +102,12 @@ public class B2BUASessionCallbackTest extends SipServletTestCase {
 	public void testCallForwardingCallerSendByeDoubleCallback() throws Exception {
 		File testResult = new File("b2buaSessionDoubleCallbackTest");
 		testResult.delete();
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+                int senderPort = NetworkPortAssigner.retrieveNextPort();
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+                int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
 		SipProvider receiverProvider = receiver.createProvider();
 
 		receiverProvider.addSipListener(receiver);
@@ -110,6 +115,15 @@ public class B2BUASessionCallbackTest extends SipServletTestCase {
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
+                
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(receiverPort)); 
+                params.put( "senderPort", String.valueOf(senderPort));                 
+                deployApplication(projectHome + 
+                        "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
+                        params
+                        , null);                
 
 		String fromName = "forward-tcp-sender";
 		String fromSipAddress = "sip-servlets.com";
@@ -141,7 +155,7 @@ public class B2BUASessionCallbackTest extends SipServletTestCase {
 		while (contactHeaderIt.hasNext()) {
 			ContactHeader contactHeader = (ContactHeader) contactHeaderIt
 					.next();			
-			assertTrue(contactHeader.toString().trim().startsWith("Contact: \"callforwardingB2BUA\" <sip:test@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070;q=0.1;transport=tcp;test>;test"));
+			assertTrue(contactHeader.toString().trim().startsWith("Contact: \"callforwardingB2BUA\" <sip:test@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + containerPort + ";q=0.1;transport=tcp;test>;test"));
 			i++;
 		}
 		assertEquals(1, i);

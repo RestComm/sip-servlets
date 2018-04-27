@@ -40,7 +40,9 @@ package org.mobicents.servlet.sip.testsuite.proxy;
  */
 
 import java.util.EventObject;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 
 import javax.sip.DialogTerminatedEvent;
 import javax.sip.IOExceptionEvent;
@@ -54,6 +56,7 @@ import javax.sip.header.CSeqHeader;
 import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
 
 /*
@@ -78,17 +81,32 @@ public class ProxySubsequentPublishRequestTest extends SipServletTestCase implem
 
 	public ProxySubsequentPublishRequestTest(String name) {
 		super(name);
-
 		this.sipIpAddress="0.0.0.0";
+		autoDeployOnStartup = false;                
+                
 	}
 
 	@Override
 	public void setUp() throws Exception {
+                containerPort = NetworkPortAssigner.retrieveNextPort();            
 		super.setUp();
-		this.shootist = new Shootist(false, null);
-		this.shootme = new Shootme(5057);
-		this.cutme = new Cutme();
+                
+                int shootistPort = NetworkPortAssigner.retrieveNextPort();
+		this.shootist = new Shootist(false, shootistPort, String.valueOf(containerPort));
+                int shootmePort = NetworkPortAssigner.retrieveNextPort();
+                this.shootme = new Shootme(shootmePort);
+                int cutmePort = NetworkPortAssigner.retrieveNextPort();                
+		this.cutme = new Cutme(cutmePort);
 		this.shootist.requestMethod = Request.PUBLISH;
+                
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(shootistPort)); 
+                params.put( "receiverPort", String.valueOf(shootmePort));
+                params.put( "cutmePort", String.valueOf(cutmePort));
+                deployApplication(projectHome + 
+                        "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp", 
+                        params, null);                 
 	}
 
 	public void testProxyPublish() {

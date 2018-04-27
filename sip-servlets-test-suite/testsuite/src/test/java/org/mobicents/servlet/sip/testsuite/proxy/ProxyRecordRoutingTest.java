@@ -22,8 +22,10 @@
 package org.mobicents.servlet.sip.testsuite.proxy;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Random;
 
 import javax.sip.ListeningPoint;
@@ -37,6 +39,7 @@ import javax.sip.header.ReasonHeader;
 
 import org.apache.catalina.connector.Connector;
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.catalina.SipProtocolHandler;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
@@ -69,7 +72,10 @@ public class ProxyRecordRoutingTest extends SipServletTestCase {
 
 	@Override
 	public void setUp() throws Exception {
+                containerPort = NetworkPortAssigner.retrieveNextPort(); 
 		super.setUp();
+        }
+        public void setupPhones() throws Exception {
 		senderProtocolObjects = new ProtocolObjects("proxy-sender",
 				"gov.nist", ListeningPoint.UDP, AUTODIALOG, null, null, null);
 		receiverProtocolObjects = new ProtocolObjects("proxy-receiver",
@@ -78,19 +84,24 @@ public class ProxyRecordRoutingTest extends SipServletTestCase {
 				"gov.nist", ListeningPoint.UDP, AUTODIALOG, null, null, null);
 		secondProto = new ProtocolObjects("proxy-second-receiver",
 				"gov.nist", ListeningPoint.UDP, AUTODIALOG, null, null, null);
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+                
+                int senderPort = NetworkPortAssigner.retrieveNextPort(); 
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, false);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5057, 5070, receiverProtocolObjects, false);
+                int receiverPort = NetworkPortAssigner.retrieveNextPort(); 
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
 		receiver.setRecordRoutingProxyTesting(true);
 		SipProvider receiverProvider = receiver.createProvider();
 		
-		neutral = new TestSipListener(5058, 5070, neutralProto, false);
+                int neutralPort = NetworkPortAssigner.retrieveNextPort(); 
+		neutral = new TestSipListener(neutralPort, containerPort, neutralProto, false);
 		neutral.setRecordRoutingProxyTesting(true);
 		SipProvider neutralProvider = neutral.createProvider();
 		
-		secondReceiver = new TestSipListener(5056, 5070, secondProto, false);
+                int secondReceiverPort = NetworkPortAssigner.retrieveNextPort();
+		secondReceiver = new TestSipListener(secondReceiverPort, containerPort, secondProto, false);
 		secondReceiver.setRecordRoutingProxyTesting(true);
 		SipProvider secondProvider = secondReceiver.createProvider();
 
@@ -103,13 +114,23 @@ public class ProxyRecordRoutingTest extends SipServletTestCase {
 		receiverProtocolObjects.start();
 		neutralProto.start();
 		secondProto.start();
+                
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort)); 
+                params.put( "testPort", String.valueOf(senderPort)); 
+                params.put( "receiverPort", String.valueOf(receiverPort));
+                params.put( "neutralPort", String.valueOf(neutralPort));
+                params.put( "cutmePort", String.valueOf(secondReceiverPort));
+                deployApplication(projectHome + 
+                        "/sip-servlets-test-suite/applications/proxy-sip-servlet/src/main/sipapp", 
+                        params, null);                  
 	}
 
 	/*
      * Non Regression test for https://code.google.com/p/sipservlets/issues/detail?id=164
      */
     public void testCancelProxying() throws Exception {
-        deployApplication();
+        setupPhones();
         String fromName = "cancel-unique-location";
         String fromSipAddress = "sip-servlets.com";
         SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -158,7 +179,7 @@ public class ProxyRecordRoutingTest extends SipServletTestCase {
      * Non Regression test for https://code.google.com/p/sipservlets/issues/detail?id=283
      */
     public void testCancelProxying2Locations() throws Exception {
-        deployApplication();
+        setupPhones();
         String fromName = "cancel-both-location";
         String fromSipAddress = "sip-servlets.com";
         SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -213,7 +234,7 @@ public class ProxyRecordRoutingTest extends SipServletTestCase {
      * Non Regression test for https://code.google.com/p/sipservlets/issues/detail?id=164
      */
     public void testCancelProxyingNon1XX() throws Exception {
-        deployApplication();
+        setupPhones();
         String fromName = "cancel-unique-location";
         String fromSipAddress = "sip-servlets.com";
         SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -239,7 +260,7 @@ public class ProxyRecordRoutingTest extends SipServletTestCase {
 	 * https://code.google.com/p/sipservlets/issues/detail?id=2
 	 */
 	public void testRedirectProxying() throws Exception {
-		deployApplication();
+		setupPhones();
 		String fromName = "redirect-unique-location";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -266,7 +287,7 @@ public class ProxyRecordRoutingTest extends SipServletTestCase {
 	 * https://github.com/Mobicents/sip-servlets/issues/63
 	 */
 	public void testRecordRouteFQDNUriProxying() throws Exception {
-		deployApplication();
+		setupPhones();
 		String fromName = "record-route-uri";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -289,13 +310,13 @@ public class ProxyRecordRoutingTest extends SipServletTestCase {
 	 * 
 	 */
 	public void testPoppedRouteFQDN() throws Exception {
-		deployApplication();
+		setupPhones();
 		tomcat.removeConnector(sipConnector);
 		Connector udpSipConnector = new Connector(
 				SipProtocolHandler.class.getName());
 		SipProtocolHandler udpProtocolHandler = (SipProtocolHandler) udpSipConnector
 				.getProtocolHandler();
-		udpProtocolHandler.setPort(5070);
+		udpProtocolHandler.setPort(containerPort);
 		udpProtocolHandler.setIpAddress(sipIpAddress);
 		udpProtocolHandler.setSignalingTransport(listeningPointTransport);		
 		udpProtocolHandler.setHostNames("test.mobicents.org");
@@ -311,7 +332,7 @@ public class ProxyRecordRoutingTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 						
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[]{RouteHeader.NAME}, new String[]{"<sip:test.mobicents.org:5070;lr;maddr="+ sipIpAddress+">"}, true);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[]{RouteHeader.NAME}, new String[]{"<sip:test.mobicents.org:" + containerPort + ";lr;maddr="+ sipIpAddress+">"}, true);		
 		Thread.sleep(TIMEOUT);
 		assertEquals(200,sender.getFinalResponseStatus());		
 		assertTrue(sender.isAckSent());
@@ -322,7 +343,7 @@ public class ProxyRecordRoutingTest extends SipServletTestCase {
 	 * Non Regression test for https://code.google.com/p/sipservlets/issues/detail?id=2
 	 */
 	public void testCancelRedirectProxying() throws Exception {
-		deployApplication();
+		setupPhones();
 		String fromName = "cancel-unique-location";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -347,7 +368,7 @@ public class ProxyRecordRoutingTest extends SipServletTestCase {
 	 * Non Regression test for https://code.google.com/p/sipservlets/issues/detail?id=266
 	 */
 	public void testCancel480Proxying() throws Exception {
-		deployApplication();
+		setupPhones();
 		String fromName = "cancel-480-sequential-2-locations";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -376,7 +397,7 @@ public class ProxyRecordRoutingTest extends SipServletTestCase {
      * Non Regression test for https://code.google.com/p/sipservlets/issues/detail?id=154
      */
     public void testCancel480ChangeToUserProxying() throws Exception {
-        deployApplication();
+        setupPhones();
         String fromName = "cancel-480-sequential-2-locations-change-to-user";
         String fromSipAddress = "sip-servlets.com";
         SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -406,7 +427,7 @@ public class ProxyRecordRoutingTest extends SipServletTestCase {
      * https://code.google.com/p/sipservlets/issues/detail?id=22
      */
     public void testUnderscoreToTagFinalResponseProxying() throws Exception {
-        deployApplication();
+        setupPhones();
         String fromName = "underscore-to-tag-unique-location";
         String fromSipAddress = "sip-servlets.com";
         SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(

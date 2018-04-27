@@ -29,6 +29,8 @@ import io.undertow.servlet.core.ManagedServlet;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -140,7 +142,7 @@ public class SipContextImpl implements SipContext {
 
     // http://code.google.com/p/sipservlets/issues/detail?id=195
     private ScheduledFuture<?> gracefulStopFuture;
-    
+
     // default constructor:
     public SipContextImpl() {
     }
@@ -237,6 +239,10 @@ public class SipContextImpl implements SipContext {
 
             Integer loadOnStartupNumber = servlet.getServletInfo().getLoadOnStartup();
             if (loadOnStartupNumber != null) {
+                if (logger.isDebugEnabled()) {
+                    String msg = String.format("Servlet %s load on startup %s", servlet.getName(), loadOnStartupNumber);
+                    logger.debug(msg);
+                }
                 if (loadOnStartupNumber < 0) {
                     continue;
                 }
@@ -723,14 +729,14 @@ public class SipContextImpl implements SipContext {
         }
         if (event.getEventType() == SipContextEventType.SERVLET_INITIALIZED) {
             //fixes https://github.com/RestComm/sip-servlets/issues/165
-            //now the SipService is totally ready/started, we prepare 
+            //now the SipService is totally ready/started, we prepare
             //the context again just in case some att was not properly
             //initiated
             try {
                 prepareServletContext();
             } catch (Exception e) {
                 logger.warn("Couldnt prepare context", e);
-            }            
+            }
             if (!timerService.isStarted()) {
                 timerService.start();
             }
@@ -745,12 +751,14 @@ public class SipContextImpl implements SipContext {
         // if(this.available) {
         enterSipApp(null, null, false, true);
         boolean batchStarted = enterSipAppHa(true);
-        try {
 
-            for (String servletName : this.deploymentInfoFacade.getSipServlets().keySet()) {
-                SipServletImpl managedServlet = (SipServletImpl) this.getChildrenMap().get(servletName);
+        List<MobicentsSipServlet> sipServlets = new ArrayList<MobicentsSipServlet>(getChildrenMap().values());
+        Collections.sort(sipServlets, new SipServletLoadOnStartupComparator());
+
+        try {
+            for (MobicentsSipServlet managedServlet : sipServlets) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("managedServlet " + managedServlet.getServletInfo().getName() + ", class : "
+                    logger.debug("managedServlet " + managedServlet.getName() + ", class : "
                             + managedServlet.getClass().getName());
                 }
                 try {
@@ -764,13 +772,13 @@ public class SipContextImpl implements SipContext {
                         // in wildfly we use threadSetupAction from the deployment object for that purpose:
                         bindThreadBindingListener();
 
-                        Servlet sipServlet = managedServlet.getServlet().getInstance();
+                        Servlet sipServlet = managedServlet.allocate();
                         if (sipServlet instanceof SipServlet) {
                             // Fix for issue 1086 (http://code.google.com/p/mobicents/issues/detail?id=1086) :
                             // Cannot send a request in SipServletListener.initialize() for servlet-selection applications
                             boolean servletHandlerWasNull = false;
                             if (this.getServletHandler() == null) {
-                                this.setServletHandler(managedServlet.getServletInfo().getName());
+                                this.setServletHandler(managedServlet.getName());
                                 servletHandlerWasNull = true;
                             }
 
@@ -836,10 +844,6 @@ public class SipContextImpl implements SipContext {
                         unbindThreadBindingListener();
                         Thread.currentThread().setContextClassLoader(oldClassLoader);
                     }
-                } catch (ServletException e) {
-                    logger.error("Cannot allocate the servlet " + managedServlet.getClass() + " for notifying the listener "
-                            + " of the event " + event.getEventType(), e);
-                    ok = false;
                 } catch (Throwable e) {
                     logger.error("An error occured when notifying the servlet " + managedServlet.getClass() + " of the event "
                             + event.getEventType(), e);
@@ -865,6 +869,23 @@ public class SipContextImpl implements SipContext {
         }
         // }
         return ok;
+    }
+
+    protected class SipServletLoadOnStartupComparator implements Comparator<MobicentsSipServlet> {
+
+        @Override
+        public int compare(MobicentsSipServlet o1, MobicentsSipServlet o2) {
+            if(o1 != null && o2 != null) {
+                if(o1.getLoadOnStartup() > o2.getLoadOnStartup()) {
+                    return 1;
+                } else if(o1.getLoadOnStartup() == o2.getLoadOnStartup()) {
+                    return 0;
+                } else {
+                    return -1;
+                }
+            }
+            return 0;
+        }
     }
 
     @Override
@@ -1168,7 +1189,7 @@ public class SipContextImpl implements SipContext {
 
 	@Override
 	public void stopGracefully(long timeToWait) {
-		// http://code.google.com/p/sipservlets/issues/detail?id=195 
+		// http://code.google.com/p/sipservlets/issues/detail?id=195
 		// Support for Graceful Shutdown of SIP Applications and Overall Server
 		if(logger.isInfoEnabled()) {
 			logger.info("Stopping the Context " + getApplicationName() + " Gracefully in " + timeToWait + " ms");
@@ -1192,12 +1213,12 @@ public class SipContextImpl implements SipContext {
 		} else {
 			if(timeToWait > 0 && timeToWait < gracefulInterval) {
 				// if the time to Wait is positive and < to the gracefulStopTaskInterval then we schedule the task directly once to the time to wait
-				gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().schedule(new ContextGracefulStopTask(this, timeToWait), timeToWait, TimeUnit.MILLISECONDS);         
+				gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().schedule(new ContextGracefulStopTask(this, timeToWait), timeToWait, TimeUnit.MILLISECONDS);
 			} else {
 				// if the time to Wait is > to the gracefulStopTaskInterval or infinite (negative value) then we schedule the task to run every gracefulStopTaskInterval, not needed to be exactly precise on the timeToWait in this case
-				gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().scheduleWithFixedDelay(new ContextGracefulStopTask(this, timeToWait), 0, gracefulInterval, TimeUnit.MILLISECONDS);                      
+				gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().scheduleWithFixedDelay(new ContextGracefulStopTask(this, timeToWait), 0, gracefulInterval, TimeUnit.MILLISECONDS);
 			}
-		}		
+		}
 	}
 
 	@Override
@@ -1206,9 +1227,9 @@ public class SipContextImpl implements SipContext {
 			return true;
 		return false;
 	}
-        
+
     public void setGracefulInterval(long gracefulInterval) {
         this.gracefulInterval = gracefulInterval;
-    }        
+    }
 
 }

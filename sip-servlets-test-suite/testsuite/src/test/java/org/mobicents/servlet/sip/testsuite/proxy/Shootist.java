@@ -133,7 +133,7 @@ public class Shootist implements SipListener {
 	
 	private boolean sendCancelOn180;
 
-	private String remotePort = "5070";
+	private String remotePort;
 	
 	private String fromHost;
 	
@@ -145,6 +145,8 @@ public class Shootist implements SipListener {
 	private boolean isRequestTerminatedReceived;
 
 	public boolean moveRouteParamsToRequestURI;
+        
+        int myPort = 5058;
 	
 
 	class ByeTask  extends TimerTask {
@@ -185,11 +187,12 @@ public class Shootist implements SipListener {
 			+ ">>>> is your class path set to the root?";
 
 	
-	public Shootist(boolean forkingProxy, String remotePort) {
+	public Shootist(boolean forkingProxy, int myPort, String remotePort) {
 		this.forkingProxy = forkingProxy;
 		if(remotePort != null) {
 			this.remotePort = remotePort;
 		}
+                this.myPort = myPort;
 	}
 
 
@@ -489,9 +492,9 @@ public class Shootist implements SipListener {
 		// You can set a max message size for tcp transport to
 		// guard against denial of service attack.
 		properties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
-				"logs/shootistdebug.txt");
+				"target/logs/shootistdebug.txt");
 		properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
-				"logs/shootistlog.xml");
+				"target/logs/shootistlog.xml");
 
 		// Drop the client connection after we are done with the transaction.
 		//properties.setProperty("gov.nist.javax.sip.CACHE_CLIENT_CONNECTIONS",
@@ -517,7 +520,7 @@ public class Shootist implements SipListener {
 			headerFactory = sipFactory.createHeaderFactory();
 			addressFactory = sipFactory.createAddressFactory();
 			messageFactory = sipFactory.createMessageFactory();
-			listeningPoint = sipStack.createListeningPoint("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "", 5058, transport);
+			listeningPoint = sipStack.createListeningPoint("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "", myPort, transport);
 			sipProvider = sipStack.createSipProvider(listeningPoint);
 			Shootist listener = this;
 			sipProvider.addSipListener(listener);

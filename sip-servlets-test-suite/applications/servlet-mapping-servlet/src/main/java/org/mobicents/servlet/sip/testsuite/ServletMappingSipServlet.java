@@ -27,6 +27,7 @@ import java.io.UnsupportedEncodingException;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipApplicationSession;
@@ -46,6 +47,8 @@ public class ServletMappingSipServlet extends SipServlet implements SipServletLi
 	
 	@Resource
     private SipFactory factory;
+        
+        static ServletContext ctx;          
 	
 	/** Creates a new instance of ServletMappingSipServlet */
 	public ServletMappingSipServlet() {
@@ -55,6 +58,7 @@ public class ServletMappingSipServlet extends SipServlet implements SipServletLi
 	public void init(ServletConfig servletConfig) throws ServletException {
 		logger.info("the servlet mamping sip servlet has been started");
 		super.init(servletConfig);
+                ctx = servletConfig.getServletContext();                 
 	}
 
 	/**
@@ -104,12 +108,32 @@ public class ServletMappingSipServlet extends SipServlet implements SipServletLi
 		SipApplicationSession appSession = factory.createApplicationSession();
 		SipServletRequest request =
 		    factory.createRequest(appSession, "MESSAGE",
-		                          "sip:from@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070", "sip:to@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+		                          "sip:from@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getServletContainerPort(ctx),
+                                          "sip:to@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + getTestPort(ctx));
 		request.setContentLength(2);
 		request.setContent(body, "text/plain;charset=UTF-8");
 		request.send();
 	}	
 
+        public static Integer getTestPort(ServletContext ctx) {
+            String tPort = ctx.getInitParameter("testPort");
+            logger.info("TestPort at:" + tPort);
+            if (tPort != null) {
+                return Integer.valueOf(tPort);
+            } else {
+                return 5080;
+            }
+        }
+        
+        public static Integer getServletContainerPort(ServletContext ctx) {
+            String cPort = ctx.getInitParameter("servletContainerPort");
+            logger.info("TestPort at:" + cPort);            
+            if (cPort != null) {
+                return Integer.valueOf(cPort);
+            } else {
+                return 5070;
+            }            
+        }         
 	
 
 }

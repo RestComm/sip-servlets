@@ -19,190 +19,226 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.servlet.sip.testsuite.security;
 
+import java.util.HashMap;
 import java.util.ListIterator;
+import java.util.Map;
 
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 import javax.sip.header.Header;
+import static junit.framework.Assert.assertTrue;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
 public class CallForwardingB2BUAAuthTest extends SipServletTestCase {
-	
-	private static transient Logger logger = Logger.getLogger(CallForwardingB2BUAAuthTest.class);
 
-	private static final String TRANSPORT = "udp";
-	private static final boolean AUTODIALOG = true;
-	private static final int TIMEOUT = 10000;	
+    private static transient Logger logger = Logger.getLogger(CallForwardingB2BUAAuthTest.class);
+
+    private static final String TRANSPORT = "udp";
+    private static final boolean AUTODIALOG = true;
+    private static final int TIMEOUT = 10000;
 //	private static final int TIMEOUT = 100000000;
-	
-	TestSipListener sender;
-	TestSipListener receiver;
-	ProtocolObjects senderProtocolObjects;
-	ProtocolObjects	receiverProtocolObjects;
 
-	public CallForwardingB2BUAAuthTest(String name) {
-		super(name);
-	}
+    TestSipListener sender;
+    TestSipListener receiver;
+    ProtocolObjects senderProtocolObjects;
+    ProtocolObjects receiverProtocolObjects;
 
-	@Override
-	public void deployApplication() {
-		assertTrue(tomcat.deployContext(
-				projectHome + "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
-				"sip-test-context", 
-				"sip-test"));
-	}
+    public CallForwardingB2BUAAuthTest(String name) {
+        super(name);
+        autoDeployOnStartup = false;
+    }
 
-	@Override
-	protected String getDarConfigurationFile() {
-		return "file:///"
-				+ projectHome
-				+ "/sip-servlets-test-suite/testsuite/src/test/resources/"
-				+ "org/mobicents/servlet/sip/testsuite/callcontroller/call-forwarding-b2bua-servlet-dar.properties";
-	}
-	
-	@Override
-	protected void setUp() throws Exception {		
-		super.setUp();
+    @Override
+    public void deployApplication() {
 
-		senderProtocolObjects = new ProtocolObjects("forward-sender",
-				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
-		receiverProtocolObjects = new ProtocolObjects("receiver",
-				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
-			
-	}
-	
-	public void testCallForwardingAuth() throws Exception {
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
-		SipProvider senderProvider = sender.createProvider();
+    }
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
-		receiver.setChallengeRequests(true);
-		SipProvider receiverProvider = receiver.createProvider();
+    public SipStandardContext deployApplication(Map<String, String> params) {
+        SipStandardContext ctx = deployApplication(
+                projectHome + "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
+                "sip-test",
+                params,
+                null);
+        assertTrue(ctx.getAvailable());
+        return ctx;
+    }
 
-		receiverProvider.addSipListener(receiver);
-		senderProvider.addSipListener(sender);
+    @Override
+    protected String getDarConfigurationFile() {
+        return "file:///"
+                + projectHome
+                + "/sip-servlets-test-suite/testsuite/src/test/resources/"
+                + "org/mobicents/servlet/sip/testsuite/callcontroller/call-forwarding-b2bua-servlet-dar.properties";
+    }
 
-		senderProtocolObjects.start();
-		receiverProtocolObjects.start();
+    @Override
+    protected void setUp() throws Exception {
+        containerPort = NetworkPortAssigner.retrieveNextPort();
+        super.setUp();
 
-		String fromName = "forward-sender";
-		String fromSipAddress = "sip-servlets.com";
-		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
-				fromName, fromSipAddress);
-		
-		String toSipAddress = "sip-servlets.com";
-		String toUser = "receiver";
-		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
-				toUser, toSipAddress);
-				
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {"Remote-Party-ID"}, new String[] {"<sip:test@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080>;screen=yes;privacy=off;party=calling;-call-initiator=5016;-call-initiator-location=int;-redirected-by;-int-ext=5016;-ent-name=Acro;-direction=ext;-call-id=55665"}, true);		
-		Thread.sleep(TIMEOUT);
-		assertTrue(sender.getOkToByeReceived());
-		assertTrue(receiver.getByeReceived());
-		// Non Regression test for http://code.google.com/p/mobicents/issues/detail?id=2094
-		// B2b re-invite for authentication will duplicate Remote-Party-ID header
-		ListIterator<Header> it = receiver.getInviteRequest().getHeaders("Remote-Party-ID");
-		int nbHeaders= 0;
-		while (it.hasNext()) {
-			Header header = it.next();
-			nbHeaders++;
-		}
-		assertEquals(1, nbHeaders);
-	}
-	
-	// Non regression test for issues 19 http://code.google.com/p/sipservlets/issues/detail?id=19
-	// and http://code.google.com/p/sipservlets/issues/detail?id=161
-	public void testCallForwardingShootmeAuthEarlyDialog() throws Exception {
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
-		SipProvider senderProvider = sender.createProvider();
+        senderProtocolObjects = new ProtocolObjects("forward-sender",
+                "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+        receiverProtocolObjects = new ProtocolObjects("receiver",
+                "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
-		receiver.sendProvisionalResponseBeforeChallenge(true);
-		receiver.setChallengeRequests(true);
-		SipProvider receiverProvider = receiver.createProvider();
+    }
 
-		receiverProvider.addSipListener(receiver);
-		senderProvider.addSipListener(sender);
+    public void testCallForwardingAuth() throws Exception {
+        int senderPort = NetworkPortAssigner.retrieveNextPort();
+        sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, true);
+        SipProvider senderProvider = sender.createProvider();
 
-		senderProtocolObjects.start();
-		receiverProtocolObjects.start();
+        int receiverPort = NetworkPortAssigner.retrieveNextPort();
+        receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
+        receiver.setChallengeRequests(true);
+        SipProvider receiverProvider = receiver.createProvider();
 
-		String fromName = "forward-sender-auth-early-dialog";
-		String fromSipAddress = "sip-servlets.com";
-		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
-				fromName, fromSipAddress);
-		
-		String toSipAddress = "sip-servlets.com";
-		String toUser = "forward-receiver-auth-early-dialog";
-		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
-				toUser, toSipAddress);
-				
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {"Remote-Party-ID"}, new String[] {"<sip:test@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080>;screen=yes;privacy=off;party=calling;-call-initiator=5016;-call-initiator-location=int;-redirected-by;-int-ext=5016;-ent-name=Acro;-direction=ext;-call-id=55665"}, true);		
-		Thread.sleep(TIMEOUT*2);
-		assertTrue(sender.getOkToByeReceived());
-		assertTrue(receiver.getByeReceived());
-		// Non Regression test for http://code.google.com/p/mobicents/issues/detail?id=2094
-		// B2b re-invite for authentication will duplicate Remote-Party-ID header
-		ListIterator<Header> it = receiver.getInviteRequest().getHeaders("Remote-Party-ID");
-		int nbHeaders= 0;
-		while (it.hasNext()) {
-			Header header = it.next();
-			nbHeaders++;
-		}
-		assertEquals(1, nbHeaders);
-	}
-	
-	/*
+        receiverProvider.addSipListener(receiver);
+        senderProvider.addSipListener(sender);
+
+        senderProtocolObjects.start();
+        receiverProtocolObjects.start();
+        
+        Map<String, String> params = new HashMap();
+        params.put("servletContainerPort", String.valueOf(containerPort));
+        params.put("senderPort", String.valueOf(senderPort));
+        params.put("testPort", String.valueOf(receiverPort));
+        deployApplication(params);            
+
+        String fromName = "forward-sender";
+        String fromSipAddress = "sip-servlets.com";
+        SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+                fromName, fromSipAddress);
+
+        String toSipAddress = "sip-servlets.com";
+        String toUser = "receiver";
+        SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+                toUser, toSipAddress);
+
+        sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[]{"Remote-Party-ID"}, new String[]{"<sip:test@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + senderPort + ">;screen=yes;privacy=off;party=calling;-call-initiator=5016;-call-initiator-location=int;-redirected-by;-int-ext=5016;-ent-name=Acro;-direction=ext;-call-id=55665"}, true);
+        Thread.sleep(TIMEOUT);
+        assertTrue(sender.getOkToByeReceived());
+        assertTrue(receiver.getByeReceived());
+        // Non Regression test for http://code.google.com/p/mobicents/issues/detail?id=2094
+        // B2b re-invite for authentication will duplicate Remote-Party-ID header
+        ListIterator<Header> it = receiver.getInviteRequest().getHeaders("Remote-Party-ID");
+        int nbHeaders = 0;
+        while (it.hasNext()) {
+            Header header = it.next();
+            nbHeaders++;
+        }
+        assertEquals(1, nbHeaders);
+    }
+
+    // Non regression test for issues 19 http://code.google.com/p/sipservlets/issues/detail?id=19
+    // and http://code.google.com/p/sipservlets/issues/detail?id=161
+    public void testCallForwardingShootmeAuthEarlyDialog() throws Exception {
+        int senderPort = NetworkPortAssigner.retrieveNextPort();
+        sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, true);
+        SipProvider senderProvider = sender.createProvider();
+
+        int receiverPort = NetworkPortAssigner.retrieveNextPort();
+        receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
+        receiver.sendProvisionalResponseBeforeChallenge(true);
+        receiver.setChallengeRequests(true);
+        SipProvider receiverProvider = receiver.createProvider();
+        
+        receiverProvider.addSipListener(receiver);
+        senderProvider.addSipListener(sender);
+
+        senderProtocolObjects.start();
+        receiverProtocolObjects.start();
+        
+        Map<String, String> params = new HashMap();
+        params.put("servletContainerPort", String.valueOf(containerPort));
+        params.put("senderPort", String.valueOf(senderPort));
+        params.put("testPort", String.valueOf(receiverPort));
+        deployApplication(params);        
+
+        String fromName = "forward-sender-auth-early-dialog";
+        String fromSipAddress = "sip-servlets.com";
+        SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+                fromName, fromSipAddress);
+
+        String toSipAddress = "sip-servlets.com";
+        String toUser = "forward-receiver-auth-early-dialog";
+        SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+                toUser, toSipAddress);
+
+        sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[]{"Remote-Party-ID"}, new String[]{"<sip:test@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + senderPort+ ">;screen=yes;privacy=off;party=calling;-call-initiator=5016;-call-initiator-location=int;-redirected-by;-int-ext=5016;-ent-name=Acro;-direction=ext;-call-id=55665"}, true);
+        Thread.sleep(TIMEOUT * 2);
+        assertTrue(sender.getOkToByeReceived());
+        assertTrue(receiver.getByeReceived());
+        // Non Regression test for http://code.google.com/p/mobicents/issues/detail?id=2094
+        // B2b re-invite for authentication will duplicate Remote-Party-ID header
+        ListIterator<Header> it = receiver.getInviteRequest().getHeaders("Remote-Party-ID");
+        int nbHeaders = 0;
+        while (it.hasNext()) {
+            Header header = it.next();
+            nbHeaders++;
+        }
+        assertEquals(1, nbHeaders);
+    }
+
+    /*
 	 * Non regression test for Issue http://code.google.com/p/mobicents/issues/detail?id=2114
 	 * In B2b servlet, after re-INVITE, and try to create CANCEL will get "final response already sent!" exception.
-	 */
-	public void testCallForwardingAuthCancel() throws Exception {
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
-		sender.setSendCancelOn1xx(true);
-		SipProvider senderProvider = sender.createProvider();
+     */
+    public void testCallForwardingAuthCancel() throws Exception {
+        int senderPort = NetworkPortAssigner.retrieveNextPort();
+        sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, true);
+        sender.setSendCancelOn1xx(true);
+        SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
-		receiver.setChallengeRequests(true);
-		receiver.setWaitForCancel(true);
-		SipProvider receiverProvider = receiver.createProvider();
+        int receiverPort = NetworkPortAssigner.retrieveNextPort();
+        receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
+        receiver.setChallengeRequests(true);
+        receiver.setWaitForCancel(true);
+        SipProvider receiverProvider = receiver.createProvider();
+        
+        receiverProvider.addSipListener(receiver);
+        senderProvider.addSipListener(sender);
 
-		receiverProvider.addSipListener(receiver);
-		senderProvider.addSipListener(sender);
+        senderProtocolObjects.start();
+        receiverProtocolObjects.start();
+        
+        Map<String, String> params = new HashMap();
+        params.put("servletContainerPort", String.valueOf(containerPort));
+        params.put("senderPort", String.valueOf(senderPort));
+        params.put("testPort", String.valueOf(receiverPort));
+        deployApplication(params);        
 
-		senderProtocolObjects.start();
-		receiverProtocolObjects.start();
+        String fromName = "forward-sender";
+        String fromSipAddress = "sip-servlets.com";
+        SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+                fromName, fromSipAddress);
 
-		String fromName = "forward-sender";
-		String fromSipAddress = "sip-servlets.com";
-		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
-				fromName, fromSipAddress);
-		
-		String toSipAddress = "sip-servlets.com";
-		String toUser = "receiver";
-		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
-				toUser, toSipAddress);
-				
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {"Remote-Party-ID"}, new String[] {"<sip:test@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080>;screen=yes;privacy=off;party=calling;-call-initiator=5016;-call-initiator-location=int;-redirected-by;-int-ext=5016;-ent-name=Acro;-direction=ext;-call-id=55665"}, true);		
-		Thread.sleep(TIMEOUT);
-		assertTrue(sender.isCancelOkReceived());
-		assertTrue(sender.isRequestTerminatedReceived());
-		assertTrue(receiver.isCancelReceived());
-	}
-	
-	@Override
-	protected void tearDown() throws Exception {	
-		senderProtocolObjects.destroy();
-		receiverProtocolObjects.destroy();			
-		logger.info("Test completed");
-		super.tearDown();
-	}
+        String toSipAddress = "sip-servlets.com";
+        String toUser = "receiver";
+        SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+                toUser, toSipAddress);
 
+        sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[]{"Remote-Party-ID"}, new String[]{"<sip:test@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" +senderPort + ">;screen=yes;privacy=off;party=calling;-call-initiator=5016;-call-initiator-location=int;-redirected-by;-int-ext=5016;-ent-name=Acro;-direction=ext;-call-id=55665"}, true);
+        Thread.sleep(TIMEOUT);
+        assertTrue(sender.isCancelOkReceived());
+        assertTrue(sender.isRequestTerminatedReceived());
+        assertTrue(receiver.isCancelReceived());
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        senderProtocolObjects.destroy();
+        receiverProtocolObjects.destroy();
+        logger.info("Test completed");
+        super.tearDown();
+    }
 
 }

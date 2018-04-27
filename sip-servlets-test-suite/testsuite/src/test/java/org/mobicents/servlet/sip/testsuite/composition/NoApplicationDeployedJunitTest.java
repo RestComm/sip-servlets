@@ -19,13 +19,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.servlet.sip.testsuite.composition;
 
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
@@ -36,138 +36,144 @@ import org.mobicents.servlet.sip.testsuite.TestSipListener;
  */
 public class NoApplicationDeployedJunitTest extends SipServletTestCase {
 
-	private static transient Logger logger = Logger.getLogger(NoApplicationDeployedJunitTest.class);
+    private static transient Logger logger = Logger.getLogger(NoApplicationDeployedJunitTest.class);
 
-	private static final String TRANSPORT = "udp";
-	private static final boolean AUTODIALOG = true;
-	private static final int TIMEOUT = 10000;	
+    private static final String TRANSPORT = "udp";
+    private static final boolean AUTODIALOG = true;
+    private static final int TIMEOUT = 10000;
 //	private static final int TIMEOUT = 100000000;
-	
-	TestSipListener sender;
-	TestSipListener receiver;
-	ProtocolObjects senderProtocolObjects;
-	ProtocolObjects	receiverProtocolObjects;
-	
-	/**
-	 * @param name
-	 */
-	public NoApplicationDeployedJunitTest(String name) {
-		super(name);
-		startTomcatOnStartup = false;
-		initTomcatOnStartup = false;
-	}
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		senderProtocolObjects = new ProtocolObjects("sender",
-				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
-		receiverProtocolObjects = new ProtocolObjects("receiver",
-				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
-	}
-	
-	@Override
-	protected void deployApplication() {
-		// test to deploy nothing
-		
-	}
-	
-	@Override
-	protected String getDarConfigurationFile() {
-		return null;
-	}
-	
-	public void testNoMatchingAppDeployedCallerSendBye() throws Exception {
-		System.setProperty("javax.servlet.sip.dar", "file:///"
-				+ projectHome
-				+ "/sip-servlets-test-suite/testsuite/src/test/resources/"
-				+ "org/mobicents/servlet/sip/testsuite/composition/dummy-dar.properties");
-		super.tomcat.initTomcat(tomcatBasePath, null);
-		tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport);
-		super.tomcat.startTomcat();
-		
-		sender = new TestSipListener(5080, 5090, senderProtocolObjects, true);
-		SipProvider senderProvider = sender.createProvider();
+    TestSipListener sender;
+    TestSipListener receiver;
+    ProtocolObjects senderProtocolObjects;
+    ProtocolObjects receiverProtocolObjects;
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
-		SipProvider receiverProvider = receiver.createProvider();
+    /**
+     * @param name
+     */
+    public NoApplicationDeployedJunitTest(String name) {
+        super(name);
+        startTomcatOnStartup = false;
+        initTomcatOnStartup = false;
+        autoDeployOnStartup = false;
+    }
 
-		receiverProvider.addSipListener(receiver);
-		senderProvider.addSipListener(sender);
+    @Override
+    protected void setUp() throws Exception {
+        containerPort = NetworkPortAssigner.retrieveNextPort();
+        super.setUp();
+        senderProtocolObjects = new ProtocolObjects("sender",
+                "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+        receiverProtocolObjects = new ProtocolObjects("receiver",
+                "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+    }
 
-		senderProtocolObjects.start();
-		receiverProtocolObjects.start();
+    @Override
+    protected void deployApplication() {
+        // test to deploy nothing
 
-		String fromName = "sender";
-		String fromHost = "sip-servlets.com";
-		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
-				fromName, fromHost);
-				
-		String toUser = "1";
-		String toHost = "sip-servlets.com";
-		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
-				toUser, toHost);
-		
-		SipURI routeAddress = senderProtocolObjects.addressFactory.createSipURI(
-				null, "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
-		routeAddress.setPort(5070);
-		routeAddress.setLrParam();
-		routeAddress.setTransportParam(senderProtocolObjects.transport);
-		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, routeAddress, false);		
-		Thread.sleep(TIMEOUT);
-		assertTrue(sender.getOkToByeReceived());
-		assertTrue(receiver.getByeReceived());
-	}
-	
-	public void testNoAppDeployedCallerSendBye() throws Exception {
-		System.setProperty("javax.servlet.sip.dar", "file:///"
-				+ projectHome
-				+ "/sip-servlets-test-suite/testsuite/src/test/resources/"
-				+ "org/mobicents/servlet/sip/testsuite/composition/empty-dar.properties");
-		super.tomcat.initTomcat(tomcatBasePath, null);
-		tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport);
-		super.tomcat.startTomcat();
-		
-		sender = new TestSipListener(5080, 5090, senderProtocolObjects, true);
-		SipProvider senderProvider = sender.createProvider();
+    }
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
-		SipProvider receiverProvider = receiver.createProvider();
+    @Override
+    protected String getDarConfigurationFile() {
+        return null;
+    }
 
-		receiverProvider.addSipListener(receiver);
-		senderProvider.addSipListener(sender);
+    public void testNoMatchingAppDeployedCallerSendBye() throws Exception {
+        System.setProperty("javax.servlet.sip.dar", "file:///"
+                + projectHome
+                + "/sip-servlets-test-suite/testsuite/src/test/resources/"
+                + "org/mobicents/servlet/sip/testsuite/composition/dummy-dar.properties");
+        super.tomcat.initTomcat(tomcatBasePath, null);
+        tomcat.addSipConnector(serverName, sipIpAddress, containerPort, listeningPointTransport);
+        super.tomcat.startTomcat();
 
-		senderProtocolObjects.start();
-		receiverProtocolObjects.start();
+        int receiverPort = NetworkPortAssigner.retrieveNextPort();
+        receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
+        SipProvider receiverProvider = receiver.createProvider();
 
-		String fromName = "sender";
-		String fromHost = "sip-servlets.com";
-		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
-				fromName, fromHost);
-				
-		String toUser = "1";
-		String toHost = "sip-servlets.com";
-		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
-				toUser, toHost);
-		
-		SipURI routeAddress = senderProtocolObjects.addressFactory.createSipURI(
-				null, "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
-		routeAddress.setPort(5070);
-		routeAddress.setLrParam();
-		routeAddress.setTransportParam(senderProtocolObjects.transport);
-		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, routeAddress, false);		
-		Thread.sleep(TIMEOUT);
-		assertTrue(sender.getOkToByeReceived());
-		assertTrue(receiver.getByeReceived());
-	}
-	
-	@Override
-	protected void tearDown() throws Exception {	
-		senderProtocolObjects.destroy();
-		receiverProtocolObjects.destroy();			
-		logger.info("Test completed");
-		super.tearDown();
-	}
+        int senderPort = NetworkPortAssigner.retrieveNextPort();
+        sender = new TestSipListener(senderPort, receiverPort, senderProtocolObjects, true);
+        SipProvider senderProvider = sender.createProvider();        
+        
+        receiverProvider.addSipListener(receiver);
+        senderProvider.addSipListener(sender);
+
+        senderProtocolObjects.start();
+        receiverProtocolObjects.start();
+
+        String fromName = "sender";
+        String fromHost = "sip-servlets.com";
+        SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+                fromName, fromHost);
+
+        String toUser = "1";
+        String toHost = "sip-servlets.com";
+        SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+                toUser, toHost);
+
+        SipURI routeAddress = senderProtocolObjects.addressFactory.createSipURI(
+                null, "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
+        routeAddress.setPort(containerPort);
+        routeAddress.setLrParam();
+        routeAddress.setTransportParam(senderProtocolObjects.transport);
+
+        sender.sendSipRequest("INVITE", fromAddress, toAddress, null, routeAddress, false);
+        Thread.sleep(TIMEOUT);
+        assertTrue(sender.getOkToByeReceived());
+        assertTrue(receiver.getByeReceived());
+    }
+
+    public void testNoAppDeployedCallerSendBye() throws Exception {
+        System.setProperty("javax.servlet.sip.dar", "file:///"
+                + projectHome
+                + "/sip-servlets-test-suite/testsuite/src/test/resources/"
+                + "org/mobicents/servlet/sip/testsuite/composition/empty-dar.properties");
+        super.tomcat.initTomcat(tomcatBasePath, null);
+        tomcat.addSipConnector(serverName, sipIpAddress, containerPort, listeningPointTransport);
+        super.tomcat.startTomcat();
+
+        int receiverPort = NetworkPortAssigner.retrieveNextPort();
+        receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
+        SipProvider receiverProvider = receiver.createProvider();
+        
+        int senderPort = NetworkPortAssigner.retrieveNextPort();
+        sender = new TestSipListener(senderPort, receiverPort, senderProtocolObjects, true);
+        SipProvider senderProvider = sender.createProvider();         
+
+        receiverProvider.addSipListener(receiver);
+        senderProvider.addSipListener(sender);
+
+        senderProtocolObjects.start();
+        receiverProtocolObjects.start();
+
+        String fromName = "sender";
+        String fromHost = "sip-servlets.com";
+        SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+                fromName, fromHost);
+
+        String toUser = "1";
+        String toHost = "sip-servlets.com";
+        SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+                toUser, toHost);
+
+        SipURI routeAddress = senderProtocolObjects.addressFactory.createSipURI(
+                null, "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
+        routeAddress.setPort(containerPort);
+        routeAddress.setLrParam();
+        routeAddress.setTransportParam(senderProtocolObjects.transport);
+
+        sender.sendSipRequest("INVITE", fromAddress, toAddress, null, routeAddress, false);
+        Thread.sleep(TIMEOUT);
+        assertTrue(sender.getOkToByeReceived());
+        assertTrue(receiver.getByeReceived());
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        senderProtocolObjects.destroy();
+        receiverProtocolObjects.destroy();
+        logger.info("Test completed");
+        super.tearDown();
+    }
 }

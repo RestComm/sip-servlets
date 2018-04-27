@@ -22,11 +22,16 @@
 
 package org.mobicents.servlet.sip.testsuite.callcontroller;
 
+import java.util.HashMap;
+import java.util.Map;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
+import static junit.framework.Assert.assertTrue;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
@@ -46,26 +51,30 @@ public class CallControllerCancelTest extends SipServletTestCase {
 
 	public CallControllerCancelTest(String name) {
 		super(name);
+                autoDeployOnStartup = false;
 	}
 
 	public void deployApplication() {
-		deployCallBlocking();
-		deployCallForwarding();
+
 	}
 
-	private void deployCallBlocking() {
-		assertTrue(tomcat.deployContext(
-				projectHome + "/sip-servlets-test-suite/applications/call-blocking-servlet/src/main/sipapp",
-				"call-blocking-context", 
-				"call-blocking"));
-	}
-	
-	private void deployCallForwarding() {
-		assertTrue(tomcat.deployContext(
-				projectHome + "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
-				"call-forwarding-b2bua-context", 
-				"call-forwarding-b2bua"));
-	}
+    private void deployCallBlocking(Map<String, String> params) {
+        SipStandardContext ctx = deployApplication(projectHome
+                + "/sip-servlets-test-suite/applications/call-blocking-servlet/src/main/sipapp",
+                "call-blocking", 
+                params,
+                null);
+        assertTrue(ctx.getAvailable());
+    }
+
+    private void deployCallForwarding(Map<String, String> params) {
+        SipStandardContext ctx = deployApplication(projectHome
+                + "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
+                "call-forwarding-b2bua",
+                params,
+                null);
+        assertTrue(ctx.getAvailable());        
+    }
 
 	@Override
 	protected String getDarConfigurationFile() {
@@ -76,7 +85,8 @@ public class CallControllerCancelTest extends SipServletTestCase {
 	}
 	
 	@Override
-	protected void setUp() throws Exception {		
+	protected void setUp() throws Exception {
+                containerPort = NetworkPortAssigner.retrieveNextPort();            
 		super.setUp();
 
 		senderProtocolObjects = new ProtocolObjects("forward-sender",
@@ -87,10 +97,13 @@ public class CallControllerCancelTest extends SipServletTestCase {
 	}
 
 	public void testCancelCallForwarding() throws Exception {
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+                int senderPort = NetworkPortAssigner.retrieveNextPort();
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, false);
+		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, true);
+                int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, true);
 		receiver.setWaitForCancel(true);
 		SipProvider receiverProvider = receiver.createProvider();
 
@@ -99,6 +112,13 @@ public class CallControllerCancelTest extends SipServletTestCase {
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
+                
+                Map<String, String> params = new HashMap();
+                params.put("servletContainerPort", String.valueOf(containerPort));
+                params.put("testPort", String.valueOf(receiverPort));
+                params.put("senderPort", String.valueOf(senderPort));                
+		deployCallBlocking(params);
+		deployCallForwarding(params);                   
 
 		String fromName = "forward-sender";
 		String fromSipAddress = "sip-servlets.com";

@@ -48,12 +48,13 @@ import javax.sip.TransactionTerminatedEvent;
 import javax.sip.message.MessageFactory;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
+import org.mobicents.servlet.sip.NetworkPortAssigner;
 
 public class Tracker implements SipListener {
 
 	private MessageFactory messageFactory;
 	private SipStack sipStack;
-	private static final int myPort = 5058;
+	private int myPort;
 	protected ServerTransaction inviteTid;
 	private Dialog dialog;
 	public static final boolean callerSendsBye = true;
@@ -176,9 +177,9 @@ public class Tracker implements SipListener {
 		// Your code will limp at 32 but it is best for debugging.
 		properties.setProperty("gov.nist.javax.sip.TRACE_LEVEL", "32");
 		properties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
-				"logs/cutmedebug.txt");
+				"target/logs/cutmedebug.txt");
 		properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
-				"logs/cutmelog.txt");
+				"target/logs/cutmelog.txt");
 
 		try {
 			// Create SipStack object
@@ -199,6 +200,7 @@ public class Tracker implements SipListener {
 //			headerFactory = sipFactory.createHeaderFactory();
 //			addressFactory = sipFactory.createAddressFactory();
 			messageFactory = sipFactory.createMessageFactory();
+                        myPort = NetworkPortAssigner.retrieveNextPort();
 			ListeningPoint lp = sipStack.createListeningPoint("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "",
 					myPort, "udp");
 
@@ -266,4 +268,10 @@ public class Tracker implements SipListener {
 
 		sipStack.stop();
 	}
+
+    public int getMyPort() {
+        return myPort;
+    }
+        
+        
 }
