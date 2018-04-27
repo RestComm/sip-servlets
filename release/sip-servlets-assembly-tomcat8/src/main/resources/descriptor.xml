@@ -31,6 +31,23 @@
             <directory>${project.build.directory}/dependency/documentation/sip-servlets-docs-${project.version}/pdf</directory>
             <outputDirectory>/docs/restcomm-sip-servlets</outputDirectory>
         </fileSet>
+        <fileSet>
+            <directory>${project.build.directory}/lib</directory>
+            <outputDirectory>/lib</outputDirectory>
+            <includes>
+                <include>*.jar</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.parent.basedir}/../sip-servlets-impl/LICENSES</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+            <excludes>
+                <exclude>GPL-LICENSE.TXT</exclude>
+            </excludes>
+        </fileSet>
     </fileSets>
     <files>
         <file>
@@ -41,6 +58,14 @@
             <source>${project.parent.basedir}/../sip-servlets-examples/websocket-b2bua/websocket-dar.properties</source>
             <outputDirectory>/conf/dars/</outputDirectory>
             <destName>mobicents-dar.properties</destName>
+        </file>
+        <file>
+            <source>${project.parent.basedir}/../sip-servlets-impl/docs/log4j.xml</source>
+            <outputDirectory>/lib</outputDirectory>
+        </file>
+        <file>
+            <source>${project.parent.basedir}/../sip-servlets-impl/docs/logging.properties</source>
+            <outputDirectory>/conf</outputDirectory>
         </file>
         <file>
             <source>${project.basedir}/src/main/resources/assembly-resources/server-tomcat-8.xml</source>
