@@ -90,8 +90,8 @@ import org.mobicents.servlet.sip.core.session.SipSessionKey;
 
 /**
  * Implementation of the B2BUA helper class.
- * 
- * 
+ *
+ *
  * @author mranga
  * @author Jean Deruelle
  */
@@ -100,8 +100,11 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger logger = Logger.getLogger(B2buaHelperImpl.class);
-	
+
 	protected static final Set<String> B2BUA_SYSTEM_HEADERS = new HashSet<String>();
+
+        private static final String ORIG_REQ_ATT_NAME="org.restcomm.servlets.sip.originalRequest";
+
 	static {
 		B2BUA_SYSTEM_HEADERS.add(CallIdHeader.NAME);
 		B2BUA_SYSTEM_HEADERS.add(CSeqHeader.NAME);
@@ -112,7 +115,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 		B2BUA_SYSTEM_HEADERS.add(RecordRouteHeader.NAME);
 		B2BUA_SYSTEM_HEADERS.add(PathHeader.NAME);
 	}
-	
+
 	// contact parameters not allowed to be modified as per JSR 289 Section 4.1.3
 	protected static final Set<String> CONTACT_FORBIDDEN_PARAMETER = new HashSet<String>();
 	static {
@@ -121,35 +124,42 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 		CONTACT_FORBIDDEN_PARAMETER.add("maddr");
 		CONTACT_FORBIDDEN_PARAMETER.add("lr");
 	}
-	
+
 	//Map to handle linked sessions
-	private Map<MobicentsSipSessionKey, MobicentsSipSessionKey> sessionMap = null;	
+	private Map<MobicentsSipSessionKey, MobicentsSipSessionKey> sessionMap = null;
 	//Map to handle linked derived sessions
 	private Map<String, String> derivedSessionMap = null;
 
-	//Map to handle responses to original request and cancel on original request
+	//Map to handle responses to linked request and cancel on linked request
 	// Issue 1550 http://code.google.com/p/mobicents/issues/detail?id=1550
 	// IllegalStateException: Cannot create a response - not a server transaction gov.nist.javax.sip.stack.SIPClientTransaction
 	// this map should be able to handle multiple linked requests at the same time
-	private transient Map<SipServletRequestImpl, SipServletRequestImpl> originalRequestMap = null;
+	private transient Map<SipServletRequestImpl, SipServletRequestImpl> linkedRequestMap = null;
 
 	private transient SipFactoryImpl sipFactoryImpl;
-	
+
 	private transient SipManager sipManager;
+
+        /**
+         * holds a ref to the latest invoked session on getLinkedSession, so
+         * if a subsequent invocation to createResponseToOrigReq is done, and this
+         * results in dericedSession, we can do the proper linking
+         */
+        private MobicentsSipSession lastSessionQueried = null;
 
 	public B2buaHelperImpl() {
 		sessionMap = new ConcurrentHashMap<MobicentsSipSessionKey, MobicentsSipSessionKey>();
 		derivedSessionMap = new ConcurrentHashMap<String, String>();
-		originalRequestMap = new ConcurrentHashMap<SipServletRequestImpl, SipServletRequestImpl>();
+		linkedRequestMap = new ConcurrentHashMap<SipServletRequestImpl, SipServletRequestImpl>();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.B2buaHelper#createRequest(javax.servlet.sip.SipServletRequest, boolean, java.util.Map)
 	 */
 	public SipServletRequest createRequest(SipServletRequest origRequest,
 			boolean linked, Map<String, List<String>> headerMap) throws TooManyHopsException {
-		
+
 		if(origRequest == null) {
 			throw new NullPointerException("original request cannot be null");
 		}
@@ -157,26 +167,26 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 		if(origRequest.getMaxForwards() == 0) {
 			throw new TooManyHopsException();
 		}
-		
+
 		try {
 			final SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
 			Request newRequest = (Request) origRequestImpl.message.clone();
 			((MessageExt)newRequest).setApplicationData(null);
 			//content should be copied too, so commented out
-//		 	newRequest.removeContent();				
+//		 	newRequest.removeContent();
 			//removing the via header from original request
-			newRequest.removeHeader(ViaHeader.NAME);	
-					
+			newRequest.removeHeader(ViaHeader.NAME);
+
 			// Remove the route header ( will point to us ).
 			// commented as per issue 649
 //			newRequest.removeHeader(RouteHeader.NAME);
 //			String tag = Integer.toString((int) (Math.random()*1000));
 //			((FromHeader) newRequest.getHeader(FromHeader.NAME)).setParameter("tag", tag);
-			
+
 			// Remove the record route headers. This is a new call leg.
-			newRequest.removeHeader(RecordRouteHeader.NAME);			
-	
-			// Issue 1490 : http://code.google.com/p/mobicents/issues/detail?id=1490 
+			newRequest.removeHeader(RecordRouteHeader.NAME);
+
+			// Issue 1490 : http://code.google.com/p/mobicents/issues/detail?id=1490
 			// B2buaHelper.createRequest does not decrement Max-forwards
 			MaxForwardsHeader maxForwardsHeader = (MaxForwardsHeader) newRequest.getHeader(MaxForwardsHeader.NAME);
 			try {
@@ -184,60 +194,60 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 			} catch (InvalidArgumentException e) {
 				throw new IllegalArgumentException(e);
 			}
-			
+
 			//Creating new call id
-			final Iterator<MobicentsExtendedListeningPoint> listeningPointsIterator = sipFactoryImpl.getSipNetworkInterfaceManager().getExtendedListeningPoints();				
-			if(!listeningPointsIterator.hasNext()) {				
+			final Iterator<MobicentsExtendedListeningPoint> listeningPointsIterator = sipFactoryImpl.getSipNetworkInterfaceManager().getExtendedListeningPoints();
+			if(!listeningPointsIterator.hasNext()) {
 				throw new IllegalStateException("There is no SIP connectors available to create the request");
 			}
 			final MobicentsExtendedListeningPoint extendedListeningPoint = listeningPointsIterator.next();
 			final CallIdHeader callIdHeader = sipFactoryImpl.getSipApplicationDispatcher().getCallId(extendedListeningPoint, null);
 			newRequest.setHeader(callIdHeader);
-			
+
 			final List<String> contactHeaderSet = retrieveContactHeaders(headerMap,
-					newRequest, origRequest.getSession().getServletContext());	
+					newRequest, origRequest.getSession().getServletContext());
 			final FromHeader newFromHeader = (FromHeader) newRequest.getHeader(FromHeader.NAME);
 			newFromHeader.removeParameter("tag");
 			((ToHeader) newRequest.getHeader(ToHeader.NAME))
 					.removeParameter("tag");
-			
+
 			final MobicentsSipSession originalSession = origRequestImpl.getSipSession();
 			final MobicentsSipApplicationSession appSession = originalSession
-					.getSipApplicationSession();			
-			
+					.getSipApplicationSession();
+
 			newFromHeader.setTag(ApplicationRoutingHeaderComposer.getHash(sipFactoryImpl.getSipApplicationDispatcher(), originalSession.getKey().getApplicationName(), appSession.getKey().getId()));
-			
+
 			final MobicentsSipSessionKey key = SessionManagerUtil.getSipSessionKey(appSession.getKey().getId(), originalSession.getKey().getApplicationName(), newRequest, false);
-			final MobicentsSipSession session = appSession.getSipContext().getSipManager().getSipSession(key, true, sipFactoryImpl, appSession);			
+			final MobicentsSipSession session = appSession.getSipContext().getSipManager().getSipSession(key, true, sipFactoryImpl, appSession);
 			session.setHandler(originalSession.getHandler());
-		
-			
+
+
 			// cater to http://code.google.com/p/sipservlets/issues/detail?id=31 to be able to set the rport in applications
 			final SipApplicationDispatcher sipApplicationDispatcher = sipFactoryImpl.getSipApplicationDispatcher();
 			final String branch = JainSipUtils.createBranch(appSession.getKey().getId(),  sipApplicationDispatcher.getHashFromApplicationName(appSession.getKey().getApplicationName()));
 			ViaHeader viaHeader = JainSipUtils.createViaHeader(
     				sipFactoryImpl.getSipNetworkInterfaceManager(), newRequest, branch, session.getOutboundInterface());
 			newRequest.addHeader(viaHeader);
-			
+
 			final SipServletRequestImpl newSipServletRequest = (SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest(
 					newRequest,
-					session, 
-					null, 
-					null, 
-					JainSipUtils.DIALOG_CREATING_METHODS.contains(newRequest.getMethod()));			
-			//JSR 289 Section 15.1.6	
-			newSipServletRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, origRequest);			
-			
+					session,
+					null,
+					null,
+					JainSipUtils.DIALOG_CREATING_METHODS.contains(newRequest.getMethod()));
+			//JSR 289 Section 15.1.6
+			newSipServletRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, origRequest);
+
 			final String method = origRequest.getMethod();
-			// For non-REGISTER requests, the Contact header field is not copied but is populated by the container as usual but if Contact header is present in the headerMap 
+			// For non-REGISTER requests, the Contact header field is not copied but is populated by the container as usual but if Contact header is present in the headerMap
 			// then relevant portions of Contact header is to be used in the request created, in accordance with section 4.1.3 of the specification.
 			if(Request.REGISTER.equalsIgnoreCase(method)) {
 				// Issue 2565 http://code.google.com/p/mobicents/issues/detail?id=2565
-				// So if the request is REGISTER the Contact Header field is copied and is used 
+				// So if the request is REGISTER the Contact Header field is copied and is used
 				if(contactHeaderSet.size() > 0) {
 					// And additional contact from the map are added + stripping the forbidden params
 					for (String contactHeaderValue : contactHeaderSet) {
-						newSipServletRequest.addHeaderInternal(ContactHeader.NAME, contactHeaderValue, true);						
+						newSipServletRequest.addHeaderInternal(ContactHeader.NAME, contactHeaderValue, true);
 					}
 					ListIterator<ContactHeader> contactHeaders = newSipServletRequest.getMessage().getHeaders(ContactHeader.NAME);
 					while (contactHeaders.hasNext()) {
@@ -249,21 +259,21 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 					}
 				}
 			} else {
-				newRequest.removeHeader(ContactHeader.NAME);	
+				newRequest.removeHeader(ContactHeader.NAME);
 				//Creating container contact header
 				ContactHeader contactHeader = null;
 				String fromName = null;
 				String diaplayName = newFromHeader.getAddress().getDisplayName();
 				if(newFromHeader.getAddress().getURI() instanceof javax.sip.address.SipURI) {
 					fromName = ((javax.sip.address.SipURI) newFromHeader.getAddress().getURI()).getUser();
-				}										
+				}
 				// if a sip load balancer is present in front of the server, the contact header is the one from the sip lb
 				// so that the subsequent requests can be failed over
 				if(sipFactoryImpl.isUseLoadBalancer()) {
 					MobicentsExtendedListeningPoint listeningPoint = JainSipUtils.findListeningPoint(sipFactoryImpl.getSipNetworkInterfaceManager(), newRequest, session.getOutboundInterface());
 					if(listeningPoint != null && listeningPoint.isUseLoadBalancer()) {
 						// https://github.com/RestComm/sip-servlets/issues/137
-						SipLoadBalancer loadBalancerToUse = null; 
+						SipLoadBalancer loadBalancerToUse = null;
 						if(listeningPoint.getLoadBalancer() == null) {
 							loadBalancerToUse = sipFactoryImpl.getLoadBalancerToUse();
 							if(logger.isDebugEnabled()) {
@@ -275,10 +285,10 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 								logger.debug("Using listeningPoint " + listeningPoint + " for connector specific load balancer " + listeningPoint.getLoadBalancer());
 							}
 						}
-						
+
 						javax.sip.address.SipURI sipURI = sipFactoryImpl.getAddressFactory().createSipURI(fromName, loadBalancerToUse.getAddress().getHostAddress());
 						sipURI.setHost(loadBalancerToUse.getAddress().getHostAddress());
-						sipURI.setPort(loadBalancerToUse.getSipPort());			
+						sipURI.setPort(loadBalancerToUse.getSipPort());
 						sipURI.setTransportParam(ListeningPoint.UDP);
 						javax.sip.address.Address contactAddress = sipFactoryImpl.getAddressFactory().createAddress(sipURI);
 						if(diaplayName != null && diaplayName.length() > 0) {
@@ -291,9 +301,9 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 						}
 						contactHeader = JainSipUtils.createContactHeader(sipFactoryImpl.getSipNetworkInterfaceManager(), newRequest, diaplayName, fromName, session.getOutboundInterface());
 					}
-				} else {					
+				} else {
 					contactHeader = JainSipUtils.createContactHeader(sipFactoryImpl.getSipNetworkInterfaceManager(), newRequest, diaplayName, fromName, session.getOutboundInterface());
-				}	
+				}
 				if(contactHeaderSet.size() > 0) {
 					// if the set is not empty then we adjust the values of the set to match the host and port + forbidden params of the container
 					setContactHeaders(contactHeaderSet, newSipServletRequest, contactHeader);
@@ -302,10 +312,10 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 					newRequest.setHeader(contactHeader);
 				}
 			}
-			
-			originalRequestMap.put(newSipServletRequest, origRequestImpl);
-			originalRequestMap.put(origRequestImpl, newSipServletRequest);
-			
+
+			linkedRequestMap.put(newSipServletRequest, origRequestImpl);
+			linkedRequestMap.put(origRequestImpl, newSipServletRequest);
+
 			if (linked) {
 				sessionMap.put(originalSession.getKey(), session.getKey());
 				sessionMap.put(session.getKey(), originalSession.getKey());
@@ -313,8 +323,9 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 			}
 			session.setB2buaHelper(this);
 			originalSession.setB2buaHelper(this);
-			session.setSessionCreatingTransactionRequest(newSipServletRequest);
-			
+                        session.setSessionCreatingTransactionRequest(newSipServletRequest);
+                        setOriginalRequest(session, newSipServletRequest);
+
 			return newSipServletRequest;
 		} catch (ParseException ex) {
 			logger.error("Unexpected parse exception ", ex);
@@ -333,44 +344,44 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 	 */
 	public SipServletRequest createRequest(SipSession session,
 			SipServletRequest origRequest, Map<String, List<String>> headerMap) {
-		
+
 		if(logger.isDebugEnabled()) {
 			logger.debug("createRequest - session=" + session + ", origRequest=" + origRequest);
 		}
-		
+
 		if(origRequest == null) {
 			throw new NullPointerException("original request cannot be null");
 		}
-		
+
 		try {
 			final SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
 			final MobicentsSipSession originalSession = origRequestImpl.getSipSession();
 			final MobicentsSipSession sessionImpl = (MobicentsSipSession) session;
 
 			final SipServletRequestImpl newSubsequentServletRequest = (SipServletRequestImpl) session.createRequest(origRequest.getMethod());
-						
-			//For non-REGISTER requests, the Contact header field is not copied 
+
+			//For non-REGISTER requests, the Contact header field is not copied
 			//but is populated by the container as usual
-			
+
 			//commented since this is not true in this case since this is a subsequent request
 			// this is needed for sending challenge requests
 //			if(!Request.REGISTER.equalsIgnoreCase(origRequest.getMethod())) {
 //				newSubsequentServletRequest.getMessage().removeHeader(ContactHeader.NAME);
 //			}
-			//If Contact header is present in the headerMap 
-			//then relevant portions of Contact header is to be used in the request created, 
+			//If Contact header is present in the headerMap
+			//then relevant portions of Contact header is to be used in the request created,
 			//in accordance with section 4.1.3 of the specification.
 			//They will be added later after the sip servlet request has been created
 			final List<String> contactHeaderSet = retrieveContactHeaders(headerMap,
 					(Request) newSubsequentServletRequest.getMessage(),
                                         originalSession.getServletContext());
-						
-			//If Contact header is present in the headerMap 
-			//then relevant portions of Contact header is to be used in the request created, 
+
+			//If Contact header is present in the headerMap
+			//then relevant portions of Contact header is to be used in the request created,
 			//in accordance with section 4.1.3 of the specification.
 			Request subsequentRequest = (Request)newSubsequentServletRequest.getMessage();
-			
-			// Issue 1490 : http://code.google.com/p/mobicents/issues/detail?id=1490 
+
+			// Issue 1490 : http://code.google.com/p/mobicents/issues/detail?id=1490
 			// B2buaHelper.createRequest does not decrement Max-forwards
 			MaxForwardsHeader maxForwardsHeader = (MaxForwardsHeader) subsequentRequest.getHeader(MaxForwardsHeader.NAME);
 			try {
@@ -378,29 +389,29 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 			} catch (InvalidArgumentException e) {
 				throw new IllegalArgumentException(e);
 			}
-			
+
 			ContactHeader contactHeader = (ContactHeader) subsequentRequest.getHeader(ContactHeader.NAME);
 			if(contactHeader != null && contactHeaderSet.size() > 0) {
 				subsequentRequest.removeHeader(ContactHeader.NAME);
 				setContactHeaders(contactHeaderSet, newSubsequentServletRequest, contactHeader);
 			}
-			
+
 			//Fix for Issue 585 by alexandre sova
 			if(origRequest.getContent() != null && origRequest.getContentType() != null) {
 				newSubsequentServletRequest.setContentLength(origRequest.getContentLength());
 				newSubsequentServletRequest.setContent(origRequest.getContent(), origRequest.getContentType());
 			}
-			
+
 			if(logger.isDebugEnabled()) {
 				logger.debug("newSubsequentServletRequest = " + newSubsequentServletRequest);
-			}			
-			
+			}
+
 			// Added for Issue 1409 http://code.google.com/p/mobicents/issues/detail?id=1409
 			copyNonSystemHeaders(origRequestImpl, newSubsequentServletRequest);
-			
-			originalRequestMap.put(newSubsequentServletRequest, origRequestImpl);
-			originalRequestMap.put(origRequestImpl, newSubsequentServletRequest);
-			
+
+			linkedRequestMap.put(newSubsequentServletRequest, origRequestImpl);
+			linkedRequestMap.put(origRequestImpl, newSubsequentServletRequest);
+
 			sessionMap.put(originalSession.getKey(), sessionImpl.getKey());
 			sessionMap.put(sessionImpl.getKey(), originalSession.getKey());
 			dumpLinkedSessions();
@@ -418,13 +429,13 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 	/**
 	 * Copies all the non system headers from the original request into the new subsequent request
 	 * (Not needed for initial requests since a clone of the request is done)
-	 * 
+	 *
 	 * Added for Issue 1409 http://code.google.com/p/mobicents/issues/detail?id=1409
 	 */
 	private void copyNonSystemHeaders(SipServletRequestImpl origRequestImpl,
 			SipServletRequestImpl newSubsequentServletRequest) {
 		final Message origMessage = origRequestImpl.getMessage();
-		final Message subsequentMessage = newSubsequentServletRequest.getMessage();		
+		final Message subsequentMessage = newSubsequentServletRequest.getMessage();
 		ListIterator<String> headerNames = origMessage.getHeaderNames();
 		while (headerNames.hasNext()) {
 			String headerName = headerNames.next();
@@ -477,7 +488,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 	/**
 	 * Issue 1151 :
 	 * For Contact header if present only the user part and some parameters are to be used as defined in 4.1.3 The Contact Header Field
-	 * 
+	 *
 	 * @param newRequest
 	 * @param contactHeaderSet
 	 * @param newSipServletRequest
@@ -495,12 +506,12 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 		}
 		// we set up a list of contact headers to be added to the request
 		List<ContactHeader> newContactHeaders = new ArrayList<ContactHeader>();
-		
+
 		ListIterator<ContactHeader> contactHeaders = newRequest.getHeaders(ContactHeader.NAME);
 		while (contactHeaders.hasNext()) {
 			// we clone the default Mobicents Sip Servlets Contact Header
 			ContactHeader newContactHeader = (ContactHeader) contactHeader.clone();
-			
+
 			ContactHeader newRequestContactHeader = contactHeaders.next();
 			final URI newURI = newRequestContactHeader.getAddress().getURI();
 			newContactHeader.getAddress().setDisplayName(newRequestContactHeader.getAddress().getDisplayName());
@@ -508,7 +519,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 			if(newURI instanceof SipURI) {
 				SipURI newSipURI = (SipURI) newURI;
 				SipURI newContactSipURI = (SipURI) newContactHeader.getAddress().getURI();
-				((SipURI)newContactHeader.getAddress().getURI()).setUser(newSipURI.getUser());								
+				((SipURI)newContactHeader.getAddress().getURI()).setUser(newSipURI.getUser());
 				Iterator<String> uriParameters = newSipURI.getParameterNames();
 				while (uriParameters.hasNext()) {
 					String parameter = uriParameters.next();
@@ -528,13 +539,13 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 			newContactHeaders.add(newContactHeader);
 		}
 		// we remove the previously added contact headers
-		newRequest.removeHeader(ContactHeader.NAME);	
+		newRequest.removeHeader(ContactHeader.NAME);
 		// and set the new correct ones
 		for (ContactHeader newContactHeader : newContactHeaders) {
 			newRequest.addHeader(newContactHeader);
 		}
 	}
-	
+
 	private void stripForbiddenContactURIParams(SipURI contactURI) {
 		Iterator<String> uriParameters = contactURI.getParameterNames();
 		while (uriParameters.hasNext()) {
@@ -545,7 +556,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 			}
 		}
 	}
-	
+
 	/**
 	 * @param headerMap
 	 * @param newRequest
@@ -563,20 +574,20 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 
                                         if (B2BUA_SYSTEM_HEADERS.contains(headerName)) {
                                             String overridenRuleStr = servCtx.getInitParameter(SipServletMessageImpl.SYS_HDR_MOD_OVERRIDE);
-                                            if (overridenRuleStr == null || 
+                                            if (overridenRuleStr == null ||
                                                     !AddressImpl.ModifiableRule.valueOf(overridenRuleStr).equals(ModifiableRule.Modifiable))
                                             {
                                                     throw new IllegalArgumentException(headerName + " in the provided map is a system header");
                                             }
 					}
-					// Fix for Issue 1002 : The header field map is then used to 
-					// override the headers in the newly created request so the header copied from the original request is removed 
-					if(entry.getValue().size() > 0)  {						
+					// Fix for Issue 1002 : The header field map is then used to
+					// override the headers in the newly created request so the header copied from the original request is removed
+					if(entry.getValue().size() > 0)  {
 						newRequest.removeHeader(headerName);
 					}
-					for (String value : entry.getValue()) {							
+					for (String value : entry.getValue()) {
 						final Header header = sipFactoryImpl.getHeaderFactory().createHeader(
-								headerName, value);					
+								headerName, value);
 						if(! JainSipUtils.SINGLETON_HEADER_NAMES.contains(header.getName())) {
 							newRequest.addHeader(header);
 						} else {
@@ -605,21 +616,33 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 		if(!sipSession.isValidInternal()) {
 			throw new IllegalArgumentException("sip session " + sipSession.getId() + " is invalid !");
 		}
-		final MobicentsSipServletMessage sipServletMessageImpl = sipSession.getSessionCreatingTransactionRequest();
+		final MobicentsSipServletMessage sipServletMessageImpl = getOriginalRequest(sipSession);
 		if(!(sipServletMessageImpl instanceof SipServletRequestImpl)) {
 			throw new IllegalStateException("session creating transaction message is not a request !");
 		}
 		final SipServletRequestImpl sipServletRequestImpl = (SipServletRequestImpl) sipServletMessageImpl;
 		if(RoutingState.FINAL_RESPONSE_SENT.equals(sipServletRequestImpl.getRoutingState())) {
-			// checked by TCK test com.bea.sipservlet.tck.agents.api.javax_servlet_sip.B2buaHelperTest.testCreateResponseToOriginalRequest101 
+			// checked by TCK test com.bea.sipservlet.tck.agents.api.javax_servlet_sip.B2buaHelperTest.testCreateResponseToOriginalRequest101
 			throw new IllegalStateException("subsequent response is inconsistent with an already sent response. a Final response has already been sent for this request " + sipServletRequestImpl);
 		}
 		if(logger.isDebugEnabled()) {
 			logger.debug("creating response to original request " + sipServletRequestImpl + " on session " + session);
 		}
-		return sipServletRequestImpl.createResponse(status, reasonPhrase);
+		SipServletResponse response =  sipServletRequestImpl.createResponse(status, reasonPhrase);
+
+		if(!session.getId().equals(response.getSession().getId())) {
+                    //a new session has been created, this means we have forked responses creating
+                    //new early dialog. We need to track the new session so next responses are
+                    //linked to proper derived session.
+                    logger.debug("SessionID=" + session.getId() + "Response Session ID=" +  response.getSession().getId());
+                    linkDerivedSipSessions(lastSessionQueried, session);
+                    //save original request in new derived session
+                    setOriginalRequest(response.getSession(), sipServletRequestImpl);
+
+		}
+                return response;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.B2buaHelper#getLinkedSession(javax.servlet.sip.SipSession)
@@ -627,15 +650,16 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 	public SipSession getLinkedSession(final SipSession session) {
 		return getLinkedSession(session, true);
 	}
-	
+
 	public SipSession getLinkedSession(final SipSession session, boolean checkSession) {
-		if ( session == null) { 
+		if ( session == null) {
 			throw new NullPointerException("the argument is null");
 		}
 		final MobicentsSipSession mobicentsSipSession = (MobicentsSipSession)session;
 		if(checkSession && !mobicentsSipSession.isValidInternal()) {
 			throw new IllegalArgumentException("the session " + mobicentsSipSession + " is invalid");
-		}		
+		}
+                lastSessionQueried = mobicentsSipSession;
 		MobicentsSipSessionKey sipSessionKey = this.sessionMap.get(mobicentsSipSession.getKey());
 		if(sipSessionKey == null) {
 			dumpLinkedSessions();
@@ -654,29 +678,28 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 			} else {
 				logger.debug("No Linked Session found for this session " + session);
 			}
-		}				
+		}
 		if(mobicentsSipSession.getParentSession() != null) {
 			if(logger.isDebugEnabled()) {
 				logger.debug(mobicentsSipSession + " has a parent session, it means we need to handle a forked case");
 			}
 			// Issue 2354 handling of forking
 			String linkedDerivedSessionId = derivedSessionMap.get(mobicentsSipSession.getId());
-			if(linkedDerivedSessionId == null) {	
-				SipServletRequestImpl originalSipServletRequestImpl = (SipServletRequestImpl) linkedSession.getSessionCreatingTransactionRequest();
-				
+			if(linkedDerivedSessionId == null) {
+                                SipServletRequestImpl originalSipServletRequestImpl = (SipServletRequestImpl) linkedSession.getSessionCreatingTransactionRequest();
 				String newToTag = ApplicationRoutingHeaderComposer.getHash(sipFactoryImpl.getSipApplicationDispatcher(),sipSessionKey.getApplicationName(), sipSessionKey.getApplicationSessionId());
 				if(logger.isDebugEnabled()) {
 					logger.debug("derived session " + mobicentsSipSession + " has no linked forked session yet, lazily creating one with new ToTag " + newToTag);
 				}
 				sipSessionKey = new SipSessionKey(sipSessionKey.getFromTag(), newToTag, sipSessionKey.getCallId(), sipSessionKey.getApplicationSessionId(), sipSessionKey.getApplicationName());
 				linkedSession = sipManager.getSipSession(sipSessionKey, false, null, mobicentsSipSession.getSipApplicationSession());
-				
+
 				// need to clone the original request to create the forked response
 				SipServletRequestImpl clonedOriginalRequest = (SipServletRequestImpl)originalSipServletRequestImpl.clone();
 				clonedOriginalRequest.setSipSession(linkedSession);
 				linkedSession.setSessionCreatingDialog(null);
-				linkedSession.setSessionCreatingTransactionRequest(clonedOriginalRequest);
-				
+                                linkedSession.setSessionCreatingTransactionRequest(clonedOriginalRequest);
+
 				derivedSessionMap.put(mobicentsSipSession.getId(), linkedSession.getId());
 				derivedSessionMap.put(linkedSession.getId(), mobicentsSipSession.getId());
 			} else {
@@ -691,15 +714,15 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 					linkedSession = sipManager.getSipSession(sipSessionKey, false, null, mobicentsSipSession.getSipApplicationSession());
 				} catch (ParseException e) {
 					logger.error("Couldn't parse linkedDerivedSessionId " + linkedDerivedSessionId + " linked to derived session " + mobicentsSipSession, e);
-				}				
+				}
 			}
 		}
-		
+
 		if(linkedSession != null) {
 			return linkedSession.getFacade();
 		} else {
 			return null;
-		}		
+		}
 	}
 
 	/*
@@ -707,12 +730,12 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 	 * @see javax.servlet.sip.B2buaHelper#getLinkedSipServletRequest(javax.servlet.sip.SipServletRequest)
 	 */
 	public SipServletRequest getLinkedSipServletRequest(SipServletRequest req) {
-		if ( req == null) { 
+		if ( req == null) {
 			throw new NullPointerException("the argument is null");
 		}
-		return originalRequestMap.get(req);
+		return linkedRequestMap.get(req);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.B2buaHelper#getPendingMessages(javax.servlet.sip.SipSession, javax.servlet.sip.UAMode)
@@ -722,8 +745,8 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 		final MobicentsSipSession sipSessionImpl = (MobicentsSipSession) session;
 		if(!sipSessionImpl.isValidInternal()) {
 			throw new IllegalArgumentException("the session " + sipSessionImpl.getId() + " is invalid");
-		}	
-		
+		}
+
 		final List<SipServletMessage> retval = new ArrayList<SipServletMessage> ();
 		if (mode.equals(UAMode.UAC)) {
 			final Set<Transaction> ongoingTransactions = sipSessionImpl.getOngoingTransactions();
@@ -732,7 +755,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 					if (transaction instanceof ClientTransaction) {
 						final TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
 						// Issue1571 http://code.google.com/p/mobicents/issues/detail?id=1571
-						// NullPointerException in SipServletResponseImpl.isCommitted 
+						// NullPointerException in SipServletResponseImpl.isCommitted
 						// race condition can occur between app code thread and processTxTerminated or Timeout thread
 						if(tad != null) {
 							final SipServletMessage sipServletMessage = tad.getSipServletMessage();
@@ -779,7 +802,35 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 		}
 		return retval;
 	}
-	
+
+        /**
+         * links derived sessionf if they are valid nad in proper state
+         * @param session1
+         * @param session2
+         */
+	private void linkDerivedSipSessions(SipSession session1, SipSession session2) {
+		if ( session1 == null) {
+			throw new NullPointerException("First argument is null");
+		}
+		if ( session2 == null) {
+			throw new NullPointerException("Second argument is null");
+		}
+
+		if(!((MobicentsSipSession)session1).isValidInternal() || !((MobicentsSipSession)session2).isValidInternal() ||
+				State.TERMINATED.equals(((MobicentsSipSession)session1).getState()) ||
+				State.TERMINATED.equals(((MobicentsSipSession)session2).getState()) ||
+				!session1.getApplicationSession().equals(session2.getApplicationSession()) ||
+				(derivedSessionMap.get(session1.getId()) != null && !derivedSessionMap.get(session1.getId()).equals(session2.getId()))  ||
+				(derivedSessionMap.get(session2.getId()) != null && !derivedSessionMap.get(session2.getId()).equals(session1.getId())) ) {
+			throw new IllegalArgumentException("either of the specified sessions has been terminated " +
+					"or the sessions do not belong to the same application session or " +
+					"one or both the sessions are already linked with some other session(s)");
+		}
+		this.derivedSessionMap.put(session1.getId(), session2.getId());
+		this.derivedSessionMap.put(session2.getId(), session1.getId());
+		dumpLinkedSessions();
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.B2buaHelper#linkSipSessions(javax.servlet.sip.SipSession, javax.servlet.sip.SipSession)
@@ -791,8 +842,8 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 		if ( session2 == null) {
 			throw new NullPointerException("Second argument is null");
 		}
-		
-		if(!((MobicentsSipSession)session1).isValidInternal() || !((MobicentsSipSession)session2).isValidInternal() || 
+
+		if(!((MobicentsSipSession)session1).isValidInternal() || !((MobicentsSipSession)session2).isValidInternal() ||
 				State.TERMINATED.equals(((MobicentsSipSession)session1).getState()) ||
 				State.TERMINATED.equals(((MobicentsSipSession)session2).getState()) ||
 				!session1.getApplicationSession().equals(session2.getApplicationSession()) ||
@@ -829,32 +880,32 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 		}
 		dumpLinkedSessions();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.B2buaHelper#unlinkSipSessions(javax.servlet.sip.SipSession)
 	 */
-	public void unlinkSipSessions(SipSession session) {		
+	public void unlinkSipSessions(SipSession session) {
 		unlinkSipSessionsInternal(session, true);
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param session
 	 * @param checkSession
 	 */
-	public void unlinkSipSessionsInternal(SipSession session, boolean checkSession) {		
-		if ( session == null) { 
+	public void unlinkSipSessionsInternal(SipSession session, boolean checkSession) {
+		if ( session == null) {
 			throw new NullPointerException("the argument is null");
 		}
 		final MobicentsSipSession key = (MobicentsSipSession) session;
 		final MobicentsSipSessionKey sipSessionKey = key.getKey();
 		if(checkSession) {
-			if(!((MobicentsSipSession)session).isValidInternal() || 
+			if(!((MobicentsSipSession)session).isValidInternal() ||
 					State.TERMINATED.equals(key.getState()) ||
 					sessionMap.get(sipSessionKey) == null) {
 				throw new IllegalArgumentException("the session is not currently linked to another session or it has been terminated");
-			}		
+			}
 		}
 		final MobicentsSipSessionKey value  = this.sessionMap.get(sipSessionKey);
 		if (value != null) {
@@ -875,7 +926,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 				}
 			}
 		} else if(logger.isDebugEnabled()) {
-			logger.debug("no sipsession for " + sipSessionKey + " to unlink");			
+			logger.debug("no sipsession for " + sipSessionKey + " to unlink");
 		}
 		final String linkedDerivedSessionId = this.derivedSessionMap.get(sipSessionKey.toString());
 		if (linkedDerivedSessionId != null) {
@@ -896,40 +947,40 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 				}
 			}
 		} else if(logger.isDebugEnabled()) {
-			logger.debug("no derived sipsession for " + sipSessionKey.toString() + " to unlink");			
+			logger.debug("no derived sipsession for " + sipSessionKey.toString() + " to unlink");
 		}
-		unlinkOriginalRequestInternal(sipSessionKey, !checkSession);
+		unlinkRequestInternal(sipSessionKey, !checkSession);
 		dumpLinkedSessions();
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param session
 	 * @param checkSession
 	 */
-	public void unlinkOriginalRequestInternal(MobicentsSipSessionKey sipSessionKey, boolean force) {
-		for (Entry<SipServletRequestImpl, SipServletRequestImpl> linkedRequests : originalRequestMap.entrySet()) {
+	public void unlinkRequestInternal(MobicentsSipSessionKey sipSessionKey, boolean force) {
+		for (Entry<SipServletRequestImpl, SipServletRequestImpl> linkedRequests : linkedRequestMap.entrySet()) {
 			SipServletRequestImpl request1 = linkedRequests.getKey();
 			SipServletRequestImpl request2 = linkedRequests.getValue();
 			if(request1 != null && request2 != null) {
 				MobicentsSipSessionKey key1 = request1.getSipSessionKey();
 				MobicentsSipSessionKey key2 = request2.getSipSessionKey();
 				if((key1!=null&&key1.equals(sipSessionKey)) || (key2!=null&&key2.equals(sipSessionKey))) {
-					unlinkOriginalRequestInternal(linkedRequests.getKey(), force);
-					unlinkOriginalRequestInternal(linkedRequests.getValue(), force);
+					unlinkRequestInternal(linkedRequests.getKey(), force);
+					unlinkRequestInternal(linkedRequests.getValue(), force);
 				}
 			}
-		}				
+		}
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param session
 	 * @param checkSession
 	 */
-	public void unlinkOriginalRequestInternal(MobicentsSipServletRequest sipServletRequestImpl, boolean force) {
+	public void unlinkRequestInternal(MobicentsSipServletRequest sipServletRequestImpl, boolean force) {
 		if(sipServletRequestImpl != null) {
-			SipServletRequestImpl linkedRequest = this.originalRequestMap.get(sipServletRequestImpl);			
+			SipServletRequestImpl linkedRequest = this.linkedRequestMap.get(sipServletRequestImpl);
 			if(sipServletRequestImpl != null) {
 				if(linkedRequest != null) {
 					// Issue 2419 we unlink only if both tx are in terminated state or transaction is null (which means it has already been cleaned up)
@@ -948,15 +999,15 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 					}
 					if(!Request.ACK.equalsIgnoreCase(sipServletRequestImpl.getMethod()) && (force || ((transaction == null || TransactionState.TERMINATED.equals(transaction.getState())) &&
 							(linkedTransaction == null || TransactionState.TERMINATED.equals(linkedTransaction.getState()))))) {
-						this.originalRequestMap.remove(sipServletRequestImpl);	
-						this.originalRequestMap.remove(linkedRequest);
+						this.linkedRequestMap.remove(sipServletRequestImpl);
+						this.linkedRequestMap.remove(linkedRequest);
 						if(logger.isDebugEnabled()) {
 							logger.debug("following linked request " + linkedRequest + " unlinked from " + sipServletRequestImpl);
 						}
 						if(!force) {
 							// in case of forceful invalidate there is no need to clean up everything here as we will use standard transaction terminated events
 							// TCK com.bea.sipservlet.tck.apps.apitestapp.B2buaHelper.testGetPendingMessages101 and testGetLinkedSession101
-							// don't remove the Linked Transaction if force is null as the response on the original cannot be sent as the transaction will be null 
+							// don't remove the Linked Transaction if force is null as the response on the original cannot be sent as the transaction will be null
 							if(linkedTransaction != null) {
 								linkedRequest.getSipSession().removeOngoingTransaction(linkedTransaction);
 								if(linkedTransaction.getApplicationData() != null) {
@@ -979,13 +1030,13 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 							}
 							if(!force && linkedRequest.getSipSession().isValidInternal() &&
 									// https://code.google.com/p/sipservlets/issues/detail?id=279
-									linkedRequest.getSipSession().isReadyToInvalidateInternal()) {														
-								linkedRequest.getSipSession().onTerminatedState();							
+									linkedRequest.getSipSession().isReadyToInvalidateInternal()) {
+								linkedRequest.getSipSession().onTerminatedState();
 							}
 							if(sipServletRequestImpl.getSipSession().isValidInternal() &&
 									// https://code.google.com/p/sipservlets/issues/detail?id=279
-									sipServletRequestImpl.getSipSession().isReadyToInvalidateInternal()) {														
-								sipServletRequestImpl.getSipSession().onTerminatedState();							
+									sipServletRequestImpl.getSipSession().isReadyToInvalidateInternal()) {
+								sipServletRequestImpl.getSipSession().onTerminatedState();
 							}
 						}
 					}
@@ -993,7 +1044,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 			}
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.B2buaHelper#createRequest(javax.servlet.sip.SipServletRequest)
@@ -1001,21 +1052,21 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 	public SipServletRequest createRequest(SipServletRequest origRequest) {
 		final SipServletRequestImpl newSipServletRequest = (SipServletRequestImpl) sipFactoryImpl.createRequest(origRequest, false);
 		final SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
-		
+
 		final MobicentsSipSession originalSession = origRequestImpl.getSipSession();
 		final MobicentsSipSession session = newSipServletRequest.getSipSession();
-		// B2buaHelperTest.testLinkSipSessions101 assumes the sessions shouldn't be linked together	
+		// B2buaHelperTest.testLinkSipSessions101 assumes the sessions shouldn't be linked together
 //		sessionMap.put(originalSession.getKey(), session.getKey());
-//		sessionMap.put(session.getKey(), originalSession.getKey());	
+//		sessionMap.put(session.getKey(), originalSession.getKey());
 //		dumpLinkedSessions();
 
-//		originalRequestMap.put(newSipServletRequest, origRequestImpl);
-//		originalRequestMap.put(origRequestImpl, newSipServletRequest);
-		
+//		linkedRequestMap.put(newSipServletRequest, origRequestImpl);
+//		linkedRequestMap.put(origRequestImpl, newSipServletRequest);
+
 		session.setB2buaHelper(this);
 		originalSession.setB2buaHelper(this);
-		
-		return newSipServletRequest;		
+                setOriginalRequest(session, newSipServletRequest);
+		return newSipServletRequest;
 	}
 
 	/**
@@ -1023,9 +1074,9 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 	 */
 	public SipServletRequest createCancel(SipSession session) {
 		if(session == null) throw new NullPointerException("The session for createCancel cannot be null");
-		for (SipServletRequestImpl linkedRequest : originalRequestMap.keySet()) {
-			if(linkedRequest.getSipSessionKey().equals(((MobicentsSipSession) session).getKey()) && 
-					linkedRequest.getMethod().equalsIgnoreCase(Request.INVITE) && 
+		for (SipServletRequestImpl linkedRequest : linkedRequestMap.keySet()) {
+			if(linkedRequest.getSipSessionKey().equals(((MobicentsSipSession) session).getKey()) &&
+					linkedRequest.getMethod().equalsIgnoreCase(Request.INVITE) &&
 					!linkedRequest.isFinalResponseGenerated() &&
 					// Fix for Issue http://code.google.com/p/mobicents/issues/detail?id=2114
 					// 	In B2b servlet, after re-INVITE, and try to create CANCEL will get "final response already sent!" exception.
@@ -1065,7 +1116,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 	public void setSipManager(SipManager sipManager) {
 		this.sipManager = sipManager;
 	}
-	
+
 	private void dumpLinkedSessions() {
 		if(logger.isDebugEnabled()) {
 			for (MobicentsSipSessionKey key : sessionMap.keySet()) {
@@ -1092,16 +1143,46 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 	}
 
 	/**
-	 * @return the originalRequestMap
+	 * @return the linkedRequestMap
 	 */
 	public Map<SipServletRequestImpl, SipServletRequestImpl> getOriginalRequestMap() {
-		return originalRequestMap;
+		return linkedRequestMap;
 	}
-	
+
 	/**
 	 * @param originalRequestsMap the originalRequests to set
 	 */
 	public void setOriginalRequestMap(Map<SipServletRequestImpl, SipServletRequestImpl> originalRequestsMap) {
-		this.originalRequestMap =  originalRequestsMap;
+		this.linkedRequestMap =  originalRequestsMap;
 	}
+
+    @Override
+    public void setOriginalRequest(SipSession sipSession, MobicentsSipServletRequest sipServletMessage) {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Setting OriginalRequest on session:" + sipSession);
+        }
+        if (sipSession.isValid()) {
+            sipSession.setAttribute(ORIG_REQ_ATT_NAME, sipServletMessage);
+        } else {
+            logger.debug("OriginalRequest not saved, session is not valid");
+        }
+    }
+
+        @Override
+    public MobicentsSipServletRequest getOriginalRequest(SipSession sipSession) {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Lookfor OrginalRequest on session:" + sipSession);
+        }
+        MobicentsSipServletRequest req = (MobicentsSipServletRequest) sipSession.getAttribute(ORIG_REQ_ATT_NAME);
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("OrginalRequest is:" + req);
+        }
+        if (req == null) {
+            throw new IllegalStateException("OrginalRequest is null.");
+        }
+        return req;
+    }
 }

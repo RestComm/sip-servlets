@@ -34,7 +34,7 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipSessionKey;
 
 /**
  * Extenstion from the B2BUAHelpr from Sip Servlets spec giving access to internals
- * 
+ *
  * @author jean.deruelle@gmail.com
  *
  */
@@ -42,7 +42,9 @@ public interface MobicentsB2BUAHelper extends B2buaHelper {
 
 	void setMobicentsSipFactory(MobicentsSipFactory sipFactoryImpl);
 	void setSipManager(SipManager sipManager);
-	void unlinkOriginalRequestInternal(MobicentsSipServletRequest sipServletMessage,
+        void setOriginalRequest(SipSession sipSession, MobicentsSipServletRequest sipServletMessage);
+        MobicentsSipServletRequest getOriginalRequest(SipSession sipSession);
+	void unlinkRequestInternal(MobicentsSipServletRequest sipServletMessage,
 			boolean b);
 	void unlinkSipSessionsInternal(SipSession sipSession, boolean b);
 	Map<MobicentsSipSessionKey, MobicentsSipSessionKey> getSessionMap();

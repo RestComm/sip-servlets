@@ -1,6 +1,8 @@
 /*
- * TeleStax, Open Source Cloud Communications.
- * Copyright 2012 and individual contributors by the @authors tag. 
+ * JBoss, Home of Professional Open Source
+ * Copyright 2011, Red Hat, Inc. and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -17,7 +19,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.servlet.sip;
 import java.io.File;
 import java.io.IOException;
@@ -60,17 +61,17 @@ import org.mobicents.servlet.sip.startup.SipStandardContext;
 /**
  * This class is emulating an embedded tomcat configured with sip servlets extension
  * to allow deployment of sip servlets apps to it. It is for the test suite purposes only for now...
- * 
+ *
  *  @author Jean Deruelle
  *  @author Vladimir Ralev
  */
-public class SipEmbedded {		
+public class SipEmbedded {
 	private static transient Logger log = Logger.getLogger(SipEmbedded.class);
 
 	private String loggingFilePath = null;
-	
+
 	private String darConfigurationFilePath = null;
-	
+
 	private String path = null;
 
 	private SipStandardService sipService = null;
@@ -78,29 +79,29 @@ public class SipEmbedded {
 	private StandardHost host = null;
 
 	private String serviceFullClassName;
-	
+
 	private String serverName;
-	
+
 	MBeanServer mBeanServer = null;
-	
+
 	private boolean isHA = false;
-	
+
 	private int callIdSize = -1;
-	
+
 	private int tagSize = -1;
 
 	/**
 	 * Default Constructor
-	 * 
+	 *
 	 */
 	public SipEmbedded(String serverName, String serviceFullClassName) {
 		this.serviceFullClassName = serviceFullClassName;
 		this.serverName = serverName;
 	}
-	
+
 	/**
 	 * Default Constructor
-	 * 
+	 *
 	 */
 	public SipEmbedded(String serverName, String serviceFullClassName, int callIdSize, int tagSize) {
 		this.serviceFullClassName = serviceFullClassName;
@@ -111,7 +112,7 @@ public class SipEmbedded {
 
 	/**
 	 * Basic Accessor setting the value of the context path
-	 * 
+	 *
 	 * @param path -
 	 *            the path
 	 */
@@ -122,35 +123,35 @@ public class SipEmbedded {
 
 	/**
 	 * Basic Accessor returning the value of the context path
-	 * 
+	 *
 	 * @return - the context path
 	 */
 	public String getPath() {
 
 		return path;
-	}		
+	}
 
 	/**
 	 * Init the tomcat server
 	 * @param tomcatBasePath the base path of the server
-	 * @param sipStackProperties 
+	 * @param sipStackProperties
 	 * @throws Exception
 	 */
-	public void initTomcat(String tomcatBasePath, Properties sipStackProperties) throws Exception {		
+	public void initTomcat(String tomcatBasePath, Properties sipStackProperties) throws Exception {
 		setPath(tomcatBasePath);
 		// Set the home directory
 //		System.setProperty("CATALINA_HOME", getPath());
 //		System.setProperty("CATALINA_BASE", getPath());
 //		System.setProperty("catalina.home", getPath());
-//		System.setProperty("catalina.base", getPath());		
+//		System.setProperty("catalina.base", getPath());
 		//logging configuration
 		System.setProperty("java.util.logging.config.file", loggingFilePath + "logging.properties");
-		DOMConfigurator.configure(loggingFilePath + "log4j.xml");		
+		DOMConfigurator.configure(loggingFilePath + "log4j.xml");
 //		BasicConfigurator.configure();
-//		PropertyConfigurator.configure(loggingFilePath);		
+//		PropertyConfigurator.configure(loggingFilePath);
 		//Those are for trying to make it work under mvn test command
 		// don't know why but some jars aren't loaded
-		// Retrieving MBean server  
+		// Retrieving MBean server
 		MBeanUtils.createServer();
         if (MBeanServerFactory.findMBeanServer(null).size() > 0) {
             mBeanServer =
@@ -163,23 +164,23 @@ public class SipEmbedded {
 		initDirs();
 		initNaming();
 		initClassLoaders();
-		
+
 		Thread.currentThread().setContextClassLoader(catalinaLoader);
         SecurityClassLoad.securityClassLoad(catalinaLoader);
-        
+
 		/*
 		 * <Service className="org.mobicents.servlet.sip.startup.SipStandardService"
 		 * darConfigurationFileLocation="file:///E:/sip-serv/sip-servlets-impl/docs/dar.properties"
 		 * name="Catalina"
 		 * sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
 		 * sipApplicationRouterClassName="org.mobicents.servlet.sip.router.DefaultApplicationRouter">
-		 */		
-		// Create an embedded server		
+		 */
+		// Create an embedded server
 		sipService = (SipStandardService) Class.forName(serviceFullClassName).newInstance();
 		sipService.setName(serverName);
 		sipService.setSipStackProperties(sipStackProperties);
 		sipService.setSipApplicationDispatcherClassName(SipApplicationDispatcherImpl.class.getName());
-//		sipService.setSipApplicationRouterClassName(DefaultApplicationRouter.class.getName());		
+//		sipService.setSipApplicationRouterClassName(DefaultApplicationRouter.class.getName());
 		sipService.setDarConfigurationFileLocation(darConfigurationFilePath);
 		sipService.setCongestionControlCheckingInterval(-1);
 		sipService.setAdditionalParameterableHeaders("additionalParameterableHeader");
@@ -196,14 +197,14 @@ public class SipEmbedded {
 		}
 //		sipService.setBypassRequestExecutor(true);
 //		sipService.setBypassResponseExecutor(true);
-		// Create an engine		
+		// Create an engine
 		SipStandardEngine engine = new SipStandardEngine();
 		engine.setName(serverName);
 		engine.setBaseDir(getPath());
 		engine.setDefaultHost("localhost");
 		engine.setService(sipService);
 		// Install the assembled container hierarchy
-		
+
 		sipService.setContainer(engine);
 		sipService.init();
 		// Create a default virtual host
@@ -211,12 +212,12 @@ public class SipEmbedded {
 		host = new StandardHost();
         host.setAppBase(getPath() + "/webapps");
         host.setName("localhost");
-		host.setConfigClass(StandardContext.class.getName());		
+		host.setConfigClass(StandardContext.class.getName());
 		host.setAppBase("webapps");
 		host.addLifecycleListener(new SipHostConfig());
 		host.setAutoDeploy(false);
 		host.setDeployOnStartup(false);
-		engine.addChild(host);		
+		engine.addChild(host);
 	}
 
 	/**
@@ -226,20 +227,20 @@ public class SipEmbedded {
 		Connector httpConnector = new Connector(
 				Http11Protocol.class.getName());
 		Http11Protocol httpProtocolHandler = (Http11Protocol) httpConnector
-				.getProtocolHandler();		
+				.getProtocolHandler();
 		httpProtocolHandler.setAddress(InetAddress.getByName(ipAddress));
-		httpProtocolHandler.setPort(port);	
+		httpProtocolHandler.setPort(port);
 		httpConnector.setPort(port);
 		httpProtocolHandler.setProperty("port", ""+port);
 		httpProtocolHandler.setDisableUploadTimeout(true);
 		httpProtocolHandler.setMaxHttpHeaderSize(8192);
 //		httpProtocolHandler.setMaxSpareThreads(75);
 //		httpProtocolHandler.setMinSpareThreads(75);
-		httpProtocolHandler.setMaxThreads(150);		
+		httpProtocolHandler.setMaxThreads(150);
 
 		sipService.addConnector(httpConnector);
 	}
-	
+
 	/**
 	 * This method Starts the Tomcat server.
 	 */
@@ -255,7 +256,7 @@ public class SipEmbedded {
 	public void restartTomcat() throws Exception {
 		// Start the embedded server
 		host.start();
-		sipService.start();		
+		sipService.start();
 	}
 
 	/**
@@ -267,57 +268,41 @@ public class SipEmbedded {
 				.getProtocolHandler();
 		udpProtocolHandler.setPort(port);
 		udpProtocolHandler.setIpAddress(ipAddress);
-		udpProtocolHandler.setSignalingTransport(transport);		
-
-		sipService.addConnector(udpSipConnector);
-		return udpSipConnector;
-	}
-	
-	public Connector addSipConnectorForLB(String connectorName, String ipAddress, int port, String transport, String lbAddress, int lbRmiPort) throws Exception {
-		Connector udpSipConnector = new Connector(
-				SipProtocolHandler.class.getName());
-		SipProtocolHandler udpProtocolHandler = (SipProtocolHandler) udpSipConnector
-				.getProtocolHandler();
-		udpProtocolHandler.setPort(port);
-		udpProtocolHandler.setIpAddress(ipAddress);
 		udpProtocolHandler.setSignalingTransport(transport);
-		udpProtocolHandler.setLoadBalancerAddress(lbAddress);
-		udpProtocolHandler.setLoadBalancerRmiPort(lbRmiPort);
-		udpProtocolHandler.setUseLoadBalancer(true);
 
 		sipService.addConnector(udpSipConnector);
 		return udpSipConnector;
 	}
 
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public Connector[] findConnectors() {
 		return sipService.findConnectors();
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param connector
 	 */
-	public void removeConnector(Connector connector) {		
+	public void removeConnector(Connector connector) {
 		sipService.removeConnector(connector);
 	}
-	
+
 	/**
 	 * This method Stops the Tomcat server.
 	 */
 	public void stopTomcat() {
 		// Stop the embedded server
 		Server server = null;
-		if(sipService != null) {			
+		if(sipService != null) {
 			try {
 				server = sipService.getServer();
-				sipService.stop();				
+				sipService.stop();
 			} catch (LifecycleException e) {
 				log.error("SipService already stopped ", e);
-			}	
+			}
 			Connector[] connectors = sipService.findConnectors();
 			// Fix regression on the testsuite causing Tomcat not to remove properly the connectors
 			// and making the tests hang
@@ -328,7 +313,7 @@ public class SipEmbedded {
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				}				
+				}
 				sipService.removeConnector(connector);
 			}
 			if(server != null) {
@@ -343,9 +328,9 @@ public class SipEmbedded {
 	 * @param contextPath the context Path of the context to deploy
 	 */
 	public boolean deployContext(String docBase, String name, String path) {
-		return deployAppContext(docBase, name, path).getAvailable();			
+		return deployAppContext(docBase, name, path).getAvailable();
 	}
-        
+
 	public SipStandardContext deployAppContext(String docBase, String name, String path) {
 		SipStandardContext context = new SipStandardContext();
 		context.setDocBase(docBase);
@@ -356,8 +341,8 @@ public class SipEmbedded {
 		context.addLifecycleListener(new SipContextConfig());
 		context.setManager(new SipStandardManager());
 		host.addChild(context);
-		return context;			
-	}        
+		return context;
+	}
         boolean deployContext(String docBase, String name, String path, int appSessionTimeout) {
          return deployAppContext(docBase, name, path, 0).getAvailable();
         }
@@ -372,16 +357,16 @@ public class SipEmbedded {
 		context.addLifecycleListener(new SipContextConfig());
 		context.setManager(new SipStandardManager());
 		host.addChild(context);
-		return context;			
+		return context;
 	}
-	
+
 	public boolean deployContext(SipStandardContext context) {
 		context.setParent(host);
 		context.setProcessTlds(false);
 		host.addChild(context);
-		return context.getAvailable();	
+		return context.getAvailable();
 	}
-	
+
 	public void undeployContext(Container context) {
 		host.removeChild(context);
 	}
@@ -401,8 +386,8 @@ public class SipEmbedded {
 	public void setLoggingFilePath(String loggingFilePath) {
 		this.loggingFilePath = loggingFilePath;
 	}
-	
-	
+
+
 	/**
      * Is naming enabled ?
      */
@@ -414,20 +399,20 @@ public class SipEmbedded {
     protected static final Integer IS_JAR = Integer.valueOf(1);
     protected static final Integer IS_GLOB = Integer.valueOf(2);
     protected static final Integer IS_URL = Integer.valueOf(3);
-    
+
     protected ClassLoader commonLoader = null;
     protected ClassLoader catalinaLoader = null;
     protected ClassLoader sharedLoader = null;
-	
+
 	private void initClassLoaders() throws Exception {
-        
+
             commonLoader = createClassLoader(serverName + "/common", null);
             if( commonLoader == null ) {
                 // no config file, default to this loader - we might be in a 'single' env.
                 commonLoader=this.getClass().getClassLoader();
             }
             catalinaLoader = createClassLoader(serverName + "/server", commonLoader);
-            sharedLoader = createClassLoader(serverName + "/shared", commonLoader);        
+            sharedLoader = createClassLoader(serverName + "/shared", commonLoader);
     }
 
 
@@ -441,7 +426,7 @@ public class SipEmbedded {
         ArrayList repositoryLocations = new ArrayList();
         ArrayList repositoryTypes = new ArrayList();
         int i;
- 
+
         StringTokenizer tokenizer = new StringTokenizer(value, ",");
         while (tokenizer.hasMoreElements()) {
             String repository = tokenizer.nextToken();
@@ -452,20 +437,20 @@ public class SipEmbedded {
             while ((i=repository.indexOf(CATALINA_HOME_TOKEN))>=0) {
                 replace=true;
                 if (i>0) {
-                repository = repository.substring(0,i) + getCatalinaHome() 
+                repository = repository.substring(0,i) + getCatalinaHome()
                     + repository.substring(i+CATALINA_HOME_TOKEN.length());
                 } else {
-                    repository = getCatalinaHome() 
+                    repository = getCatalinaHome()
                         + repository.substring(CATALINA_HOME_TOKEN.length());
                 }
             }
             while ((i=repository.indexOf(CATALINA_BASE_TOKEN))>=0) {
                 replace=true;
                 if (i>0) {
-                repository = repository.substring(0,i) + getCatalinaBase() 
+                repository = repository.substring(0,i) + getCatalinaBase()
                     + repository.substring(i+CATALINA_BASE_TOKEN.length());
                 } else {
-                    repository = getCatalinaBase() 
+                    repository = getCatalinaBase()
                         + repository.substring(CATALINA_BASE_TOKEN.length());
                 }
             }
@@ -498,7 +483,7 @@ public class SipEmbedded {
 
         String[] locations = (String[]) repositoryLocations.toArray(new String[0]);
         Integer[] types = (Integer[]) repositoryTypes.toArray(new Integer[0]);
- 
+
         ClassLoader classLoader = createClassLoader
             (locations, types, parent);
 
@@ -538,8 +523,8 @@ public class SipEmbedded {
 //        return System.getProperty("catalina.base", getCatalinaHome());
     	return getPath();
     }
-	
-    
+
+
     /**
      * Create and return a new class loader, based on the configuration
      * defaults and the specified directory paths:
@@ -643,7 +628,7 @@ public class SipEmbedded {
         securityConfig.setPackageDefinition();
         securityConfig.setPackageAccess();
     }
-	
+
 	/** Initialize naming - this should only enable java:env and root naming.
      * If tomcat is embeded in an application that already defines those -
      * it shouldn't do it.
@@ -703,7 +688,7 @@ public class SipEmbedded {
                 }
             }
         }
-        // last resort - for minimal/embedded cases. 
+        // last resort - for minimal/embedded cases.
         if(catalinaHome==null) {
             catalinaHome=System.getProperty("user.dir");
         }
@@ -734,7 +719,7 @@ public class SipEmbedded {
             }
             System.setProperty("catalina.base", catalinaBase);
         }
-        
+
         String temp = System.getProperty("java.io.tmpdir");
         if (temp == null || (!(new File(temp)).exists())
                 || (!(new File(temp)).isDirectory())) {
