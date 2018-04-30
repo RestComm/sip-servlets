@@ -39,7 +39,7 @@ note over b2bua: Since final response has already been sent,\nB2BUA will BYE thi
 
 b2bua -> proxy: BYE (UAC-1)
 proxy -> shootme2: BYE
-shootme -> b2bua: 200 OK (UAC-1)
+shootme2 -> b2bua: 200 OK (UAC-1)
 
 note over b2bua: !!! At this point, UAC-1 will invalidate !!!
 
