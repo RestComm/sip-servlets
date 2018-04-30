@@ -86,6 +86,7 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSessionKey;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
+import org.mobicents.servlet.sip.core.session.SipManagerDelegate;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 
 /**
@@ -656,6 +657,11 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 			throw new NullPointerException("the argument is null");
 		}
 		final MobicentsSipSession mobicentsSipSession = (MobicentsSipSession)session;
+
+		String msg = String.format("Request to discover linkedSession for [%s] with toTag [%s], hasParentSession [%s], has derived sessions [%s]",mobicentsSipSession.getKey().toString(),
+				(mobicentsSipSession.getKey().getToTag() != null ? mobicentsSipSession.getKey().getToTag() : "null to tag"), mobicentsSipSession.getParentSession() != null, mobicentsSipSession.getDerivedSipSessions().hasNext());
+		logger.info(msg);
+
 		if(checkSession && !mobicentsSipSession.isValidInternal()) {
 			throw new IllegalArgumentException("the session " + mobicentsSipSession + " is invalid");
 		}
@@ -672,6 +678,20 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 			logger.debug(" trying to find linked session with key " + sipSessionKey + " for session " + mobicentsSipSession);
 		}
 		MobicentsSipSession linkedSession = sipManager.getSipSession(sipSessionKey, false, null, mobicentsSipSession.getSipApplicationSession());
+
+		//Doesn't work
+		if (linkedSession == null) {
+			String sipSessionKeyStr = this.derivedSessionMap.get(mobicentsSipSession.getKey());
+			Iterator derivedSipSessionIter = ((MobicentsSipSession) session).getDerivedSipSessions();
+			while (derivedSipSessionIter.hasNext()) {
+				MobicentsSipSession derivedSipSession = (MobicentsSipSession) derivedSipSessionIter.next();
+				if (derivedSipSession.getKey().equals(sipSessionKey)) {
+					linkedSession = derivedSipSession;
+					break;
+				}
+			}
+		}
+
 		if(logger.isDebugEnabled()) {
 			if(linkedSession != null) {
 				logger.debug("Linked Session found : " + linkedSession + " for this session " + session);
@@ -681,12 +701,12 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 		}
 		if(mobicentsSipSession.getParentSession() != null) {
 			if(logger.isDebugEnabled()) {
-				logger.debug(mobicentsSipSession + " has a parent session, it means we need to handle a forked case");
+				logger.debug(mobicentsSipSession + " has a parent session, it means we need to handle a forked case. ToTag: "+mobicentsSipSession.getKey().getToTag());
 			}
 			// Issue 2354 handling of forking
 			String linkedDerivedSessionId = derivedSessionMap.get(mobicentsSipSession.getId());
 			if(linkedDerivedSessionId == null) {
-                                SipServletRequestImpl originalSipServletRequestImpl = (SipServletRequestImpl) linkedSession.getSessionCreatingTransactionRequest();
+				SipServletRequestImpl originalSipServletRequestImpl = (SipServletRequestImpl) linkedSession.getSessionCreatingTransactionRequest();
 				String newToTag = ApplicationRoutingHeaderComposer.getHash(sipFactoryImpl.getSipApplicationDispatcher(),sipSessionKey.getApplicationName(), sipSessionKey.getApplicationSessionId());
 				if(logger.isDebugEnabled()) {
 					logger.debug("derived session " + mobicentsSipSession + " has no linked forked session yet, lazily creating one with new ToTag " + newToTag);
@@ -702,6 +722,8 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 
 				derivedSessionMap.put(mobicentsSipSession.getId(), linkedSession.getId());
 				derivedSessionMap.put(linkedSession.getId(), mobicentsSipSession.getId());
+				sessionMap.put(mobicentsSipSession.getKey(), linkedSession.getKey());
+				sessionMap.put(linkedSession.getKey(), mobicentsSipSession.getKey());
 			} else {
 				if(logger.isDebugEnabled()) {
 					logger.debug("derived session " + mobicentsSipSession + " has already a linked forked session " + linkedDerivedSessionId + " reusing it");
@@ -816,6 +838,9 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 			throw new NullPointerException("Second argument is null");
 		}
 
+		String direvedSessionKey1 = session1.getId()+((MobicentsSipSession)session1).getKey().getToTag();
+		String direvedSessionKey2 = session2.getId()+((MobicentsSipSession)session2).getKey().getToTag();
+
 		if(!((MobicentsSipSession)session1).isValidInternal() || !((MobicentsSipSession)session2).isValidInternal() ||
 				State.TERMINATED.equals(((MobicentsSipSession)session1).getState()) ||
 				State.TERMINATED.equals(((MobicentsSipSession)session2).getState()) ||
@@ -895,37 +920,69 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 	 * @param checkSession
 	 */
 	public void unlinkSipSessionsInternal(SipSession session, boolean checkSession) {
-		if ( session == null) {
+		if (session == null) {
 			throw new NullPointerException("the argument is null");
 		}
+
+		boolean isDerivedSession = false;
+
 		final MobicentsSipSession key = (MobicentsSipSession) session;
 		final MobicentsSipSessionKey sipSessionKey = key.getKey();
-		if(checkSession) {
-			if(!((MobicentsSipSession)session).isValidInternal() ||
+		String derivedSessionKey = null;
+		if (key.getParentSession() != null) {
+			logger.info("this is from a derived session");
+			isDerivedSession = true;
+			derivedSessionKey = key.getId()+key.getKey().getToTag();
+		}
+
+		if (checkSession) {
+			if (!((MobicentsSipSession) session).isValidInternal() ||
 					State.TERMINATED.equals(key.getState()) ||
 					sessionMap.get(sipSessionKey) == null) {
 				throw new IllegalArgumentException("the session is not currently linked to another session or it has been terminated");
 			}
 		}
-		final MobicentsSipSessionKey value  = this.sessionMap.get(sipSessionKey);
+		final MobicentsSipSessionKey value = this.sessionMap.get(sipSessionKey);
 		if (value != null) {
 			SipSession linkedSipSession = getLinkedSession(session, checkSession);
-			this.sessionMap.remove(sipSessionKey);
-			this.sessionMap.remove(value);
-			if(logger.isDebugEnabled()) {
-				logger.debug("sipsession " + sipSessionKey + " unlinked from sip session " + value);
-			}
-			if(linkedSipSession != null) {
-				// https://github.com/Mobicents/sip-servlets/issues/56
-				MobicentsB2BUAHelper linkedB2buaHelper = ((MobicentsSipSession)linkedSipSession).getB2buaHelper();
-				if(!linkedB2buaHelper.equals(this)) {
-					linkedB2buaHelper.unlinkSipSessionsInternal(linkedSipSession, false);
-				} else {
-					linkedB2buaHelper = ((MobicentsSipSession)session).getB2buaHelper();
-					linkedB2buaHelper.unlinkSipSessionsInternal(linkedSipSession, false);
+//			if (!((MobicentsSipSession)linkedSipSession).getDerivedSipSessions().hasNext()) {
+				this.sessionMap.remove(sipSessionKey);
+				this.sessionMap.remove(value);
+
+				if (((MobicentsSipSession) session).getDerivedSipSessions().hasNext()) {
+					Iterator derivedSessionIter = ((MobicentsSipSession) session).getDerivedSipSessions();
+					while (derivedSessionIter.hasNext()) {
+						MobicentsSipSession derivedSipSession = (MobicentsSipSession) derivedSessionIter.next();
+						MobicentsSipSession targetSipSession = sipManager.getSipSession(value, false, null, derivedSipSession.getSipApplicationSession());
+						this.linkSipSessions(derivedSipSession, targetSipSession);
+//						this.sessionMap.put(derivedSipSession.getKey(), value);
+//						this.sessionMap.put(value, derivedSipSession.getKey());
+					}
+
 				}
-			}
-		} else if(logger.isDebugEnabled()) {
+
+
+				if (logger.isDebugEnabled()) {
+					logger.debug("sipsession " + sipSessionKey + " unlinked from sip session " + value);
+				}
+				if (linkedSipSession != null) {
+					// https://github.com/Mobicents/sip-servlets/issues/56
+					MobicentsB2BUAHelper linkedB2buaHelper = ((MobicentsSipSession) linkedSipSession).getB2buaHelper();
+					if (linkedB2buaHelper != null) {
+						if (!linkedB2buaHelper.equals(this)) {
+							linkedB2buaHelper.unlinkSipSessionsInternal(linkedSipSession, false);
+						} else {
+							linkedB2buaHelper = ((MobicentsSipSession) session).getB2buaHelper();
+							linkedB2buaHelper.unlinkSipSessionsInternal(linkedSipSession, false);
+						}
+					}
+				}
+//			} else {
+//				if (logger.isDebugEnabled()) {
+//					logger.debug("Will NOT unlink sipsession " + sipSessionKey + " from sip session " + value + " because has derived sessions pending");
+//				}
+//			}
+		} else if (logger.isDebugEnabled()) {
 			logger.debug("no sipsession for " + sipSessionKey + " to unlink");
 		}
 		final String linkedDerivedSessionId = this.derivedSessionMap.get(sipSessionKey.toString());

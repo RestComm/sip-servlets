@@ -70,22 +70,33 @@ public class B2BUASipServletForkingTest extends SipServletTestCase {
 
     // non regression test for Issue https://telestax.atlassian.net/browse/RES-4
     public void testB2BUAForkingCrossed180() throws Exception {
-        int shootme1Port = NetworkPortAssigner.retrieveNextPort();
+
+        // ShootMe-1                        : 5091
+        // ShootMe-2                        : 5092
+        // Proxy (forks to Shootme clients) : 5090
+        // Container running B2BUA app      : 5060
+        // Shootist (initiates the call)    : 5089
+
+
+        int shootme1Port = 5091;//NetworkPortAssigner.retrieveNextPort();
         //force ringing to come after shootme2,but 200ok before shootme 2
-        Shootme shootme1 = new Shootme(shootme1Port, true, 1000,1500);
+        Shootme shootme1 = new Shootme(shootme1Port, true, 1000, 1500);
         SipProvider shootmeProvider = shootme1.createProvider();
         shootmeProvider.addSipListener(shootme1);
-        int shootme2Port = NetworkPortAssigner.retrieveNextPort();
+
+        int shootme2Port = 5092;//NetworkPortAssigner.retrieveNextPort();
         //send 180 inmediately,but 200 ok after shootme1
-        Shootme shootme2 = new Shootme(shootme2Port, true, 2500);
+        Shootme shootme2 = new Shootme(shootme2Port, true,2500);
         SipProvider shootme2Provider = shootme2.createProvider();
         shootme2Provider.addSipListener(shootme2);
-        int proxyPort = NetworkPortAssigner.retrieveNextPort();
+
+        int proxyPort = 5090;//NetworkPortAssigner.retrieveNextPort();
         Proxy proxy = new Proxy(proxyPort, new int[]{shootme1Port, shootme2Port});
         SipProvider provider = proxy.createSipProvider();
         provider.addSipListener(proxy);
-        int shootistPort = NetworkPortAssigner.retrieveNextPort();
-        int listeningPort = NetworkPortAssigner.retrieveNextPort();
+
+        int shootistPort = 5089;//NetworkPortAssigner.retrieveNextPort();
+        int listeningPort = 5060;//NetworkPortAssigner.retrieveNextPort();
         Shootist shootist = new Shootist(true, shootistPort, String.valueOf(listeningPort));
         shootist.pauseBeforeBye = 20000;
         shootist.setFromHost("sip-servlets.com");

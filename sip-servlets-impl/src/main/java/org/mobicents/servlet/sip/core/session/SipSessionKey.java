@@ -34,7 +34,7 @@ import java.io.Serializable;
  * It is to be noted that the To Header parameter Tag will not be used in SipSessionKey comparison (equals() and hashcode() methods).<br/>
  * It will only be used to check if a new derived sip session needs to be created.
  * </p>
- * 
+ *
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
  *
  */
@@ -42,7 +42,7 @@ public final class SipSessionKey implements MobicentsSipSessionKey, Serializable
 	private static final long serialVersionUID = 1L;
 	private final String fromTag;
 	private String toTag;
-	private final String callId; 
+	private final String callId;
 	private final String applicationName;
 	// Issue 790 : 1 SipSession should not be used in 2 different app session (http://code.google.com/p/mobicents/issues/detail?id=790)
 	// so we add the app session id in the key as well
@@ -64,8 +64,8 @@ public final class SipSessionKey implements MobicentsSipSessionKey, Serializable
 		this.callId = callId;
 		this.applicationName = applicationName;
 		this.applicationSessionId = applicationSessionId;
-		
-		computeToString();		
+
+		computeToString();
 	}
 	/**
 	 * @return the fromTag
@@ -146,7 +146,7 @@ public final class SipSessionKey implements MobicentsSipSessionKey, Serializable
 			return false;
 		return true;
 	}
-	
+
 	@Override
 	public String toString() {
 		return toString;
@@ -156,7 +156,7 @@ public final class SipSessionKey implements MobicentsSipSessionKey, Serializable
 	 * We recompute the session id only for derived session otherwise the id will change
 	 * when the a request is received or sent and the response is sent back or received which should not happen
 	 * See TCK test SipSessionListenerTest.testSessionDestroyed001
-	 * 
+	 *
 	 * @param toTag the toTag to set
 	 * @param recomputeSessionId check if the sessionid need to be recomputed
 	 */
@@ -167,7 +167,7 @@ public final class SipSessionKey implements MobicentsSipSessionKey, Serializable
 			computeToString();
 		}
 	}
-	
+
 	/**
 	 * @param toString the toString to set
 	 */
@@ -184,6 +184,6 @@ public final class SipSessionKey implements MobicentsSipSessionKey, Serializable
 		} else {
 			toString = "(" + fromTag + SessionManagerUtil.SESSION_KEY_SEPARATOR + callId + SessionManagerUtil.SESSION_KEY_SEPARATOR + applicationSessionId +SessionManagerUtil.SESSION_KEY_SEPARATOR + applicationName + ")";
 		}
-	}	
-	
+	}
+
 }

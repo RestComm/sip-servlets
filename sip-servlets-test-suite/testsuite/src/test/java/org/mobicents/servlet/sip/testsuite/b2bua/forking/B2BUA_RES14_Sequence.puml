@@ -1,0 +1,51 @@
+@startuml
+shootist -> b2bua: INVITE (UAS-1)
+b2bua -> proxy: INVITE (UAC-1)
+proxy -> shootme1: INVITE
+proxy -> shootme2: INVITE
+
+shootme2 -> proxy: 180 Ringing
+proxy -> b2bua: 180 Ringing (UAC-1)
+b2bua -> shootist: 180 Ringing (UAS-1)
+
+shootme1 -> proxy: 180 Ringing
+note left of proxy
+UAC-2 is a derived sip
+session. parent is UAC-1
+end note
+proxy -> b2bua: 180 Ringing (UAC-2)
+note left of b2bua
+UAS-2 is the cloned sip
+session of UAS-1
+end note
+b2bua -> shootist: 180 Ringing (UAS-2)
+
+shootme1 -> proxy: 200 OK
+proxy -> b2bua: 200 OK (UAC-2)
+b2bua -> shootist: 200 OK (UAS-2)
+shootist -> b2bua: ACK (UAS-2)
+b2bua -> proxy: ACK (UAC-2)
+proxy -> shootme1: ACK
+
+note over b2bua: At this point UAS-2 and UAC-2\nsessions are both confirmed
+
+
+shootme2 -> proxy: 200 OK
+proxy -> b2bua: 200 OK (UAC-1)
+b2bua -> proxy: ACK (UAC-1)
+proxy -> shootme2: ACK
+
+note over b2bua: Since final response has already been sent,\nB2BUA will BYE this branch
+
+b2bua -> proxy: BYE (UAC-1)
+proxy -> shootme2: BYE
+shootme -> b2bua: 200 OK (UAC-1)
+
+note over b2bua: !!! At this point, UAC-1 will invalidate !!!
+
+shootist -> b2bua: BYE (UAS-2)
+
+note over b2bua: Even if B2BUA mapps are fixed, there is\nno way to access the UAC-2 session\nat this point
+
+note over b2bua: B2BUA fails to get linked session\nand BYE fails with NPE
+@enduml

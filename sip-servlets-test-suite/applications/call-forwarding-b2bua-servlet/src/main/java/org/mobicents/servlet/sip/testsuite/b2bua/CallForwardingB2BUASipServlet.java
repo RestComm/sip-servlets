@@ -64,6 +64,7 @@ import javax.sip.message.Request;
 import org.apache.log4j.Logger;
 import org.mobicents.javax.servlet.sip.SipFactoryExt;
 import org.mobicents.javax.servlet.sip.SipSessionExt;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.message.B2buaHelperImpl;
 
 
@@ -844,6 +845,10 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 				responseToOriginalRequest.send();
 			}
 		} else if(!originalRequest.isCommitted()) {
+			String msg = String.format("About to get Linked session for Session [%s], with session key [%s], and to tag [%s], has Parent session [%s], for sip response [%s]", sipServletResponse.getSession(),
+                    sipServletResponse.getSession().getId(), ((MobicentsSipSession)sipServletResponse.getSession()).getKey().getToTag(),
+					((MobicentsSipSession) sipServletResponse.getSession()).getParentSession() != null,  sipServletResponse);
+			logger.info(msg);
 			SipSession originalSession =
 			    sipServletResponse.getRequest().getB2buaHelper().getLinkedSession(sipServletResponse.getSession());
 			checkForkedSession(originalSession, sipServletResponse);
