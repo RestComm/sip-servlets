@@ -85,7 +85,6 @@
 		<module>sip-servlets-impl</module>
 		<module>sip-servlets-application-router</module>
 		<module>sip-servlets-annotations</module>
-		<module>sip-servlets-test-suite</module>
 	</modules>
 
 	<properties>
