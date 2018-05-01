@@ -1586,16 +1586,20 @@ public class SipSessionImpl implements MobicentsSipSession {
 
 	public void onTerminatedState() {
 		if(isValidInternal()) {
-			String msg = String.format("SipSession [%s] onTerminateState, hasParent [%s], hasDerivedSessions [%s]", key, parentSession !=null, derivedSipSessions != null);
-			logger.debug(msg);
+                        if(logger.isDebugEnabled()) {
+                            String msg = String.format("SipSession [%s] onTerminateState, hasParent [%s], hasDerivedSessions [%s]", key, parentSession !=null, derivedSipSessions != null);
+                            logger.debug(msg);
+                        }
 			onReadyToInvalidate();
 			if(!this.isValid && this.parentSession != null) {
 				//Since there is a parent session, and since the current derived sip session
 				//is already invalidated, ask the parent session to invalidate.
 				//During parent session invalidation, it will check if there are more pending
 				//derived session and will proceed accordingly
-				msg = String.format("SipSession [%s] onTerminateState hasParentSession [%s] that will ask to onReadyToInvalidate()", key, parentSession.getKey());
-				logger.debug(msg);
+				if(logger.isDebugEnabled()) {
+                                    String msg = String.format("SipSession [%s] onTerminateState hasParentSession [%s] that will ask to onReadyToInvalidate()", key, parentSession.getKey());
+                                    logger.debug(msg);
+                                }
 				// Calling this.parentSession.onReadyToInvalidate(); will check whether or not there are derived sip sessions
 				this.parentSession.onReadyToInvalidate();
 			}
@@ -2018,8 +2022,10 @@ public class SipSessionImpl implements MobicentsSipSession {
                 allDerivedReady = allDerivedReady & mobicentsSipSession.isReadyToInvalidate();
         }
 
-	    String msg = String.format("Session [%s] onReadyToInvalidate, hasParent [%s], hasDerivedSessions [%s], will invalidate [%s]", key, parentSession != null, derivedSipSessions != null, allDerivedReady);
-	    logger.debug(msg);
+            if(logger.isDebugEnabled()) {
+                String msg = String.format("Session [%s] onReadyToInvalidate, hasParent [%s], hasDerivedSessions [%s], will invalidate [%s]", key, parentSession != null, derivedSipSessions != null, allDerivedReady);
+                logger.debug(msg);
+            }
 
         if (!allDerivedReady) {
             logger.debug("Cant invalidate yet, lets wait until all derived to be ready.");

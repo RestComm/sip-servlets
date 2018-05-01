@@ -922,18 +922,24 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
         boolean hasDerived = key.getDerivedSipSessions().hasNext();
 
 		if (hasDerived) {
-		    String msg = String.format("This session [%s], has derived sessions, will not be removed from main map", sipSessionKey);
-            logger.debug(msg);
+                    if(logger.isDebugEnabled()) {
+                        String msg = String.format("This session [%s], has derived sessions, will not be removed from main map", sipSessionKey);
+                        logger.debug(msg);
+                    }
             Iterator<MobicentsSipSession> iterator = key.getDerivedSipSessions();
             while (iterator.hasNext()) {
                 MobicentsSipSession derivedSipSession = iterator.next();
-                msg = String.format("DerivedSipSession [%s], state [%s]", derivedSipSession.getKey(), derivedSipSession.getState());
-                logger.debug(msg);
+                if(logger.isDebugEnabled()) {
+                    String msg = String.format("DerivedSipSession [%s], state [%s]", derivedSipSession.getKey(), derivedSipSession.getState());
+                    logger.debug(msg);
+                }
             }
             return;
         } else {
-            String msg = String.format("This session [%s], has NO derived sessions, will be removed from main map", sipSessionKey);
-            logger.debug(msg);
+            if(logger.isDebugEnabled()) {
+                String msg = String.format("This session [%s], has NO derived sessions, will be removed from main map", sipSessionKey);
+                logger.debug(msg);
+            }
         }
 
         final MobicentsSipSessionKey value = this.sessionMap.get(sipSessionKey);
@@ -955,8 +961,10 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
                         linkedB2buaHelper.unlinkSipSessionsInternal(linkedSipSession, false);
                     }
                 } else {
+                    if(logger.isDebugEnabled()) {
 				    String msg = String.format("LinkedB2BUA Helper is null");
 				    logger.debug(msg);
+                    }
                 }
             }
 		} else if(logger.isDebugEnabled()) {
