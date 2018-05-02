@@ -22,6 +22,7 @@
 package org.mobicents.servlet.sip.testsuite.b2bua.forking;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
@@ -31,6 +32,7 @@ import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.NetworkPortAssigner;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.catalina.SipStandardService;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.proxy.Shootist;
 import org.mobicents.servlet.sip.testsuite.simple.forking.Proxy;
@@ -70,20 +72,31 @@ public class B2BUASipServletForkingTest extends SipServletTestCase {
 
     // non regression test for Issue https://telestax.atlassian.net/browse/RES-4
     public void testB2BUAForkingCrossed180() throws Exception {
+
+        // ShootMe-1                        : 5091
+        // ShootMe-2                        : 5092
+        // Proxy (forks to Shootme clients) : 5090
+        // Container running B2BUA app      : 5060
+        // Shootist (initiates the call)    : 5089
+
+
         int shootme1Port = NetworkPortAssigner.retrieveNextPort();
         //force ringing to come after shootme2,but 200ok before shootme 2
         Shootme shootme1 = new Shootme(shootme1Port, true, 1000,1500);
         SipProvider shootmeProvider = shootme1.createProvider();
         shootmeProvider.addSipListener(shootme1);
+
         int shootme2Port = NetworkPortAssigner.retrieveNextPort();
         //send 180 inmediately,but 200 ok after shootme1
         Shootme shootme2 = new Shootme(shootme2Port, true, 2500);
         SipProvider shootme2Provider = shootme2.createProvider();
         shootme2Provider.addSipListener(shootme2);
+
         int proxyPort = NetworkPortAssigner.retrieveNextPort();
         Proxy proxy = new Proxy(proxyPort, new int[]{shootme1Port, shootme2Port});
         SipProvider provider = proxy.createSipProvider();
         provider.addSipListener(proxy);
+
         int shootistPort = NetworkPortAssigner.retrieveNextPort();
         int listeningPort = NetworkPortAssigner.retrieveNextPort();
         Shootist shootist = new Shootist(true, shootistPort, String.valueOf(listeningPort));
@@ -112,6 +125,20 @@ public class B2BUASipServletForkingTest extends SipServletTestCase {
         assertTrue(shootme1.checkBye());
         assertTrue(shootme2.isAckSeen());
         assertTrue(shootme2.checkBye());
+
+        Iterator sipSessionsIter = sipContext.getSipManager().getAllSipSessions();
+        while (sipSessionsIter.hasNext()) {
+            MobicentsSipSession sipSession = (MobicentsSipSession) sipSessionsIter.next();
+            String msg = String.format("SipSession in memory, key [%s], state [%s], hasParent [%s], hasDerivedSessions [%s]", sipSession.getKey(), sipSession.getState(), sipSession.getParentSession() != null, sipSession.getDerivedSipSessions().hasNext());
+            logger.error(msg);
+            Iterator<MobicentsSipSession> iter = sipSession.getDerivedSipSessions();
+            while (iter.hasNext()) {
+                MobicentsSipSession derivedSipSession = iter.next();
+                msg = String.format("Derived sip session [%s], state [%s}",derivedSipSession.getKey(), derivedSipSession.getState());
+                logger.error(msg);
+            }
+        }
+
         assertEquals(0, sipContext.getSipManager().getActiveSipSessions());
         assertEquals(0, sipContext.getSipManager().getActiveSipApplicationSessions());
 
@@ -120,11 +147,13 @@ public class B2BUASipServletForkingTest extends SipServletTestCase {
     // non regression test for Issue 2354 http://code.google.com/p/mobicents/issues/detail?id=2354
     public void testB2BUAForking() throws Exception {
         int shootme1Port = NetworkPortAssigner.retrieveNextPort();
-        Shootme shootme1 = new Shootme(shootme1Port, true, 1500);
+        //force shootme1 to send 180 first
+        Shootme shootme1 = new Shootme(shootme1Port, true,100, 1500);
         SipProvider shootmeProvider = shootme1.createProvider();
         shootmeProvider.addSipListener(shootme1);
         int shootme2Port = NetworkPortAssigner.retrieveNextPort();
-        Shootme shootme2 = new Shootme(shootme2Port, true, 2500);
+        //force shootme2 to send 180 second
+        Shootme shootme2 = new Shootme(shootme2Port, true, 300, 2500);
         SipProvider shootme2Provider = shootme2.createProvider();
         shootme2Provider.addSipListener(shootme2);
         int proxyPort = NetworkPortAssigner.retrieveNextPort();

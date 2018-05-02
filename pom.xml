@@ -412,7 +412,7 @@
 				<module>containers/sip-servlets-as7-drop-in/jboss-as-mobicents</module>
 				<module>containers/sip-servlets-as7-drop-in/build-restcomm-modules</module>
 			</modules>
-			<properties>				
+			<properties>
 				<version.org.jboss.spec.javax.servlet.jboss-servlet-api_3.0_spec>1.0.0.Final</version.org.jboss.spec.javax.servlet.jboss-servlet-api_3.0_spec>
 				<log4j.version>1.2.16</log4j.version>
 			</properties>
@@ -439,7 +439,7 @@
 				<module>containers/sip-servlets-as8-drop-in/jboss-as-restcomm</module>
 				<module>containers/sip-servlets-as8-drop-in/build-restcomm-modules</module>
 			</modules>
-			<properties>				
+			<properties>
 				<version.org.jboss.spec.javax.servlet.jboss-servlet-api_3.0_spec>1.0.0.Final</version.org.jboss.spec.javax.servlet.jboss-servlet-api_3.0_spec>
 				<log4j.version>1.2.16</log4j.version>
 			</properties>
@@ -460,7 +460,7 @@
 				<module>containers/sip-servlets-as10-drop-in/jboss-as-restcomm</module>
 				<module>containers/sip-servlets-as10-drop-in/build-restcomm-modules</module>
 			</modules>
-			<properties>				
+			<properties>
 				<version.org.jboss.spec.javax.servlet.jboss-servlet-api_3.0_spec>1.0.0.Final</version.org.jboss.spec.javax.servlet.jboss-servlet-api_3.0_spec>
 				<log4j.version>1.2.16</log4j.version>
 			</properties>
