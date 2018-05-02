@@ -147,11 +147,13 @@ public class B2BUASipServletForkingTest extends SipServletTestCase {
     // non regression test for Issue 2354 http://code.google.com/p/mobicents/issues/detail?id=2354
     public void testB2BUAForking() throws Exception {
         int shootme1Port = NetworkPortAssigner.retrieveNextPort();
-        Shootme shootme1 = new Shootme(shootme1Port, true, 1500);
+        //force shootme1 to send 180 first
+        Shootme shootme1 = new Shootme(shootme1Port, true,100, 1500);
         SipProvider shootmeProvider = shootme1.createProvider();
         shootmeProvider.addSipListener(shootme1);
         int shootme2Port = NetworkPortAssigner.retrieveNextPort();
-        Shootme shootme2 = new Shootme(shootme2Port, true, 2500);
+        //force shootme2 to send 180 second
+        Shootme shootme2 = new Shootme(shootme2Port, true, 300, 2500);
         SipProvider shootme2Provider = shootme2.createProvider();
         shootme2Provider.addSipListener(shootme2);
         int proxyPort = NetworkPortAssigner.retrieveNextPort();
