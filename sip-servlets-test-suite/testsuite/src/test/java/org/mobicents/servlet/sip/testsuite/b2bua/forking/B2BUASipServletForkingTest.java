@@ -231,10 +231,10 @@ public class B2BUASipServletForkingTest extends SipServletTestCase {
         shootme1.stop();
         shootme2.stop();
         shootist.stop();
-//		assertTrue(shootme1.isAckSeen());		
+//		assertTrue(shootme1.isAckSeen());
         assertTrue(shootme1.checkBye());
 //		assertTrue(shootme2.isAckSeen());
-//		assertTrue(shootme2.checkBye());	
+//		assertTrue(shootme2.checkBye());
         assertEquals(0, sipContext.getSipManager().getActiveSipSessions());
         assertEquals(0, sipContext.getSipManager().getActiveSipApplicationSessions());
 

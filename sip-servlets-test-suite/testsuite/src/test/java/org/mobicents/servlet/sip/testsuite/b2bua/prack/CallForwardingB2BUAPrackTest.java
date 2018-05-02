@@ -39,14 +39,14 @@ import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
 public class CallForwardingB2BUAPrackTest extends SipServletTestCase {
-	
+
 	private static transient Logger logger = Logger.getLogger(CallForwardingB2BUAPrackTest.class);
 
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
-	private static final int TIMEOUT = 20000;	
+	private static final int TIMEOUT = 20000;
 //	private static final int TIMEOUT = 100000000;
-	
+
 	TestSipListener sender;
 	TestSipListener receiver;
 	ProtocolObjects senderProtocolObjects;
@@ -62,7 +62,7 @@ public class CallForwardingB2BUAPrackTest extends SipServletTestCase {
 	public void deployApplication() {
 		assertTrue(tomcat.deployContext(
 				projectHome + "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
-				"sip-test-context", 
+				"sip-test-context",
 				"sip-test"));
 	}
 
@@ -73,7 +73,7 @@ public class CallForwardingB2BUAPrackTest extends SipServletTestCase {
 				+ "/sip-servlets-test-suite/testsuite/src/test/resources/"
 				+ "org/mobicents/servlet/sip/testsuite/callcontroller/call-forwarding-b2bua-servlet-dar.properties";
 	}
-	
+
 	@Override
 	protected void setUp() throws Exception {
                 containerPort = NetworkPortAssigner.retrieveNextPort();
@@ -83,12 +83,12 @@ public class CallForwardingB2BUAPrackTest extends SipServletTestCase {
 				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 		receiverProtocolObjects = new ProtocolObjects("receiver",
 				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
-			
+
 	}
-	
+
 	public void testCallForwardingCallerSendBye() throws Exception {
 		tomcat.startTomcat();
-		
+
                 int senderPort = NetworkPortAssigner.retrieveNextPort();
 		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, true);
 		SipProvider senderProvider = sender.createProvider();
@@ -102,40 +102,40 @@ public class CallForwardingB2BUAPrackTest extends SipServletTestCase {
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
-                
+
                 Map<String,String> params = new HashMap();
-                params.put( "servletContainerPort", String.valueOf(containerPort)); 
-                params.put( "testPort", String.valueOf(receiverPort)); 
-                params.put( "senderPort", String.valueOf(senderPort));                 
-            SipStandardContext deployApplication = deployApplication(projectHome + 
+                params.put( "servletContainerPort", String.valueOf(containerPort));
+                params.put( "testPort", String.valueOf(receiverPort));
+                params.put( "senderPort", String.valueOf(senderPort));
+            SipStandardContext deployApplication = deployApplication(projectHome +
                     "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
                     params
                     , null);
-                
+
 
 		String fromName = "forward-sender";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
 				fromName, fromSipAddress);
-		
+
 		String toSipAddress = "sip-servlets.com";
 		String toUser = "receiver";
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
-		
+
 		String[] headerNames = new String[]{"require"};
 		String[] headerValues = new String[]{"100rel"};
-		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerValues, true);		
+
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerValues, true);
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());
 	}
-	
+
 	// non regression test for https://github.com/Mobicents/sip-servlets/issues/66
 	public void testCallForwardingCallerPrackUpdateSendBye() throws Exception {
 		tomcat.startTomcat();
-		
+
                int senderPort = NetworkPortAssigner.retrieveNextPort();
 		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, true);
 		SipProvider senderProvider = sender.createProvider();
@@ -143,43 +143,100 @@ public class CallForwardingB2BUAPrackTest extends SipServletTestCase {
                 int receiverPort = NetworkPortAssigner.retrieveNextPort();
 		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
 		SipProvider receiverProvider = receiver.createProvider();
-                
+
 		receiverProvider.addSipListener(receiver);
 		senderProvider.addSipListener(sender);
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
-                
+
                 Map<String,String> params = new HashMap();
-                params.put( "servletContainerPort", String.valueOf(containerPort)); 
-                params.put( "testPort", String.valueOf(receiverPort)); 
-                params.put( "senderPort", String.valueOf(senderPort));                 
-            SipStandardContext deployApplication = deployApplication(projectHome + 
+                params.put( "servletContainerPort", String.valueOf(containerPort));
+                params.put( "testPort", String.valueOf(receiverPort));
+                params.put( "senderPort", String.valueOf(senderPort));
+            SipStandardContext deployApplication = deployApplication(projectHome +
                     "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
                     params
-                    , null);                
+                    , null);
 
 		String fromName = "forward-sender";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
 				fromName, fromSipAddress);
-		
+
 		String toSipAddress = "sip-servlets.com";
 		String toUser = "receiver";
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
-		
+
 		String[] headerNames = new String[]{"require"};
 		String[] headerValues = new String[]{"100rel"};
-		
+
 //		sender.setSendUpdateOn180(true);
 //		receiver.setTimeToWaitBeforeAck(5000);
 		sender.setSendUpdateAfterPrack(true);
 		sender.setTimeToWaitBeforeBye(1000);
 		receiver.setSendUpdateAfterPrack(true);
 		receiver.setWaitBeforeFinalResponse(3000);
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerValues, true);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerValues, true);
 		Thread.sleep(TIMEOUT);
+		assertTrue(sender.getOkToByeReceived());
+		assertTrue(receiver.getByeReceived());
+		assertEquals(4, ((RequestExt)receiver.getByeRequestReceived()).getCSeqHeader().getSeqNumber());
+	}
+
+	// non regression test for https://github.com/RestComm/sip-servlets/issues/362
+	public void testCallForwardingCallerPrackUpdateFromBPartySendBye() throws Exception {
+		tomcat.startTomcat();
+
+               int senderPort = NetworkPortAssigner.retrieveNextPort();
+		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, true);
+		SipProvider senderProvider = sender.createProvider();
+
+                int receiverPort = NetworkPortAssigner.retrieveNextPort();
+		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+
+                Map<String,String> params = new HashMap();
+                params.put( "servletContainerPort", String.valueOf(containerPort));
+                params.put( "testPort", String.valueOf(receiverPort));
+                params.put( "senderPort", String.valueOf(senderPort));
+            SipStandardContext deployApplication = deployApplication(projectHome +
+                    "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
+                    params
+                    , null);
+
+		String fromName = "forward-sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+
+		String[] headerNames = new String[]{"require"};
+		String[] headerValues = new String[]{"100rel"};
+
+//		sender.setSendUpdateOn180(true);
+//		receiver.setTimeToWaitBeforeAck(5000);
+		sender.setSendUpdateAfterPrack(true);
+		sender.setTimeToWaitBeforeBye(1000);
+		receiver.setSendUpdateAfterPrack(true);
+                //this will actually cuase the issue, by forcing receiver to send counter UPDATE
+                receiver.setSendUpdateAfterUpdate(true);
+		receiver.setWaitBeforeFinalResponse(3000);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerValues, true);
+		Thread.sleep(TIMEOUT);
+                assertTrue(sender.isUpdateReceived());
+                assertTrue(receiver.isUpdateReceived());
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());
 		assertEquals(4, ((RequestExt)receiver.getByeRequestReceived()).getCSeqHeader().getSeqNumber());
@@ -187,7 +244,7 @@ public class CallForwardingB2BUAPrackTest extends SipServletTestCase {
 
 	public void testCallForwardingCalleeSendBye() throws Exception {
 		tomcat.startTomcat();
-		
+
                int senderPort = NetworkPortAssigner.retrieveNextPort();
 		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, false);
 		SipProvider senderProvider = sender.createProvider();
@@ -202,47 +259,47 @@ public class CallForwardingB2BUAPrackTest extends SipServletTestCase {
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
-                
+
                 Map<String,String> params = new HashMap();
-                params.put( "servletContainerPort", String.valueOf(containerPort)); 
-                params.put( "testPort", String.valueOf(receiverPort)); 
-                params.put( "senderPort", String.valueOf(senderPort));                 
-            SipStandardContext deployApplication = deployApplication(projectHome + 
+                params.put( "servletContainerPort", String.valueOf(containerPort));
+                params.put( "testPort", String.valueOf(receiverPort));
+                params.put( "senderPort", String.valueOf(senderPort));
+            SipStandardContext deployApplication = deployApplication(projectHome +
                     "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
                     params
-                    , null);                
+                    , null);
 
 		String fromName = "forward-sender";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
 				fromName, fromSipAddress);
-		
+
 		String toSipAddress = "sip-servlets.com";
 		String toUser = "receiver";
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
-		
+
 		String[] headerNames = new String[]{"require"};
 		String[] headerValues = new String[]{"100rel"};
-		
+
 		for (int i = 0; i < 3; i++) {
 			sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerValues, true);
-		}			
+		}
 		Thread.sleep(TIMEOUT * 5);
 		assertTrue(receiver.getOkToByeReceived());
-		assertTrue(sender.getByeReceived());	
+		assertTrue(sender.getByeReceived());
 
 		if(sender.getAllMessagesContent() != null) {
 			assertFalse(sender.getAllMessagesContent().contains("KO"));
 		}
-	}	
+	}
 
 	public void testCallForwardingCallerSendByeAnyLocalAddress() throws Exception {
 		tomcat.removeConnector(sipConnector);
 		sipIpAddress = "0.0.0.0";
 		tomcat.addSipConnector(serverName, sipIpAddress, containerPort, listeningPointTransport);
 		tomcat.startTomcat();
-		
+
                int senderPort = NetworkPortAssigner.retrieveNextPort();
 		sender = new TestSipListener(senderPort, containerPort, senderProtocolObjects, true);
 		SipProvider senderProvider = sender.createProvider();
@@ -250,36 +307,36 @@ public class CallForwardingB2BUAPrackTest extends SipServletTestCase {
                 int receiverPort = NetworkPortAssigner.retrieveNextPort();
 		receiver = new TestSipListener(receiverPort, containerPort, receiverProtocolObjects, false);
 		SipProvider receiverProvider = receiver.createProvider();
-                
+
 		receiverProvider.addSipListener(receiver);
 		senderProvider.addSipListener(sender);
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
-                
+
                 Map<String,String> params = new HashMap();
-                params.put( "servletContainerPort", String.valueOf(containerPort)); 
-                params.put( "testPort", String.valueOf(receiverPort)); 
-                params.put( "senderPort", String.valueOf(senderPort));                 
-            SipStandardContext deployApplication = deployApplication(projectHome + 
+                params.put( "servletContainerPort", String.valueOf(containerPort));
+                params.put( "testPort", String.valueOf(receiverPort));
+                params.put( "senderPort", String.valueOf(senderPort));
+            SipStandardContext deployApplication = deployApplication(projectHome +
                     "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
                     params
-                    , null);                
+                    , null);
 
 		String fromName = "forward-sender";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
 				fromName, fromSipAddress);
-		
+
 		String toSipAddress = "sip-servlets.com";
 		String toUser = "receiver";
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
-		
+
 		String[] headerNames = new String[]{"require"};
 		String[] headerValues = new String[]{"100rel"};
-		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerValues, true);		
+
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerValues, true);
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.isPrackReceived());
 		Request prackReceived = receiver.getPrackRequestReceived();
@@ -290,11 +347,11 @@ public class CallForwardingB2BUAPrackTest extends SipServletTestCase {
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());
 	}
-	
+
 	@Override
-	protected void tearDown() throws Exception {	
+	protected void tearDown() throws Exception {
 		senderProtocolObjects.destroy();
-		receiverProtocolObjects.destroy();			
+		receiverProtocolObjects.destroy();
 		logger.info("Test completed");
 		super.tearDown();
 	}

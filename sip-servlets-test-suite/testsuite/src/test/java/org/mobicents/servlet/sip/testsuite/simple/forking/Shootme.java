@@ -93,7 +93,7 @@ public class Shootme   implements SipListener {
 
     private int delay;
 
-    private int ringingDelay;
+    private int ringingDelay = 0;
 
     private boolean sendRinging;
 
@@ -108,10 +108,31 @@ public class Shootme   implements SipListener {
     private static Timer timer = new Timer();
 
     private long waitBeforeFinalResponse = 0;
-    
+
     private boolean waitForCancel = false;
-    
+
     private String toTag = null;
+
+    class SendRinging extends TimerTask {
+        Response  response;
+        ServerTransaction serverTx;
+
+
+        public SendRinging(ServerTransaction serverTx, Response  res) {
+            logger.info("SendRinging ");
+            this.response = res;
+            this.serverTx = serverTx;
+        }
+
+        public void run() {
+            try {
+                serverTx.sendResponse(response);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+
+    }
 
     class MyTimerTask extends TimerTask {
         RequestEvent  requestEvent;
@@ -221,7 +242,11 @@ public class Shootme   implements SipListener {
             toHeader.setTag(toTag);
             if ( sendRinging ) {
                 ringingResponse.addHeader(contactHeader);
-                st.sendResponse(ringingResponse);
+                if (ringingDelay > 0 ) {
+                    timer.schedule(new SendRinging(st,ringingResponse), this.ringingDelay);
+                } else {
+                    st.sendResponse(ringingResponse);
+                }
             }
             Dialog dialog =  st.getDialog();
             dialog.setApplicationData(st);
@@ -367,6 +392,11 @@ public class Shootme   implements SipListener {
 
         }
 
+    }
+
+    public Shootme( int myPort, boolean sendRinging, int ringingDelay, int delay ) {
+        this(myPort, sendRinging, delay);
+        this.ringingDelay = ringingDelay;
     }
 
     public Shootme( int myPort, boolean sendRinging, int delay ) {
