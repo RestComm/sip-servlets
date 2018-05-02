@@ -551,7 +551,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		stopSipStack();
 
                 if (statsReporter != null) {
+                    try {
                     statsReporter.stop();
+                    } catch (RuntimeException lExp) {
+                        logger.warn("License not found", lExp);
+                    }
                 }
 
 		if(oname != null) {
