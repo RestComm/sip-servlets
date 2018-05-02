@@ -723,7 +723,10 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
             // Only when state is TERMINATED, all other states are ok
             if(linkedSession.getState().equals(State.TERMINATED)) {
                 logger.debug("Linked session is TERMINATED, try with derived.");
-                linkedSession = linkedSession.getDerivedSipSessions().next();
+                Iterator<MobicentsSipSession> iterator = linkedSession.getDerivedSipSessions();
+                if (iterator.hasNext()) {
+                    linkedSession = linkedSession.getDerivedSipSessions().next();
+                }
             }
         }
 
