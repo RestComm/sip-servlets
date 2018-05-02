@@ -86,3 +86,4 @@ containers/sip-servlets-as8-drop-in/jboss-as-mobicents/pom.xml.orig.undertow
 containers/sip-servlets-as8/pom.xml.new.undertow
 containers/sip-servlets-as8-drop-in/jboss-as-mobicents/.checkstyle
 containers/sip-servlets-as8/${CATALINA_HOME}/lib/sip-servlets-as8-3.0.0-SNAPSHOT.jar
+*.jar
