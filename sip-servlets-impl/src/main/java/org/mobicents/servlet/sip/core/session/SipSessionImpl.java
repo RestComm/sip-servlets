@@ -1590,6 +1590,9 @@ public class SipSessionImpl implements MobicentsSipSession {
                             String msg = String.format("SipSession [%s] onTerminateState, hasParent [%s], hasDerivedSessions [%s]", key, parentSession !=null, derivedSipSessions != null);
                             logger.debug(msg);
                         }
+                        //switch to readyToInvalidate state here
+                        this.setReadyToInvalidate(true);
+                        //evaluate if we can proceed to invalidation
 			onReadyToInvalidate();
 			if(!this.isValid && this.parentSession != null) {
 				//Since there is a parent session, and since the current derived sip session
@@ -2012,7 +2015,11 @@ public class SipSessionImpl implements MobicentsSipSession {
      * session are met
      */
     public void onReadyToInvalidate() {
-    	this.setReadyToInvalidate(true);
+
+        if (!readyToInvalidate) {
+            logger.debug("Session not ready to invalidate, wait next chance.");
+            return;
+        }
 
         boolean allDerivedReady = true;
         Iterator<MobicentsSipSession> derivedSessionsIterator = this.getDerivedSipSessions();
