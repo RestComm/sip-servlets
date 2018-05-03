@@ -21,10 +21,6 @@
  */
 
 package org.mobicents.servlet.sip.testsuite.proxy;
-import gov.nist.javax.sip.ClientTransactionExt;
-import gov.nist.javax.sip.ResponseEventExt;
-import gov.nist.javax.sip.SipStackImpl;
-
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -32,8 +28,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
-import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
@@ -76,10 +72,15 @@ import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
 
+import gov.nist.javax.sip.ClientTransactionExt;
+import gov.nist.javax.sip.ResponseEventExt;
+import gov.nist.javax.sip.SipStackImpl;
+
 
 public class Shootist implements SipListener {
 	private static transient Logger logger = Logger.getLogger(Shootist.class);
-	
+
+	private AtomicInteger rseqNumber = new AtomicInteger(1);	
 	private static SipProvider sipProvider;
 
 	private static AddressFactory addressFactory;
@@ -428,7 +429,14 @@ public class Shootist implements SipListener {
 					prackOkReceived = true;
 				}
 			} else if(response.getStatusCode() == 180 && !((ResponseEventExt)responseReceivedEvent).isRetransmission()) {
+				logger.info("We got :"+response.getStatusCode() +" and usePrack: "+usePrack);
 				if(usePrack) {
+					RequireHeader requireHeader = (RequireHeader) response.getHeader(RequireHeader.NAME);
+					requireHeader = headerFactory.createRequireHeader("100rel");
+					response.addHeader(requireHeader);
+					Header rseqHeader = headerFactory.createRSeqHeader(rseqNumber.getAndIncrement());
+					response.addHeader(rseqHeader);
+					
 					Request prackRequest = dialog.createPrack(response);
 					ClientTransaction ct = sipProvider.getNewClientTransaction(prackRequest);
 					dialog.sendRequest(ct);

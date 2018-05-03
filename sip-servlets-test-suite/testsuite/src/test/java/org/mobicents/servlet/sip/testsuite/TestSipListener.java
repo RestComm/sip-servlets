@@ -21,24 +21,6 @@
 
 package org.mobicents.servlet.sip.testsuite;
 
-import gov.nist.javax.sip.DialogExt;
-import gov.nist.javax.sip.address.SipUri;
-import gov.nist.javax.sip.header.HeaderExt;
-import gov.nist.javax.sip.header.HeaderFactoryExt;
-import gov.nist.javax.sip.header.ParameterNames;
-import gov.nist.javax.sip.header.SIPETag;
-import gov.nist.javax.sip.header.SIPHeaderNames;
-import gov.nist.javax.sip.header.WWWAuthenticate;
-import gov.nist.javax.sip.header.extensions.JoinHeader;
-import gov.nist.javax.sip.header.extensions.ReplacesHeader;
-import gov.nist.javax.sip.header.ims.PathHeader;
-import gov.nist.javax.sip.message.MessageExt;
-
-import gov.nist.javax.sip.stack.SIPTransactionStack;
-import gov.nist.javax.sip.message.SIPResponse;
-import gov.nist.javax.sip.stack.SIPDialog;
-import gov.nist.javax.sip.stack.SIPTransaction;
-
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -98,6 +80,22 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
+
+import gov.nist.javax.sip.DialogExt;
+import gov.nist.javax.sip.address.SipUri;
+import gov.nist.javax.sip.header.HeaderExt;
+import gov.nist.javax.sip.header.HeaderFactoryExt;
+import gov.nist.javax.sip.header.ParameterNames;
+import gov.nist.javax.sip.header.SIPETag;
+import gov.nist.javax.sip.header.SIPHeaderNames;
+import gov.nist.javax.sip.header.WWWAuthenticate;
+import gov.nist.javax.sip.header.extensions.JoinHeader;
+import gov.nist.javax.sip.header.extensions.ReplacesHeader;
+import gov.nist.javax.sip.header.ims.PathHeader;
+import gov.nist.javax.sip.message.MessageExt;
+import gov.nist.javax.sip.message.SIPResponse;
+import gov.nist.javax.sip.stack.SIPDialog;
+import gov.nist.javax.sip.stack.SIPTransaction;
 
 /**
  * This class is a UAC template. Shootist is the guy that shoots and shootme is
@@ -2591,6 +2589,10 @@ public class TestSipListener implements SipListener {
 			ReferToHeader referToHeader = (ReferToHeader) protocolObjects.headerFactory.createHeader(ReferToHeader.NAME, "sip:refer-to@nist.gov");
 			request.addHeader(referToHeader);
 		}
+	}
+	
+	public TestSipListener(){
+		
 	}
 	
 	public TestSipListener (int myPort, int peerPort, ProtocolObjects protocolObjects, boolean callerSendBye) {

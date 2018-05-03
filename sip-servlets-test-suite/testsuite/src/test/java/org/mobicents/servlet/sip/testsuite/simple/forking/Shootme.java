@@ -23,19 +23,16 @@
 package org.mobicents.servlet.sip.testsuite.simple.forking;
 
 import java.util.Hashtable;
-import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.sip.Dialog;
-import javax.sip.DialogState;
 import javax.sip.DialogTerminatedEvent;
 import javax.sip.IOExceptionEvent;
 import javax.sip.ListeningPoint;
 import javax.sip.RequestEvent;
 import javax.sip.ResponseEvent;
 import javax.sip.ServerTransaction;
-import javax.sip.SipListener;
 import javax.sip.SipProvider;
 import javax.sip.SipStack;
 import javax.sip.Transaction;
@@ -51,9 +48,10 @@ import javax.sip.message.MessageFactory;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
-import junit.framework.TestCase;
-
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.testsuite.TestSipListener;
+
+import junit.framework.TestCase;
 
 
 
@@ -64,7 +62,7 @@ import org.apache.log4j.Logger;
  * @author M. Ranganathan
  */
 
-public class Shootme   implements SipListener {
+public class Shootme extends TestSipListener {
 
 
 
@@ -176,8 +174,8 @@ public class Shootme   implements SipListener {
 
     }
 
-    public void processResponse(ResponseEvent responseEvent) {
-    }
+    /*public void processResponse(ResponseEvent responseEvent) {
+    }*/
 
     /**
      * Process the ACK request. Send the bye and complete the call flow.
@@ -400,6 +398,7 @@ public class Shootme   implements SipListener {
     }
 
     public Shootme( int myPort, boolean sendRinging, int delay ) {
+    	super();
         this.myPort = myPort;
         this.delay = delay;
         this.sendRinging = sendRinging;
