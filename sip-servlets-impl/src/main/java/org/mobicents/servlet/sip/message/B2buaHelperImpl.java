@@ -172,6 +172,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
                 parentSession.getKey().getApplicationSessionId(),
                 parentSession.getKey().getApplicationName());
         MobicentsSipSession newDerivedSesion = sipManager.getSipSession(newDerivedKey, false, null, parentSession.getSipApplicationSession());
+        newDerivedSesion.setAckReceived(newRequest.getCSeq().getSeqNumber(), false);
 
         //removing the via header from original request
         /*newRequest.removeHeader(ViaHeader.NAME);
@@ -195,6 +196,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
         sipServletRequestImpl.setSubscriberURI(origRequestImpl.getSubscriberURI());
         sipServletRequestImpl.setAttributeMap(origRequestImpl.getAttributeMap());
         newDerivedSesion.setSessionCreatingDialog(null);
+        newDerivedSesion.setB2buaHelper(this);
         newDerivedSesion.setSessionCreatingTransactionRequest(sipServletRequestImpl);
         setOriginalRequest(newDerivedSesion,sipServletRequestImpl);
         return sipServletRequestImpl;
