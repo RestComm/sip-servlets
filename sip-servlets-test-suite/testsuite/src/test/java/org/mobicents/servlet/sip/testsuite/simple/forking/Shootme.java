@@ -238,7 +238,7 @@ public class Shootme   implements SipListener {
             ContactHeader contactHeader = headerFactory.createContactHeader(address);
             response.addHeader(contactHeader);
             ToHeader toHeader = (ToHeader) ringingResponse.getHeader(ToHeader.NAME);
-            String toTag =  "" + System.nanoTime();
+            String toTag =  "" + myPort + "_" + System.nanoTime();
             toHeader.setTag(toTag);
             if ( sendRinging ) {
                 ringingResponse.addHeader(contactHeader);
