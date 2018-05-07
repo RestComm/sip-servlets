@@ -1592,8 +1592,22 @@ public class SipSessionImpl implements MobicentsSipSession {
                         }
                         //switch to readyToInvalidate state here
                         this.setReadyToInvalidate(true);
+
+                        //make sure linked session is terminated as well so is
+                        //not left on memory
+                        MobicentsSipSession linkedSession = null;
+                        if (this.b2buaHelper != null) {
+                            //save ref to linkedSession for later
+                            linkedSession = (MobicentsSipSession) this.b2buaHelper.getLinkedSession(this);
+                        }
                         //evaluate if we can proceed to invalidation
 			onReadyToInvalidate();
+
+                        //invoke after actual invalidation to prevent infinite loop
+                        if (linkedSession != null) {
+                            //linkedSession.onTerminatedState();
+                        }
+
 			if(!this.isValid && this.parentSession != null) {
 				//Since there is a parent session, and since the current derived sip session
 				//is already invalidated, ask the parent session to invalidate.
@@ -1603,19 +1617,8 @@ public class SipSessionImpl implements MobicentsSipSession {
                                     String msg = String.format("SipSession [%s] onTerminateState hasParentSession [%s] that will ask to onReadyToInvalidate()", key, parentSession.getKey());
                                     logger.debug(msg);
                                 }
-				Iterator<MobicentsSipSession> derivedSessionsIterator = parentSession.getDerivedSipSessions();
-                                boolean allDerivedTerminated = true;
-				while (derivedSessionsIterator.hasNext()) {
-					MobicentsSipSession derivedSession = (MobicentsSipSession) derivedSessionsIterator
-							.next();
-					if(!derivedSession.isValidInternal() || !derivedSession.isReadyToInvalidate()) {
-						allDerivedTerminated = allDerivedTerminated && false;
-					}
-				}
-                                // Calling this.parentSession.onReadyToInvalidate(); will check whether or not there are derived sip sessions
-                                if (allDerivedTerminated) {
-                                    this.parentSession.onTerminatedState();
-                                }
+
+                                this.parentSession.onReadyToInvalidate();
 			}
 		}
 	}
