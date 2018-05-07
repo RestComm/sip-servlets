@@ -157,7 +157,6 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
         linkedRequestMap = new ConcurrentHashMap<SipServletRequestImpl, SipServletRequestImpl>();
     }
 
-
     public SipServletRequestImpl cloneDerivedRequest(SipServletRequestImpl origRequestImpl, MobicentsSipSession parentSession) throws TransactionAlreadyExistsException, TransactionUnavailableException {
         SIPRequest newRequest = (SIPRequest) origRequestImpl.message.clone();
         String newToTag = ApplicationRoutingHeaderComposer.getHash(sipFactoryImpl.getSipApplicationDispatcher(),
@@ -172,7 +171,6 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
                 parentSession.getKey().getApplicationSessionId(),
                 parentSession.getKey().getApplicationName());
         MobicentsSipSession newDerivedSesion = sipManager.getSipSession(newDerivedKey, false, null, parentSession.getSipApplicationSession());
-        newDerivedSesion.setAckReceived(newRequest.getCSeq().getSeqNumber(), false);
 
         //removing the via header from original request
         /*newRequest.removeHeader(ViaHeader.NAME);
@@ -185,8 +183,6 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
         SipStackImpl stack =  (SipStackImpl) transaction.getSipProvider().getSipStack();
         SIPServerTransaction newTx = stack.createServerTransaction((MessageChannel) newRequest.getMessageChannel());
         newTx.setOriginalRequest(newRequest);*/
-
-
         SipServletRequestImpl sipServletRequestImpl = (SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest(newRequest,
                 newDerivedSesion, (Transaction) origRequestImpl.getTransaction(),
                 null,
@@ -196,155 +192,156 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
         sipServletRequestImpl.setSubscriberURI(origRequestImpl.getSubscriberURI());
         sipServletRequestImpl.setAttributeMap(origRequestImpl.getAttributeMap());
         newDerivedSesion.setSessionCreatingDialog(null);
+        newDerivedSesion.setAckReceived(newRequest.getCSeq().getSeqNumber(), false);
         newDerivedSesion.setB2buaHelper(this);
         newDerivedSesion.setSessionCreatingTransactionRequest(sipServletRequestImpl);
-        setOriginalRequest(newDerivedSesion,sipServletRequestImpl);
+        setOriginalRequest(newDerivedSesion, sipServletRequestImpl);
         return sipServletRequestImpl;
     }
 
-    private SipServletRequestImpl cloneRequest(SipServletRequestImpl origRequestImpl, Map<String, List<String>> headerMap) throws ParseException, ServletException  {
-            Request newRequest = (Request) origRequestImpl.message.clone();
-            ((MessageExt) newRequest).setApplicationData(null);
-            //content should be copied too, so commented out
+    private SipServletRequestImpl cloneRequest(SipServletRequestImpl origRequestImpl, Map<String, List<String>> headerMap) throws ParseException, ServletException {
+        Request newRequest = (Request) origRequestImpl.message.clone();
+        ((MessageExt) newRequest).setApplicationData(null);
+        //content should be copied too, so commented out
 //		 	newRequest.removeContent();
-            //removing the via header from original request
-            newRequest.removeHeader(ViaHeader.NAME);
+        //removing the via header from original request
+        newRequest.removeHeader(ViaHeader.NAME);
 
-            // Remove the route header ( will point to us ).
-            // commented as per issue 649
+        // Remove the route header ( will point to us ).
+        // commented as per issue 649
 //			newRequest.removeHeader(RouteHeader.NAME);
 //			String tag = Integer.toString((int) (Math.random()*1000));
 //			((FromHeader) newRequest.getHeader(FromHeader.NAME)).setParameter("tag", tag);
-            // Remove the record route headers. This is a new call leg.
-            newRequest.removeHeader(RecordRouteHeader.NAME);
+        // Remove the record route headers. This is a new call leg.
+        newRequest.removeHeader(RecordRouteHeader.NAME);
 
-            // Issue 1490 : http://code.google.com/p/mobicents/issues/detail?id=1490
-            // B2buaHelper.createRequest does not decrement Max-forwards
-            MaxForwardsHeader maxForwardsHeader = (MaxForwardsHeader) newRequest.getHeader(MaxForwardsHeader.NAME);
-            try {
-                maxForwardsHeader.setMaxForwards(maxForwardsHeader.getMaxForwards() - 1);
-            } catch (InvalidArgumentException e) {
-                throw new IllegalArgumentException(e);
-            }
+        // Issue 1490 : http://code.google.com/p/mobicents/issues/detail?id=1490
+        // B2buaHelper.createRequest does not decrement Max-forwards
+        MaxForwardsHeader maxForwardsHeader = (MaxForwardsHeader) newRequest.getHeader(MaxForwardsHeader.NAME);
+        try {
+            maxForwardsHeader.setMaxForwards(maxForwardsHeader.getMaxForwards() - 1);
+        } catch (InvalidArgumentException e) {
+            throw new IllegalArgumentException(e);
+        }
 
-            //Creating new call id
-            final Iterator<MobicentsExtendedListeningPoint> listeningPointsIterator = sipFactoryImpl.getSipNetworkInterfaceManager().getExtendedListeningPoints();
-            if (!listeningPointsIterator.hasNext()) {
-                throw new IllegalStateException("There is no SIP connectors available to create the request");
-            }
-            final MobicentsExtendedListeningPoint extendedListeningPoint = listeningPointsIterator.next();
-            final CallIdHeader callIdHeader = sipFactoryImpl.getSipApplicationDispatcher().getCallId(extendedListeningPoint, null);
-            newRequest.setHeader(callIdHeader);
+        //Creating new call id
+        final Iterator<MobicentsExtendedListeningPoint> listeningPointsIterator = sipFactoryImpl.getSipNetworkInterfaceManager().getExtendedListeningPoints();
+        if (!listeningPointsIterator.hasNext()) {
+            throw new IllegalStateException("There is no SIP connectors available to create the request");
+        }
+        final MobicentsExtendedListeningPoint extendedListeningPoint = listeningPointsIterator.next();
+        final CallIdHeader callIdHeader = sipFactoryImpl.getSipApplicationDispatcher().getCallId(extendedListeningPoint, null);
+        newRequest.setHeader(callIdHeader);
 
-            final List<String> contactHeaderSet = retrieveContactHeaders(headerMap,
-                    newRequest, origRequestImpl.getSession().getServletContext());
-            final FromHeader newFromHeader = (FromHeader) newRequest.getHeader(FromHeader.NAME);
-            newFromHeader.removeParameter("tag");
-            ((ToHeader) newRequest.getHeader(ToHeader.NAME))
-                    .removeParameter("tag");
+        final List<String> contactHeaderSet = retrieveContactHeaders(headerMap,
+                newRequest, origRequestImpl.getSession().getServletContext());
+        final FromHeader newFromHeader = (FromHeader) newRequest.getHeader(FromHeader.NAME);
+        newFromHeader.removeParameter("tag");
+        ((ToHeader) newRequest.getHeader(ToHeader.NAME))
+                .removeParameter("tag");
 
-            final MobicentsSipSession originalSession = origRequestImpl.getSipSession();
-            final MobicentsSipApplicationSession appSession = originalSession
-                    .getSipApplicationSession();
+        final MobicentsSipSession originalSession = origRequestImpl.getSipSession();
+        final MobicentsSipApplicationSession appSession = originalSession
+                .getSipApplicationSession();
 
-            newFromHeader.setTag(ApplicationRoutingHeaderComposer.getHash(sipFactoryImpl.getSipApplicationDispatcher(), originalSession.getKey().getApplicationName(), appSession.getKey().getId()));
+        newFromHeader.setTag(ApplicationRoutingHeaderComposer.getHash(sipFactoryImpl.getSipApplicationDispatcher(), originalSession.getKey().getApplicationName(), appSession.getKey().getId()));
 
-            final MobicentsSipSessionKey key = SessionManagerUtil.getSipSessionKey(appSession.getKey().getId(), originalSession.getKey().getApplicationName(), newRequest, false);
-            final MobicentsSipSession session = appSession.getSipContext().getSipManager().getSipSession(key, true, sipFactoryImpl, appSession);
-            session.setHandler(originalSession.getHandler());
+        final MobicentsSipSessionKey key = SessionManagerUtil.getSipSessionKey(appSession.getKey().getId(), originalSession.getKey().getApplicationName(), newRequest, false);
+        final MobicentsSipSession session = appSession.getSipContext().getSipManager().getSipSession(key, true, sipFactoryImpl, appSession);
+        session.setHandler(originalSession.getHandler());
 
-            // cater to http://code.google.com/p/sipservlets/issues/detail?id=31 to be able to set the rport in applications
-            final SipApplicationDispatcher sipApplicationDispatcher = sipFactoryImpl.getSipApplicationDispatcher();
-            final String branch = JainSipUtils.createBranch(appSession.getKey().getId(), sipApplicationDispatcher.getHashFromApplicationName(appSession.getKey().getApplicationName()));
-            ViaHeader viaHeader = JainSipUtils.createViaHeader(
-                    sipFactoryImpl.getSipNetworkInterfaceManager(), newRequest, branch, session.getOutboundInterface());
-            newRequest.addHeader(viaHeader);
+        // cater to http://code.google.com/p/sipservlets/issues/detail?id=31 to be able to set the rport in applications
+        final SipApplicationDispatcher sipApplicationDispatcher = sipFactoryImpl.getSipApplicationDispatcher();
+        final String branch = JainSipUtils.createBranch(appSession.getKey().getId(), sipApplicationDispatcher.getHashFromApplicationName(appSession.getKey().getApplicationName()));
+        ViaHeader viaHeader = JainSipUtils.createViaHeader(
+                sipFactoryImpl.getSipNetworkInterfaceManager(), newRequest, branch, session.getOutboundInterface());
+        newRequest.addHeader(viaHeader);
 
-            final SipServletRequestImpl newSipServletRequest = (SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest(
-                    newRequest,
-                    session,
-                    null,
-                    null,
-                    JainSipUtils.DIALOG_CREATING_METHODS.contains(newRequest.getMethod()));
-            //JSR 289 Section 15.1.6
-            newSipServletRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, origRequestImpl);
+        final SipServletRequestImpl newSipServletRequest = (SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest(
+                newRequest,
+                session,
+                null,
+                null,
+                JainSipUtils.DIALOG_CREATING_METHODS.contains(newRequest.getMethod()));
+        //JSR 289 Section 15.1.6
+        newSipServletRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, origRequestImpl);
 
-            final String method = origRequestImpl.getMethod();
-            // For non-REGISTER requests, the Contact header field is not copied but is populated by the container as usual but if Contact header is present in the headerMap
-            // then relevant portions of Contact header is to be used in the request created, in accordance with section 4.1.3 of the specification.
-            if (Request.REGISTER.equalsIgnoreCase(method)) {
-                // Issue 2565 http://code.google.com/p/mobicents/issues/detail?id=2565
-                // So if the request is REGISTER the Contact Header field is copied and is used
-                if (contactHeaderSet.size() > 0) {
-                    // And additional contact from the map are added + stripping the forbidden params
-                    for (String contactHeaderValue : contactHeaderSet) {
-                        newSipServletRequest.addHeaderInternal(ContactHeader.NAME, contactHeaderValue, true);
-                    }
-                    ListIterator<ContactHeader> contactHeaders = newSipServletRequest.getMessage().getHeaders(ContactHeader.NAME);
-                    while (contactHeaders.hasNext()) {
-                        final URI contactURI = contactHeaders.next().getAddress().getURI();
-                        // and reset its user part and params accoridng to 4.1.3 The Contact Header Field
-                        if (contactURI instanceof SipURI) {
-                            stripForbiddenContactURIParams((SipURI) contactURI);
-                        }
+        final String method = origRequestImpl.getMethod();
+        // For non-REGISTER requests, the Contact header field is not copied but is populated by the container as usual but if Contact header is present in the headerMap
+        // then relevant portions of Contact header is to be used in the request created, in accordance with section 4.1.3 of the specification.
+        if (Request.REGISTER.equalsIgnoreCase(method)) {
+            // Issue 2565 http://code.google.com/p/mobicents/issues/detail?id=2565
+            // So if the request is REGISTER the Contact Header field is copied and is used
+            if (contactHeaderSet.size() > 0) {
+                // And additional contact from the map are added + stripping the forbidden params
+                for (String contactHeaderValue : contactHeaderSet) {
+                    newSipServletRequest.addHeaderInternal(ContactHeader.NAME, contactHeaderValue, true);
+                }
+                ListIterator<ContactHeader> contactHeaders = newSipServletRequest.getMessage().getHeaders(ContactHeader.NAME);
+                while (contactHeaders.hasNext()) {
+                    final URI contactURI = contactHeaders.next().getAddress().getURI();
+                    // and reset its user part and params accoridng to 4.1.3 The Contact Header Field
+                    if (contactURI instanceof SipURI) {
+                        stripForbiddenContactURIParams((SipURI) contactURI);
                     }
                 }
-            } else {
-                newRequest.removeHeader(ContactHeader.NAME);
-                //Creating container contact header
-                ContactHeader contactHeader = null;
-                String fromName = null;
-                String diaplayName = newFromHeader.getAddress().getDisplayName();
-                if (newFromHeader.getAddress().getURI() instanceof javax.sip.address.SipURI) {
-                    fromName = ((javax.sip.address.SipURI) newFromHeader.getAddress().getURI()).getUser();
-                }
-                // if a sip load balancer is present in front of the server, the contact header is the one from the sip lb
-                // so that the subsequent requests can be failed over
-                if (sipFactoryImpl.isUseLoadBalancer()) {
-                    MobicentsExtendedListeningPoint listeningPoint = JainSipUtils.findListeningPoint(sipFactoryImpl.getSipNetworkInterfaceManager(), newRequest, session.getOutboundInterface());
-                    if (listeningPoint != null && listeningPoint.isUseLoadBalancer()) {
-                        // https://github.com/RestComm/sip-servlets/issues/137
-                        SipLoadBalancer loadBalancerToUse = null;
-                        if (listeningPoint.getLoadBalancer() == null) {
-                            loadBalancerToUse = sipFactoryImpl.getLoadBalancerToUse();
-                            if (logger.isDebugEnabled()) {
-                                logger.debug("Using listeningPoint " + listeningPoint + " for global load balancer " + sipFactoryImpl.getLoadBalancerToUse());
-                            }
-                        } else {
-                            loadBalancerToUse = listeningPoint.getLoadBalancer();
-                            if (logger.isDebugEnabled()) {
-                                logger.debug("Using listeningPoint " + listeningPoint + " for connector specific load balancer " + listeningPoint.getLoadBalancer());
-                            }
-                        }
-
-                        javax.sip.address.SipURI sipURI = sipFactoryImpl.getAddressFactory().createSipURI(fromName, loadBalancerToUse.getAddress().getHostAddress());
-                        sipURI.setHost(loadBalancerToUse.getAddress().getHostAddress());
-                        sipURI.setPort(loadBalancerToUse.getSipPort());
-                        sipURI.setTransportParam(ListeningPoint.UDP);
-                        javax.sip.address.Address contactAddress = sipFactoryImpl.getAddressFactory().createAddress(sipURI);
-                        if (diaplayName != null && diaplayName.length() > 0) {
-                            contactAddress.setDisplayName(diaplayName);
-                        }
-                        contactHeader = sipFactoryImpl.getHeaderFactory().createContactHeader(contactAddress);
-                    } else {
+            }
+        } else {
+            newRequest.removeHeader(ContactHeader.NAME);
+            //Creating container contact header
+            ContactHeader contactHeader = null;
+            String fromName = null;
+            String diaplayName = newFromHeader.getAddress().getDisplayName();
+            if (newFromHeader.getAddress().getURI() instanceof javax.sip.address.SipURI) {
+                fromName = ((javax.sip.address.SipURI) newFromHeader.getAddress().getURI()).getUser();
+            }
+            // if a sip load balancer is present in front of the server, the contact header is the one from the sip lb
+            // so that the subsequent requests can be failed over
+            if (sipFactoryImpl.isUseLoadBalancer()) {
+                MobicentsExtendedListeningPoint listeningPoint = JainSipUtils.findListeningPoint(sipFactoryImpl.getSipNetworkInterfaceManager(), newRequest, session.getOutboundInterface());
+                if (listeningPoint != null && listeningPoint.isUseLoadBalancer()) {
+                    // https://github.com/RestComm/sip-servlets/issues/137
+                    SipLoadBalancer loadBalancerToUse = null;
+                    if (listeningPoint.getLoadBalancer() == null) {
+                        loadBalancerToUse = sipFactoryImpl.getLoadBalancerToUse();
                         if (logger.isDebugEnabled()) {
-                            logger.debug("Not Using load balancer as it is not enabled for listeningPoint " + listeningPoint);
+                            logger.debug("Using listeningPoint " + listeningPoint + " for global load balancer " + sipFactoryImpl.getLoadBalancerToUse());
                         }
-                        contactHeader = JainSipUtils.createContactHeader(sipFactoryImpl.getSipNetworkInterfaceManager(), newRequest, diaplayName, fromName, session.getOutboundInterface());
+                    } else {
+                        loadBalancerToUse = listeningPoint.getLoadBalancer();
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Using listeningPoint " + listeningPoint + " for connector specific load balancer " + listeningPoint.getLoadBalancer());
+                        }
                     }
+
+                    javax.sip.address.SipURI sipURI = sipFactoryImpl.getAddressFactory().createSipURI(fromName, loadBalancerToUse.getAddress().getHostAddress());
+                    sipURI.setHost(loadBalancerToUse.getAddress().getHostAddress());
+                    sipURI.setPort(loadBalancerToUse.getSipPort());
+                    sipURI.setTransportParam(ListeningPoint.UDP);
+                    javax.sip.address.Address contactAddress = sipFactoryImpl.getAddressFactory().createAddress(sipURI);
+                    if (diaplayName != null && diaplayName.length() > 0) {
+                        contactAddress.setDisplayName(diaplayName);
+                    }
+                    contactHeader = sipFactoryImpl.getHeaderFactory().createContactHeader(contactAddress);
                 } else {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Not Using load balancer as it is not enabled for listeningPoint " + listeningPoint);
+                    }
                     contactHeader = JainSipUtils.createContactHeader(sipFactoryImpl.getSipNetworkInterfaceManager(), newRequest, diaplayName, fromName, session.getOutboundInterface());
                 }
-                if (contactHeaderSet.size() > 0) {
-                    // if the set is not empty then we adjust the values of the set to match the host and port + forbidden params of the container
-                    setContactHeaders(contactHeaderSet, newSipServletRequest, contactHeader);
-                } else if (JainSipUtils.CONTACT_HEADER_METHODS.contains(method)) {
-                    // otherwise we set the container contact header for allowed methods
-                    newRequest.setHeader(contactHeader);
-                }
+            } else {
+                contactHeader = JainSipUtils.createContactHeader(sipFactoryImpl.getSipNetworkInterfaceManager(), newRequest, diaplayName, fromName, session.getOutboundInterface());
             }
+            if (contactHeaderSet.size() > 0) {
+                // if the set is not empty then we adjust the values of the set to match the host and port + forbidden params of the container
+                setContactHeaders(contactHeaderSet, newSipServletRequest, contactHeader);
+            } else if (JainSipUtils.CONTACT_HEADER_METHODS.contains(method)) {
+                // otherwise we set the container contact header for allowed methods
+                newRequest.setHeader(contactHeader);
+            }
+        }
 
-            return newSipServletRequest;
+        return newSipServletRequest;
     }
 
     /*
@@ -364,7 +361,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 
         try {
             SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
-            SipServletRequestImpl newSipServletRequest =cloneRequest(origRequestImpl, headerMap);
+            SipServletRequestImpl newSipServletRequest = cloneRequest(origRequestImpl, headerMap);
             final MobicentsSipSession originalSession = origRequestImpl.getSipSession();
             final MobicentsSipApplicationSession appSession = originalSession
                     .getSipApplicationSession();
@@ -689,15 +686,14 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
         SipServletResponseImpl response = (SipServletResponseImpl) sipServletRequestImpl.createResponse(status, reasonPhrase);
 
         SIPTransaction tx = (SIPTransaction) response.getTransaction();
-        if (tx != null &&
-               tx.getDialog() != null &&
-              !tx.getDialog().getLocalTag().equals(response.getTo().getParameter("tag"))) {
-                SIPServerTransaction transaction = (SIPServerTransaction) sipServletRequestImpl.getTransaction();
-                SIPDialog newDialog = new SIPDialog(transaction);
-                newDialog.setLastResponse(tx, (SIPResponse) response.getMessage());
-                transaction.setDialog(newDialog, newDialog.getDialogId());
+        if (tx != null
+                && tx.getDialog() != null
+                && !tx.getDialog().getLocalTag().equals(response.getTo().getParameter("tag"))) {
+            SIPServerTransaction transaction = (SIPServerTransaction) sipServletRequestImpl.getTransaction();
+            SIPDialog newDialog = new SIPDialog(transaction);
+            newDialog.setLastResponse(tx, (SIPResponse) response.getMessage());
+            transaction.setDialog(newDialog, newDialog.getDialogId());
         }
-
 
         return response;
     }
@@ -740,19 +736,20 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
                     logger.debug(mobicentsSipSession + " has a parent session, it means we need to handle a forked case");
                 }
                 String linkedParentSessionId = this.sessionMap.get(mobicentsSipSession.getParentSession().getId());
-                MobicentsSipSession linkedParentSession = lookupSessionById(linkedParentSessionId, (MobicentsSipApplicationSession) session.getApplicationSession());
-                SipServletRequestImpl originalSipServletRequestImpl = (SipServletRequestImpl) getOriginalRequest(linkedParentSession);
+                if (linkedParentSessionId != null) {
+                    MobicentsSipSession linkedParentSession = lookupSessionById(linkedParentSessionId, (MobicentsSipApplicationSession) session.getApplicationSession());
+                    SipServletRequestImpl originalSipServletRequestImpl = (SipServletRequestImpl) getOriginalRequest(linkedParentSession);
 
+                    // need to clone the original request to create the forked response
+                    try {
+                        SipServletRequestImpl clonedOriginalRequest = cloneDerivedRequest(originalSipServletRequestImpl, linkedParentSession);
+                        sessionMap.put(session.getId(), clonedOriginalRequest.getSession().getId());
+                        sessionMap.put(clonedOriginalRequest.getSession().getId(), session.getId());
+                        sipSessionKey = clonedOriginalRequest.getSession().getId();
+                    } catch (Exception e) {
+                        logger.debug("error cloning request", e);
 
-                // need to clone the original request to create the forked response
-                try {
-                SipServletRequestImpl clonedOriginalRequest = cloneDerivedRequest(originalSipServletRequestImpl, linkedParentSession);
-                sessionMap.put(session.getId(), clonedOriginalRequest.getSession().getId());
-                sessionMap.put(clonedOriginalRequest.getSession().getId(), session.getId());
-                sipSessionKey = clonedOriginalRequest.getSession().getId();
-                } catch(Exception e) {
-                    logger.debug("error cloning request", e);
-
+                    }
                 }
             }
         }
