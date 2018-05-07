@@ -1603,8 +1603,19 @@ public class SipSessionImpl implements MobicentsSipSession {
                                     String msg = String.format("SipSession [%s] onTerminateState hasParentSession [%s] that will ask to onReadyToInvalidate()", key, parentSession.getKey());
                                     logger.debug(msg);
                                 }
-				// Calling this.parentSession.onReadyToInvalidate(); will check whether or not there are derived sip sessions
-				this.parentSession.onReadyToInvalidate();
+				Iterator<MobicentsSipSession> derivedSessionsIterator = parentSession.getDerivedSipSessions();
+                                boolean allDerivedTerminated = true;
+				while (derivedSessionsIterator.hasNext()) {
+					MobicentsSipSession derivedSession = (MobicentsSipSession) derivedSessionsIterator
+							.next();
+					if(!derivedSession.isValidInternal() || !derivedSession.isReadyToInvalidate()) {
+						allDerivedTerminated = allDerivedTerminated && false;
+					}
+				}
+                                // Calling this.parentSession.onReadyToInvalidate(); will check whether or not there are derived sip sessions
+                                if (allDerivedTerminated) {
+                                    this.parentSession.onTerminatedState();
+                                }
 			}
 		}
 	}
