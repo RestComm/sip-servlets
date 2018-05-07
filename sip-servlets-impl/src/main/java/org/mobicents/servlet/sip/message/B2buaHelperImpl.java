@@ -1156,10 +1156,10 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
             if (obj instanceof MobicentsSipSession) {
                 MobicentsSipSession sAux = (MobicentsSipSession) obj;
                 Iterator<MobicentsSipSession> derivedSipSessions = sAux.getDerivedSipSessions();
-                buffer.append("SessionId:" + sAux.getId() + ".State:" + sAux.getState() + "\n");
+                buffer.append("SessionId(" + System.identityHashCode(sAux) +"):" + sAux.getId() + ".State:" + sAux.getState() + "\n");
                 while (derivedSipSessions.hasNext()) {
                     MobicentsSipSession derived = derivedSipSessions.next();
-                    buffer.append("DerivedSessionId:" + derived.getId() + ".State:" + sAux.getState() + "\n");
+                    buffer.append("DerivedSessionId(" + System.identityHashCode(derived) + "):" + derived.getId() + ".State:" + sAux.getState() + "\n");
                     buffer.append("++++++++++++++++++++\n");
                 }
             }
