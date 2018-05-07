@@ -117,6 +117,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
     protected static final Set<String> B2BUA_SYSTEM_HEADERS = new HashSet<String>();
 
     private static final String ORIG_REQ_ATT_NAME = "org.restcomm.servlets.sip.originalRequest";
+    private static final String LINKED_SESSION_ATT_NAME = "org.restcomm.servlets.sip.linkedSession";
 
     static {
         B2BUA_SYSTEM_HEADERS.add(CallIdHeader.NAME);
@@ -139,8 +140,6 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
         CONTACT_FORBIDDEN_PARAMETER.add("lr");
     }
 
-    //Map to handle linked sessions
-    private Map<String, String> sessionMap = null;
 
     //Map to handle responses to linked request and cancel on linked request
     // Issue 1550 http://code.google.com/p/mobicents/issues/detail?id=1550
@@ -153,7 +152,6 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
     private transient SipManager sipManager;
 
     public B2buaHelperImpl() {
-        sessionMap = new ConcurrentHashMap<String, String>();
         linkedRequestMap = new ConcurrentHashMap<SipServletRequestImpl, SipServletRequestImpl>();
     }
 
@@ -372,9 +370,8 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
             linkedRequestMap.put(origRequestImpl, newSipServletRequest);
 
             if (linked) {
-                sessionMap.put(originalSession.getId(), session.getId());
-                sessionMap.put(session.getId(), originalSession.getId());
-                dumpLinkedSessions();
+                setLinkedSession(originalSession, session);
+                dumpAppSession(session);
             }
             session.setB2buaHelper(this);
             originalSession.setB2buaHelper(this);
@@ -466,9 +463,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
             linkedRequestMap.put(newSubsequentServletRequest, origRequestImpl);
             linkedRequestMap.put(origRequestImpl, newSubsequentServletRequest);
 
-            sessionMap.put(originalSession.getId(), sessionImpl.getId());
-            sessionMap.put(sessionImpl.getId(), originalSession.getId());
-            dumpLinkedSessions();
+            setLinkedSession(originalSession, sessionImpl);
 
             sessionImpl.setB2buaHelper(this);
             originalSession.setB2buaHelper(this);
@@ -706,20 +701,8 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
         return getLinkedSession(session, true);
     }
 
-    private MobicentsSipSession lookupSessionById(String sessionId, MobicentsSipApplicationSession appSession) {
-        MobicentsSipSession sessionFound = null;
-        try {
-            SipSessionKey parseSipSessionKey = SessionManagerUtil.parseSipSessionKey(sessionId);
-            sessionFound = (MobicentsSipSession) sipManager.getSipSession(parseSipSessionKey, false, sipFactoryImpl, appSession);
-        } catch (Exception ex) {
-            logger.debug("Failed to find session", ex);
-        }
-        return sessionFound;
-    }
-
     public SipSession getLinkedSession(final SipSession session, boolean checkSession) {
         dumpAppSession((MobicentsSipSession) session);
-        dumpLinkedSessions();
         if (session == null) {
             throw new NullPointerException("the argument is null");
         }
@@ -728,24 +711,22 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
             throw new IllegalArgumentException("the session " + mobicentsSipSession + " is invalid");
         }
 
-        String sipSessionKey = this.sessionMap.get(mobicentsSipSession.getId());
-        if (sipSessionKey == null) {
+        MobicentsSipSession linkedSession = lookupLinkedSession(session);
+        if (linkedSession == null) {
             //check if derived is necessary
             if (mobicentsSipSession.getParentSession() != null) {
                 if (logger.isDebugEnabled()) {
                     logger.debug(mobicentsSipSession + " has a parent session, it means we need to handle a forked case");
                 }
-                String linkedParentSessionId = this.sessionMap.get(mobicentsSipSession.getParentSession().getId());
-                if (linkedParentSessionId != null) {
-                    MobicentsSipSession linkedParentSession = lookupSessionById(linkedParentSessionId, (MobicentsSipApplicationSession) session.getApplicationSession());
+                MobicentsSipSession linkedParentSession = (MobicentsSipSession)lookupLinkedSession(mobicentsSipSession.getParentSession());
+                if (linkedParentSession != null) {
                     SipServletRequestImpl originalSipServletRequestImpl = (SipServletRequestImpl) getOriginalRequest(linkedParentSession);
 
                     // need to clone the original request to create the forked response
                     try {
                         SipServletRequestImpl clonedOriginalRequest = cloneDerivedRequest(originalSipServletRequestImpl, linkedParentSession);
-                        sessionMap.put(session.getId(), clonedOriginalRequest.getSession().getId());
-                        sessionMap.put(clonedOriginalRequest.getSession().getId(), session.getId());
-                        sipSessionKey = clonedOriginalRequest.getSession().getId();
+                        setLinkedSession(session, clonedOriginalRequest.getSession());
+                        linkedSession = (MobicentsSipSession)clonedOriginalRequest.getSession();
                     } catch (Exception e) {
                         logger.debug("error cloning request", e);
 
@@ -754,17 +735,12 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
             }
         }
 
-        if (sipSessionKey == null) {
-            dumpLinkedSessions();
+        if (linkedSession == null) {
             if (logger.isDebugEnabled()) {
                 logger.debug("No Linked Session found for this session " + session);
             }
             return null;
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug(" trying to find linked session with key " + sipSessionKey + " for session " + mobicentsSipSession);
-        }
-        MobicentsSipSession linkedSession = lookupSessionById(sipSessionKey, (MobicentsSipApplicationSession) session.getApplicationSession());
         if (logger.isDebugEnabled()) {
             if (linkedSession != null) {
                 logger.debug("Linked Session found : " + linkedSession + " for this session " + session);
@@ -774,7 +750,6 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
         }
 
         dumpAppSession((MobicentsSipSession) session);
-        dumpLinkedSessions();
         if (linkedSession != null) {
             return linkedSession.getFacade();
         } else {
@@ -876,23 +851,22 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
                 || State.TERMINATED.equals(((MobicentsSipSession) session1).getState())
                 || State.TERMINATED.equals(((MobicentsSipSession) session2).getState())
                 || !session1.getApplicationSession().equals(session2.getApplicationSession())
-                || (sessionMap.get(((MobicentsSipSession) session1).getId()) != null && !sessionMap.get(((MobicentsSipSession) session1).getId()).equals(((MobicentsSipSession) session2).getId()))
-                || (sessionMap.get(((MobicentsSipSession) session2).getId()) != null
-                && sessionMap.get(((MobicentsSipSession) session2).getId()).equals(((MobicentsSipSession) session1).getId()))) {
+                || lookupLinkedSession(session1) != null && lookupLinkedSession(session1) != session2
+                || lookupLinkedSession(session2)!= null
+                && lookupLinkedSession(session1) != session1) {
             throw new IllegalArgumentException("either of the specified sessions has been terminated "
                     + "or the sessions do not belong to the same application session or "
                     + "one or both the sessions are already linked with some other session(s)");
         }
-        this.sessionMap.put(((MobicentsSipSession) session1).getId(), ((MobicentsSipSession) session2).getId());
-        this.sessionMap.put(((MobicentsSipSession) session2).getId(), ((MobicentsSipSession) session1).getId());
+        setLinkedSession(session1, session2);
         // https://github.com/Mobicents/sip-servlets/issues/56
         if (!this.equals(((MobicentsSipSession) session1).getB2buaHelper())) {
             if (((MobicentsSipSession) session1).getB2buaHelper() == null) {
                 ((MobicentsSipSession) session1).setB2buaHelper(this);
             } else {
-                Map<String, String> forkedSessionMap = ((MobicentsSipSession) session1).getB2buaHelper().getSessionMap();
+                /*Map<String, String> forkedSessionMap = ((MobicentsSipSession) session1).getB2buaHelper().getSessionMap();
                 forkedSessionMap.put(((MobicentsSipSession) session1).getId(), ((MobicentsSipSession) session2).getId());
-                forkedSessionMap.put(((MobicentsSipSession) session2).getId(), ((MobicentsSipSession) session1).getId());
+                forkedSessionMap.put(((MobicentsSipSession) session2).getId(), ((MobicentsSipSession) session1).getId());*/
             }
         }
         // https://github.com/Mobicents/sip-servlets/issues/56
@@ -900,16 +874,15 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
             if (((MobicentsSipSession) session2).getB2buaHelper() == null) {
                 ((MobicentsSipSession) session2).setB2buaHelper(this);
             } else {
-                Map<String, String> forkedSessionMap = ((MobicentsSipSession) session2).getB2buaHelper().getSessionMap();
+                /*Map<String, String> forkedSessionMap = ((MobicentsSipSession) session2).getB2buaHelper().getSessionMap();
                 forkedSessionMap.put(((MobicentsSipSession) session1).getId(), ((MobicentsSipSession) session2).getId());
-                forkedSessionMap.put(((MobicentsSipSession) session2).getId(), ((MobicentsSipSession) session1).getId());
+                forkedSessionMap.put(((MobicentsSipSession) session2).getId(), ((MobicentsSipSession) session1).getId());*/
             }
         }
         if (logger.isDebugEnabled()) {
             logger.debug("sipsession " + ((MobicentsSipSession) session1).getKey() + " linked to sip session " + ((MobicentsSipSession) session2).getKey());
         }
         dumpAppSession((MobicentsSipSession) session1);
-        dumpLinkedSessions();
     }
 
     /*
@@ -934,7 +907,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
         if (checkSession) {
             if (!((MobicentsSipSession) session).isValidInternal()
                     || State.TERMINATED.equals(key.getState())
-                    || sessionMap.get(sipSessionKey) == null) {
+                    || lookupLinkedSession(session) == null) {
                 throw new IllegalArgumentException("the session is not currently linked to another session or it has been terminated");
             }
         }
@@ -959,13 +932,11 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
             logger.debug(msg);
         }
 
-        final String value = this.sessionMap.get(sipSessionKey);
-        if (value != null) {
-            SipSession linkedSipSession = getLinkedSession(session, checkSession);
-            this.sessionMap.remove(sipSessionKey);
-            this.sessionMap.remove(value);
+        SipSession linkedSipSession = lookupLinkedSession(session);
+        if (linkedSipSession != null) {
+            unsetLinkedSession(session, linkedSipSession);
             if (logger.isDebugEnabled()) {
-                logger.debug("sipsession " + sipSessionKey + " unlinked from sip session " + value);
+                logger.debug("sipsession " + session.getId() + " unlinked from sip session " + linkedSipSession.getCallId());
             }
             if (linkedSipSession != null) {
                 // https://github.com/Mobicents/sip-servlets/issues/56
@@ -986,7 +957,6 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
             logger.debug("no sipsession for " + sipSessionKey + " to unlink");
         }
         unlinkRequestInternal(sipSessionKey, !checkSession);
-        dumpLinkedSessions();
         dumpAppSession((MobicentsSipSession) session);
     }
 
@@ -1156,10 +1126,18 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
             if (obj instanceof MobicentsSipSession) {
                 MobicentsSipSession sAux = (MobicentsSipSession) obj;
                 Iterator<MobicentsSipSession> derivedSipSessions = sAux.getDerivedSipSessions();
-                buffer.append("SessionId(" + System.identityHashCode(sAux) +"):" + sAux.getId() + ".State:" + sAux.getState() + "\n");
+                buffer.append("SessionId(" + System.identityHashCode(sAux) +"):" + sAux.getId() + "\n");
+                MobicentsSipSession linkedSession = lookupLinkedSession(sAux);
+                if (linkedSession != null) {
+                    buffer.append("LinkedSession(" + System.identityHashCode(linkedSession) +"):" + linkedSession.getId() + "\n");
+                }
                 while (derivedSipSessions.hasNext()) {
                     MobicentsSipSession derived = derivedSipSessions.next();
-                    buffer.append("DerivedSessionId(" + System.identityHashCode(derived) + "):" + derived.getId() + ".State:" + sAux.getState() + "\n");
+                    buffer.append("DerivedSessionId(" + System.identityHashCode(derived) + "):" + derived.getId() + "\n");
+                    MobicentsSipSession linkedDerivedSession = lookupLinkedSession(derived);
+                    if (linkedDerivedSession != null) {
+                        buffer.append("LinkedSession(" + System.identityHashCode(linkedDerivedSession) +"):" + linkedDerivedSession.getId() + "\n");
+                    }
                     buffer.append("++++++++++++++++++++\n");
                 }
             }
@@ -1169,32 +1147,18 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
         logger.debug(buffer);
     }
 
-    private void dumpLinkedSessions() {
-
-        if (logger.isDebugEnabled()) {
-            StringBuffer buffer = new StringBuffer();
-            buffer.append("######################B2BUASessionMapping\n");
-            for (String key : sessionMap.keySet()) {
-                buffer.append(key + "\n -> " + sessionMap.get(key) + "\n");
-                buffer.append("------------------\n");
-            }
-            buffer.append("######################B2BUASessionMapping\n");
-            logger.debug(buffer);
-        }
-    }
-
     /**
      * @param sessionMap the sessionMap to set
      */
     public void setSessionMap(Map<String, String> sessionMap) {
-        this.sessionMap = sessionMap;
+        //this.sessionMap = sessionMap;
     }
 
     /**
      * @return the sessionMap
      */
     public Map<String, String> getSessionMap() {
-        return sessionMap;
+        return null;
     }
 
     /**
@@ -1236,5 +1200,45 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
             logger.debug("OrginalRequest is(" + System.identityHashCode(req) + "):" + req);
         }
         return req;
+    }
+
+    public void unsetLinkedSession(SipSession sipSession, SipSession targetSession) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("UnSetting LinkedSession:" + System.identityHashCode(sipSession) + ", on session:" + targetSession);
+        }
+        if (sipSession.isValid()) {
+            sipSession.setAttribute(LINKED_SESSION_ATT_NAME, null);
+            targetSession.setAttribute(LINKED_SESSION_ATT_NAME, null);
+        } else {
+            logger.debug("LinkedSession not saved, session is not valid");
+        }
+    }
+
+    public void setLinkedSession(SipSession sipSession, SipSession targetSession) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Setting LinkedSession:" + System.identityHashCode(sipSession) + ", on session:" + targetSession);
+        }
+        if (sipSession.isValid()) {
+            sipSession.setAttribute(LINKED_SESSION_ATT_NAME, targetSession);
+            targetSession.setAttribute(LINKED_SESSION_ATT_NAME, sipSession);
+        } else {
+            logger.debug("LinkedSession not saved, session is not valid");
+        }
+    }
+
+    private MobicentsSipSession lookupLinkedSession(SipSession sipSession) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Lookfor LinkedSession on session:" + sipSession);
+        }
+        MobicentsSipSession linkedSession = null;
+        if (sipSession.isValid()) {
+            linkedSession = (MobicentsSipSession) sipSession.getAttribute(LINKED_SESSION_ATT_NAME);
+            if (logger.isDebugEnabled()) {
+                logger.debug("LInkedSession is(" + System.identityHashCode(linkedSession) + "):" + linkedSession);
+            }
+        } else {
+            logger.debug("session is not valid.");
+        }
+        return linkedSession;
     }
 }
