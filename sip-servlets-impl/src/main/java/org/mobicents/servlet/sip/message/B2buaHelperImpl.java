@@ -166,8 +166,43 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
         }
 
 		if(origRequest.getMaxForwards() == 0) {
-			throw new TooManyHopsException();
-		}
+            throw new TooManyHopsException();
+        }
+        SipSessionKey newDerivedKey = new SipSessionKey(parentSession.getKey().getFromTag(),
+                newToTag,
+                parentSession.getKey().getCallId(),
+                parentSession.getKey().getApplicationSessionId(),
+                parentSession.getKey().getApplicationName());
+        MobicentsSipSession newDerivedSesion = sipManager.getSipSession(newDerivedKey, false, null, parentSession.getSipApplicationSession());
+        newDerivedSesion.setAckReceived(newRequest.getCSeq().getSeqNumber(), false);
+
+        //removing the via header from original request
+        /*newRequest.removeHeader(ViaHeader.NAME);
+	final SipApplicationDispatcher sipApplicationDispatcher = sipFactoryImpl.getSipApplicationDispatcher();
+        final String branch = JainSipUtils.createBranch(newDerivedSesion.getId(),  sipApplicationDispatcher.getHashFromApplicationName(newDerivedSesion.getKey().getApplicationName()));
+        ViaHeader viaHeader = JainSipUtils.createViaHeader(
+                        sipFactoryImpl.getSipNetworkInterfaceManager(), newRequest, branch, null);
+        newRequest.addHeader(viaHeader);
+        SIPTransaction transaction = (SIPTransaction) origRequestImpl.getTransaction();
+        SipStackImpl stack =  (SipStackImpl) transaction.getSipProvider().getSipStack();
+        SIPServerTransaction newTx = stack.createServerTransaction((MessageChannel) newRequest.getMessageChannel());
+        newTx.setOriginalRequest(newRequest);*/
+
+
+        SipServletRequestImpl sipServletRequestImpl = (SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest(newRequest,
+                newDerivedSesion, (Transaction) origRequestImpl.getTransaction(),
+                null,
+                origRequestImpl.getDialog() != null);
+        sipServletRequestImpl.setLinkedRequest(origRequestImpl.getLinkedRequest());
+        sipServletRequestImpl.setPoppedRoute(origRequestImpl.getPoppedRouteHeader());
+        sipServletRequestImpl.setSubscriberURI(origRequestImpl.getSubscriberURI());
+        sipServletRequestImpl.setAttributeMap(origRequestImpl.getAttributeMap());
+        newDerivedSesion.setSessionCreatingDialog(null);
+        newDerivedSesion.setB2buaHelper(this);
+        newDerivedSesion.setSessionCreatingTransactionRequest(sipServletRequestImpl);
+        setOriginalRequest(newDerivedSesion,sipServletRequestImpl);
+        return sipServletRequestImpl;
+    }
 
 		try {
 			final SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
