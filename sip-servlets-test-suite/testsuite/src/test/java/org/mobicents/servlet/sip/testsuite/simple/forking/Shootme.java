@@ -184,7 +184,7 @@ public class Shootme   implements SipListener {
      */
     public void processAck(RequestEvent requestEvent,
             ServerTransaction serverTransaction) {
-        logger.info("shootme: got an ACK! ");
+        logger.info("shootme:(" + myPort + "): got an ACK! ");
         logger.info("Dialog = " + requestEvent.getDialog());
         if(requestEvent.getDialog() != null) {
         	logger.info("Dialog State = " + requestEvent.getDialog().getState());
@@ -201,8 +201,8 @@ public class Shootme   implements SipListener {
         SipProvider sipProvider = (SipProvider) requestEvent.getSource();
         Request request = requestEvent.getRequest();
         try {
-            logger.info("shootme: got an Invite sending Trying");
-            // logger.info("shootme: " + request);
+            logger.info("shootme:(" + myPort + "): got an Invite sending Trying");
+            // logger.info("shootme:(" + myPort + "): " + request);
 
             ServerTransaction st = requestEvent.getServerTransaction();
 
@@ -264,7 +264,7 @@ public class Shootme   implements SipListener {
         try {
             logger.info("sendInviteOK: " + inviteTid);
             if (inviteTid.getState() != TransactionState.COMPLETED) {
-                logger.info("shootme: Dialog state before OK: "
+                logger.info("shootme:(" + myPort + "): Dialog state before OK: "
                         + inviteTid.getDialog().getState());
 
                 SipProvider sipProvider = (SipProvider) requestEvent.getSource();
@@ -292,7 +292,7 @@ public class Shootme   implements SipListener {
                 Thread.sleep(waitBeforeFinalResponse);
 				logger.debug("sending back response " + okResponse);
                 inviteTid.sendResponse(okResponse);
-                logger.info("shootme: Dialog state after OK: "
+                logger.info("shootme:(" + myPort + "): Dialog state after OK: "
                         + inviteTid.getDialog().getState());
                 if(!waitForCancel) {
 //                	TestCase.assertEquals( DialogState.CONFIRMED , inviteTid.getDialog().getState() );
@@ -312,14 +312,14 @@ public class Shootme   implements SipListener {
             ServerTransaction serverTransactionId) {
         Request request = requestEvent.getRequest();
         try {
-            logger.info("shootme:  got a bye sending OK.");
-            logger.info("shootme:  dialog = " + requestEvent.getDialog());
-            logger.info("shootme:  dialogState = " + requestEvent.getDialog().getState());
+            logger.info("shootme:(" + myPort + "):  got a bye sending OK.");
+            logger.info("shootme:(" + myPort + "):  dialog = " + requestEvent.getDialog());
+            logger.info("shootme:(" + myPort + "):  dialogState = " + requestEvent.getDialog().getState());
             Response response = messageFactory.createResponse(200, request);
             if ( serverTransactionId != null) {
                 serverTransactionId.sendResponse(response);
             }
-            logger.info("shootme:  dialogState = " + requestEvent.getDialog().getState());
+            logger.info("shootme:(" + myPort + "):  dialogState = " + requestEvent.getDialog().getState());
 
             this.byeSeen = true;
 
@@ -336,7 +336,7 @@ public class Shootme   implements SipListener {
         Request request = requestEvent.getRequest();
         SipProvider sipProvider = (SipProvider)requestEvent.getSource();
         try {
-            logger.info("shootme:  got a cancel. " );
+            logger.info("shootme:(" + myPort + "):  got a cancel. " );
             // Because this is not an In-dialog request, you will get a null server Tx id here.
             if (serverTransactionId == null) {
                 serverTransactionId = sipProvider.getNewServerTransaction(request);
