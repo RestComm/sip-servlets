@@ -21,23 +21,16 @@
  */
 package org.mobicents.servlet.sip.message;
 
-import gov.nist.javax.sip.SipStackImpl;
 import gov.nist.javax.sip.header.HeaderExt;
 import gov.nist.javax.sip.header.ims.PathHeader;
 import gov.nist.javax.sip.message.MessageExt;
 import gov.nist.javax.sip.message.SIPRequest;
-import gov.nist.javax.sip.message.SIPResponse;
-import gov.nist.javax.sip.stack.MessageChannel;
 import gov.nist.javax.sip.stack.SIPDialog;
-import gov.nist.javax.sip.stack.SIPServerTransaction;
-import gov.nist.javax.sip.stack.SIPServerTransactionImpl;
 import gov.nist.javax.sip.stack.SIPTransaction;
-import java.io.IOException;
 
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -46,7 +39,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
 import javax.servlet.ServletContext;
 
 import javax.servlet.ServletException;
@@ -172,25 +164,20 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
                 parentSession.getKey().getApplicationName());
         MobicentsSipSession newDerivedSesion = sipManager.getSipSession(newDerivedKey, false, null, parentSession.getSipApplicationSession());
 
-        //removing the via header from original request
-        /*newRequest.removeHeader(ViaHeader.NAME);
-	final SipApplicationDispatcher sipApplicationDispatcher = sipFactoryImpl.getSipApplicationDispatcher();
-        final String branch = JainSipUtils.createBranch(newDerivedSesion.getId(),  sipApplicationDispatcher.getHashFromApplicationName(newDerivedSesion.getKey().getApplicationName()));
-        ViaHeader viaHeader = JainSipUtils.createViaHeader(
-                        sipFactoryImpl.getSipNetworkInterfaceManager(), newRequest, branch, null);
-        newRequest.addHeader(viaHeader);
         SIPTransaction transaction = (SIPTransaction) origRequestImpl.getTransaction();
-        SipStackImpl stack =  (SipStackImpl) transaction.getSipProvider().getSipStack();
-        SIPServerTransaction newTx = stack.createServerTransaction((MessageChannel) newRequest.getMessageChannel());
-        newTx.setOriginalRequest(newRequest);*/
+        //set transaction dialog to null to force creation of new dialog
+        transaction.setDialog(null, null);
+
         SipServletRequestImpl sipServletRequestImpl = (SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest(newRequest,
-                newDerivedSesion, (Transaction) origRequestImpl.getTransaction(),
+                newDerivedSesion,
+                transaction,
                 null,
                 origRequestImpl.getDialog() != null);
         sipServletRequestImpl.setLinkedRequest(origRequestImpl.getLinkedRequest());
         sipServletRequestImpl.setPoppedRoute(origRequestImpl.getPoppedRouteHeader());
         sipServletRequestImpl.setSubscriberURI(origRequestImpl.getSubscriberURI());
         sipServletRequestImpl.setAttributeMap(origRequestImpl.getAttributeMap());
+
         newDerivedSesion.setSessionCreatingDialog(null);
         newDerivedSesion.setAckReceived(newRequest.getCSeq().getSeqNumber(), false);
         newDerivedSesion.setB2buaHelper(this);
@@ -683,17 +670,21 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
         if (logger.isDebugEnabled()) {
             logger.debug("creating response to original request " + sipServletRequestImpl + " on session " + session);
         }
+
+        //set dialog from session in case is forked/derived
+        //do this before creating response so proper toTag is selected
+        SIPTransaction tx = (SIPTransaction) sipServletRequestImpl.getTransaction();
+        SIPDialog newDialog = (SIPDialog)sipSession.getSessionCreatingDialog();
+        if (newDialog != null) {
+            logger.debug("recovering dialog on transaction before send:" + System.identityHashCode(newDialog));
+            tx.setDialog(newDialog, newDialog.getDialogId());
+        }
+
         SipServletResponseImpl response = (SipServletResponseImpl) sipServletRequestImpl.createResponse(status, reasonPhrase);
 
-        SIPTransaction tx = (SIPTransaction) response.getTransaction();
-        if (tx != null
-                && tx.getDialog() != null
-                && !tx.getDialog().getLocalTag().equals(response.getTo().getParameter("tag"))) {
-            SIPServerTransaction transaction = (SIPServerTransaction) sipServletRequestImpl.getTransaction();
-            SIPDialog newDialog = new SIPDialog(transaction);
-            newDialog.setLastResponse(tx, (SIPResponse) response.getMessage());
-            transaction.setDialog(newDialog, newDialog.getDialogId());
-        }
+
+
+
 
         return response;
     }
@@ -1233,7 +1224,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
             throw new IllegalStateException("OrginalRequest is null.");
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("OrginalRequest is(" + System.identityHashCode(req) + "):" + req);
+            logger.debug("OrginalRequest is(" + System.identityHashCode(req) + ").tx:" + req.getTransaction());
         }
         return req;
     }
