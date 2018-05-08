@@ -1423,7 +1423,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
 	public void setSessionCreatingDialog(Dialog dialog) {
 		if(logger.isDebugEnabled()) {
-			logger.debug("setSessionCreatingDialog - getId()=" + this.getId() + ", dialog=" + dialog);
+			logger.debug("setSessionCreatingDialog - getId()=" + this.getId() + ", dialog=" + System.identityHashCode(dialog));
 		}
 		if(proxy == null) {
 			this.sessionCreatingDialog = dialog;
@@ -1605,7 +1605,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 
                         //invoke after actual invalidation to prevent infinite loop
                         if (linkedSession != null) {
-                            //linkedSession.onTerminatedState();
+                            linkedSession.onTerminatedState();
                         }
 
 			if(!this.isValid && this.parentSession != null) {
