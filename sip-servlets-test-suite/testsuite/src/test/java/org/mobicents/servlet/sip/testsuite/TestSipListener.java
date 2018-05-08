@@ -291,7 +291,7 @@ public class TestSipListener implements SipListener {
 
 	private boolean okToPrackReceived;
 	
-	private AtomicInteger rseqNumber = new AtomicInteger(1);	
+	protected AtomicInteger rseqNumber = new AtomicInteger(1);	
 	
 	public boolean sendByeInNewThread = false;
 
@@ -1459,7 +1459,7 @@ public class TestSipListener implements SipListener {
 		}
 	}
 
-	private void sendProvisionalResponses(Request request,
+	protected void sendProvisionalResponses(Request request,
 			ServerTransaction st, Dialog dialog, boolean sendReliably)
 			throws InterruptedException, ParseException,
 			InvalidArgumentException, SipException {

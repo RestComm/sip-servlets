@@ -430,13 +430,7 @@ public class Shootist implements SipListener {
 				}
 			} else if(response.getStatusCode() == 180 && !((ResponseEventExt)responseReceivedEvent).isRetransmission()) {
 				logger.info("We got :"+response.getStatusCode() +" and usePrack: "+usePrack);
-				if(usePrack) {
-					RequireHeader requireHeader = (RequireHeader) response.getHeader(RequireHeader.NAME);
-					requireHeader = headerFactory.createRequireHeader("100rel");
-					response.addHeader(requireHeader);
-					Header rseqHeader = headerFactory.createRSeqHeader(rseqNumber.getAndIncrement());
-					response.addHeader(rseqHeader);
-					
+				if(usePrack) {					
 					Request prackRequest = dialog.createPrack(response);
 					ClientTransaction ct = sipProvider.getNewClientTransaction(prackRequest);
 					dialog.sendRequest(ct);

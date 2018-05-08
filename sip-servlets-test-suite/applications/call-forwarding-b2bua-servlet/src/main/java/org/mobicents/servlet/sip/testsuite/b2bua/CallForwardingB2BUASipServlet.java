@@ -826,7 +826,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			return;
 		}
 
-		if(!originalRequest.isCommitted() && !fromURI.contains("forking") && !toURI.contains("forking")) {
+		if(!originalRequest.isCommitted() ) {//&& !fromURI.contains("forking") && !toURI.contains("forking")) {
 			SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
 			if(logger.isInfoEnabled()) {
 				logger.info("Sending on the first call leg " + responseToOriginalRequest.toString());
@@ -843,7 +843,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			} else {
 				responseToOriginalRequest.send();
 			}
-		} else if(!originalRequest.isCommitted()) {
+		}/* else if(!originalRequest.isCommitted()) {
 			SipSession originalSession =
 			    sipServletResponse.getRequest().getB2buaHelper().getLinkedSession(sipServletResponse.getSession());
 			checkForkedSession(originalSession, sipServletResponse);
@@ -854,7 +854,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		    } catch (IllegalStateException e) {
 		    	logger.error("problem while trying to create response to original request ", e);
 			}
-		}
+		}*/
 	}
 
 	// SipErrorListener methods

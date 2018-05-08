@@ -52,6 +52,8 @@ import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
 import junit.framework.TestCase;
+import javax.sip.header.Header;
+import javax.sip.header.RequireHeader;
 
 
 
@@ -239,6 +241,13 @@ public class Shootme extends TestSipListener {
             String toTag =  "" + System.nanoTime();
             toHeader.setTag(toTag);
             if ( sendRinging ) {
+            	RequireHeader requireHeader = (RequireHeader) request.getHeader(RequireHeader.NAME);				
+    			if(requireHeader != null && "100rel".equalsIgnoreCase(requireHeader.getOptionTag().trim())) {
+                	ringingResponse.addHeader(requireHeader);
+    				Header rseqHeader = headerFactory.createRSeqHeader(rseqNumber.getAndIncrement());
+    				ringingResponse.addHeader(rseqHeader);
+                }
+                
                 ringingResponse.addHeader(contactHeader);
                 if (ringingDelay > 0 ) {
                     timer.schedule(new SendRinging(st,ringingResponse), this.ringingDelay);
