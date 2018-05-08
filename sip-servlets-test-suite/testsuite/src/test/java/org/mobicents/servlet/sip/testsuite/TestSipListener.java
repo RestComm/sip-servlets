@@ -143,9 +143,9 @@ public class TestSipListener implements SipListener {
 
 	private ClientTransaction inviteClientTid;
 	
-	private ServerTransaction inviteServerTid;
+	protected ServerTransaction inviteServerTid;
 
-	private Dialog dialog;
+	protected Dialog dialog;
 	
 	private Dialog joinDialog;
 	
@@ -191,7 +191,7 @@ public class TestSipListener implements SipListener {
 	
 	private URI requestURI;
 	
-	private Request inviteRequest;
+	protected Request inviteRequest;
 	
 	private Request messageRequest;
 	
@@ -219,7 +219,7 @@ public class TestSipListener implements SipListener {
 	
 	public int numberOf491s = 0;	
 	
-	private List<Integer> provisionalResponsesToSend;
+	protected List<Integer> provisionalResponsesToSend;
 
 	private boolean useToURIasRequestUri;
 
@@ -285,9 +285,9 @@ public class TestSipListener implements SipListener {
 
 	private boolean prackSent;
 	
-	private boolean prackReceived;
+	protected boolean prackReceived;
 	
-	private Request prackRequestReceived;
+	protected Request prackRequestReceived;
 
 	private boolean okToPrackReceived;
 	
@@ -334,9 +334,9 @@ public class TestSipListener implements SipListener {
 
 	private boolean updateReceived;
 
-	private boolean sendUpdateAfterUpdate = false;
+	protected boolean sendUpdateAfterUpdate = false;
 	
-	private boolean sendUpdateAfterPrack = false;
+	protected boolean sendUpdateAfterPrack = false;
 
 	private boolean sendUpdateAfterProvisionalResponses;
 
@@ -2595,7 +2595,18 @@ public class TestSipListener implements SipListener {
 		
 	}
 	
+	public TestSipListener() {
+		allMessagesContent = new ArrayList<String>();
+		allSubscriptionStates = new ArrayList<String>();
+		finalResponseToSend = Response.OK;
+		provisionalResponsesToSend = new ArrayList<Integer>();
+		provisionalResponsesToSend.add(Response.TRYING);
+		provisionalResponsesToSend.add(Response.RINGING);
+	
+	}
+	
 	public TestSipListener (int myPort, int peerPort, ProtocolObjects protocolObjects, boolean callerSendBye) {
+		this();
 		this.protocolObjects = protocolObjects;		
 		this.myPort = myPort;
 		if(peerPort > 0) {
@@ -2603,12 +2614,6 @@ public class TestSipListener implements SipListener {
 			this.peerHostPort = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":"+ peerPort;
 		}
 		this.sendBye = callerSendBye;
-		allMessagesContent = new ArrayList<String>();
-		allSubscriptionStates = new ArrayList<String>();
-		finalResponseToSend = Response.OK;
-		provisionalResponsesToSend = new ArrayList<Integer>();
-		provisionalResponsesToSend.add(Response.TRYING);
-		provisionalResponsesToSend.add(Response.RINGING);
 	}
 
 	public void processIOException(IOExceptionEvent exceptionEvent) {

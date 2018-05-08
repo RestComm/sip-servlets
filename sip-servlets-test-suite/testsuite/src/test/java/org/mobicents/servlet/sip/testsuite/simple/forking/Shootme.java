@@ -52,6 +52,10 @@ import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
 import junit.framework.TestCase;
+import testsuite.src.test.java.org.mobicents.servlet.sip.testsuite.DialogExt;
+import gov.nist.javax.sip.message.MessageExt;
+import javax.sip.TransactionAlreadyExistsException;
+
 import javax.sip.header.Header;
 import javax.sip.header.RequireHeader;
 
@@ -172,9 +176,71 @@ public class Shootme extends TestSipListener {
             processBye(requestEvent, serverTransactionId);
         } else if (request.getMethod().equals(Request.CANCEL)) {
             processCancel(requestEvent, serverTransactionId);
-        }
+        } else if (request.getMethod().equals(Request.PRACK)) {
+			processPrack(request, serverTransactionId);
+		}
 
     }
+	
+	private void processPrack(Request request,
+			ServerTransaction serverTransactionId) {
+				
+		try {
+			prackReceived = true;
+			prackRequestReceived = request;
+			ServerTransaction st = serverTransactionId;			
+			if (st == null) {
+				try {
+					st = sipProvider.getNewServerTransaction(request);
+				} catch ( TransactionAlreadyExistsException taex ) {
+					// This is a retransmission so just return.
+					return;				
+				} 
+			}						
+			Response response = protocolObjects.messageFactory.createResponse(
+					200, request);
+			Address address = protocolObjects.addressFactory
+			.createAddress("Shootme <sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + myPort
+					+";transport="+protocolObjects.transport
+					+ ">");
+			ContactHeader contactHeader = protocolObjects.headerFactory.createContactHeader(address);
+			response.addHeader(contactHeader);
+			st.sendResponse(response);
+			
+			Thread.sleep(200);
+			
+			RequireHeader requireHeader = (RequireHeader) request.getHeader(RequireHeader.NAME);				
+			if(provisionalResponsesToSend.size() > 0) {
+				logger.info("shootme: Creating provisional response with status code " + provisionalResponsesToSend.get(0));
+				response = protocolObjects.messageFactory.createResponse(
+						provisionalResponsesToSend.get(0), inviteRequest);
+				requireHeader = protocolObjects.headerFactory.createRequireHeader("100rel");
+				response.addHeader(requireHeader);
+				Header rseqHeader = protocolObjects.headerFactory.createRSeqHeader(rseqNumber.getAndIncrement());
+				response.addHeader(rseqHeader);
+				((MessageExt)response).getToHeader().setTag(((MessageExt) request).getToHeader().getTag());
+				address = protocolObjects.addressFactory
+				.createAddress("Shootme <sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + myPort
+						+";transport="+protocolObjects.transport
+						+ ">");
+				contactHeader = protocolObjects.headerFactory.createContactHeader(address);
+				response.addHeader(contactHeader);
+				dialog.sendReliableProvisionalResponse(response);
+				provisionalResponsesToSend.remove(0);
+				return;
+			} 
+			
+			if(!sendUpdateAfterUpdate && !waitForCancel
+					// https://github.com/Mobicents/sip-servlets/issues/66 include UPDATE after PRACK
+					&& !sendUpdateAfterPrack)
+				inviteServerTid.sendResponse(getFinalResponse());
+			else {
+				logger.info("sendUpdateAfterUpdate or Waiting for CANCEL, stopping the PRACK processing and not sending 200 OK to INVITE");
+			}
+		} catch(Exception e) {
+			logger.error("Unexpected exception while trying to send the 200 to PRACK " + request, e);
+		}
+	}
 
     /*public void processResponse(ResponseEvent responseEvent) {
     }*/
@@ -200,6 +266,7 @@ public class Shootme extends TestSipListener {
             ServerTransaction serverTransaction) {
         SipProvider sipProvider = (SipProvider) requestEvent.getSource();
         Request request = requestEvent.getRequest();
+        inviteRequest = request;
         try {
             logger.info("shootme: got an Invite sending Trying");
             // logger.info("shootme: " + request);
@@ -212,7 +279,28 @@ public class Shootme extends TestSipListener {
             }
 
             logger.info("getNewServerTransaction : " + st);
-
+           
+            this.inviteServerTid = st;
+			Dialog dialog = st.getDialog();
+			if(request.getHeader(JoinHeader.NAME) != null) {
+				setJoinRequestReceived(true);
+				this.joinDialog = dialog;
+			} else if (request.getHeader(ReplacesHeader.NAME) != null) {
+				setReplacesRequestReceived(true);
+				this.replacesDialog = dialog;
+			} else {
+				this.dialogCount ++;
+				this.dialog = dialog;
+			}						
+			
+			logger.info("Shootme: dialog = " + dialog);
+			if(dialog != null) {
+				logger.info("Shootme: dialog state = " + dialog.getState());
+			}
+			if(dialog != null && disableSequenceNumberValidation) {
+				((DialogExt)dialog).disableSequenceNumberValidation();
+			}
+			
             String txId = ((ViaHeader)request.getHeader(ViaHeader.NAME)).getBranch();
             this.serverTxTable.put(txId, st);
 
