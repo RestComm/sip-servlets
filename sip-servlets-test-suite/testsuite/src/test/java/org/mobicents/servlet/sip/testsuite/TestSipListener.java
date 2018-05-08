@@ -147,9 +147,9 @@ public class TestSipListener implements SipListener {
 
 	protected Dialog dialog;
 	
-	private Dialog joinDialog;
-	
-	private Dialog replacesDialog;
+	protected Dialog joinDialog;
+
+	protected Dialog replacesDialog;
 
 	public int myPort;
 
@@ -163,7 +163,7 @@ public class TestSipListener implements SipListener {
 
 	private int transactionCount;
 
-	private int dialogCount;
+	protected int dialogCount;
 
 	private Request cancelRequest;
 	
@@ -316,7 +316,7 @@ public class TestSipListener implements SipListener {
 	public Request firstRequest;
 	public Request lastInvite;
 
-	private boolean disableSequenceNumberValidation = false;
+	protected boolean disableSequenceNumberValidation = false;
 	
 	private boolean sendCancelOn1xx = false;
 
@@ -2589,10 +2589,6 @@ public class TestSipListener implements SipListener {
 			ReferToHeader referToHeader = (ReferToHeader) protocolObjects.headerFactory.createHeader(ReferToHeader.NAME, "sip:refer-to@nist.gov");
 			request.addHeader(referToHeader);
 		}
-	}
-	
-	public TestSipListener(){
-		
 	}
 	
 	public TestSipListener() {

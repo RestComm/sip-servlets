@@ -52,12 +52,14 @@ import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
 import junit.framework.TestCase;
-import testsuite.src.test.java.org.mobicents.servlet.sip.testsuite.DialogExt;
 import gov.nist.javax.sip.message.MessageExt;
 import javax.sip.TransactionAlreadyExistsException;
 
 import javax.sip.header.Header;
 import javax.sip.header.RequireHeader;
+import gov.nist.javax.sip.header.extensions.JoinHeader;
+import gov.nist.javax.sip.header.extensions.ReplacesHeader;
+import gov.nist.javax.sip.DialogExt;
 
 
 
@@ -281,7 +283,7 @@ public class Shootme extends TestSipListener {
             logger.info("getNewServerTransaction : " + st);
            
             this.inviteServerTid = st;
-			Dialog dialog = st.getDialog();
+			dialog = st.getDialog();
 			if(request.getHeader(JoinHeader.NAME) != null) {
 				setJoinRequestReceived(true);
 				this.joinDialog = dialog;
