@@ -153,8 +153,6 @@ public class SipSessionImpl implements MobicentsSipSession {
 
 	protected ProxyImpl proxy;
 
-	protected B2buaHelperImpl b2buaHelper;
-
 	protected transient int requestsPending;
 
 	volatile protected Map<String, Object> sipSessionAttributeMap;
@@ -1116,9 +1114,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 		// because it will try to get the B2BUAHelper after the session has been invalidated
 //		sipApplicationSession = null;
 		manager = null;
-		if(b2buaHelper != null) {
-			b2buaHelper.unlinkSipSessionsInternal(this, false);
-			b2buaHelper= null;
+		if(getB2buaHelper() != null) {
+			getB2buaHelper().unlinkSipSessionsInternal(this, false);
 		}
 		derivedSipSessions = null;
 		// not collecting it here to avoid race condition from
@@ -1587,7 +1584,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	public void onTerminatedState() {
 		if(isValidInternal()) {
                         if(logger.isDebugEnabled()) {
-                            String msg = String.format("SipSession [%s] onTerminateState, hasParent [%s], hasDerivedSessions [%s]", key, parentSession !=null, derivedSipSessions != null);
+                            String msg = String.format("SipSession [%s] onTerminateState, hasParent [%s], hasDerivedSessions [%s]", getId(), parentSession !=null, derivedSipSessions != null);
                             logger.debug(msg);
                         }
                         //switch to readyToInvalidate state here
@@ -1596,15 +1593,16 @@ public class SipSessionImpl implements MobicentsSipSession {
                         //make sure linked session is terminated as well so is
                         //not left on memory
                         MobicentsSipSession linkedSession = null;
-                        if (this.b2buaHelper != null) {
+                        if (getB2buaHelper() != null) {
                             //save ref to linkedSession for later
-                            linkedSession = (MobicentsSipSession) this.b2buaHelper.getLinkedSession(this);
+                            linkedSession = (MobicentsSipSession) getB2buaHelper().getLinkedSession(this);
                         }
                         //evaluate if we can proceed to invalidation
 			onReadyToInvalidate();
 
                         //invoke after actual invalidation to prevent infinite loop
                         if (linkedSession != null) {
+                            logger.debug("terminating linked session.");
                             linkedSession.onTerminatedState();
                         }
 
@@ -2040,7 +2038,7 @@ public class SipSessionImpl implements MobicentsSipSession {
         while (derivedSessionsIterator.hasNext()) {
                 MobicentsSipSession mobicentsSipSession = (MobicentsSipSession) derivedSessionsIterator
                                 .next();
-                allDerivedReady = allDerivedReady & mobicentsSipSession.isReadyToInvalidate();
+                allDerivedReady = allDerivedReady & !mobicentsSipSession.isValid();
         }
 
             if(logger.isDebugEnabled()) {
@@ -2100,14 +2098,18 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * {@inheritDoc}
 	 */
 	public void setB2buaHelper(MobicentsB2BUAHelper helperImpl) {
-		this.b2buaHelper = (B2buaHelperImpl) helperImpl;
+            logger.debug("setting B2BUAHelper:" + helperImpl);
+            SipApplicationSession applicationSession = getApplicationSession();
+            applicationSession.setAttribute(B2buaHelperImpl.B2BUA_ATT_NAME, helperImpl);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public B2buaHelperImpl getB2buaHelper() {
-		return this.b2buaHelper;
+            SipApplicationSession applicationSession = getApplicationSession();
+            B2buaHelperImpl helper = (B2buaHelperImpl) applicationSession.getAttribute(B2buaHelperImpl.B2BUA_ATT_NAME);
+            return helper;
 	}
 
 	/**

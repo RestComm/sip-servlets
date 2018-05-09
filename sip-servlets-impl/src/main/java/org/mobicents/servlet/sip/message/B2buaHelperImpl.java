@@ -109,6 +109,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
     protected static final Set<String> B2BUA_SYSTEM_HEADERS = new HashSet<String>();
 
     private static final String ORIG_REQ_ATT_NAME = "org.restcomm.servlets.sip.originalRequest";
+    public static final String B2BUA_ATT_NAME = "org.restcomm.servlets.sip.B2BUAHelper";
 
     static {
         B2BUA_SYSTEM_HEADERS.add(CallIdHeader.NAME);
@@ -145,6 +146,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
     private transient SipManager sipManager;
 
     public B2buaHelperImpl() {
+        logger.debug("creating new B2BUAhelper");
         sessionMap = new ConcurrentHashMap<String, String>();
         linkedRequestMap = new ConcurrentHashMap<SipServletRequestImpl, SipServletRequestImpl>();
     }
@@ -165,8 +167,11 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
         MobicentsSipSession newDerivedSesion = sipManager.getSipSession(newDerivedKey, false, null, parentSession.getSipApplicationSession());
 
         SIPTransaction transaction = (SIPTransaction) origRequestImpl.getTransaction();
-        //set transaction dialog to null to force creation of new dialog
-        transaction.setDialog(null, null);
+        //set transaction dialog to null to force creation of new dialog on server side
+        if (transaction instanceof ServerTransaction) {
+            logger.debug("Setting dialog to null on server transaction");
+            transaction.setDialog(null, null);
+        }
 
         SipServletRequestImpl sipServletRequestImpl = (SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest(newRequest,
                 newDerivedSesion,
@@ -729,17 +734,19 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
                 String linkedParentSessionId = this.sessionMap.get(mobicentsSipSession.getParentSession().getId());
                 if (linkedParentSessionId != null) {
                     MobicentsSipSession linkedParentSession = lookupSessionById(linkedParentSessionId, (MobicentsSipApplicationSession) session.getApplicationSession());
-                    SipServletRequestImpl originalSipServletRequestImpl = (SipServletRequestImpl) getOriginalRequest(linkedParentSession);
+                    if (linkedParentSession != null) {
+                        SipServletRequestImpl originalSipServletRequestImpl = (SipServletRequestImpl) getOriginalRequest(linkedParentSession);
 
-                    // need to clone the original request to create the forked response
-                    try {
-                        SipServletRequestImpl clonedOriginalRequest = cloneDerivedRequest(originalSipServletRequestImpl, linkedParentSession);
-                        sessionMap.put(session.getId(), clonedOriginalRequest.getSession().getId());
-                        sessionMap.put(clonedOriginalRequest.getSession().getId(), session.getId());
-                        sipSessionKey = clonedOriginalRequest.getSession().getId();
-                    } catch (Exception e) {
-                        logger.debug("error cloning request", e);
+                        // need to clone the original request to create the forked response
+                        try {
+                            SipServletRequestImpl clonedOriginalRequest = cloneDerivedRequest(originalSipServletRequestImpl, linkedParentSession);
+                            sessionMap.put(session.getId(), clonedOriginalRequest.getSession().getId());
+                            sessionMap.put(clonedOriginalRequest.getSession().getId(), session.getId());
+                            sipSessionKey = clonedOriginalRequest.getSession().getId();
+                        } catch (Exception e) {
+                            logger.debug("error cloning request", e);
 
+                        }
                     }
                 }
             }
@@ -876,26 +883,6 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
         }
         this.sessionMap.put(((MobicentsSipSession) session1).getId(), ((MobicentsSipSession) session2).getId());
         this.sessionMap.put(((MobicentsSipSession) session2).getId(), ((MobicentsSipSession) session1).getId());
-        // https://github.com/Mobicents/sip-servlets/issues/56
-        if (!this.equals(((MobicentsSipSession) session1).getB2buaHelper())) {
-            if (((MobicentsSipSession) session1).getB2buaHelper() == null) {
-                ((MobicentsSipSession) session1).setB2buaHelper(this);
-            } else {
-                Map<String, String> forkedSessionMap = ((MobicentsSipSession) session1).getB2buaHelper().getSessionMap();
-                forkedSessionMap.put(((MobicentsSipSession) session1).getId(), ((MobicentsSipSession) session2).getId());
-                forkedSessionMap.put(((MobicentsSipSession) session2).getId(), ((MobicentsSipSession) session1).getId());
-            }
-        }
-        // https://github.com/Mobicents/sip-servlets/issues/56
-        if (!this.equals(((MobicentsSipSession) session2).getB2buaHelper())) {
-            if (((MobicentsSipSession) session2).getB2buaHelper() == null) {
-                ((MobicentsSipSession) session2).setB2buaHelper(this);
-            } else {
-                Map<String, String> forkedSessionMap = ((MobicentsSipSession) session2).getB2buaHelper().getSessionMap();
-                forkedSessionMap.put(((MobicentsSipSession) session1).getId(), ((MobicentsSipSession) session2).getId());
-                forkedSessionMap.put(((MobicentsSipSession) session2).getId(), ((MobicentsSipSession) session1).getId());
-            }
-        }
         if (logger.isDebugEnabled()) {
             logger.debug("sipsession " + ((MobicentsSipSession) session1).getKey() + " linked to sip session " + ((MobicentsSipSession) session2).getKey());
         }
@@ -929,26 +916,6 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
                 throw new IllegalArgumentException("the session is not currently linked to another session or it has been terminated");
             }
         }
-        boolean hasDerived = key.getDerivedSipSessions().hasNext();
-
-        if (hasDerived) {
-            if (logger.isDebugEnabled()) {
-                String msg = String.format("This session [%s], has derived sessions, will not be removed from main map", sipSessionKey);
-                logger.debug(msg);
-            }
-            Iterator<MobicentsSipSession> iterator = key.getDerivedSipSessions();
-            while (iterator.hasNext()) {
-                MobicentsSipSession derivedSipSession = iterator.next();
-                if (logger.isDebugEnabled()) {
-                    String msg = String.format("DerivedSipSession [%s], state [%s]", derivedSipSession.getKey(), derivedSipSession.getState());
-                    logger.debug(msg);
-                }
-            }
-            return;
-        } else if (logger.isDebugEnabled()) {
-            String msg = String.format("This session [%s], has NO derived sessions, will be removed from main map", sipSessionKey);
-            logger.debug(msg);
-        }
 
         final String value = this.sessionMap.get(sipSessionKey);
         if (value != null) {
@@ -957,21 +924,6 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
             this.sessionMap.remove(value);
             if (logger.isDebugEnabled()) {
                 logger.debug("sipsession " + sipSessionKey + " unlinked from sip session " + value);
-            }
-            if (linkedSipSession != null) {
-                // https://github.com/Mobicents/sip-servlets/issues/56
-                MobicentsB2BUAHelper linkedB2buaHelper = ((MobicentsSipSession) linkedSipSession).getB2buaHelper();
-                if (linkedB2buaHelper != null) {
-                    if (!linkedB2buaHelper.equals(this)) {
-                        linkedB2buaHelper.unlinkSipSessionsInternal(linkedSipSession, false);
-                    } else {
-                        linkedB2buaHelper = ((MobicentsSipSession) session).getB2buaHelper();
-                        linkedB2buaHelper.unlinkSipSessionsInternal(linkedSipSession, false);
-                    }
-                } else if (logger.isDebugEnabled()) {
-                    String msg = String.format("LinkedB2BUA Helper is null");
-                    logger.debug(msg);
-                }
             }
         } else if (logger.isDebugEnabled()) {
             logger.debug("no sipsession for " + sipSessionKey + " to unlink");
