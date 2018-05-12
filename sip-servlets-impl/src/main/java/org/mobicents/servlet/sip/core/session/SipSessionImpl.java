@@ -1115,6 +1115,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 //		sipApplicationSession = null;
 		manager = null;
 		if(getB2buaHelper() != null) {
+                    //this will remove the linking so infinite loop is prevented
 			getB2buaHelper().unlinkSipSessionsInternal(this, false);
 		}
 		derivedSipSessions = null;
@@ -1181,7 +1182,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 //			semaphore = null;
 //		}
 		facade = null;
-	}
+                        }
 
 	/**
 	 * Not needed anymore after PFD JSR 289 spec
@@ -1604,7 +1605,7 @@ public class SipSessionImpl implements MobicentsSipSession {
                         if (linkedSession != null) {
                             logger.debug("terminating linked session.");
                             linkedSession.onTerminatedState();
-                        }
+		}
 
 			if(!this.isValid && this.parentSession != null) {
 				//Since there is a parent session, and since the current derived sip session
@@ -1614,7 +1615,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 				if(logger.isDebugEnabled()) {
                                     String msg = String.format("SipSession [%s] onTerminateState hasParentSession [%s] that will ask to onReadyToInvalidate()", key, parentSession.getKey());
                                     logger.debug(msg);
-                                }
+	}
 
                                 this.parentSession.onReadyToInvalidate();
 			}
@@ -2051,7 +2052,7 @@ public class SipSessionImpl implements MobicentsSipSession {
             return;
         } else {
             logger.debug("All Derived ready, lets proceed.");
-        }
+            }
 
     	if(logger.isDebugEnabled()) {
     		logger.debug("invalidateWhenReady flag is set to " + invalidateWhenReady);
@@ -2098,17 +2099,24 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * {@inheritDoc}
 	 */
 	public void setB2buaHelper(MobicentsB2BUAHelper helperImpl) {
-            logger.debug("setting B2BUAHelper:" + helperImpl);
+            logger.debug("setting B2BUAHelper");
             SipApplicationSession applicationSession = getApplicationSession();
-            applicationSession.setAttribute(B2buaHelperImpl.B2BUA_ATT_NAME, helperImpl);
+            if (this.isValid && applicationSession.isValid()) {
+                applicationSession.setAttribute(B2buaHelperImpl.B2BUA_ATT_NAME, helperImpl);
+                logger.debug("B2BUAHelper set");
+            }
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public B2buaHelperImpl getB2buaHelper() {
+            B2buaHelperImpl helper = null;
             SipApplicationSession applicationSession = getApplicationSession();
-            B2buaHelperImpl helper = (B2buaHelperImpl) applicationSession.getAttribute(B2buaHelperImpl.B2BUA_ATT_NAME);
+            if (this.isValid && applicationSession.isValid()) {
+                helper = (B2buaHelperImpl) applicationSession.getAttribute(B2buaHelperImpl.B2BUA_ATT_NAME);
+                logger.debug("B2BUAHelper got");
+            }
             return helper;
 	}
 
