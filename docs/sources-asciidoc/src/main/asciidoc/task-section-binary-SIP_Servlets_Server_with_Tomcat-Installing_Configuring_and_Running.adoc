@@ -50,7 +50,7 @@ link:Common_Content/Setting_the_JBOSS_HOME_Environment_Variable.adoc[Setting Env
 
 == Testing Click2CallAsync with Restcomm  for Tomcat 7 
 
-If Restcomm SIP Servlets for Tomcat 7 is started and running, you should be able to use your web browser to access the welcome page at this url http://127.0.0.1:8080/ This will show you a screenshot similar to the one below. 
+If Restcomm SIP Servlets for Tomcat 7 is started and running, you should be able to use your web browser to access the welcome page at this url `http\://127.0.0.1:8080/` This will show you a screenshot similar to the one below. 
 
 
 
