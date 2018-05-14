@@ -1591,21 +1591,9 @@ public class SipSessionImpl implements MobicentsSipSession {
                         //switch to readyToInvalidate state here
                         this.setReadyToInvalidate(true);
 
-                        //make sure linked session is terminated as well so is
-                        //not left on memory
-                        MobicentsSipSession linkedSession = null;
-                        if (getB2buaHelper() != null) {
-                            //save ref to linkedSession for later
-                            linkedSession = (MobicentsSipSession) getB2buaHelper().getLinkedSession(this);
-                        }
                         //evaluate if we can proceed to invalidation
 			onReadyToInvalidate();
 
-                        //invoke after actual invalidation to prevent infinite loop
-                        if (linkedSession != null) {
-                            logger.debug("terminating linked session.");
-                            linkedSession.onTerminatedState();
-		}
 
 			if(!this.isValid && this.parentSession != null) {
 				//Since there is a parent session, and since the current derived sip session
