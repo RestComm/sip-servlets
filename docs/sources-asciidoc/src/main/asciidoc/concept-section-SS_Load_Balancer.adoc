@@ -285,7 +285,7 @@ On Restcomm for JBoss server installations, the default [path]_standalone-sip.xm
 
 .Easy Node Configuration with JMX
 Both SIP Servlet-enabled JBoss and Tomcat have  (Java Management Extensions) interfaces that allow for easy server configuration.
-The JMX Console is available once the server has been started by navigating to http://localhost:8080/jmx-console/.
+The JMX Console is available once the server has been started by navigating to `http\://localhost:8080/jmx-console/`.
  
 
 Both the `balancers` and `heartBeatInterval` attribute values are available under `name=-SIP-Servlets,type=load-balancer-heartbeat-service` in the JMX Console. 
@@ -405,7 +405,7 @@ Deploy the Location service manually on both nodes.
 . Start the "Sender" SIP softphone
 +
 Start a SIP softphone client with the SIP address of `sip:sender@sip-servlets-com`, listening on port 5055.
-The outbound proxy must be specified as the sip-balancer (http://127.0.0.1:5060)
+The outbound proxy must be specified as the sip-balancer (`http\://127.0.0.1:5060`)
 
 . Start the "Receiver" SIP softphone
 +
