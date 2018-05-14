@@ -700,7 +700,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
         //do this before creating response so proper toTag is selected
         SIPTransaction tx = (SIPTransaction) sipServletRequestImpl.getTransaction();
         SIPDialog newDialog = (SIPDialog)sipSession.getSessionCreatingDialog();
-        if (newDialog != null) {
+        if (newDialog != null && tx != null) {
             logger.debug("recovering dialog on transaction before send:" + System.identityHashCode(newDialog));
             tx.setDialog(newDialog, newDialog.getDialogId());
         }
