@@ -64,13 +64,13 @@ You need to copy your .War files to the  $CATALINA_HOME/webapps directory.
 There is a pre-installed sample SIP application that you can use to test your Restcomm SIP Servlets Tomcat 7 configuration.
 The application is also located in the $CATALINA_HOME/webapps directory 
 
-Start your web browser and go to the link, http://127.0.0.1:8080/Click2CallAsync/
+Start your web browser and go to the link, `http\://127.0.0.1:8080/Click2CallAsync/`
 
 
 .Sample Application Name
 [NOTE]
 ====
-Note that the application name is case-sensitive and will not work if you try to access it as http://127.0.0.1:8080/click2callasync/
+Note that the application name is case-sensitive and will not work if you try to access it as `http\://127.0.0.1:8080/click2callasync/`
 
 ====
 
@@ -126,7 +126,7 @@ On the Manage SIP Accounts tab,
 Leave the rest of the settings as default.
 ----
 
-Once the softphones are configured and are successfully registered with the Restcomm SIP Servlets for Tomcat 7 server, you will see a screenshot like the one below in the web browser at this url http://127.0.0.1:8080/Click2CallAsync/
+Once the softphones are configured and are successfully registered with the Restcomm SIP Servlets for Tomcat 7 server, you will see a screenshot like the one below in the web browser at this url `http\://127.0.0.1:8080/Click2CallAsync/`
 
 
 
