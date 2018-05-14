@@ -62,7 +62,7 @@ started in 22148ms - Started 222 of 306 services (83 services are passive or on-
 You will notice that the startup is very fast.
 The reason for this is that JBoss was rewritten from the ground up for speed with services being started concurrently and non critical services remain passive until first use.
 This provides better system resource management.
-With the simple startup above, you will be able to enter the default web interface of the application server by going to this url http://127.0.0.1:8080.
+With the simple startup above, you will be able to enter the default web interface of the application server by going to this url 'http\://127.0.0.1:8080'.
 The result will show a screenshot similar to the one below. 
 
 
@@ -105,7 +105,7 @@ Type the following command:
 20:43:21,648 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015874: JBoss AS 7.1.2.Final "Steropes" started in 26560ms - Started 232 of 321 services (88 services are passive or on-demand)
 ----
 
-The click2call SIP sample application bundled with Restcomm SIP Servlets will become available at this url http://127.0.0.1:8080/click2call.
+The click2call SIP sample application bundled with Restcomm SIP Servlets will become available at this url `http\://127.0.0.1:8080/click2call`.
 You can configure multiple SIP softphones to use the sample application.
 See the section below for how to configure and test the SIP sample application. 
 
@@ -153,7 +153,7 @@ A correctly configured Linphone will look like the screenshot below.
 image::images/linphone-registration-port-5080.png[]
 
 
-Once the phones are successfully registered with the Restcomm SIP Servlets for JBoss AS7 server, you can check the result in the sample SIP application at this url, http://127.0.0.1:8080/click2call
+Once the phones are successfully registered with the Restcomm SIP Servlets for JBoss AS7 server, you can check the result in the sample SIP application at this url, `http\://127.0.0.1:8080/click2call`
 
 
 
