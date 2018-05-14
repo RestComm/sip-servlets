@@ -949,15 +949,16 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
             throw new NullPointerException("Second argument is null");
         }
 
-		if(!((MobicentsSipSession)session1).isValidInternal() || !((MobicentsSipSession)session2).isValidInternal() ||
-				State.TERMINATED.equals(((MobicentsSipSession)session1).getState()) ||
-				State.TERMINATED.equals(((MobicentsSipSession)session2).getState()) ||
-				!session1.getApplicationSession().equals(session2.getApplicationSession()) ||
-				(sessionMap.get(((MobicentsSipSession)session1).getKey()) != null && sessionMap.get(((MobicentsSipSession)session1).getKey()) != ((MobicentsSipSession)session2).getKey())  ||
-				(sessionMap.get(((MobicentsSipSession)session2).getKey()) != null && sessionMap.get(((MobicentsSipSession)session2).getKey()) != ((MobicentsSipSession)session1).getKey())) {
-			throw new IllegalArgumentException("either of the specified sessions has been terminated " +
-					"or the sessions do not belong to the same application session or " +
-					"one or both the sessions are already linked with some other session(s)");
+        if (!((MobicentsSipSession) session1).isValidInternal() || !((MobicentsSipSession) session2).isValidInternal()
+                || State.TERMINATED.equals(((MobicentsSipSession) session1).getState())
+                || State.TERMINATED.equals(((MobicentsSipSession) session2).getState())
+                || !session1.getApplicationSession().equals(session2.getApplicationSession())
+                || (sessionMap.get(((MobicentsSipSession) session1).getId()) != null && !sessionMap.get(((MobicentsSipSession) session1).getId()).equals(((MobicentsSipSession) session2).getId()))
+                || (sessionMap.get(((MobicentsSipSession) session2).getId()) != null
+                && !sessionMap.get(((MobicentsSipSession) session2).getId()).equals(((MobicentsSipSession) session1).getId()))) {
+            throw new IllegalArgumentException("either of the specified sessions has been terminated "
+                    + "or the sessions do not belong to the same application session or "
+                    + "one or both the sessions are already linked with some other session(s)");
         }
         this.sessionMap.put(((MobicentsSipSession) session1).getId(), ((MobicentsSipSession) session2).getId());
         this.sessionMap.put(((MobicentsSipSession) session2).getId(), ((MobicentsSipSession) session1).getId());
