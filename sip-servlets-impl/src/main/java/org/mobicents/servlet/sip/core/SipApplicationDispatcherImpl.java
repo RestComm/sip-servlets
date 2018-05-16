@@ -1349,9 +1349,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 									logger.debug("Sip session " + sipSessionKey + " is ready to be invalidated ? :" + sipSessionImpl.isReadyToInvalidateInternal());
 								}
 							}
-							if(sipSessionImpl.isValidInternal() &&
+                                                        boolean b2buaOrphaned = sipSessionImpl.isB2BUAOrphan();
+							if(sipSessionImpl.isValidInternal() && (
 									// https://code.google.com/p/sipservlets/issues/detail?id=279
-									sipSessionImpl.isReadyToInvalidateInternal()) {
+									sipSessionImpl.isReadyToInvalidateInternal() ||
+                                                                b2buaOrphaned)) {
 								sipSessionImpl.onTerminatedState();
 							}
 						} finally {

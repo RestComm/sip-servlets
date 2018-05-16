@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -45,7 +45,7 @@ import org.mobicents.servlet.sip.core.security.SipPrincipal;
 
 /**
  * Extension to the SipSession interface from JSR 289
- * 
+ *
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
  *
  */
@@ -58,8 +58,8 @@ public interface MobicentsSipSession extends SipSession, SipSessionExt {
 	MobicentsSipSessionKey getKey();
 
 	/**
-	 * Add the derived sip session it will be identified by the To tag from its key 
-	 * @param derivedSession the derived session to add  
+	 * Add the derived sip session it will be identified by the To tag from its key
+	 * @param derivedSession the derived session to add
 	 */
 	void addDerivedSipSessions(MobicentsSipSession derivedSession);
 	/**
@@ -67,7 +67,7 @@ public interface MobicentsSipSession extends SipSession, SipSessionExt {
 	 * @param key the key identifying the sip session to remove
 	 * @return the removed derived sip session
 	 */
-	public MobicentsSipSession removeDerivedSipSession(String key);	
+	public MobicentsSipSession removeDerivedSipSession(String key);
 	/**
 	 * Find the derived sip session identified by its to tag
 	 * @param toTag the to Tag identifying the sip session to remove
@@ -75,29 +75,29 @@ public interface MobicentsSipSession extends SipSession, SipSessionExt {
 	 */
 	public MobicentsSipSession findDerivedSipSession(String toTag);
 
-	
+
 	MobicentsSipApplicationSession getSipApplicationSession();
 
 	String getHandler();
 
 	Dialog getSessionCreatingDialog();
 	void setSessionCreatingDialog(Dialog dialog);
-	
+
 	MobicentsSipServletMessage getSessionCreatingTransactionRequest();
 	void setSessionCreatingTransactionRequest(MobicentsSipServletMessage message);
 
 	Set<Transaction> getOngoingTransactions();
 	void removeOngoingTransaction(Transaction transaction);
 	void addOngoingTransaction(Transaction transaction);
-	
+
 	void cleanDialogInformation(boolean terminate);
 
 	Serializable getStateInfo();
 	void setStateInfo(Serializable stateInfo);
-		
+
 	SipPrincipal getUserPrincipal();
 	void setUserPrincipal(SipPrincipal principal);
-	
+
 	void setRoutingRegion(SipApplicationRoutingRegion routingRegion);
 
 	/**
@@ -106,9 +106,9 @@ public interface MobicentsSipSession extends SipSession, SipSessionExt {
 	 */
 	MobicentsProxy getProxy();
 	void setProxy(MobicentsProxy proxy);
-	
+
 	public void setB2buaHelper(MobicentsB2BUAHelper helperImpl);
-	public MobicentsB2BUAHelper getB2buaHelper();	
+	public MobicentsB2BUAHelper getB2buaHelper();
 
 	void access();
 
@@ -121,21 +121,21 @@ public interface MobicentsSipSession extends SipSession, SipSessionExt {
 	void onTerminatedState();
 
 	void onReadyToInvalidate();
-	
+
 	String getOutboundInterface();
 
 	Iterator<MobicentsSipSession> getDerivedSipSessions();
 
-	void setState(State state);	
+	void setState(State state);
 
 	void setSipSubscriberURI(String subscriberURI);
 
 	String getSipSubscriberURI();
-	
+
 	MobicentsSipSession getParentSession();
 	void setParentSession(MobicentsSipSession mobicentsSipSession);
 
-	Map<String, Object> getSipSessionAttributeMap();	
+	Map<String, Object> getSipSessionAttributeMap();
 
 	void setSipSessionAttributeMap(Map<String, Object> sipSessionAttributeMap);
 
@@ -144,44 +144,44 @@ public interface MobicentsSipSession extends SipSession, SipSessionExt {
 	void setRemoteParty(Address addressImpl);
 
 	SipApplicationRoutingRegion getRegionInternal();
-	
+
 	void acquire();
 	void release();
-	
+
 	//RFC 3265
 	void addSubscription(MobicentsSipServletMessage sipServletMessage) throws SipException;
 	void removeSubscription(MobicentsSipServletMessage sipServletMessage);
-	
+
 	MobicentsSipSession getFacade();
 
 	void setNextSipApplicationRouterInfo(SipApplicationRouterInfo routerInfo);
-	SipApplicationRouterInfo getNextSipApplicationRouterInfo();	
+	SipApplicationRouterInfo getNextSipApplicationRouterInfo();
 
 	public boolean isValidInternal();
 	// https://code.google.com/p/sipservlets/issues/detail?id=279
 	public boolean isReadyToInvalidateInternal();
- 
+
 	public long getCseq();
 	public void setCseq(long cseq);
 	boolean validateCSeq(MobicentsSipServletRequest sipServletRequestImpl);
-	
+
 	String getTransport();
 	void setTransport(String transport);
-	
+
 	int getRequestsPending();
 	void setRequestsPending(int requests);
 
 	void setAckReceived(long cSeq, boolean ackReceived);
 
 	void notifySipSessionListeners(SipSessionEventType creation);
-	
+
 	void setSipSessionSecurity(MobicentsSipSessionSecurity sipSessionSecurity);
 	MobicentsSipSessionSecurity getSipSessionSecurity();
-	
+
 	/**
 	 * Associate a particular flow (see RFC5626) with this
 	 * session.
-	 * 
+	 *
 	 * @param flow
 	 */
 	public void setFlow(final javax.sip.address.SipURI flow);
@@ -191,11 +191,13 @@ public interface MobicentsSipSession extends SipSession, SipSessionExt {
 	public void setOrphan(boolean orphan);
 
 	public boolean isOrphan();
-	
+
 	// https://code.google.com/p/sipservlets/issues/detail?id=279
 	/**
 	 * Invalidate with an option to bypass the check if the session was already invalidated
 	 * @param bypassCheck whether or not to by pass the checks to throw Exception if the session was already invalidated or is in the process of it
 	 */
 	public void invalidate(boolean bypassCheck);
+
+        public boolean isB2BUAOrphan();
 }

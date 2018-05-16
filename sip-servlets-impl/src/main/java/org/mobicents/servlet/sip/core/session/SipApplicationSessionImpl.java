@@ -66,17 +66,17 @@ import org.mobicents.servlet.sip.utils.JvmRouteUtil;
 
 /**
  * <p>Implementation of the SipApplicationSession interface.
- * An instance of this sip application session can only be retrieved through the Session Manager 
+ * An instance of this sip application session can only be retrieved through the Session Manager
  * (extended class from Tomcat's manager classes implementing the <code>Manager</code> interface)
  * to constrain the creation of sip application session and to make sure that all sessions created
- * can be retrieved only through the session manager<p/> 
- * 
+ * can be retrieved only through the session manager<p/>
+ *
  * <p>
  * As a SipApplicationSession represents a call (that can contain multiple call legs, in the B2BUA case by example),
- * the call id and the app name are used as a unique key for a given SipApplicationSession instance. 
+ * the call id and the app name are used as a unique key for a given SipApplicationSession instance.
  * </p>
- * 
- * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
+ *
+ * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
  */
 public class SipApplicationSessionImpl implements MobicentsSipApplicationSession {
 
@@ -85,46 +85,46 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	protected Map<String, Object> sipApplicationSessionAttributeMap;
 
 	protected transient Set<SipSessionKey> sipSessions;
-	
+
 	protected transient Set<String> httpSessions;
-	
-	protected SipApplicationSessionKey key;	
-	
+
+	protected SipApplicationSessionKey key;
+
 	protected long lastAccessedTime;
-	
+
 	protected long creationTime;
-	
+
 	protected long expirationTime;
-	
+
 	protected boolean expired;
-	
+
 	protected transient SipApplicationSessionTimerTask expirationTimerTask;
-	
+
 //	protected transient ScheduledFuture<MobicentsSipApplicationSession> expirationTimerFuture;
-	
+
 	protected transient ConcurrentHashMap<String, ServletTimer> servletTimers;
-	
+
 	protected transient AtomicBoolean isValidInternal;
-	
+
 	protected transient boolean isValid;
-	
+
 	protected boolean invalidateWhenReady = true;
-	
+
 	protected boolean readyToInvalidate = false;
-	
+
 	/**
 	 * The first sip application for subsequent requests.
 	 */
 	protected transient SipContext sipContext;
-	
+
 	protected String currentRequestHandler;
-	
+
 	protected transient Semaphore semaphore;
-		
+
 	protected transient MobicentsSipApplicationSessionFacade facade = null;
-	
+
 	protected long sipApplicationSessionTimeout = -1;
-	
+
 	// Does it need to be synchronized?
 	protected Map<String,Object> getAttributeMap() {
 		if(sipApplicationSessionAttributeMap == null) {
@@ -132,15 +132,15 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		}
 		return sipApplicationSessionAttributeMap;
 	}
-	
+
 	@SuppressWarnings(value="unchecked")
 	protected SipApplicationSessionImpl(SipApplicationSessionKey key, SipContext sipContext) {
-		sipSessions = new CopyOnWriteArraySet<SipSessionKey>();	
+		sipSessions = new CopyOnWriteArraySet<SipSessionKey>();
 		this.key = key;
-		creationTime = System.currentTimeMillis();		
+		creationTime = System.currentTimeMillis();
 		expired = false;
 		isValid = true;
-		isValidInternal = new AtomicBoolean(true);		
+		isValidInternal = new AtomicBoolean(true);
 		// the sip context can be null if the AR returned an application that was not deployed
 		if(sipContext != null) {
 			this.sipContext = sipContext;
@@ -150,44 +150,44 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			}
 			//scheduling the timer for session expiration
 			final int sipContextTimeout = sipContext.getSipApplicationSessionTimeout();
-			if(sipContextTimeout > 0) {				
-				sipApplicationSessionTimeout = sipContextTimeout * 60 * 1000L;								
+			if(sipContextTimeout > 0) {
+				sipApplicationSessionTimeout = sipContextTimeout * 60 * 1000L;
 			} else {
 				if(logger.isDebugEnabled()) {
 					logger.debug("The sip application session "+ key +" will never expire ");
 				}
-				// If the session timeout value is 0 or less, then an application session timer 
-				// never starts for the SipApplicationSession object and the container does 
+				// If the session timeout value is 0 or less, then an application session timer
+				// never starts for the SipApplicationSession object and the container does
 				// not consider the object to ever have expired
 //				expirationTime = -1;
-			}			
+			}
 		}
 		// Last Accessed Time set here instead of at the same time as creationTime
-		// Contribution from Naoki Nishihara from OKI 
-		// Fix for Issue 1853  http://code.google.com/p/mobicents/issues/detail?id=1853 
+		// Contribution from Naoki Nishihara from OKI
+		// Fix for Issue 1853  http://code.google.com/p/mobicents/issues/detail?id=1853
 		// SipApplicationSession.getExpirationTime() returns 0 in converged app
 		setLastAccessedTime(creationTime);
 	}
-	
+
 	/**
-	 * Notifies the listeners that a lifecycle event occured on that sip application session 
+	 * Notifies the listeners that a lifecycle event occured on that sip application session
 	 * @param sipApplicationSessionEventType the type of event that happened
 	 */
-	public void notifySipApplicationSessionListeners(SipApplicationSessionEventType sipApplicationSessionEventType) {						
-		List<SipApplicationSessionListener> listeners = 
+	public void notifySipApplicationSessionListeners(SipApplicationSessionEventType sipApplicationSessionEventType) {
+		List<SipApplicationSessionListener> listeners =
 			sipContext.getListeners().getSipApplicationSessionListeners();
 		if(listeners.size() > 0) {
 			ClassLoader oldClassLoader = java.lang.Thread.currentThread().getContextClassLoader();
-			sipContext.enterSipContext();	
+			sipContext.enterSipContext();
 			SipApplicationSessionEvent event = new SipApplicationSessionEvent(this.getFacade());
 			if(logger.isDebugEnabled()) {
-				logger.debug("notifying sip application session listeners of context " + 
+				logger.debug("notifying sip application session listeners of context " +
 						key.getApplicationName() + " of following event " + sipApplicationSessionEventType);
 			}
 			for (SipApplicationSessionListener sipApplicationSessionListener : listeners) {
 				try {
 					if(logger.isDebugEnabled()) {
-						logger.debug("notifying sip application session listener " + sipApplicationSessionListener.getClass().getName() + " of context " + 
+						logger.debug("notifying sip application session listener " + sipApplicationSessionListener.getClass().getName() + " of context " +
 								key.getApplicationName() + " of following event " + sipApplicationSessionEventType);
 					}
 					if(SipApplicationSessionEventType.CREATION.equals(sipApplicationSessionEventType)) {
@@ -199,15 +199,15 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 					} else if (SipApplicationSessionEventType.READYTOINVALIDATE.equals(sipApplicationSessionEventType)) {
 						sipApplicationSessionListener.sessionReadyToInvalidate(event);
 					}
-					
+
 				} catch (Throwable t) {
 					logger.error("SipApplicationSessionListener threw exception", t);
 				}
 			}
 			sipContext.exitSipContext(oldClassLoader);
-		}		
+		}
 	}
-	
+
 	public boolean addSipSession(MobicentsSipSession mobicentsSipSession) {
 		boolean wasNotPresent = this.sipSessions.add((SipSessionKey)mobicentsSipSession.getKey());
 		if(logger.isDebugEnabled() && wasNotPresent) {
@@ -217,7 +217,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		return wasNotPresent;
 //		sipSessionImpl.setSipApplicationSession(this);
 	}
-	
+
 	public SipSessionKey removeSipSession(MobicentsSipSession mobicentsSipSession) {
 		if(logger.isDebugEnabled()) {
 			logger.debug("Trying to remove sip session " + mobicentsSipSession);
@@ -236,7 +236,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 						MobicentsSipSession derivedSipSession = itDerivedSessions.next();
 						logger.debug("Derived sip session : " + derivedSipSession.getKey() + " isValid " + derivedSipSession.isValidInternal() + " isReadyToInvalidate " + derivedSipSession.isReadyToInvalidateInternal());
 					}
-				} 
+				}
 				return null;
 			}
 			if(parentSession.isValidInternal()) {
@@ -260,15 +260,15 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		}
 		if(sipSessions != null) {
 			boolean wasPresent = this.sipSessions.remove(key);
-			
+
 			if(logger.isDebugEnabled() && wasPresent) {
 				logger.debug("Removed sip session " + key + " from sip app session " + getKey());
 			}
 			return key;
-		} 
+		}
 		return null;
 	}
-	
+
 	public boolean addHttpSession(HttpSession httpSession) {
 		if(httpSessions == null) {
 			httpSessions = new CopyOnWriteArraySet<String>();
@@ -281,7 +281,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		// TODO: We assume that there is only one HTTP session in the app session. In this case
 		// we are safe to only assign jvmRoute once here. When we support multiple http sessions
 		// we will need something more sophisticated.
-		String jvmRoute = JvmRouteUtil.extractJvmRoute(httpSession.getId());	
+		String jvmRoute = JvmRouteUtil.extractJvmRoute(httpSession.getId());
 		if(jvmRoute != null) {
 			if(logger.isDebugEnabled()) {
 				logger.debug("JVM Route " + jvmRoute + " for just added http session " + JvmRouteUtil.removeJvmRoute(httpSession.getId()));
@@ -290,7 +290,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		}
 		return wasNotPresent;
 	}
-	
+
 	public boolean removeHttpSession(HttpSession httpSession) {
 		if(httpSessions != null) {
 			if(logger.isDebugEnabled()) {
@@ -304,7 +304,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		}
 		return false;
 	}
-	
+
 	public HttpSession findHttpSession (String sessionId) {
 		String id = JvmRouteUtil.removeJvmRoute(sessionId);
 		if(httpSessions != null) {
@@ -312,13 +312,13 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 				try {
 					return (HttpSession)sipContext.getSipManager().findSession(id);
 				} catch (IOException e) {
-					logger.error("An Unexpected exception happened while retrieving the http session " + id, e);				
+					logger.error("An Unexpected exception happened while retrieving the http session " + id, e);
 				}
 			}
 		}
 		return null;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -407,8 +407,8 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		}
 		return this.expirationTime;
 	}
-	
-	
+
+
 
 	/**
 	 * {@inheritDoc}
@@ -425,13 +425,13 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		return lastAccessedTime;
 	}
 
-	
+
 	protected void setLastAccessedTime(long lastAccessTime) {
 		if(logger.isDebugEnabled()) {
 			logger.debug("lastAccessedTime set to "+ lastAccessTime);
 		}
 		this.lastAccessedTime = lastAccessTime;
-		//JSR 289 Section 6.3 : starting the sip app session expiry timer anew 
+		//JSR 289 Section 6.3 : starting the sip app session expiry timer anew
 		if(sipApplicationSessionTimeout > 0) {
 			expirationTime = lastAccessedTime + sipApplicationSessionTimeout;
 			if(logger.isDebugEnabled()) {
@@ -443,7 +443,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			}
 		}
 	}
-	
+
 	/**
      * Update the accessed time information for this session.  This method
      * should be called by the context when a request comes in for a particular
@@ -455,7 +455,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	public void access() {
 		setLastAccessedTime(System.currentTimeMillis());
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipApplicationSession#getSessions()
@@ -486,7 +486,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		}
 		if("SIP".equalsIgnoreCase(protocol)) {
 			return getSipSessions(false).iterator();
-		} else if("HTTP".equalsIgnoreCase(protocol)) {			
+		} else if("HTTP".equalsIgnoreCase(protocol)) {
 			return getHttpSessions().iterator();
 		} else {
 			throw new IllegalArgumentException(protocol + " sessions are not handled by this container");
@@ -507,7 +507,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 							retSipSessions.add(sipSession.getFacade());
 						}
 					}
-					// https://github.com/Mobicents/sip-servlets/issues/41 
+					// https://github.com/Mobicents/sip-servlets/issues/41
 					// Adding derived Sessions to the list of returned sip sessions
 					Iterator<MobicentsSipSession> derivedSessionsIterator = sipSession.getDerivedSipSessions();
 					while (derivedSessionsIterator.hasNext()) {
@@ -524,7 +524,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		}
 		return retSipSessions;
 	}
-	
+
 	protected Set<HttpSession> getHttpSessions() {
 		Set<HttpSession> retHttpSessions = new HashSet<HttpSession>();
 		if(httpSessions != null) {
@@ -535,8 +535,8 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 						retHttpSessions.add(httpSession);
 					}
 				} catch (IOException e) {
-					logger.error("An Unexpected exception happened while retrieving the http session " + id, e);			
-				}			
+					logger.error("An Unexpected exception happened while retrieving the http session " + id, e);
+				}
 			}
 		}
 		return retHttpSessions;
@@ -561,7 +561,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			isPresent = sipSessions.contains(sipSessionKey);
 		} catch (ParseException e) {
 			//can happen if the id passed is invalid
-		}		 
+		}
 		if(isPresent) {
 			return sipContext.getSipManager().getSipSession(sipSessionKey, false, null, this).getFacade();
 		} else {
@@ -614,7 +614,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			updateReadyToInvalidateState();
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipApplicationSession#invalidate()
@@ -622,11 +622,11 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	public void invalidate() {
 		invalidate(false);
 	}
-	
+
 	public void invalidate(boolean bypassCheck) {
 		//JSR 289 Section 6.1.2.2.1
-		//When the IllegalStateException is thrown, the application is guaranteed 
-		//that the state of the SipApplicationSession object will be unchanged from its state prior to the invalidate() 
+		//When the IllegalStateException is thrown, the application is guaranteed
+		//that the state of the SipApplicationSession object will be unchanged from its state prior to the invalidate()
 		//method call. Even session objects that were eligible for invalidation will not have been invalidated.
 		boolean wasValid = isValidInternal.compareAndSet(true, false);
 		if(!wasValid) {
@@ -634,7 +634,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 				throw new IllegalStateException("SipApplicationSession " + key + " already invalidated !");
 			} else {
 				if(logger.isInfoEnabled()) {
-					logger.info("SipApplicationSession " + key + " already invalidated, doing nothing");					
+					logger.info("SipApplicationSession " + key + " already invalidated, doing nothing");
 				}
 				return;
 			}
@@ -642,7 +642,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		if(logger.isInfoEnabled()) {
 			logger.info("Invalidating the following sip application session " + key);
 		}
-		
+
 		//doing the invalidation
 		for(MobicentsSipSession session: getSipSessions(true)) {
 			if(session.isValidInternal()) {
@@ -684,17 +684,17 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		}
 		// http://code.google.com/p/mobicents/issues/detail?id=2885
         // FQN Memory Leak in HA mode with PESSIMISTIC locking
-        // remove it before the DELETION notification to avoid the sip application session to be destroyed before 
+        // remove it before the DELETION notification to avoid the sip application session to be destroyed before
         // and leaking in the JBoss Cache
-		
+
 		//cancelling the timers
 		if(servletTimers != null) {
 			for (Map.Entry<String, ServletTimer> servletTimerEntry : servletTimers.entrySet()) {
 				ServletTimer timerEntry = servletTimerEntry.getValue();
 				if(timerEntry != null) {
-					timerEntry.cancel();				
+					timerEntry.cancel();
 				}
-			}		
+			}
 		}
 		if(!expired && expirationTimerTask != null) {
 			cancelExpirationTimer();
@@ -708,7 +708,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
          */
         long timeNow = System.currentTimeMillis();
         int timeAlive = (int) ((timeNow - creationTime)/1000);
-                
+
         synchronized (manager) {
             if (timeAlive > manager.getSipApplicationSessionMaxAliveTime()) {
                 manager.setSipApplicationSessionMaxAliveTime(timeAlive);
@@ -720,11 +720,11 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
             average = ((average * (numExpired-1)) + timeAlive)/numExpired;
             manager.setSipApplicationSessionAverageAliveTime(average);
         }
-        
-		notifySipApplicationSessionListeners(SipApplicationSessionEventType.DELETION);				
-		
+
+		notifySipApplicationSessionListeners(SipApplicationSessionEventType.DELETION);
+
 		isValid = false;
-				
+
 		expirationTimerTask = null;
 //		expirationTimerFuture = null;
 		if(httpSessions != null) {
@@ -739,13 +739,13 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		}
 		if(sipSessions != null) {
 			sipSessions.clear();
-		}		
+		}
 //		executorService.shutdown();
-//		executorService = null;		
+//		executorService = null;
 		httpSessions = null;
 		sipSessions = null;
 		sipApplicationSessionAttributeMap = null;
-		servletTimers = null;			
+		servletTimers = null;
 		if(logger.isInfoEnabled()) {
 			logger.info("The following sip application session " + key + " has been invalidated");
 		}
@@ -758,7 +758,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 //		}
 		facade = null;
 	}
-	
+
 	public void cancelAllTimers() {
 		cancelExpirationTimer();
 		if(this.servletTimers != null) {
@@ -774,7 +774,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			sipContext.getSipApplicationSessionTimerService().cancel(expirationTimerTask);
 		}
 		if(expirationTimerTask != null) {
-			// http://code.google.com/p/mobicents/issues/detail?id=2322 : expiration Timer task can be null after calling cancel above due to Race condition 
+			// http://code.google.com/p/mobicents/issues/detail?id=2322 : expiration Timer task can be null after calling cancel above due to Race condition
 			expirationTimerTask.setSipApplicationSession(null);
 			expirationTimerTask = null;
 		}
@@ -787,7 +787,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	public boolean isValid() {
 		return isValid;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession#isValidInternal()
@@ -796,7 +796,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		return isValidInternal.get();
 	}
 
-	
+
 	/**
 	 * @param isValid the isValid to set
 	 */
@@ -811,7 +811,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	public void removeAttribute(String name) {
 		removeAttribute(name, false);
 	}
-	
+
 	public void removeAttribute(String name, boolean byPassValidCheck) {
 		if (!byPassValidCheck && !isValid())
 			throw new IllegalStateException(
@@ -823,7 +823,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			return;
 
 		SipApplicationSessionBindingEvent event = null;
-		
+
         Object value = this.getAttributeMap().remove(name);
 
         // Call the valueUnbound() method if necessary
@@ -831,10 +831,10 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
         	event = new SipApplicationSessionBindingEvent(this, name);
             ((SipApplicationSessionBindingListener) value).valueUnbound(event);
         }
-        
+
 		SipListeners listeners = sipContext.getListeners();
 		List<SipApplicationSessionAttributeListener> listenersList = listeners.getSipApplicationSessionAttributeListeners();
-		if(listenersList.size() > 0) {		
+		if(listenersList.size() > 0) {
 			if(event == null) {
 				event = new SipApplicationSessionBindingEvent(this, name);
 			}
@@ -881,13 +881,13 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
                 try {
                     ((SipApplicationSessionBindingListener) attribute).valueBound(event);
                 } catch (Throwable t){
-                	logger.error("SipSessionBindingListener threw exception", t); 
+                	logger.error("SipSessionBindingListener threw exception", t);
                 }
             }
         }
-		
+
 		Object previousValue = this.getAttributeMap().put(key, attribute);
-		
+
 		if (previousValue != null && previousValue != attribute &&
 	            previousValue instanceof SipApplicationSessionBindingListener) {
             try {
@@ -904,7 +904,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			if(event == null) {
 				event = new SipApplicationSessionBindingEvent(this, key);
 			}
-			if (previousValue == null) {				
+			if (previousValue == null) {
 				for (SipApplicationSessionAttributeListener listener : listenersList) {
 					if(logger.isDebugEnabled()) {
 						logger.debug("notifying SipApplicationSessionAttributeListener " + listener.getClass().getCanonicalName() + " of attribute added on key "+ key);
@@ -915,7 +915,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 						logger.error("SipApplicationSessionAttributeListener threw exception", t);
 					}
 				}
-			} else {				
+			} else {
 				for (SipApplicationSessionAttributeListener listener : listenersList) {
 					if(logger.isDebugEnabled()) {
 						logger.debug("notifying SipApplicationSessionAttributeListener " + listener.getClass().getCanonicalName() + " of attribute replaced on key "+ key);
@@ -926,10 +926,10 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 						logger.error("SipApplicationSessionAttributeListener threw exception", t);
 					}
 				}
-			}	
+			}
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipApplicationSession#setExpires(int)
@@ -942,15 +942,15 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		}
 		expired = false;
 		if(logger.isDebugEnabled()) {
-			logger.debug("Postponing the expiratin of the sip application session " 
+			logger.debug("Postponing the expiratin of the sip application session "
 					+ key +" to expire in " + deltaMinutes + " minutes.");
 		}
 		if(deltaMinutes <= 0) {
 			if(logger.isDebugEnabled()) {
 				logger.debug("The sip application session "+ key +" won't expire anymore ");
 			}
-			// If the session timeout value is 0 or less, then an application session timer 
-			// never starts for the SipApplicationSession object and the container 
+			// If the session timeout value is 0 or less, then an application session timer
+			// never starts for the SipApplicationSession object and the container
 			// does not consider the object to ever have expired
 //			this.expirationTime = -1;
 			if(expirationTimerTask != null) {
@@ -958,7 +958,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 				// Fix for Issue 1678 : SipApplicationSession.setExpires() doesn't work sometimes
 				// the global sipApplicationSessionTimeout needs to be reset as well
 				sipApplicationSessionTimeout = deltaMinutes;
-			}		
+			}
 			return Integer.MAX_VALUE;
 		} else {
 			long deltaMilliseconds = 0;
@@ -973,7 +973,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			// Fix for Issue 1678 : SipApplicationSession.setExpires() doesn't work sometimes
 			// the global sipApplicationSessionTimeout needs to be reset as well
 			sipApplicationSessionTimeout = deltaMilliseconds;
-			expirationTime = System.currentTimeMillis() + deltaMilliseconds;				
+			expirationTime = System.currentTimeMillis() + deltaMilliseconds;
 			if(logger.isDebugEnabled()) {
 				logger.debug("Setting expirationTime to "+ expirationTime + " on sip application session " + key);
 				logger.debug("Re-Scheduling sip application session "+ key +" to expire in " + deltaMinutes + " minutes");
@@ -981,38 +981,38 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 				calendar.setTimeInMillis(expirationTime);
 				logger.debug("sip application session "+ key +" will expires at " + new SimpleDateFormat().format(calendar.getTime()));
 			}
-			
-			
+
+
 			final long milisecondsToGive = deltaMilliseconds;
-			
-			
+
+
 			//Run the timer in different transaction
 			new Thread(){
-				
+
 				@Override
 				public void run() {
-					if(expirationTimerTask != null) {								
+					if(expirationTimerTask != null) {
 						cancelExpirationTimer();
 //						expirationTimerFuture = null;
 					}
 					expirationTimerTask = sipContext.getSipApplicationSessionTimerService().createSipApplicationSessionTimerTask(SipApplicationSessionImpl.this);
 					expirationTimerTask = sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, milisecondsToGive, TimeUnit.MILLISECONDS);
 				}
-				
+
 			}.start();
-			
+
 
 			return deltaMinutes;
-		}				
+		}
 	}
 
 	public boolean hasTimerListener() {
 		return this.sipContext.getListeners().getTimerListener() != null;
-	}	
+	}
 
 	public SipContext getSipContext() {
 		return sipContext;
-	}		
+	}
 
 	/**
 	 * @return the key
@@ -1032,7 +1032,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipApplicationSession#getApplicationName()
 	 */
-	public String getApplicationName() {		
+	public String getApplicationName() {
 		return key.getApplicationName();
 	}
 
@@ -1046,10 +1046,10 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		}
 		if(servletTimers != null) {
 			return servletTimers.get(id);
-		} 
+		}
 		return null;
 	}
-	
+
 	/**
      * Perform the internal processing required to passivate
      * this session.
@@ -1074,12 +1074,12 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			}
 	    }
     }
-    
+
     /**
      * Perform internal processing required to activate this
      * session.
      */
-    public void activate() {        
+    public void activate() {
         // Notify ActivationListeners
     	SipApplicationSessionEvent event = null;
     	if(sipApplicationSessionAttributeMap != null) {
@@ -1123,11 +1123,11 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		switch (protocol) {
 			case SIP :
 				return getSipSession(id);
-				
+
 			case HTTP :
 				return findHttpSession(id);
-				
-			default : 
+
+			default :
 				break;
 		}
 		return null;
@@ -1147,12 +1147,12 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		}
 		this.invalidateWhenReady = invalidateWhenReady;
 	}
-	
+
 	public void onSipSessionReadyToInvalidate(MobicentsSipSession mobicentsSipSession) {
 		removeSipSession(mobicentsSipSession);
 		updateReadyToInvalidateState();
 	}
-	
+
 	private void updateReadyToInvalidateState() {
 		if(isValidInternal() && !readyToInvalidate) {
 			if(logger.isDebugEnabled()) {
@@ -1161,10 +1161,12 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			for(MobicentsSipSession sipSession : getSipSessions(true)) {
 				if(logger.isDebugEnabled()) {
 					logger.debug("Is Sip Session Key " + sipSession.getKey() + " ready to be invalidated, "
-							+ "isvalidInternal " + sipSession.isValidInternal() + 
+							+ "isvalidInternal " + sipSession.isValidInternal() +
 							", isReadyToInvalidate " + sipSession.isReadyToInvalidateInternal());
 				}
-				if(sipSession.isValidInternal() && !sipSession.isReadyToInvalidate()) {
+
+				if( (sipSession.isValidInternal() && !sipSession.isReadyToInvalidate()) &&
+                                        (sipSession.isValidInternal() && !sipSession.isB2BUAOrphan())) {
 					if(logger.isDebugEnabled()) {
 						logger.debug("Sip Session not ready to be invalidated : " + sipSession.getKey());
 					}
@@ -1173,7 +1175,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			}
 			// Fix for Issue 813 : SipApplicationSession invalidates too soon when HttpSession are present
 			// (http://code.google.com/p/mobicents/issues/detail?id=813)
-			for(HttpSession httpSession: getHttpSessions()) {				
+			for(HttpSession httpSession: getHttpSessions()) {
 				if(httpSession instanceof ConvergedSession) {
 					ConvergedSession convergedSession = (ConvergedSession) httpSession;
 					if(convergedSession.isValidIntern()) {
@@ -1182,9 +1184,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 						}
 						return;
 					}
-				} 
+				}
 			}
-			
+
 			if(servletTimers == null || this.servletTimers.size() <= 0) {
 				if(logger.isDebugEnabled()) {
 					logger.debug("All sip sessions and http session are ready to be invalidated, no timers alive, can invalidate this application session " + key);
@@ -1202,16 +1204,16 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			this.readyToInvalidate = true;
 		}
 	}
-	
-	public void tryToInvalidate() {		
+
+	public void tryToInvalidate() {
 		if(logger.isDebugEnabled()) {
-			logger.debug("tryToInvalidate:[isValidInternal=" + this.isValidInternal() + 
-					",readyToInvalidate=" + this.readyToInvalidate + 
+			logger.debug("tryToInvalidate:[isValidInternal=" + this.isValidInternal() +
+					",readyToInvalidate=" + this.readyToInvalidate +
 					",invalidateWhenReady=" + invalidateWhenReady + "]");
 		}
 		// we try to invalidate only when the session is still valid (not invalidated yet) and is ready to be invalidated
 		// and if the invalidateWhenReady flag is true
-		if(isValidInternal() && readyToInvalidate && invalidateWhenReady) {						
+		if(isValidInternal() && readyToInvalidate && invalidateWhenReady) {
 			boolean allSipSessionsInvalidated = true;
 			for(MobicentsSipSession sipSession : getSipSessions(true)) {
 				if(sipSession.isValidInternal()) {
@@ -1228,15 +1230,15 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 				}
 			}
 			if(logger.isDebugEnabled()) {
-				logger.debug("tryToInvalidate:[allSipSessionInvalidated=" + allSipSessionsInvalidated + "," 
+				logger.debug("tryToInvalidate:[allSipSessionInvalidated=" + allSipSessionsInvalidated + ","
 						+ "allHttpSessionsInvalidated=" + allHttpSessionsInvalidated  +"]");
 			}
 			if(allSipSessionsInvalidated && allHttpSessionsInvalidated) {
-				// An application willing to invalidate a SipApplicationSession cleanly could use the callback mechanism 
+				// An application willing to invalidate a SipApplicationSession cleanly could use the callback mechanism
 				// to perform any application clean up before the SipApplicationSession gets invalidated by the container
 				notifySipApplicationSessionListeners(SipApplicationSessionEventType.READYTOINVALIDATE);
-				// Applications may also use the callback to call setInvalidateWhenReady(false) 
-				// to indicate to the container to not observe this SipApplicationSession anymore. 
+				// Applications may also use the callback to call setInvalidateWhenReady(false)
+				// to indicate to the container to not observe this SipApplicationSession anymore.
 				// In this case, the containers MUST not invalidate the SipApplicationSession after the callback
 				if(invalidateWhenReady) {
 					this.invalidate(true);
@@ -1257,7 +1259,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 */
 	public void setCurrentRequestHandler(String currentRequestHandler) {
 		this.currentRequestHandler = currentRequestHandler;
-		// Fix for issue 1087 (http://code.google.com/p/mobicents/issues/detail?id=1087) : 
+		// Fix for issue 1087 (http://code.google.com/p/mobicents/issues/detail?id=1087) :
 		// Can not make an instance of SipApplicationSession for servlet-selection type of applications
 		if(sipContext != null && !sipContext.isMainServlet()) {
 			sipContext.setServletHandler(currentRequestHandler);
@@ -1281,9 +1283,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	public Semaphore getSemaphore() {
 		return semaphore;
 	}
-	
+
 	@SuppressWarnings(value="unchecked")
-	public MobicentsSipApplicationSession getFacade() {		
+	public MobicentsSipApplicationSession getFacade() {
 
         if (facade == null){
             if (sipContext.isPackageProtectionEnabled()){
@@ -1297,11 +1299,11 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
                 facade = new MobicentsSipApplicationSessionFacade(this);
             }
         }
-        return (facade);	  
+        return (facade);
 	}
 
 	protected String jvmRoute;
-	
+
 	public String getJvmRoute() {
 		return this.jvmRoute;
 	}
@@ -1313,7 +1315,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		// Assign the new jvmRoute
 		this.jvmRoute = jvmRoute;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if(obj instanceof MobicentsSipApplicationSession) {
@@ -1352,12 +1354,12 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	public long getSipApplicationSessionTimeout() {
 		return sipApplicationSessionTimeout;
 	}
-	
+
 	public void setExpired(boolean hasExpired) {
 		expired = hasExpired;
 	}
 
-	public long getExpirationTimeInternal() {		
+	public long getExpirationTimeInternal() {
 		return expirationTime;
 	}
 
@@ -1368,8 +1370,8 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	public void scheduleAsynchronousWork(
 			SipApplicationSessionAsynchronousWork work) {
 		sipContext.getSipApplicationDispatcher().getAsynchronousExecutor().execute(new SipApplicationSessionAsyncTask(key, work, (SipFactoryImpl)sipContext.getSipApplicationDispatcher().getSipFactory()));
-	}	
-	
+	}
+
 	public void acquire() {
 		if(semaphore != null) {
 			if(logger.isDebugEnabled()) {
@@ -1377,11 +1379,11 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			}
 			try {
 				while(!semaphore.tryAcquire(30000, TimeUnit.MILLISECONDS)){
-					logger.warn("Failed to acquire session semaphore " + 
+					logger.warn("Failed to acquire session semaphore " +
 							semaphore + " for 30 secs. We will unlock the " +
 							"semaphore no matter what because the " +
 							"transaction is about to timeout. THIS " +
-							"MIGHT ALSO BE CONCURRENCY CONTROL RISK." +						 
+							"MIGHT ALSO BE CONCURRENCY CONTROL RISK." +
 							" app Session is" + this);
 					if(logger.isDebugEnabled()) {
 						logger.debug("releasing semaphore, this=" + this + ", semaphore=" + semaphore);
@@ -1391,7 +1393,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 						logger.debug("semaphore released, this=" + this + ", semaphore=" + semaphore);
 					}
 				}
-				
+
 				if(logger.isDebugEnabled()) {
 					logger.debug("proceed, this=" + this + ", semaphore=" + semaphore);
 				}
@@ -1403,7 +1405,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			}
 		}
 	}
-	
+
 	public void release() {
 		if(semaphore != null) {
 			if(logger.isDebugEnabled()) {
@@ -1421,7 +1423,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 				}
 			}
 			if(semaphore.availablePermits()<0) {
-				logger.warn("About to release semaphore but we expected permits = 0. We will adjust to normal " 
+				logger.warn("About to release semaphore but we expected permits = 0. We will adjust to normal "
 						+ semaphore + " app session=" + this);
 				while(semaphore.availablePermits()<0) {
 					try {
@@ -1429,15 +1431,15 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 					} catch (Exception e) {
 					}
 				}
-			}	
-			
+			}
+
 			semaphore.release();
 			if(logger.isDebugEnabled()) {
 				logger.debug("After Semaphore released for sipApplicationSession=" + this + " semaphore=" + semaphore);
 			}
 		}
 	}
-	
+
 	protected boolean orphan = false;
 
 	public boolean isOrphan() {

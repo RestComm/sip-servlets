@@ -62,11 +62,11 @@ import org.mobicents.servlet.sip.core.session.SipSessionEventType;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
 /**
- * The purpose of this class is to be a facade to the real sip session as well as a 
- * serializable session class that can be put as a session attribute in other sessions or even its own session. 
+ * The purpose of this class is to be a facade to the real sip session as well as a
+ * serializable session class that can be put as a session attribute in other sessions or even its own session.
  * Basically instead of replicating the whole attribute map, we will replicate the id, then on the remote side we will
  * read the ID and look it up in the remote session manager.
- * 
+ *
  * @author vralev
  * @author jean.deruelle@gmail.com
  * @author <A HREF="mailto:gvagenas@gmail.com">George Vagenas</A>
@@ -79,9 +79,9 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 	private transient MobicentsSipSession sipSession;
 	private MobicentsSipSessionKey sipSessionKey = null;
 	private MobicentsSipApplicationSessionKey sipAppSessionKey = null;
-	
+
 //	public MobicentsSipSessionFacade() { }
-	
+
 	public MobicentsSipSessionFacade(MobicentsSipSession sipSession) {
 		this.sipSession = sipSession;
 		this.sipSessionKey = sipSession.getKey();
@@ -154,10 +154,10 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 	public void invalidate() {
 		getSipSession().invalidate();
 	}
-	
+
 	@Override
 	public void invalidate(boolean bypassCheck) {
-		getSipSession().invalidate(bypassCheck);		
+		getSipSession().invalidate(bypassCheck);
 	}
 
 	public boolean isReadyToInvalidate() {
@@ -168,11 +168,11 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 	public boolean isReadyToInvalidateInternal() {
 		return getSipSession().isReadyToInvalidateInternal();
 	}
-	
+
 	public boolean isValid() {
 		return getSipSession().isValid();
 	}
-	
+
 	public boolean isValidInternal() {
 		return getSipSession().isValidInternal();
 	}
@@ -200,22 +200,22 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 	public void setOutboundInterface(InetSocketAddress arg0) {
 		getSipSession().setOutboundInterface(arg0);
 	}
-	
+
 	public void setOutboundInterface(SipURI arg0) {
 		getSipSession().setOutboundInterface(arg0);
 	}
 
 //	public void readExternal(ObjectInput in) throws IOException,
-//			ClassNotFoundException {		
-//		sipSessionKey = (SipSessionKey) in.readObject();		
+//			ClassNotFoundException {
+//		sipSessionKey = (SipSessionKey) in.readObject();
 //		sipAppSessionKey = (SipApplicationSessionKey) in.readObject();
 //		if(logger.isDebugEnabled()) {
 //			logger.debug("sip app session key=" + sipAppSessionKey);
 //			logger.debug("sip session key=" + sipSessionKey);
-//		}				
+//		}
 //	}
 //
-//	public void writeExternal(ObjectOutput out) throws IOException {		
+//	public void writeExternal(ObjectOutput out) throws IOException {
 //		out.writeObject(sipSessionKey);
 //		out.writeObject(sipAppSessionKey);
 //	}
@@ -238,82 +238,82 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 	}
 
 	public MobicentsSipSession findDerivedSipSession(String toTag) {
-		
+
 		return findDerivedSipSession(toTag);
 	}
 
 	public MobicentsB2BUAHelper getB2buaHelper() {
-		
+
 		return getSipSession().getB2buaHelper();
 	}
 
 	public Iterator<MobicentsSipSession> getDerivedSipSessions() {
-		
+
 		return getSipSession().getDerivedSipSessions();
 	}
 
 	public String getHandler() {
-		
+
 		return getSipSession().getHandler();
 	}
 
 	public MobicentsSipSessionKey getKey() {
-		
+
 		return getSipSession().getKey();
 	}
 
 	public Set<Transaction> getOngoingTransactions() {
-		
+
 		return getSipSession().getOngoingTransactions();
 	}
 
 	public String getOutboundInterface() {
-		
+
 		return getSipSession().getOutboundInterface();
 	}
 
 	public MobicentsProxy getProxy() {
-		
+
 		return getSipSession().getProxy();
 	}
 
 	public SipApplicationRoutingRegion getRegionInternal() {
-		
+
 		return getSipSession().getRegionInternal();
 	}
 
 	public Dialog getSessionCreatingDialog() {
-		
+
 		return getSipSession().getSessionCreatingDialog();
 	}
 
 	public MobicentsSipServletMessage getSessionCreatingTransactionRequest() {
-		
+
 		return getSipSession().getSessionCreatingTransactionRequest();
 	}
 
 	public MobicentsSipApplicationSession getSipApplicationSession() {
-		
+
 		return getSipSession().getSipApplicationSession();
 	}
 
 	public Map<String, Object> getSipSessionAttributeMap() {
-		
+
 		return getSipSession().getSipSessionAttributeMap();
 	}
 
 	public String getSipSubscriberURI() {
-		
+
 		return getSipSession().getSipSubscriberURI();
 	}
 
 	public Serializable getStateInfo() {
-		
+
 		return getSipSession().getStateInfo();
 	}
 
 	public SipPrincipal getUserPrincipal() {
-		
+
 		return getSipSession().getUserPrincipal();
 	}
 
@@ -326,12 +326,12 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 	}
 
 	public MobicentsSipSession removeDerivedSipSession(String toTag) {
-		
+
 		return getSipSession().removeDerivedSipSession(toTag);
 	}
 
 	public void removeOngoingTransaction(Transaction transaction) {
-		
+
 		getSipSession().removeOngoingTransaction(transaction);
 	}
 
@@ -350,7 +350,7 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 	public void setParentSession(MobicentsSipSession mobicentsSipSession) {
 		getSipSession().setParentSession(mobicentsSipSession);
 	}
-	
+
 	public MobicentsSipSession getParentSession() {
 		return getSipSession().getParentSession();
 	}
@@ -409,7 +409,7 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 	public MobicentsSipSession getFacade() {
 		return getSipSession().getFacade();
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		return getSipSession().equals(obj);
@@ -436,7 +436,7 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 
 	public void setAckReceived(long cSeq, boolean ackReceived) {
 		getSipSession().setAckReceived(cSeq, ackReceived);
-	}	
+	}
 
 	public void setCseq(long cseq) {
 		getSipSession().setCseq(cseq);
@@ -445,11 +445,11 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 	public long getCseq() {
 		return getSipSession().getCseq();
 	}
-	
+
 	public boolean validateCSeq(MobicentsSipServletRequest request) {
 		return getSipSession().validateCSeq(request);
 	}
-	
+
 	/**
 	 * @return the sipSession
 	 */
@@ -461,7 +461,7 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 			}
 			SipContext sipContext = StaticServiceHolder.sipStandardService
 				.getSipApplicationDispatcher().findSipApplication(sipAppSessionKey.getApplicationName());
-	
+
 			MobicentsSipApplicationSession sipApplicationSession = sipContext.getSipManager().getSipApplicationSession(sipAppSessionKey, false);
 			sipSession = sipContext.getSipManager().getSipSession(sipSessionKey, false, null, sipApplicationSession);
 			if(sipSession == null)
@@ -470,8 +470,8 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 						+ sipSessionKey);
 		}
 		return sipSession;
-	}	
-	
+	}
+
 	public MobicentsSipSession getMobicentsSipSession() {
 		return sipSession;
 	}
@@ -497,7 +497,7 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 	}
 
 	public void notifySipSessionListeners(SipSessionEventType creation) {
-		sipSession.notifySipSessionListeners(creation);		
+		sipSession.notifySipSessionListeners(creation);
 	}
 
 	public void setCopyRecordRouteHeadersOnSubsequentResponses(
@@ -516,7 +516,7 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 	public void setSipSessionSecurity(MobicentsSipSessionSecurity sipSessionSecurity) {
 		sipSession.setSipSessionSecurity(sipSessionSecurity);
 	}
-	
+
 	public void acquire() {
 		sipSession.acquire();
 	}
@@ -524,7 +524,7 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 	public void release() {
 		sipSession.release();
 	}
-	
+
 	public void setFlow(final javax.sip.address.SipURI flow) {
 		this.sipSession.setFlow(flow);
 	}
@@ -574,9 +574,14 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
     public boolean getBypassProxy() {
         return this.sipSession.getBypassProxy();
     }
-    
+
     @Override
 	public void cleanDialogInformation(boolean terminate) {
 		this.cleanDialogInformation(terminate);
 	}
+
+    @Override
+    public boolean isB2BUAOrphan() {
+        return sipSession.isB2BUAOrphan();
+    }
 }

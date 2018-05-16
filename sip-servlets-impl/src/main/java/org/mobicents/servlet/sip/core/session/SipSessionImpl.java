@@ -957,6 +957,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 		if(logger.isInfoEnabled()) {
 			logger.info("Invalidating the sip session " + key);
 		}
+                B2buaHelperImpl b2buaHelper = getB2buaHelper();
+
 		/*
          * Compute how long this session has been alive, and update
          * session manager's related properties accordingly
@@ -1010,7 +1012,7 @@ public class SipSessionImpl implements MobicentsSipSession {
     			if(derivedSipSessions != null) {
     				for (MobicentsSipSession session: derivedSipSessions.values()) {
     					if(logger.isDebugEnabled()) {
-    						logger.debug("derived session " + session + " " + isValidInternal + " " + readyToInvalidate + " " + state);
+    						logger.debug("derived session " + session + " " + session.isValidInternal() + " " + session.isReadyToInvalidate() + " " + session.getState());
     					}
     					if(session.isReadyToInvalidateInternal() && state == State.TERMINATED) {
     						if(logger.isDebugEnabled()) {
@@ -1114,9 +1116,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 		// because it will try to get the B2BUAHelper after the session has been invalidated
 //		sipApplicationSession = null;
 		manager = null;
-		if(getB2buaHelper() != null) {
+		if(b2buaHelper != null) {
                     //this will remove the linking so infinite loop is prevented
-			getB2buaHelper().unlinkSipSessionsInternal(this, false);
+			b2buaHelper.unlinkSipSessionsInternal(this, false);
 		}
 		derivedSipSessions = null;
 		// not collecting it here to avoid race condition from
@@ -2012,10 +2014,27 @@ public class SipSessionImpl implements MobicentsSipSession {
 	}
 
     /**
+     *
+     * @return true if session is part of B2BUA but not linked to any session.
+     */
+    public boolean isB2BUAOrphan() {
+        boolean orphan = getB2buaHelper() != null &&
+                getB2buaHelper().getLinkedSession(this) == null;
+        if(logger.isDebugEnabled()) {
+            logger.debug("isB2BUAOrphan:" + orphan);
+        }
+        return orphan;
+    }
+    /**
      * This method is called immediately when the conditions for read to invalidate
      * session are met
      */
     public void onReadyToInvalidate() {
+
+        if (isB2BUAOrphan()) {
+            logger.debug("Session is B2BUA Orphaned, lets invalidate");
+            setReadyToInvalidate(true);
+        }
 
         if (!readyToInvalidate) {
             logger.debug("Session not ready to invalidate, wait next chance.");
@@ -2027,7 +2046,9 @@ public class SipSessionImpl implements MobicentsSipSession {
         while (derivedSessionsIterator.hasNext()) {
                 MobicentsSipSession mobicentsSipSession = (MobicentsSipSession) derivedSessionsIterator
                                 .next();
-                allDerivedReady = allDerivedReady & !mobicentsSipSession.isValid();
+                boolean derivedIsOrphaned = mobicentsSipSession.isB2BUAOrphan();
+                boolean derivedReady = !mobicentsSipSession.isValid() || derivedIsOrphaned;
+                allDerivedReady = allDerivedReady & derivedReady;
         }
 
             if(logger.isDebugEnabled()) {
@@ -2103,7 +2124,9 @@ public class SipSessionImpl implements MobicentsSipSession {
             SipApplicationSession applicationSession = getApplicationSession();
             if (this.isValid && applicationSession.isValid()) {
                 helper = (B2buaHelperImpl) applicationSession.getAttribute(B2buaHelperImpl.B2BUA_ATT_NAME);
-                logger.debug("B2BUAHelper got");
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("B2BUAHelper got:" + helper);
             }
             return helper;
 	}
