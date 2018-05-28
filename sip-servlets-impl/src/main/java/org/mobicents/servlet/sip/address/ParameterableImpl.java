@@ -41,12 +41,13 @@ import javax.sip.header.Parameters;
 
 import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.core.SipContext;
+import static org.mobicents.servlet.sip.core.SipContext.INTERNAL_ATT_PREFIX;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionCreationThreadLocal;
 
 
 /**
  * Implementation of the parameterable interface.
- * 
+ *
  * @author mranga
  * @author jean.deruelle@gmail.com
  *
@@ -54,25 +55,25 @@ import org.mobicents.servlet.sip.core.session.SipApplicationSessionCreationThrea
 
 public abstract class ParameterableImpl implements Parameterable ,Cloneable, Serializable {
 	private static final long serialVersionUID = 1L;
-//	private static Logger logger = Logger.getLogger(ParameterableImpl.class.getCanonicalName());	
+//	private static Logger logger = Logger.getLogger(ParameterableImpl.class.getCanonicalName());
 	private static final String PARAM_SEPARATOR = ";";
 	private static final String PARAM_NAME_VALUE_SEPARATOR = "=";
         // default quotable params that their values need to be quoted.
 	private static final String DEFAULT_QUOTABLE_PARAMS = "vendor, model, version, cnonce, nextnonce,"
 			+ "nonce, code, oc-algo, cid, text, domain, opaque, qop, realm, response, rspauth, uri, username";
         // Name of the parameter for the list of quotable params
-        private static final String QUOTABLE_PARAMS = "org.restcomm.servlets.sip.QUOTABLE_PARAMETER";
-	
+        private static final String QUOTABLE_PARAMS = INTERNAL_ATT_PREFIX + ".QUOTABLE_PARAMETER";
+
 	protected Map<String,String> parameters = new ConcurrentHashMap<String, String>();
-	
+
 	protected transient Parameters header = null;
-	
+
 	protected ModifiableRule isModifiable = ModifiableRule.Modifiable;
-	
+
 	protected ParameterableImpl() {
-		this.parameters = new ConcurrentHashMap<String, String>();	
+		this.parameters = new ConcurrentHashMap<String, String>();
 	}
-	
+
 	/**
 	 * Create parametrable instance.
 	 * @param value - initial value of parametrable value
@@ -83,15 +84,15 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 		if(header instanceof Parameters) {
 			this.header = (Parameters) header;
 		}
-		if(params!=null) {			 
-			Iterator<Map.Entry<String, String>> entries=params.entrySet().iterator(); 
+		if(params!=null) {
+			Iterator<Map.Entry<String, String>> entries=params.entrySet().iterator();
 			while (entries.hasNext()) {
 				Map.Entry<String, String> e=entries.next();
 				parameters.put(e.getKey(), e.getValue());
 			}
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.Parameterable#getParameter(java.lang.String)
@@ -101,7 +102,7 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 			throw new NullPointerException("the parameter given in parameter is null !");
 		}
 		String value = this.parameters.get(name);
-		if(value != null) {			
+		if(value != null) {
 			return RFC2396UrlDecoder.decode(value);
 		} else {
 			if("lr".equals(name)) return "";// special case to pass Addressing spec test from 289 TCK
@@ -124,7 +125,7 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 	public void removeParameter(String name) {
 		if(name == null) {
 			throw new NullPointerException("parameter name is null ! ");
-		}		
+		}
 		if(isModifiable == ModifiableRule.NotModifiable) {
 			throw new IllegalStateException("it is forbidden to modify the parameters");
 		}
@@ -139,13 +140,13 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 			header.removeParameter(name);
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.Parameterable#setParameter(java.lang.String, java.lang.String)
 	 */
 	public void setParameter(String name, String value) {
-		// Global Fix by alexvinn for Issue 1010 : Unable to set flag parameter to parameterable header 
+		// Global Fix by alexvinn for Issue 1010 : Unable to set flag parameter to parameterable header
 		if(name == null) {
 			throw new NullPointerException("parameter name is null ! ");
 		}
@@ -162,7 +163,7 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 		if(name.equalsIgnoreCase("branch") && isModifiable == ModifiableRule.Via) {
 			throw new IllegalStateException("it is forbidden to set the branch parameter on the Via Header");
 		}
-		//Fix from abondar for Issue 494 and angelo.marletta for Issue 502      
+		//Fix from abondar for Issue 494 and angelo.marletta for Issue 502
 		this.parameters.put(name.toLowerCase(), value);
 		if(header != null) {
 			try {
@@ -176,12 +177,12 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 			}
 		}
 	}
-	
+
 	/*
 	 * Check if the param name is in the list that its value need to be quoted
-	 * 
+	 *
 	 * @param name - a string specifying the parameter name
-	 * 
+	 *
 	 */
         private boolean isQuotableParam(String name){
             boolean isQuotableParameter = false;
@@ -194,16 +195,16 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
             }
             return isQuotableParameter;
         }
-        
+
         /**
-	 * 
+	 *
 	 * @return a list of known params that their values need to be quoted.
 	 */
         private List<String> getQuotableParams(){
             List<String> retValue = new ArrayList<String>();
             SipContext context = SipApplicationSessionCreationThreadLocal.lookupContext();
             if (context != null){
-                // bug zendesk#34106, because of JBOSS lifcycle and save the cost, get context param dirrectly 
+                // bug zendesk#34106, because of JBOSS lifcycle and save the cost, get context param dirrectly
                 // from init param.
                 String quotableParameters = context.getServletContext().getInitParameter(QUOTABLE_PARAMS);
                 if (quotableParameters == null){
@@ -217,7 +218,7 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
                     }
                 }
             }
-            
+
             return retValue;
         }
 	/*
@@ -231,7 +232,7 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 		}
 		return retval.entrySet();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.Parameterable#getParameters()
@@ -247,9 +248,9 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 	public String toString() {
 		StringBuffer retVal = new StringBuffer();
 		boolean firstTime = true;
-		for(java.util.Map.Entry<String, String> entry : parameters.entrySet()) {			
+		for(java.util.Map.Entry<String, String> entry : parameters.entrySet()) {
 			if(!firstTime) {
-				retVal.append(PARAM_SEPARATOR);				
+				retVal.append(PARAM_SEPARATOR);
 			}
 			firstTime = false;
 			String value = entry.getValue();
@@ -261,10 +262,10 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 		}
 		return retVal.toString();
 	}
-	
+
 	public void setParameters(Map<String, String> parameters) {
 		this.parameters = parameters;
-		if(header != null) {			
+		if(header != null) {
 			for(Entry<String, String> nameValue : this.parameters.entrySet()) {
 				try {
 					header.setParameter(nameValue.getKey(), nameValue.getValue());
@@ -274,7 +275,7 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 			}
 		}
 	}
-	
+
 	public abstract Object clone();
 
 	/* (non-Javadoc)
@@ -314,7 +315,7 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 			return false;
 		return true;
 	}
-	
-	
-	
+
+
+
 }

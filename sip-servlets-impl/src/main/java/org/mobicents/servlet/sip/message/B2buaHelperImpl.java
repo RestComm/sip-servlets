@@ -82,6 +82,7 @@ import org.mobicents.servlet.sip.core.MobicentsExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.MobicentsSipFactory;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
+import static org.mobicents.servlet.sip.core.SipContext.INTERNAL_ATT_PREFIX;
 import org.mobicents.servlet.sip.core.SipManager;
 import org.mobicents.servlet.sip.core.b2bua.MobicentsB2BUAHelper;
 import org.mobicents.servlet.sip.core.message.MobicentsSipServletMessage;
@@ -107,8 +108,8 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 
 	protected static final Set<String> B2BUA_SYSTEM_HEADERS = new HashSet<String>();
 
-    private static final String ORIG_REQ_ATT_NAME = "org.restcomm.servlets.sip.originalRequest";
-    public static final String B2BUA_ATT_NAME = "org.restcomm.servlets.sip.B2BUAHelper";
+    private static final String ORIG_REQ_ATT_NAME = INTERNAL_ATT_PREFIX + ".originalRequest";
+    public static final String B2BUA_ATT_NAME = INTERNAL_ATT_PREFIX + ".B2BUAHelper";
 
 	static {
 		B2BUA_SYSTEM_HEADERS.add(CallIdHeader.NAME);
@@ -876,7 +877,11 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 								if(sipServletsResponses != null) {
 									for(SipServletResponseImpl sipServletResponseImpl : sipServletsResponses) {
                                         if (!sipServletResponseImpl.isCommitted()) {
-                                            retval.add(sipServletResponseImpl);
+                                            //do not return Trying, this makes TCK AppRouter fail.
+                                            if (sipServletResponseImpl.getStatus() != 100
+                                                    ) {
+                                                retval.add(sipServletResponseImpl);
+                                            }
                                         }
                                     }
                                 }
@@ -905,6 +910,15 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
                     }
                 }
             }
+        }
+        if (logger.isDebugEnabled()) {
+            StringBuffer buffer = new StringBuffer();
+            buffer.append("############pending messages");
+            for (SipServletMessage msg : retval) {
+                buffer.append(msg);
+            }
+            buffer.append("############pending messages");
+            logger.debug(buffer.toString());
         }
         return retval;
     }
@@ -1105,10 +1119,12 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 									((TransactionApplicationData)transaction.getApplicationData()).cleanUpMessage();
                                 }
                             }
-							if(linkedRequest.getSipSession().getOngoingTransactions().isEmpty()) {
+                            if (linkedRequest.getSipSession().getOngoingTransactions() == null ||
+                                    linkedRequest.getSipSession().getOngoingTransactions().isEmpty()) {
                                 linkedRequest.getSipSession().cleanDialogInformation(false);
                             }
-							if(sipServletRequestImpl.getSipSession().getOngoingTransactions().isEmpty()) {
+                            if (sipServletRequestImpl.getSipSession().getOngoingTransactions() == null ||
+                                    sipServletRequestImpl.getSipSession().getOngoingTransactions().isEmpty()) {
                                 sipServletRequestImpl.getSipSession().cleanDialogInformation(false);
                             }
 							if(!force && linkedRequest.getSipSession().isValidInternal() &&

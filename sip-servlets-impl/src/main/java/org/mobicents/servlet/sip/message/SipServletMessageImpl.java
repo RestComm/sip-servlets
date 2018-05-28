@@ -90,6 +90,7 @@ import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.address.ParameterableHeaderImpl;
 import org.mobicents.servlet.sip.core.MobicentsExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipContext;
+import static org.mobicents.servlet.sip.core.SipContext.INTERNAL_ATT_PREFIX;
 import org.mobicents.servlet.sip.core.message.MobicentsSipServletMessage;
 import org.mobicents.servlet.sip.core.security.SipPrincipal;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
@@ -101,18 +102,18 @@ import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
 /**
  * Implementation of SipServletMessage
- * 
+ *
  * @author mranga
  * @author jean.deruelle@telestax.com
- * 
+ *
  */
 public abstract class SipServletMessageImpl implements MobicentsSipServletMessage, Externalizable {
 
-	
+
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(SipServletMessageImpl.class
 			.getCanonicalName());
-	
+
 	private static final String CONTENT_TYPE_TEXT = "text";
 	private static final String CONTENT_TYPE_MULTIPART = "multipart";
 	private static final String MULTIPART_BOUNDARY = "boundary";
@@ -121,7 +122,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	private static final String LINE_RETURN_DELIM = "\n";
 	public static final String REL100_OPTION_TAG = "100rel";
 //	private static final String HCOLON = " : ";
-	
+
 	protected Message message;
 	protected SipFactoryImpl sipFactoryImpl;
 	protected MobicentsSipSessionKey sessionKey;
@@ -135,14 +136,14 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	// used for failover to recover the transaction
 	private String transactionId;
 	private boolean transactionType;
-	
+
 	// We need this object separate from transaction.getApplicationData, because the actualy transaction
 	// may be create later and we still need to accumulate useful data. Also the transaction might be
 	// cleaned up earlier. The transaction and this object have different lifecycle.
-	protected TransactionApplicationData transactionApplicationData;		
+	protected TransactionApplicationData transactionApplicationData;
 
 	protected HeaderForm headerForm = HeaderForm.DEFAULT;
-	
+
 	// IP address of the next upstream/downstream hop from which this message
 	// was received. Applications can determine the actual IP address of the UA
 	// that originated the message from the message Via header fields.
@@ -154,36 +155,36 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	protected transient String transport = null;
 
 	protected String currentApplicationName = null;
-	
+
 	protected transient SipPrincipal userPrincipal;
-	
+
 	protected boolean isMessageSent;
 
     // Made it transient for Issue 1523 : http://code.google.com/p/mobicents/issues/detail?id=1523
 	// NotSerializableException happens if a message is stored in the sip session during HA
 	protected transient Dialog dialog;
-	
+
 	protected transient String method;
-	
+
 	// needed for orphan routing
 	boolean orphan;
 	private String appSessionId;
-	
+
 	// needed for externalizable
 	public SipServletMessageImpl () {}
-	
+
 	protected SipServletMessageImpl(Message message,
 			SipFactoryImpl sipFactoryImpl, Transaction transaction,
 			MobicentsSipSession sipSession, Dialog dialog) {
-		
+
 		if(logger.isDebugEnabled()) {
 			logger.debug("SipServletMessageImpl constructor - sipSession=" + sipSession);
 			if (sipSession != null){
 				logger.debug("SipServletMessageImpl constructor - sipSession.getSipApplicationSession()=" + sipSession.getSipApplicationSession());
 			}
 		}
-		
-		
+
+
 		if (sipFactoryImpl == null)
 			throw new NullPointerException("Null factory");
 		if (message == null)
@@ -203,13 +204,13 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			if(transaction.getApplicationData() != null) {
 				this.transactionApplicationData = (TransactionApplicationData) transaction.getApplicationData();
 			}
-		} 
+		}
 		if(transactionApplicationData == null){
 			this.transactionApplicationData = new TransactionApplicationData(this);
 		}
 		isMessageSent = false;
 		this.dialog = dialog;
-		
+
 		if(sipSession != null && dialog != null) {
 			sipSession.setSessionCreatingDialog(dialog);
 			if(dialog.getApplicationData() == null) {
@@ -219,9 +220,9 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 				dialog.setApplicationData(transactionApplicationData);
 			}
 		}
-		
+
 		// good behaviour, lets make some default
-		//seems like bad behavior finally 
+		//seems like bad behavior finally
 		//check http://forums.java.net/jive/thread.jspa?messageID=260944
 		// => commented out
 //		if (this.message.getContentEncoding() == null)
@@ -270,15 +271,15 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 					+ first + "] value [" + addr + "]");
 		}
 
-		//we should test for 
-		//This method can be used with headers which are defined to contain one 
+		//we should test for
+		//This method can be used with headers which are defined to contain one
 		//or more entries matching (name-addr | addr-spec) *(SEMI generic-param) as defined in RFC 3261
 //		if (!isAddressTypeHeader(hName)) {
 //			logger.error("Header [" + hName + "] is not address type header");
 //			throw new IllegalArgumentException("Header[" + hName
 //					+ "] is not of an address type");
 //		}
-		
+
 		if (isSystemHeaderAndNotGruu(getModifiableRule(hName), (Parameterable)addr.getURI())) {
 			logger.error("Error, can't add system header [" + hName + "]");
 			throw new IllegalArgumentException("Header[" + hName
@@ -321,13 +322,13 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		}
 
 		String nameToAdd = getCorrectHeaderName(hName);
-		
+
 		try {
-			// Fix to Issue 1015 by alexander.kozlov.IV			
+			// Fix to Issue 1015 by alexander.kozlov.IV
 			if(JainSipUtils.SINGLETON_HEADER_NAMES.contains(name)) {
 				Header header = SipFactory.getInstance().createHeaderFactory().createHeader(nameToAdd, value);
-				this.message.setHeader(header);				
-			} else {	
+				this.message.setHeader(header);
+			} else {
 				// Dealing with Allow:INVITE, ACK, CANCEL, OPTIONS, BYE kind of values
 				if(JainSipUtils.LIST_HEADER_NAMES.contains(name)) {
 					List<Header> headers = SipFactory.getInstance().createHeaderFactory()
@@ -340,18 +341,18 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 					Header header = SipFactory.getInstance().createHeaderFactory()
 						.createHeader(name, value);
 					this.message.addLast(header);
-				}				
+				}
 			}
 		} catch (Exception ex) {
 			throw new IllegalArgumentException("Illegal args supplied ", ex);
 		}
 	}
-	
+
 	public void setHeaderInternal(String name, String value, boolean bypassSystemHeaderCheck) {
 		if(logger.isDebugEnabled()) {
 			logger.debug("setHeaderInternal - name=" + name + ", value=" + value);
 		}
-		
+
 		if(name == null) {
 			throw new NullPointerException ("name parameter is null");
 		}
@@ -360,17 +361,17 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		}
 		if(!bypassSystemHeaderCheck && isSystemHeader(getModifiableRule(name))) {
 			throw new IllegalArgumentException(name + " is a system header !");
-		}		
-		
+		}
+
 		try {
 			Header header = SipFactory.getInstance().createHeaderFactory()
 				.createHeader(name, value);
-			this.message.setHeader(header);				
+			this.message.setHeader(header);
 		} catch (Exception e) {
 			throw new IllegalArgumentException("Error creating header!", e);
 		}
 	}
-	
+
 	//check if the submitted value is of the form header-value *(COMMA header-value)
 //	private boolean isMultipleValue(String value) {
 //		StringTokenizer tokenizer = new StringTokenizer(value, ",");
@@ -386,7 +387,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		if(logger.isDebugEnabled()) {
 			logger.debug("addHeader - name=" + name + ", value=" + value);
 		}
-		
+
 		checkCommitted();
 		addHeaderInternal(name, value, false);
 	}
@@ -400,7 +401,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		if(logger.isDebugEnabled()) {
 			logger.debug("addParameterableHeader - name=" + name + ", param=" + param + ", first=" + first);
 		}
-		
+
 		checkCommitted();
 		try {
 			String hName = getFullHeaderName(name);
@@ -429,7 +430,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	 * @see javax.servlet.sip.SipServletMessage#getAcceptLanguage()
 	 */
 	public Locale getAcceptLanguage() {
-		// See section 14.4 of RFC 2616 (HTTP/1.1) for more information about how the Accept-Language header 
+		// See section 14.4 of RFC 2616 (HTTP/1.1) for more information about how the Accept-Language header
 		// must interpreted to determine the preferred language of the client.
 		Locale preferredLocale = null;
 		float q = 0;
@@ -505,7 +506,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			} else {
 				Parameterable parametrable = createParameterable(first, first.getName(), message instanceof Request);
 				try {
-					logger.debug("parametrable Value " + parametrable.getValue());					
+					logger.debug("parametrable Value " + parametrable.getValue());
 					if(this.isCommitted()) {
 						return new AddressImpl(SipFactoryImpl.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), ModifiableRule.NotModifiable);
 					} else {
@@ -568,14 +569,14 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see javax.servlet.sip.SipServletMessage#getApplicationSession()
 	 */
 	public SipApplicationSession getApplicationSession() {
 		if(logger.isDebugEnabled()) {
 			logger.debug("getApplicationSession");
 		}
-		
+
 		MobicentsSipApplicationSession sipApplicationSession = getSipApplicationSession(true);
 		if(sipApplicationSession == null) {
 			if(logger.isDebugEnabled()) {
@@ -589,14 +590,14 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see javax.servlet.sip.SipServletMessage#getApplicationSession(boolean)
 	 */
 	public SipApplicationSession getApplicationSession(boolean create) {
 		if(logger.isDebugEnabled()) {
 			logger.debug("getApplicationSession - create=" + create);
 		}
-		
+
 		MobicentsSipApplicationSession sipApplicationSession = getSipApplicationSession(create);
 		if(sipApplicationSession == null) {
 			return null;
@@ -604,7 +605,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			return sipApplicationSession.getFacade();
 		}
 	}
-	
+
 	public MobicentsSipApplicationSession getSipApplicationSession(boolean create) {
 		if(logger.isDebugEnabled()) {
 			logger.debug("getSipApplicationSession - create=" + create);
@@ -616,7 +617,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 				return sipApplicationSession;
 			}
 		}
-		
+
 		String applicationName = getCurrentApplicationName();
 		if(sessionKey != null) {
 			applicationName = sessionKey.getApplicationName();
@@ -644,7 +645,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			final SipContext sipContext = sipFactoryImpl.getSipApplicationDispatcher().findSipApplication(applicationName);
 			//call id not needed anymore since the sipappsessionkey is not a callid anymore but a random uuid
 			final SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
-					applicationName, 
+					applicationName,
 					sessionKey.getApplicationSessionId(), null);
 			if(logger.isDebugEnabled()) {
 				logger.debug("trying to load the sip app session with Key " + sipApplicationSessionKey + " and create = " + true);
@@ -653,7 +654,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			if(applicationSession != null) {
 				// application session can be null if create is false and it is an orphan request
 				applicationSession.setOrphan(isOrphan());
-			}			
+			}
 			return applicationSession;
 		}
 		return null;
@@ -723,18 +724,18 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	 * @see javax.servlet.sip.SipServletMessage#getContent()
 	 */
 	public Object getContent() throws IOException, UnsupportedEncodingException {
-		ContentTypeHeader contentTypeHeader = (ContentTypeHeader) 
+		ContentTypeHeader contentTypeHeader = (ContentTypeHeader)
  			this.message.getHeader(ContentTypeHeader.NAME);
 		if(contentTypeHeader != null && logger.isDebugEnabled()) {
 			logger.debug("Content type " + contentTypeHeader.getContentType());
 			logger.debug("Content sub type " + contentTypeHeader.getContentSubType());
-		}		
+		}
 		if(contentTypeHeader!= null && CONTENT_TYPE_TEXT.equals(contentTypeHeader.getContentType())) {
 			String content = null;
 			if(message.getRawContent() != null) {
 				String charset = this.getCharacterEncoding();
 				if(charset == null) {
-					content = new String(message.getRawContent());	
+					content = new String(message.getRawContent());
 				} else {
 					content = new String(message.getRawContent(), charset);
 				}
@@ -744,7 +745,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			return content;
 		} else if(contentTypeHeader!= null && CONTENT_TYPE_MULTIPART.equals(contentTypeHeader.getContentType())) {
 			try {
-				return new MimeMultipart(new ByteArrayDataSource(message.getRawContent(), 
+				return new MimeMultipart(new ByteArrayDataSource(message.getRawContent(),
 						contentTypeHeader.toString().replaceAll(ContentTypeHeader.NAME+": ", "")));
 			} catch (MessagingException e) {
 				logger.warn("Problem with multipart message.", e);
@@ -766,25 +767,25 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		// Issue 1123 : http://code.google.com/p/mobicents/issues/detail?id=1123 : Multipart type is supported
 		String delimiter = contentTypeHeader.getParameter(MULTIPART_BOUNDARY);
 		String start = contentTypeHeader.getParameter(MULTIPART_START);
-		
+
 		MimeMultipart mimeMultipart = new MimeMultipart(contentTypeHeader.getContentSubType());
 		if (delimiter == null) {
-			MimeBodyPart mbp = new MimeBodyPart();			
+			MimeBodyPart mbp = new MimeBodyPart();
 		    DataSource ds = new ByteArrayDataSource(rawContent, contentTypeHeader.getContentSubType());
 		    try {
 				mbp.setDataHandler(new DataHandler(ds));
-				mimeMultipart.addBodyPart(mbp);				
+				mimeMultipart.addBodyPart(mbp);
 			} catch (MessagingException e) {
 				throw new IllegalArgumentException("couldn't create the multipart object from the message content " + rawContent, e);
 			}
 		} else {
 			// splitting the body content by delimiter
 		    String[] fragments = new String(rawContent).split(MULTIPART_BOUNDARY_DELIM + delimiter);
-			for (String fragment: fragments) { 
+			for (String fragment: fragments) {
 				final String trimmedFragment = fragment.trim();
 				// skipping empty fragment and ending fragment looking like --
 				if(trimmedFragment.length() > 0 && !MULTIPART_BOUNDARY_DELIM.equals(trimmedFragment)) {
-					String fragmentHeaders = null; 
+					String fragmentHeaders = null;
 					String fragmentBody = fragment;
 					// if there is a start, it means that there is probably headers before the content that need to be added to the mime body part
 					// so we split headers from body content
@@ -792,17 +793,17 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 						int indexOfStart = fragment.indexOf(start);
 						if(indexOfStart != -1) {
 							fragmentHeaders = fragmentBody.substring(0, indexOfStart + start.length());
-							fragmentBody = fragmentBody.substring(indexOfStart + start.length()).trim();    							
+							fragmentBody = fragmentBody.substring(indexOfStart + start.length()).trim();
 						}
 					}
-					MimeBodyPart mbp = new MimeBodyPart();	    				
+					MimeBodyPart mbp = new MimeBodyPart();
 				    try {
 				    	String contentType = contentTypeHeader.getContentSubType();
 				    	// check if the body content start with a Content-Type header
 				    	// if so we strip it from the content body
 				    	if(fragmentBody.startsWith(ContentTypeHeader.NAME)) {
 				    		int indexOfLineReturn =  fragmentBody.indexOf(LINE_RETURN_DELIM);
-				    		contentType = fragmentBody.substring(0, indexOfLineReturn -1).trim();	    			    		
+				    		contentType = fragmentBody.substring(0, indexOfLineReturn -1).trim();
 				    		fragmentBody = fragmentBody.substring(indexOfLineReturn).trim();
 				    	}
 				    	// setting the content body stripped from the headers
@@ -818,12 +819,12 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 				    			}
 							}
 				    	}
-						mimeMultipart.addBodyPart(mbp);				    					
+						mimeMultipart.addBodyPart(mbp);
 					} catch (MessagingException e) {
 						throw new IllegalArgumentException("couldn't create the multipart object from the message content " + rawContent, e);
 					}
 				}
-			}					    			
+			}
 		}
 		return mimeMultipart;
 	}
@@ -863,10 +864,10 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			// getContentType doesn't return the full header value
 //			String contentType = cth.getContentType();
 //			String contentSubType = cth.getContentSubType();
-//			if(contentSubType != null) 
+//			if(contentSubType != null)
 //				return contentType + "/" + contentSubType;
 			return ((HeaderExt)cth).getValue();
-		} 
+		}
 		return null;
 	}
 
@@ -896,7 +897,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
             throw new IllegalArgumentException("Couldn't parse From Header " + from, e);
         }
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipServletMessage#getHeader(java.lang.String)
@@ -955,7 +956,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see javax.servlet.sip.SipServletMessage#getMethod()
 	 */
 	public final String getMethod() {
@@ -986,15 +987,15 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		String nameToSearch = getCorrectHeaderName(name);
 
 		Header h = this.message.getHeader(nameToSearch);
-		
+
 		if(!isParameterable(name)) {
 			throw new ServletParseException(name + " header is not parameterable !");
 		}
-		
+
 		if(h == null) {
 			return null;
 		}
-		
+
 		return createParameterable(h, getFullHeaderName(name), message instanceof Request);
 	}
 
@@ -1016,11 +1017,11 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 
 		if(!isParameterable(name)) {
 			throw new ServletParseException(name + " header is not parameterable !");
-		}			
-		
+		}
+
 		return result.listIterator();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipServletMessage#getProtocol()
@@ -1034,13 +1035,13 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipServletMessage#getRawContent()
 	 */
-	public byte[] getRawContent() throws IOException {		
+	public byte[] getRawContent() throws IOException {
 		if (message != null)
 			return message.getRawContent();
 		else
 			return null;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -1058,7 +1059,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	/**
 	 * {@inheritDoc}
 	 */
-	public String getInitialTransport() {		
+	public String getInitialTransport() {
 		return transactionApplicationData.getInitialRemoteTransport();
 	}
 
@@ -1122,7 +1123,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			return port;
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipServletMessage#getTransport()
@@ -1134,7 +1135,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			return null;
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipServletMessage#getRemoteUser()
@@ -1148,7 +1149,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see javax.servlet.sip.SipServletMessage#getSession()
 	 */
 	public SipSession getSession() {
@@ -1160,14 +1161,14 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see javax.servlet.sip.SipServletMessage#getSession(boolean)
 	 */
 	public SipSession getSession(boolean create) {
 		if(logger.isDebugEnabled()) {
 			logger.debug("getSession - create=" + create);
 		}
-		
+
 		MobicentsSipSession session = getSipSession();
 		if (session == null && create) {
 			MobicentsSipApplicationSession sipApplicationSessionImpl = (MobicentsSipApplicationSession)getSipApplicationSession(create);
@@ -1180,7 +1181,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
                             sessionKey = session.getKey();
                         }
 		}
-		
+
 		if(session != null) {
 			return session.getFacade();
 		}
@@ -1189,7 +1190,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Retrieve the sip session implementation
 	 * @return the sip session implementation
@@ -1198,7 +1199,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		if(logger.isDebugEnabled()) {
 			logger.debug("getSipSession");
 		}
-		
+
 		if(sipSession == null && sessionKey == null) {
 			sessionKey = getSipSessionKey();
 			if(logger.isDebugEnabled()) {
@@ -1214,7 +1215,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 					} else if (transaction != null && transaction.getApplicationData() != null) {
 						this.sessionKey =  ((TransactionApplicationData)transaction.getApplicationData()).getSipSessionKey();
 						if(logger.isDebugEnabled()) {
-							logger.debug("session Key is " + sessionKey + ", retrieved from the transaction txAppData " + 
+							logger.debug("session Key is " + sessionKey + ", retrieved from the transaction txAppData " +
 									(TransactionApplicationData)transaction.getApplicationData());
 						}
 					} else {
@@ -1234,20 +1235,20 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			if(logger.isDebugEnabled()) {
 				logger.debug("session is null, trying to load the session from the sessionKey " + sessionKey);
 			}
-			final String applicationName = sessionKey.getApplicationName(); 
+			final String applicationName = sessionKey.getApplicationName();
 			final SipContext sipContext = sipFactoryImpl.getSipApplicationDispatcher().findSipApplication(applicationName);
 			SipApplicationSessionKey sipApplicationSessionKey = new SipApplicationSessionKey(sessionKey.getApplicationSessionId(), sessionKey.getApplicationName(), null);
 			MobicentsSipApplicationSession sipApplicationSession = sipContext.getSipManager().getSipApplicationSession(sipApplicationSessionKey, false);
-			sipSession = sipContext.getSipManager().getSipSession(sessionKey, false, sipFactoryImpl, sipApplicationSession);	
+			sipSession = sipContext.getSipManager().getSipSession(sessionKey, false, sipFactoryImpl, sipApplicationSession);
 			if(logger.isDebugEnabled()) {
 				if(sipSession == null) {
 					logger.debug("couldn't find any session with sessionKey " + sessionKey);
 				} else {
 					logger.debug("reloaded session session " + sipSession + " with sessionKey " + sessionKey);
-				} 
+				}
 			}
-		} 
-		return sipSession; 
+		}
+		return sipSession;
 	}
 
 	/**
@@ -1263,7 +1264,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 				}
 			}
 		}
-		// we store the session in JVM to cope with race conditions on session invalidation 
+		// we store the session in JVM to cope with race conditions on session invalidation
 		// See Issue 1294 http://code.google.com/p/mobicents/issues/detail?id=1294
 		// but it will not be persisted to avoid unecessary replication if the message is persisted
 		this.sipSession = session;
@@ -1290,7 +1291,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
         }
 		this.sessionKey = sessionKey;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipServletMessage#getTo()
@@ -1306,7 +1307,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
             throw new IllegalArgumentException("Couldn't parse From Header " + to, e);
         }
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipServletMessage#getUserPrincipal()
@@ -1319,7 +1320,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		}
 		return this.userPrincipal;
 	}
-	
+
 	public void setUserPrincipal(SipPrincipal principal) {
 		this.userPrincipal = principal;
 	}
@@ -1328,7 +1329,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipServletMessage#isSecure()
 	 */
-	public boolean isSecure() {		
+	public boolean isSecure() {
 		return ListeningPoint.TLS.equalsIgnoreCase(JainSipUtils.findTransport(message));
 	}
 
@@ -1355,7 +1356,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			this.attributes.remove(name);
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipServletMessage#removeHeader(java.lang.String)
@@ -1379,7 +1380,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 						+ hName + "]");
 			}
 		}
-		
+
 		if (hName.equalsIgnoreCase("From") || hName.equalsIgnoreCase("To")) {
 			logger.error("Error, can't remove From or To header [" + hName + "]");
 			throw new IllegalArgumentException(
@@ -1391,7 +1392,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		this.message.removeHeader(nameToSearch);
 
 	}
-	
+
 	public void removeHeaderInternal(String name, boolean bypassSystemHeaderCheck) {
 		if(logger.isDebugEnabled()) {
         	logger.debug("removeHeaderInternal - name=" + name + ", bypassSystemHeaderCheck=" + bypassSystemHeaderCheck);
@@ -1411,7 +1412,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 
 		String nameToRemove = getCorrectHeaderName(hName);
 		try {
-			message.removeHeader(nameToRemove);			
+			message.removeHeader(nameToRemove);
 		} catch (Exception ex) {
 			throw new IllegalArgumentException("Illegal args supplied ", ex);
 		}
@@ -1476,7 +1477,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			this.message.setHeader(h);
 		} catch (ParseException e) {
 			logger.error("Parsing problem while setting address header with name "
-					+ name + " and address "+ addr, e);			
+					+ name + " and address "+ addr, e);
 		}
 	}
 
@@ -1500,7 +1501,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	public void setCharacterEncoding(String enc) throws UnsupportedEncodingException {
 		new String("testEncoding".getBytes(),enc);
 		checkCommitted();
-		try {			
+		try {
 			this.message.setContentEncoding(SipFactoryImpl.headerFactory
 					.createContentEncodingHeader(enc));
 		} catch (Exception ex) {
@@ -1508,7 +1509,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		}
 
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipServletMessage#setContent(java.lang.Object, java.lang.String)
@@ -1516,17 +1517,17 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	public void setContent(Object content, String contentType)
 			throws UnsupportedEncodingException {
 		// https://code.google.com/p/sipservlets/issues/detail?id=202
-		if(getSipSession().getProxy() == null) {			
+		if(getSipSession().getProxy() == null) {
 			checkMessageState();
 		}
 		checkContentType(contentType);
 		checkCommitted();
-		
+
 		if(contentType != null && contentType.length() > 0) {
 			this.addHeader(ContentTypeHeader.NAME, contentType);
-			ContentTypeHeader contentTypeHeader = (ContentTypeHeader)this.message.getHeader(ContentTypeHeader.NAME);			
+			ContentTypeHeader contentTypeHeader = (ContentTypeHeader)this.message.getHeader(ContentTypeHeader.NAME);
 			String charset = this.getCharacterEncoding();
-			try {		
+			try {
 			    // https://code.google.com/p/sipservlets/issues/detail?id=169
 				if(contentType.contains(CONTENT_TYPE_MULTIPART) && content instanceof Multipart) {
 					// Fix for Issue 2667 : Correct Handling of MimeMultipart
@@ -1546,11 +1547,11 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			} catch (UnsupportedEncodingException uee) {
 				throw uee;
 			} catch (Exception e) {
-				throw new IllegalArgumentException("Parse error reading content " + content + " with content type " + contentType, e);				
-			} 
+				throw new IllegalArgumentException("Parse error reading content " + content + " with content type " + contentType, e);
+			}
 		}
 	}
-	
+
 	protected abstract void checkMessageState();
 
 	/**
@@ -1563,7 +1564,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			throw new IllegalArgumentException("the content type cannot be null");
 		}
 		int indexOfSlash = contentType.indexOf("/");
-		if(indexOfSlash != -1) { 
+		if(indexOfSlash != -1) {
 			if(!JainSipUtils.IANA_ALLOWED_CONTENT_TYPES.contains(contentType.substring(0, indexOfSlash))) {
 				throw new IllegalArgumentException("the given content type " + contentType + " is not allowed");
 			}
@@ -1578,11 +1579,11 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	 */
 	public void setContentLanguage(Locale locale) {
 		checkCommitted();
-		ContentLanguageHeader contentLanguageHeader = 
+		ContentLanguageHeader contentLanguageHeader =
 			SipFactoryImpl.headerFactory.createContentLanguageHeader(locale);
 		this.message.setContentLanguage(contentLanguageHeader);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipServletMessage#setContentLength(int)
@@ -1623,8 +1624,8 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	 */
 	public void setExpires(int seconds) {
 		try {
-			ExpiresHeader expiresHeader = 
-				SipFactoryImpl.headerFactory.createExpiresHeader(seconds);			
+			ExpiresHeader expiresHeader =
+				SipFactoryImpl.headerFactory.createExpiresHeader(seconds);
 			expiresHeader.setExpires(seconds);
 			this.message.setExpires(expiresHeader);
 		} catch (Exception e) {
@@ -1640,7 +1641,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		if(logger.isDebugEnabled()) {
         	logger.debug("setHeader - name=" + name + ", value=" + value);
         }
-		
+
 		if(name == null) {
 			throw new NullPointerException ("name parameter is null");
 		}
@@ -1651,7 +1652,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			throw new IllegalArgumentException(name + " is a system header !");
 		}
 		checkCommitted();
-		
+
 		try {
 			// Dealing with Allow:INVITE, ACK, CANCEL, OPTIONS, BYE kind of headers
 			if(JainSipUtils.LIST_HEADER_NAMES.contains(name)) {
@@ -1684,8 +1685,8 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		// action is performed
 		if(form == HeaderForm.DEFAULT)
 			return;
-		
-//		if(form == HeaderForm.COMPACT) {			 
+
+//		if(form == HeaderForm.COMPACT) {
 //			for(String fullName : headerFull2CompactNamesMappings.keySet()) {
 //				if(message.getHeader(fullName) != null) {
 //					try {
@@ -1700,7 +1701,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 //			}
 //		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipServletMessage#setParameterableHeader(java.lang.String, javax.servlet.sip.Parameterable)
@@ -1709,7 +1710,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		if(logger.isDebugEnabled()) {
         	logger.debug("setParameterableHeader - name=" + name + ", param=" + param);
         }
-		
+
 		checkCommitted();
 		if(isSystemHeader(getModifiableRule(name))) {
 			throw new IllegalArgumentException(name + " is a system header !");
@@ -1729,23 +1730,23 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	 * and responses, 3xx and 485 responses, and 200/OPTIONS responses.
 	 * Additionally, for containers implementing the reliable provisional
 	 * responses extension, RAck and RSeq are considered system headers also.
-	 * 
+	 *
 	 * This method should return true if passed name - full or compact is name
 	 * of system header in context of this message. Each subclass has to
 	 * implement it in the manner that it conforms to semantics of wrapping
 	 * class
-	 * 
+	 *
 	 * @param headerName -
 	 *            either long or compact header name
 	 * @return
 	 */
 	public abstract ModifiableRule getModifiableRule(String headerName);
 
-        static final String SYS_HDR_MOD_OVERRIDE ="org.restcomm.servlets.sip.OVERRIDE_SYSTEM_HEADER_MODIFICATION";
+        static final String SYS_HDR_MOD_OVERRIDE = INTERNAL_ATT_PREFIX + ".OVERRIDE_SYSTEM_HEADER_MODIFICATION";
 
         /**
          * Allows to override the System header modifiable rule assignment.
-         * 
+         *
          * @return if the InitParameter is present at servletContext, or null
          * otherwise
          */
@@ -1760,10 +1761,10 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
                     overridenRule = ModifiableRule.valueOf(overridenRuleStr);
                 }
             }
-            return overridenRule;            
+            return overridenRule;
         }
-        
-        
+
+
 
 	/**
 	 * Applications must not add, delete, or modify so-called "system" headers.
@@ -1773,12 +1774,12 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	 * and responses, 3xx and 485 responses, and 200/OPTIONS responses.
 	 * Additionally, for containers implementing the reliable provisional
 	 * responses extension, RAck and RSeq are considered system headers also.
-	 * 
+	 *
 	 * This method should return true if passed name - full or compact is name
 	 * of system header in context of this message. Each subclass has to
 	 * implement it in the manner that it conforms to semantics of wrapping
 	 * class
-	 * 
+	 *
 	 * @param headerName -
 	 *            either long or compact header name
 	 * @return
@@ -1790,7 +1791,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Support for GRUU https://github.com/Mobicents/sip-servlets/issues/51
 	 * if the header contains one of the gruu, gr, temp-gruu or pub-gruu, it is allowed to set the Contact Header
@@ -1798,8 +1799,8 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	 */
 	public static boolean isSystemHeaderAndNotGruu(ModifiableRule modifiableRule, Parameterable parameterable) {
 		boolean isSettingGruu = false;
-		if(modifiableRule == ModifiableRule.ContactSystem && 
-				(parameterable.getParameter("gruu") != null || 
+		if(modifiableRule == ModifiableRule.ContactSystem &&
+				(parameterable.getParameter("gruu") != null ||
 					parameterable.getParameter("gr") != null)) {
 			isSettingGruu = true;
 			if (logger.isDebugEnabled())
@@ -1807,10 +1808,10 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		}
 		return !isSettingGruu && isSystemHeader(modifiableRule);
 	}
-	
+
 	public static boolean isSystemHeaderAndNotGruu(ModifiableRule modifiableRule, String value) {
 		boolean isSettingGruu = false;
-		if(modifiableRule == ModifiableRule.ContactSystem && 
+		if(modifiableRule == ModifiableRule.ContactSystem &&
 				(value.indexOf("gruu") != -1 ||
 					value.indexOf("gr=") != -1)) {
 			isSettingGruu = true;
@@ -1819,11 +1820,11 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		}
 		return !isSettingGruu && isSystemHeader(modifiableRule);
 	}
-	
+
 	/**
 	 * This method checks if passed name is name of address type header -
 	 * according to rfc 3261
-	 * 
+	 *
 	 * @param headerName -
 	 *            name of header - either full or compact
 	 * @return
@@ -1837,7 +1838,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	/**
 	 * This method tries to resolve header name - meaning if it is compact - it
 	 * returns full name, if its not, it returns passed value.
-	 * 
+	 *
 	 * @param headerName
 	 * @return
 	 */
@@ -1861,7 +1862,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	 * compact form it is returned, otherwise method tries to find compact name -
 	 * if it is found, string rpresenting compact name is returned, otherwise
 	 * null!!!
-	 * 
+	 *
 	 * @param headerName
 	 * @return
 	 */
@@ -1912,7 +1913,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		if (logger.isDebugEnabled()) {
 			logger.debug("transaction " + transaction + " transactionId = " + transactionId + " transactionType " + transactionType);
 		}
-		if(transaction == null && transactionId != null) {            
+		if(transaction == null && transactionId != null) {
 			// used for early dialog failover purposes, lazily load the transaction
             setTransaction(((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).findTransaction(transactionId, transactionType));
             if(transaction != null) {
@@ -1962,7 +1963,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	public void setTransport(String transport) {
 		this.transport = transport;
 	}
-	
+
 	protected static int countChars(String string, char c) {
 		int count = 0;
 		for(int w=0; w<string.length(); w++) {
@@ -1983,7 +1984,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		String stringHeader = whole.substring(whole.indexOf(":") + 1).trim();
 //		if (!stringHeader.contains("<") || !stringHeader.contains(">")
 //				|| !isParameterable(getFullHeaderName(hName))) {
-		
+
 		Map<String, String> paramMap = new HashMap<String, String>();
 		String value = stringHeader;
 		String displayName = null;
@@ -1993,29 +1994,29 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			String displayNameString = stringHeader.substring(1);
 			int nextIndexOfDoubleQuote = displayNameString.indexOf("\"");
 			displayName = stringHeader.substring(0, nextIndexOfDoubleQuote + 2);
-			stringHeader = stringHeader.substring(nextIndexOfDoubleQuote + 2).trim();			
+			stringHeader = stringHeader.substring(nextIndexOfDoubleQuote + 2).trim();
 		}
-		
+
 		boolean hasLaRaQuotes = false;
 		if(stringHeader.trim().indexOf("<") == 0) {
-			
+
 			stringHeader = stringHeader.substring(1);
 			int indexOfBracket = stringHeader.indexOf(">");
 			if(indexOfBracket != -1) {
 				hasLaRaQuotes = true;
 			}
 			//String[] split = stringHeader.split(">");
-			
-			value = stringHeader.substring(0, indexOfBracket);//split[0];	
+
+			value = stringHeader.substring(0, indexOfBracket);//split[0];
 			String restOfHeader = stringHeader.substring(indexOfBracket+1) ;
-			
+
 			if (restOfHeader.length() > 1 && restOfHeader.contains(";")) {
 				// repleace first ";" with "" because it separates us from the URI that we romved
 				restOfHeader = restOfHeader.replaceFirst(";", "");
 				String[] split = restOfHeader.split(";");
-				
+
 				// Now concatenate the items that have quotes that represent nested parameters http://code.google.com/p/sipservlets/issues/detail?id=105
-				// example <sip:1.2.3.4:5061>;expires=500;+sip.instance="<urn:uuid:00000000-0000-0000-0000-000000000000>";gruu="sip:100@ocs14.com;opaque=user:epid:xxxxxxxxxxxxxxxxxxxxxxxx;gruu" 
+				// example <sip:1.2.3.4:5061>;expires=500;+sip.instance="<urn:uuid:00000000-0000-0000-0000-000000000000>";gruu="sip:100@ocs14.com;opaque=user:epid:xxxxxxxxxxxxxxxxxxxxxxxx;gruu"
 				ArrayList<StringBuffer> resplitListWithQuotes = new ArrayList<StringBuffer>(); // here we collect the items and append related entries that are part of the same quotation zone
 				int resplitIndex = 0;
 				boolean addToPrevious = false;
@@ -2031,7 +2032,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 							addToPrevious = true;
 						}
 					} else { // if mod 2 then there are no unclosed quotes in that item
-						if(addToPrevious) { // we will add any data 
+						if(addToPrevious) { // we will add any data
 							resplitListWithQuotes.get(resplitIndex-1).append(";" + split[q]); // must reappend the ";" symbol because we lost it in the split
 						} else {
 							resplitListWithQuotes.add(new StringBuffer(split[q])); // this is the normal case without quotes to take care of
@@ -2039,19 +2040,19 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 						}
 					}
 				}
-				
+
 				if(addToPrevious) {
 					// Lets warn if something is really that wrong
 					throw new RuntimeException("Unclosed quote sign in this string " + whole);
 				}
-				
+
 				// Change the split array now with the adjusted array
 				String[] newSplit = new String[resplitListWithQuotes.size()];
 				for(int q=0; q<resplitListWithQuotes.size(); q++) {
 					newSplit[q] = resplitListWithQuotes.get(q).toString();
 				}
 				split = newSplit;
-				
+
 				// And process with the usual algorithm
 				for (String pair : split) {
 					int indexOfEq = pair.indexOf('=');
@@ -2068,7 +2069,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 							val = pair.substring(indexOfEq+1);
 						}
 					}
-					
+
 					// Fix to Issue 1010 (http://code.google.com/p/mobicents/issues/detail?id=1010) : Unable to set flag parameter to parameterable header
 					// from Alexander Kozlov from Codeminders
 					paramMap.put(key, val);
@@ -2078,9 +2079,9 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			if (value.length() > 1 && value.contains(";")) {
 				// repleace first ";" with ""
 				String parameters = value.substring(value.indexOf(";") + 1);
-				value = value.substring(0, value.indexOf(";"));				
+				value = value.substring(0, value.indexOf(";"));
 				String[] split = parameters.split(";");
-	
+
 				for (String pair : split) {
 					String[] vals = pair.split("=");
 					if (vals.length > 2) {
@@ -2091,7 +2092,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 								"Wrong parameter format, expected value or name["
 										+ pair + "]");
 					}
-					// Fix to Issue 1010 (http://code.google.com/p/mobicents/issues/detail?id=1010) : Unable to set flag parameter to parameterable header 
+					// Fix to Issue 1010 (http://code.google.com/p/mobicents/issues/detail?id=1010) : Unable to set flag parameter to parameterable header
 					// from Alexander Kozlov from Codeminders
 					paramMap.put(vals[0], vals.length == 2 ? vals[1] : "");
 				}
@@ -2099,9 +2100,9 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			    // Deals with https://code.google.com/p/sipservlets/issues/detail?id=239
                 // repleace first ";" with ""
 //                String parameters = value.substring(value.indexOf(",") + 1);
-//                value = value.substring(0, value.indexOf(","));             
+//                value = value.substring(0, value.indexOf(","));
                 String[] split = value.split(",");
-    
+
                 for (String pair : split) {
                     String[] vals = pair.split("=");
                     if (vals.length > 2) {
@@ -2121,13 +2122,13 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
                     paramMap.put(vals[0], paramValue);
                 }
             }
-		}		
-		
+		}
+
 		// quotes are parts of the value as well as the display Name
 		if(hasLaRaQuotes) {
 			value = "<" + value + ">";
 		}
-		
+
 		// if a display name is present then we need add the quote back
 		if(displayName != null) {
 			value = displayName.concat(value);
@@ -2183,8 +2184,8 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	 */
 	public void setCurrentApplicationName(String currentApplicationName) {
 		this.currentApplicationName = currentApplicationName;
-	}	
-	
+	}
+
 
 	/*
 	 * (non-Javadoc)
@@ -2196,9 +2197,9 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			return sipTransaction.getHost();
 		} else {
 			final String transport = JainSipUtils.findTransport(message);
-			final MobicentsExtendedListeningPoint listeningPoint = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(transport, false);		
+			final MobicentsExtendedListeningPoint listeningPoint = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(transport, false);
 			return listeningPoint.getHost(true);
-		}		
+		}
 	}
 
 	/*
@@ -2211,13 +2212,13 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			return sipTransaction.getPort();
 		} else {
 			final String transport = JainSipUtils.findTransport(message);
-			final MobicentsExtendedListeningPoint listeningPoint = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(transport, false);		
+			final MobicentsExtendedListeningPoint listeningPoint = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(transport, false);
 			return listeningPoint.getPort();
 		}
 	}
 	// Fix for Issue 1552 http://code.google.com/p/mobicents/issues/detail?id=1552
 	// Container does not recognise 100rel if there are other extensions on the Require or Supported line
-	// we check all the values of Require and Supported headers to make sure the 100rel is present	
+	// we check all the values of Require and Supported headers to make sure the 100rel is present
 	protected boolean containsRel100(Message message) {
 		ListIterator<SIPHeader> requireHeaders = message.getHeaders(RequireHeader.NAME);
 		if(requireHeaders != null) {
@@ -2237,21 +2238,21 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		}
 		return false;
 	}
-	
+
 	public abstract void cleanUp();
-	
+
 	protected Map<String, Object> getAttributeMap() {
 		if(this.attributes == null) {
 			this.attributes = new ConcurrentHashMap<String, Object>();
 		}
 		return this.attributes;
 	}
-	
+
 	// Issue 2354
 	protected void setAttributeMap(Map<String, Object> atttributes) {
 		this.attributes = atttributes;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
@@ -2303,7 +2304,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			if(transactionId != null) {
 				if(transactionId.equals("")) {
 					transactionId = null;
-				} else { 
+				} else {
 					transactionType = in.readBoolean();
 					if (logger.isDebugEnabled()) {
 						logger.debug("readExternal transactionType = " + transactionType);
@@ -2312,7 +2313,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			}
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
@@ -2321,7 +2322,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		if(logger.isDebugEnabled()) {
         	logger.debug("writeExternal - sessionKey=" + sessionKey);
         }
-		
+
 		out.writeObject(sipFactoryImpl);
 		if(sessionKey != null) {
 			out.writeUTF(sessionKey.toString());
@@ -2337,10 +2338,10 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			Object[][] attributesArray = new Object[2][attributes.size()];
 			int i = 0;
 			for (Entry<String, Object> entry : attributes.entrySet()) {
-				attributesArray [0][i] = entry.getKey(); 
+				attributesArray [0][i] = entry.getKey();
 				attributesArray [1][i] = entry.getValue();
 				i++;
-			}		
+			}
 			out.writeObject(attributesArray);
 		} else {
 			out.writeInt(0);
@@ -2357,7 +2358,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		} else {
 			out.writeUTF("");
 		}
-		out.writeBoolean(isMessageSent);		
+		out.writeBoolean(isMessageSent);
 		if(ReplicationStrategy.EarlyDialog == StaticServiceHolder.sipStandardService.getReplicationStrategy()) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("writeExternal transaction = " + transaction);
@@ -2406,8 +2407,8 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		return true;
 	}
 
-	
-	
+
+
 //	public void cleanUp() {
 //		if(logger.isDebugEnabled()) {
 //			logger.debug("cleaning up the message " + message);
@@ -2420,13 +2421,13 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 //		dialog = null;
 //		headerForm= null;
 //		message= null;
-//		
+//
 //		remoteAddr = null;
 ////		sessionKey = null;
-////		sipFactoryImpl = null;		
+////		sipFactoryImpl = null;
 //		sipSession = null;
 //		method = null;
-//		
+//
 ////		if(transactionApplicationData != null) {
 ////			transactionApplicationData.cleanUp(false);
 //			transactionApplicationData = null;
@@ -2444,19 +2445,19 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 
 	public boolean isOrphan() {
 		return orphan;
-	}	
+	}
 
 	public String getAppSessionId() {
 		return appSessionId;
 	}
-	
+
 	public void setAppSessionId(String appSessionId) {
 		if(logger.isDebugEnabled()) {
         	logger.debug("setAppSessionId - appSessionId=" + appSessionId);
         }
 		this.appSessionId = appSessionId;
 	}
-	
+
 	public boolean isMessageSent() {
         return isMessageSent;
     }

@@ -54,20 +54,26 @@ import org.mobicents.servlet.sip.ruby.SipRubyController;
 public interface SipContext {
 
 	public static final String APPLICATION_SIP_XML = "WEB-INF/sip.xml";
-	
-	public static final String LOAD_BALANCER = "org.mobicents.servlet.sip.LoadBalancer";	
-	
+
+	public static final String LOAD_BALANCER = "org.mobicents.servlet.sip.LoadBalancer";
+
+        /**
+         * This prefix will be used to name internal session attributes, or context
+         * params that are specially managed by the container.
+         */
+        public static final String INTERNAL_ATT_PREFIX = "org.restcomm.servlets.sip";
+
 	String getApplicationName();
 	String getApplicationNameHashed();
 
 	boolean hasDistributableManager();
-	
+
 	void setApplicationName(String applicationName);
 
 	String getDescription();
-	
+
 	void setDescription(String description);
-	
+
 	String getLargeIcon();
 
 	void setLargeIcon(String largeIcon);
@@ -77,82 +83,82 @@ public interface SipContext {
 	void setListeners(SipListeners listeners);
 
 	boolean isMainServlet();
-	
+
 	String getMainServlet();
 
 	void setMainServlet(String mainServlet);
-	
+
 	void setServletHandler(String servletHandler);
 	String getServletHandler();
 
 	int getProxyTimeout();
-	
+
 	void setProxyTimeout(int proxyTimeout);
-	
+
 	int getSipApplicationSessionTimeout();
-	
-	void setSipApplicationSessionTimeout(int proxyTimeout);	
-	
+
+	void setSipApplicationSessionTimeout(int proxyTimeout);
+
 	String getSmallIcon();
 
 	void setSmallIcon(String smallIcon);
 
 	void addSipApplicationListener(String listener);
-	
+
 	void removeSipApplicationListener(String listener);
-	
+
 	String[] findSipApplicationListeners();
-	
+
 	Method getSipApplicationKeyMethod();
-	
+
 	void setSipApplicationKeyMethod(Method sipApplicationKeyMethod);
-	
+
 	void setSipLoginConfig(MobicentsSipLoginConfig config);
-	
+
 	MobicentsSipLoginConfig getSipLoginConfig();
-	
+
 	void addSipServletMapping(MobicentsSipServletMapping sipServletMapping);
-	
+
 	void removeSipServletMapping(MobicentsSipServletMapping sipServletMapping);
-	
+
 	List<MobicentsSipServletMapping> findSipServletMappings();
-	
+
 	MobicentsSipServletMapping findSipServletMappings(SipServletRequest sipServletRequest);
-		
+
 	SipManager getSipManager();
-	
-	SipApplicationDispatcher getSipApplicationDispatcher();	
+
+	SipApplicationDispatcher getSipApplicationDispatcher();
 
 	String getEngineName();
 
 	boolean notifySipContextListeners(SipContextEvent event);
-	
+
 	/**
 	 * notify the application that we are going to access it with the sipapplicationsession and sip session in parameter and tells whether or not to check
 	 * if we are in a managed thread to check if we should lock the session or not
 	 * @param sipApplicationSession the sip application session that is accessing the application, it can be null
 	 * @param sipSession the sip session that is accessing the application, it can be null
-	 * @param checkIsManagedThread need to check if the access is done within a managed Thread or not to lock or not the session depending on the concurrency control 
+	 * @param checkIsManagedThread need to check if the access is done within a managed Thread or not to lock or not the session depending on the concurrency control
 	 */
 	void enterSipApp(MobicentsSipApplicationSession sipApplicationSession, MobicentsSipSession sipSession, boolean checkIsManagedThread, boolean isContainerManaged);
 	/**
-	 * notify the application that we are going to exit it with the sipapplicationsession and sip session in parameter 
+	 * notify the application that we are going to exit it with the sipapplicationsession and sip session in parameter
 	 * @param sipApplicationSession the sip application session that is exiting the application, it can be null
 	 * @param sipSession the sip session that is exiting the application, it can be null
-	 * 
+	 *
 	 */
 	void exitSipApp(MobicentsSipApplicationSession sipApplicationSession, MobicentsSipSession sipSession);
-	
+
 	//Issue http://code.google.com/p/mobicents/issues/detail?id=2452
 	// Returning boolean vlaue and new parameter batchStarted to decide whether or not to end the batch
 	boolean enterSipAppHa(boolean startCacheActivity);
 	void exitSipAppHa(MobicentsSipServletRequest request, MobicentsSipServletResponse response, boolean batchStarted);
-	
+
 	SipFactory getSipFactoryFacade();
-	
+
 	MobicentsSipSessionsUtil getSipSessionsUtil();
-	
-	TimerService getTimerService();	
+
+	TimerService getTimerService();
 	ProxyTimerService getProxyTimerService();
 	SipApplicationSessionTimerService getSipApplicationSessionTimerService();
 
@@ -161,17 +167,17 @@ public interface SipContext {
 
 	void setSipRubyController(SipRubyController rubyController);
 	SipRubyController getSipRubyController();
-	
+
 	ServletContext getServletContext();
 	String getPath();
 	MobicentsSipServlet findSipServletByClassName(String canonicalName);
 	MobicentsSipServlet findSipServletByName(String name);
-	
+
 	ClassLoader getSipContextClassLoader();
 	Map<String, MobicentsSipServlet> getChildrenMap();
-	
+
 	boolean isPackageProtectionEnabled();
-	
+
 	boolean authorize(MobicentsSipServletRequest request);
 	SipDigestAuthenticator getDigestAuthenticator();
 
@@ -181,11 +187,11 @@ public interface SipContext {
 	/**
 	 * Stop the Context GraceFully, ie the context will stop only when  there is no outstanding SIP or HTTP Sessions
 	 * @param timeToWait - the context will wait for the time specified in this parameter before forcefully killing
-	 * the remaining sessions (HTTP and SIP) for each application deployed, if a negative value is provided the context 
+	 * the remaining sessions (HTTP and SIP) for each application deployed, if a negative value is provided the context
 	 * will wait until there is no remaining Session before shutting down
 	 */
 	void stopGracefully(long timeToWait);
 	boolean isStoppingGracefully();
-        
+
         void setGracefulInterval(long gracefulInterval);
 }

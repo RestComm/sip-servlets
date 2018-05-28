@@ -957,7 +957,6 @@ public class SipSessionImpl implements MobicentsSipSession {
 		if(logger.isInfoEnabled()) {
 			logger.info("Invalidating the sip session " + key);
 		}
-                B2buaHelperImpl b2buaHelper = getB2buaHelper();
 
 		/*
          * Compute how long this session has been alive, and update
@@ -1116,10 +1115,6 @@ public class SipSessionImpl implements MobicentsSipSession {
 		// because it will try to get the B2BUAHelper after the session has been invalidated
 //		sipApplicationSession = null;
 		manager = null;
-		if(b2buaHelper != null) {
-                    //this will remove the linking so infinite loop is prevented
-			b2buaHelper.unlinkSipSessionsInternal(this, false);
-		}
 		derivedSipSessions = null;
 		// not collecting it here to avoid race condition from
 		// http://code.google.com/p/mobicents/issues/detail?id=2130#c19
@@ -2018,12 +2013,13 @@ public class SipSessionImpl implements MobicentsSipSession {
      * @return true if session is part of B2BUA but not linked to any session.
      */
     public boolean isB2BUAOrphan() {
-        boolean orphan = getB2buaHelper() != null &&
+        boolean b2bUAOrphan = getB2buaHelper() != null &&
+                !getB2buaHelper().getSessionMap().isEmpty() &&
                 getB2buaHelper().getLinkedSession(this) == null;
         if(logger.isDebugEnabled()) {
-            logger.debug("isB2BUAOrphan:" + orphan);
+            logger.debug("isB2BUAOrphan:" + b2bUAOrphan);
         }
-        return orphan;
+        return b2bUAOrphan;
     }
     /**
      * This method is called immediately when the conditions for read to invalidate
