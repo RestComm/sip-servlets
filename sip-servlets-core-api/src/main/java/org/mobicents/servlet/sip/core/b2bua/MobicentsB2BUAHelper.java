@@ -30,7 +30,6 @@ import javax.servlet.sip.SipSession;
 import org.mobicents.servlet.sip.core.MobicentsSipFactory;
 import org.mobicents.servlet.sip.core.SipManager;
 import org.mobicents.servlet.sip.core.message.MobicentsSipServletRequest;
-import org.mobicents.servlet.sip.core.session.MobicentsSipSessionKey;
 
 /**
  * Extenstion from the B2BUAHelpr from Sip Servlets spec giving access to internals
@@ -47,6 +46,6 @@ public interface MobicentsB2BUAHelper extends B2buaHelper {
 	void unlinkRequestInternal(MobicentsSipServletRequest sipServletMessage,
 			boolean b);
 	void unlinkSipSessionsInternal(SipSession sipSession, boolean b);
-	Map<MobicentsSipSessionKey, MobicentsSipSessionKey> getSessionMap();
+	Map<String, String> getSessionMap();
 
 }
