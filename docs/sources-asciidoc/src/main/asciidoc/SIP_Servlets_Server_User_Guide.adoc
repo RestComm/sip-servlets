@@ -64,11 +64,11 @@ include::concept-chapter-Best_Practices.adoc[]
 
 :leveloffset: 0
 
-:leveloffset: 1
+#:leveloffset: 1
 
-include::concept-chapter-Appendix.adoc[]
+#include::concept-chapter-Appendix.adoc[]
 
-:leveloffset: 0
+#:leveloffset: 0
 
 :leveloffset: 1
 

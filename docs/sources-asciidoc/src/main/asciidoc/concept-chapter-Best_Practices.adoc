@@ -115,7 +115,7 @@ The full list of JAIN SIP stack properties is available from https://mobicents.c
 
 === Tuning The JVM
 
-The following tuning information applies to Sun JDK 1.6, however the information should also apply to Sun JDK 1.5.
+The following tuning information applies to Sun JDK 1.7
 
 [NOTE]
 ====

@@ -41,9 +41,6 @@ If you leave these two options out, the keytool command will ask you for it.
 +
 -keyalg specifies which algorithm to use when generating the keys and the keysize how long those keys should be.
 +
-Note: the command -genkeypair is new in JDK 6 and was previously named -genkey.
-The keytool in JDK 6 has some improvements over the previous versions so it is recommended to use it instead.
-+
 See more about the Java keytool here: http://docs.oracle.com/javase/6/docs/technotes/tools/solaris/keytool.html
 
 . Configure the SIP Servlet Container
