@@ -4861,7 +4861,7 @@ WebRTCommMessage.prototype.getFrom= function() {
 };
 
 /**
- * Get message recever identity
+ * Get message receiver identity
  * @public
  * @returns {String} to  
  */ 
