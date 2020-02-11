@@ -261,7 +261,7 @@
 		<repository>
 			<id>telscale-releases-repository</id>
 			<name>TelScale Releases Repository</name>
-			<url>http://telestax.artifactoryonline.com/telestax/releases</url>
+			<url>https://telestax.artifactoryonline.com/telestax/releases</url>
 			<releases>
 				<enabled>true</enabled>
 				<updatePolicy>never</updatePolicy>
@@ -274,7 +274,7 @@
 		<repository>
 			<id>telscale-snapshots-repository</id>
 			<name>TelScale Snapshots Repository</name>
-			<url>http://telestax.artifactoryonline.com/telestax/snapshots</url>
+			<url>https://telestax.artifactoryonline.com/telestax/snapshots</url>
 			<releases>
 				<enabled>false</enabled>
 				<updatePolicy>never</updatePolicy>

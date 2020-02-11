@@ -328,7 +328,7 @@
     <repositories>
         <repository>
             <id>equalsverifier-repository</id>
-            <url>http://equalsverifier.googlecode.com/svn/maven/</url>
+            <url>https://equalsverifier.googlecode.com/svn/maven/</url>
         </repository>
     </repositories>
 </project>
