@@ -28,7 +28,7 @@
 		<!-- <sipservletapi.version>7.0.3.272</sipservletapi.version> -->
 		<sipservletapi.version>7.0.3-TelScale-SNAPSHOT</sipservletapi.version>
 		<version.org.apache.tomcat>7.0.29</version.org.apache.tomcat>
-		<junit.version>4.11</junit.version>
+		<junit.version>4.13.1</junit.version>
 		<sipunit.version>2.0.0</sipunit.version>
 		<log4j.version>1.2.17</log4j.version>
 
