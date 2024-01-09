@@ -1,10 +1,5 @@
-
-[Try Restcomm Cloud NOW for FREE!](https://www.restcomm.com/sign-up/) Zero download and install required.
-
-
-All Restcomm [docs](https://www.restcomm.com/docs/) and [downloads](https://www.restcomm.com/downloads/) are now available at [Restcomm.com](https://www.restcomm.com).
-
-
+> [!NOTE]  
+> On 29 June 2023, Mobius Software LTD signed an agreement with Mavenir to assume development and support of the RestcommOne on prem products.  For more details regarding open source / commercial differentiation, roadmap, licensing and other details please visit the [Mobius Website](https://www.mobius-software.com/telestaxannouncement).
 
 
 RestComm Sip Servlets
