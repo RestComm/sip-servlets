@@ -537,7 +537,7 @@
 			<id>java.net-Public</id>
 			<name>Maven Java Net Snapshots and Releases</name>
 			<!--url>https://maven.java.net/content/groups/public/</url -->
-			<url>http://download.java.net/maven/2/</url>
+			<url>https://download.java.net/maven/2/</url>
 			<releases>
 				<enabled>true</enabled>
 				<updatePolicy>never</updatePolicy>
@@ -550,7 +550,7 @@
 		<repository>
 			<id>backup.repository.jboss.org</id>
 			<name>JBoss Repository Backup</name>
-			<url>http://anonsvn.jboss.org/repos/repository.jboss.org/maven2/</url>
+			<url>https://anonsvn.jboss.org/repos/repository.jboss.org/maven2/</url>
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
